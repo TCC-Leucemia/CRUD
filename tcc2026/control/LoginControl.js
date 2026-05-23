@@ -1,0 +1,81 @@
+const LoginService = require("../service/LoginService");
+
+module.exports = class LoginControl {
+
+    #service;
+
+    constructor(banco) {
+        console.log("LoginControl.constructor");
+        this.#service = new LoginService(banco);
+    }
+
+    store = async (req, res, next) => {
+        try {
+            const result = await this.#service.create(req.body);
+
+            res.status(201).send({
+                status: true,
+                msg: "Criado com sucesso",
+                dados: result
+            });
+
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    index = async (req, res, next) => {
+        try {
+            const result = await this.#service.findAll();
+            res.status(200).send({ status: true, dados: result });
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    show = async (req, res, next) => {
+        try {
+            const result = await this.#service.findById(req.params.id);
+            res.status(200).send({ status: true, dados: result });
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    update = async (req, res, next) => {
+        try {
+            const result = await this.#service.update(req.params.id, req.body);
+            res.status(200).send({
+                status: true,
+                msg: result.atualizado
+                    ? "Atualizado com sucesso."
+                    : "Nenhuma alteração foi feita."
+            });
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    destroy = async (req, res, next) => {
+        try {
+            await this.#service.delete(req.params.id);
+
+            res.status(200).send({
+                status: true,
+                msg: "Deletado com sucesso."
+            });
+
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    login = async (req, res, next) => {
+        try {
+            const user = await this.#service.login(req.body);
+            res.status(200).send({ status: true, dados: user });
+        } catch (err) {
+            next(err);
+        }
+    }
+}

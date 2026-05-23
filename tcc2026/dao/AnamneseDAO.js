@@ -1,0 +1,139 @@
+module.exports = class AnamneseDAO {
+
+    #banco;
+
+    constructor(banco) {
+        this.#banco = banco;
+    }
+
+    create = async (anamnese) => {
+
+        const sql = `
+            INSERT INTO anamnese
+            (cpf, crm, id_consulta, sintomas, comorbidades)
+            VALUES (?, ?, ?, ?, ?)
+        `;
+
+        const valores = [
+            anamnese.cpf,
+            anamnese.crm,
+            anamnese.id_consulta,
+            anamnese.sintomas,
+            anamnese.comorbidades
+        ];
+
+        return new Promise((resolve, reject) => {
+
+            this.#banco.query(sql, valores, (erro, resultado) => {
+
+                if (erro) {
+                    reject(erro);
+                } else {
+                    resolve(resultado);
+                }
+
+            });
+
+        });
+    }
+
+    findAll = async () => {
+
+        const sql = `SELECT * FROM anamnese`;
+
+        return new Promise((resolve, reject) => {
+
+            this.#banco.query(sql, (erro, resultado) => {
+
+                if (erro) {
+                    reject(erro);
+                } else {
+                    resolve(resultado);
+                }
+
+            });
+
+        });
+    }
+
+    findById = async (id) => {
+
+        const sql = `
+            SELECT * FROM anamnese
+            WHERE id_anamnese = ?
+        `;
+
+        return new Promise((resolve, reject) => {
+
+            this.#banco.query(sql, [id], (erro, resultado) => {
+
+                if (erro) {
+                    reject(erro);
+                } else {
+                    resolve(resultado[0]);
+                }
+
+            });
+
+        });
+    }
+
+    update = async (anamnese) => {
+
+        const sql = `
+            UPDATE anamnese
+            SET
+                cpf = ?,
+                crm = ?,
+                id_consulta = ?,
+                sintomas = ?,
+                comorbidades = ?
+            WHERE id_anamnese = ?
+        `;
+
+        const valores = [
+            anamnese.cpf,
+            anamnese.crm,
+            anamnese.id_consulta,
+            anamnese.sintomas,
+            anamnese.comorbidades,
+            anamnese.id_anamnese
+        ];
+
+        return new Promise((resolve, reject) => {
+
+            this.#banco.query(sql, valores, (erro, resultado) => {
+
+                if (erro) {
+                    reject(erro);
+                } else {
+                    resolve(resultado);
+                }
+
+            });
+
+        });
+    }
+
+    delete = async (id) => {
+
+        const sql = `
+            DELETE FROM anamnese
+            WHERE id_anamnese = ?
+        `;
+
+        return new Promise((resolve, reject) => {
+
+            this.#banco.query(sql, [id], (erro, resultado) => {
+
+                if (erro) {
+                    reject(erro);
+                } else {
+                    resolve(resultado);
+                }
+
+            });
+
+        });
+    }
+}
