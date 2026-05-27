@@ -1,4 +1,5 @@
 const LoginService = require("../service/LoginService");
+const MeuTokenJWT = require("../http/MeuTokenJWT");
 
 module.exports = class LoginControl {
 
@@ -71,11 +72,48 @@ module.exports = class LoginControl {
     }
 
     login = async (req, res, next) => {
-        try {
-            const user = await this.#service.login(req.body);
-            res.status(200).send({ status: true, dados: user });
-        } catch (err) {
-            next(err);
-        }
+
+    try {
+
+        const user =
+            await this.#service.login(req.body);
+
+        const jwt = new MeuTokenJWT();
+
+        const token = jwt.gerarToken({
+
+            id_usuario: user.id_usuario,
+
+            nome: user.nome,
+
+            email: user.email,
+
+            role: user.tipo,
+
+            crm: user.crm
+        });
+
+        res.status(200).send({
+
+            status: true,
+
+            token: token,
+
+            usuario: {
+
+                id_usuario: user.id_usuario,
+
+                nome: user.nome,
+
+                email: user.email,
+
+                role: user.tipo
+            }
+        });
+
+    } catch (err) {
+
+        next(err);
     }
+}
 }

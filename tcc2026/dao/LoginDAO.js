@@ -56,6 +56,36 @@ module.exports = class LoginDAO {
             );
         });
     }
+    findMedicoByEmail = async (email) => {
+
+        const sql = `
+            SELECT
+                l.id_usuario,
+                l.email,
+                l.senha,
+                l.tipo,
+                m.crm,
+                m.nome
+            FROM login l
+            INNER JOIN medicos m
+                ON m.id_usuario = l.id_usuario
+            WHERE l.email = ?
+        `;
+
+        return new Promise((resolve, reject) => {
+
+            this.#banco.query(
+                sql,
+                [email],
+                (err, result) => {
+
+                    if (err) return reject(err);
+
+                    resolve(result[0] || null);
+                }
+            );
+        });
+    }
 
     update = async (login) => {
         const sql = `

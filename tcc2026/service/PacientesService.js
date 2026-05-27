@@ -24,15 +24,53 @@ module.exports = class PacientesService {
         return await this.#dao.create(paciente);
     }
 
-    findAll = async () => {
-        return await this.#dao.findAll();
+    findAll = async (user) => {
+
+        if (user.role === "Administrador") {
+            return await this.#dao.findAll();
+        }
+
+        if (user.role === "Médico") {
+            return await this.#dao.findByMedico(user.crm);
+        }
+
+        throw new ErrorResponse(403,"Acesso negado");
     }
 
-    async findById(cpf) {
-        const paciente = await this.#dao.findById(cpf);
+    findByMedico = async (crm) => {
+
+        return await this.#dao.findByMedico(crm);
+    }
+
+    findById = async (cpf, user) => {
+
+        let paciente;
+
+        if (user.role === "Administrador") {
+
+            paciente = await this.#dao.findById(cpf);
+
+        } else if (user.role === "Médico") {
+
+            paciente = await this.#dao.findByCpfAndMedico(
+                cpf,
+                user.crm
+            );
+
+        } else {
+
+            throw new ErrorResponse(
+                403,
+                "Acesso negado"
+            );
+        }
 
         if (!paciente) {
-            throw new ErrorResponse(404, "Paciente não encontrado");
+
+            throw new ErrorResponse(
+                404,
+                "Paciente não encontrado"
+            );
         }
 
         return paciente;

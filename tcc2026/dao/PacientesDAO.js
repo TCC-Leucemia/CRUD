@@ -48,6 +48,57 @@ module.exports = class PacientesDAO {
         });
     }
 
+    findByMedico = async (crm) => {
+
+        const sql = `
+            SELECT DISTINCT p.*
+            FROM pacientes p
+            INNER JOIN consultas c
+                ON c.cpf = p.cpf
+            WHERE c.crm = ?
+        `;
+
+        return new Promise((resolve, reject) => {
+
+            this.#banco.query(
+                sql,
+                [crm],
+                (err, result) => {
+
+                    if (err) return reject(err);
+
+                    resolve(result);
+                }
+            );
+        });
+    }
+
+    findByCpfAndMedico = async (cpf, crm) => {
+
+        const sql = `
+            SELECT DISTINCT p.*
+            FROM pacientes p
+            INNER JOIN consultas c
+                ON c.cpf = p.cpf
+            WHERE p.cpf = ?
+            AND c.crm = ?
+        `;
+
+        return new Promise((resolve, reject) => {
+
+            this.#banco.query(
+                sql,
+                [cpf, crm],
+                (err, result) => {
+
+                    if (err) return reject(err);
+
+                    resolve(result[0] || null);
+                }
+            );
+        });
+    }
+
     update = async (paciente) => {
         const sql = `
             UPDATE pacientes 

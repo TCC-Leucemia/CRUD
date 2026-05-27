@@ -1,5 +1,6 @@
 const PacientesService = require("../service/PacientesService");
 
+
 module.exports = class PacientesControl {
 
     #service;
@@ -28,17 +29,30 @@ module.exports = class PacientesControl {
     }
 
     index = async (req, res, next) => {
+
         try {
-            const result = await this.#service.findAll();
-            res.status(200).send({ status: true, dados: result });
+
+            const result = await this.#service.findAll(
+                req.user
+            );
+
+            res.status(200).send({
+                status: true,
+                dados: result
+            });
+
         } catch (err) {
+
             next(err);
         }
     }
 
     show = async (req, res, next) => {
         try {
-            const result = await this.#service.findById(req.params.cpf);
+            const result = await this.#service.findById(
+                req.params.cpf,
+                req.user
+            );
             res.status(200).send({ status: true, dados: result });
         } catch (err) {
             next(err);

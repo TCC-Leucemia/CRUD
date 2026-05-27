@@ -109,8 +109,22 @@ module.exports = class LoginService {
 
     login = async (dados) => {
 
-        const user =
-            await this.#dao.findByEmail(dados.email);
+        let user;
+
+        if (dados.tipo === "Médico") {
+
+            user =
+                await this.#dao.findMedicoByEmail(
+                    dados.email
+                );
+
+        } else {
+
+            user =
+                await this.#dao.findByEmail(
+                    dados.email
+                );
+        }
 
         if (!user) {
             throw new ErrorResponse(
@@ -131,7 +145,9 @@ module.exports = class LoginService {
         return {
             id_usuario: user.id_usuario,
             email: user.email,
-            tipo: user.tipo
+            tipo: user.tipo,
+            crm: user.crm,
+            nome: user.nome
         };
     }
 }
