@@ -22,7 +22,7 @@ app.use(express.json());
 
 app.use(express.static('js'));
 
-app.use('/', express.static(__dirname + '/view'));
+//app.use('/', express.static(__dirname + '/view'));
 
 
 const porta = 3000;
@@ -42,6 +42,7 @@ rotas_login(app, banco);
 rotas_enderecos(app, banco);
 rotas_pacientes(app, banco);
 rotas_medicos(app, banco);
+console.log("ROTAS MÉDICOS REGISTRADAS");
 rotas_consultas(app, banco);
 rotas_exames(app, banco);
 rotas_resultados_exame(app, banco);
@@ -71,8 +72,13 @@ app.use((error, request, response, next) => {
 });
 
 
-app.listen(porta, function () {
+app.listen(porta, () => {
 
     console.log("Servidor rodando: " + porta);
     console.log(">> " + host);
-})
+
+    setInterval(() => {
+        console.log("Servidor vivo...");
+    }, 10000);
+
+});
