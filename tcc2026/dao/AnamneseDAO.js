@@ -78,6 +78,50 @@ module.exports = class AnamneseDAO {
         });
     }
 
+    findByCpf = async (cpf) => {
+
+        const sql = `
+            SELECT * FROM anamnese
+            WHERE cpf = ?
+        `;
+
+        return new Promise((resolve, reject) => {
+
+            this.#banco.query(
+                sql,
+                [cpf],
+                (erro, resultado) => {
+
+                    if (erro) reject(erro);
+                    else resolve(resultado);
+
+                }
+            );
+        });
+    }
+
+    findByCrm = async (crm) => {
+
+        const sql = `
+            SELECT * FROM anamnese
+            WHERE crm = ?
+        `;
+
+        return new Promise((resolve, reject) => {
+
+            this.#banco.query(
+                sql,
+                [crm],
+                (erro, resultado) => {
+
+                    if (erro) reject(erro);
+                    else resolve(resultado);
+
+                }
+            );
+        });
+    }
+
     update = async (anamnese) => {
 
         const sql = `

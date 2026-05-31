@@ -38,6 +38,15 @@ module.exports = class ConsultasService {
         return await this.#dao.findAll();
     }
 
+    findByPaciente = async (cpf) => {
+        return await this.#dao.findByPaciente(cpf);
+    }
+
+    findByMedico = async (crm) => {
+        return await this.#dao.findByMedico(crm);
+    }
+
+
     findById = async (id) => {
         const result = await this.#dao.findById(id);
 

@@ -50,6 +50,41 @@ module.exports = class ConsultasDAO {
         });
     }
 
+    findByPaciente(cpf) {
+
+        return new Promise((resolve, reject) => {
+
+            this.#banco.query(
+                "SELECT * FROM consultas WHERE cpf = ?",
+                [cpf],
+                (err, result) => {
+
+                    if (err) return reject(err);
+
+                    resolve(result);
+                }
+            );
+        });
+    }
+
+    findByMedico(crm) {
+
+        return new Promise((resolve, reject) => {
+
+            this.#banco.query(
+                "SELECT * FROM consultas WHERE crm = ?",
+                [crm],
+                (err, result) => {
+
+                    if (err) return reject(err);
+
+                    resolve(result);
+                }
+            );
+        });
+    }
+
+
     update(consulta) {
         const sql = `
             UPDATE consultas 

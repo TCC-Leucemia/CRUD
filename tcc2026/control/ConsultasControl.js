@@ -30,12 +30,39 @@ module.exports = class ConsultasControl {
 
     index = async (req, res, next) => {
         try {
-            const service = new ConsultasService(this.#banco);
-            const data = await service.findAll();
 
-            res.status(200).send({ status: true, dados: data });
+            const service = new ConsultasService(this.#banco);
+
+            let data;
+
+            if (req.user.role === "Administrador") {
+
+                data = await service.findAll();
+
+            } else if (req.user.role === "Médico") {
+
+                data = await service.findByMedico(
+                    req.user.crm
+                );
+
+            } else if (req.user.role === "Paciente") {
+
+                data = await service.findByPaciente(
+                    req.user.cpf
+                );
+
+            } else {
+
+                data = [];
+            }
+
+            res.status(200).send({
+                status: true,
+                dados: data
+            });
 
         } catch (err) {
+
             next(err);
         }
     }

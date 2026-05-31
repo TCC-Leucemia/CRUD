@@ -79,6 +79,14 @@ module.exports = class AnamneseService {
         return anamnese;
     }
 
+    findByCpf = async (cpf) => {
+        return await this.#dao.findByCpf(cpf);
+    }
+
+    findByCrm = async (crm) => {
+        return await this.#dao.findByCrm(crm);
+    }
+
     update = async (id, dados) => {
 
         const existente = await this.#dao.findById(id);

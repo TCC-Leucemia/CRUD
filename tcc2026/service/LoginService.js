@@ -118,6 +118,13 @@ module.exports = class LoginService {
                     dados.email
                 );
 
+        } else if (dados.tipo === "Paciente") {
+
+            user =
+                await this.#dao.findPacienteByEmail(
+                    dados.email
+                );
+
         } else {
 
             user =
@@ -147,6 +154,7 @@ module.exports = class LoginService {
             email: user.email,
             tipo: user.tipo,
             crm: user.crm,
+            cpf: user.cpf,
             nome: user.nome
         };
     }

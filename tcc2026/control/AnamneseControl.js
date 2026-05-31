@@ -37,7 +37,24 @@ module.exports = class AnamneseControl {
 
             const service = new AnamneseService(this.#banco);
 
-            const resultado = await service.findAll();
+            let resultado;
+
+            if (req.user.role === "Paciente") {
+
+                resultado =
+                    await service.findByCpf(
+                        req.user.cpf
+                    );
+
+            }
+            else if (req.user.role === "Médico") {
+
+                resultado =
+                    await service.findByCrm(
+                        req.user.crm
+                    );
+
+            }
 
             res.status(200).send({
                 status: true,

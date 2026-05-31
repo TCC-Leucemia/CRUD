@@ -73,33 +73,14 @@ module.exports = class LoginControl {
 
     login = async (req, res, next) => {
 
-    try {
+        try {
 
-        const user =
-            await this.#service.login(req.body);
+            const user =
+                await this.#service.login(req.body);
 
-        const jwt = new MeuTokenJWT();
+            const jwt = new MeuTokenJWT();
 
-        const token = jwt.gerarToken({
-
-            id_usuario: user.id_usuario,
-
-            nome: user.nome,
-
-            email: user.email,
-
-            role: user.tipo,
-
-            crm: user.crm
-        });
-
-        res.status(200).send({
-
-            status: true,
-
-            token: token,
-
-            usuario: {
+            const token = jwt.gerarToken({
 
                 id_usuario: user.id_usuario,
 
@@ -107,13 +88,34 @@ module.exports = class LoginControl {
 
                 email: user.email,
 
-                role: user.tipo
-            }
-        });
+                role: user.tipo,
 
-    } catch (err) {
+                crm: user.crm,
 
-        next(err);
+                cpf: user.cpf
+            });
+
+            res.status(200).send({
+
+                status: true,
+
+                token: token,
+
+                usuario: {
+
+                    id_usuario: user.id_usuario,
+
+                    nome: user.nome,
+
+                    email: user.email,
+
+                    role: user.tipo
+                }
+            });
+
+        } catch (err) {
+
+            next(err);
+        }
     }
-}
 }

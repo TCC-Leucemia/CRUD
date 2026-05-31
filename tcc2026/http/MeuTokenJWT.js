@@ -65,6 +65,10 @@ module.exports = class MeuTokenJWT {
             payload.crm = claims.crm;
         }
 
+        if (claims.cpf) {
+            payload.cpf = claims.cpf;
+        }
+
         return jwt.sign(
             payload,
             this.#key,
