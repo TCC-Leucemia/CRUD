@@ -12,7 +12,10 @@ module.exports = class ConsultasControl {
         try {
             const service = new ConsultasService(this.#banco);
 
-            const result = await service.create(req.body);
+            const result = await service.create(
+                req.body,
+                req.user
+            );
 
             res.status(201).send({
                 status: true,
@@ -68,22 +71,42 @@ module.exports = class ConsultasControl {
     }
 
     show = async (req, res, next) => {
-        try {
-            const service = new ConsultasService(this.#banco);
-            const data = await service.findById(req.params.id);
 
-            res.status(200).send({ status: true, dados: data });
+        try {
+
+            const service =
+                new ConsultasService(this.#banco);
+
+            const data =
+                await service.validarAcessoConsulta(
+                    req.params.id,
+                    req.user
+                );
+
+            res.status(200).send({
+                status: true,
+                dados: data
+            });
 
         } catch (err) {
+
             next(err);
         }
     }
 
     update = async (req, res, next) => {
-        try {
-            const service = new ConsultasService(this.#banco);
 
-            const result = await service.update(req.params.id, req.body);
+        try {
+
+            const service =
+                new ConsultasService(this.#banco);
+
+            const result =
+            await service.update(
+                req.params.id,
+                req.body,
+                req.user
+            );
 
             res.status(200).send({
                 status: true,
@@ -92,15 +115,23 @@ module.exports = class ConsultasControl {
             });
 
         } catch (err) {
+
             next(err);
         }
     }
 
     destroy = async (req, res, next) => {
-        try {
-            const service = new ConsultasService(this.#banco);
 
-            await service.delete(req.params.id);
+        try {
+
+            const service =
+                new ConsultasService(this.#banco);
+
+
+            await service.delete(
+                req.params.id,
+                req.user
+            );
 
             res.status(200).send({
                 status: true,
@@ -108,6 +139,7 @@ module.exports = class ConsultasControl {
             });
 
         } catch (err) {
+
             next(err);
         }
     }

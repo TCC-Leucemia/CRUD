@@ -35,15 +35,29 @@ module.exports = class ImagensExameControl {
 
         try {
 
-            const service = new ImagensExameService(this.#banco);
+            const service =
+                new ImagensExameService(this.#banco);
 
-            const resultado = await service.findAll();
+            let resultado;
 
+            if (req.user.role === "Paciente") {
+
+                resultado =
+                    await service.findByCpf(
+                        req.user.cpf
+                    );
+            }
+            else if (req.user.role === "Médico") {
+
+                resultado =
+                    await service.findByCrm(
+                        req.user.crm
+                    );
+            }
             res.status(200).send({
                 status: true,
                 dados: resultado
             });
-
         } catch (erro) {
             next(erro);
         }
@@ -54,6 +68,11 @@ module.exports = class ImagensExameControl {
         try {
 
             const service = new ImagensExameService(this.#banco);
+
+            await service.validarAcessoImagem(
+                req.params.id_imagem,
+                req.user
+            );
 
             const resultado = await service.findById(req.params.id_imagem);
 
@@ -72,6 +91,11 @@ module.exports = class ImagensExameControl {
         try {
 
             const service = new ImagensExameService(this.#banco);
+
+            await service.validarAcessoImagem(
+                req.params.id_imagem,
+                req.user
+            );
 
             const resultado = await service.update(
                 req.params.id_imagem,
@@ -94,6 +118,11 @@ module.exports = class ImagensExameControl {
         try {
 
             const service = new ImagensExameService(this.#banco);
+
+            await service.validarAcessoImagem(
+                req.params.id_imagem,
+                req.user
+            );
 
             await service.delete(req.params.id_imagem);
 

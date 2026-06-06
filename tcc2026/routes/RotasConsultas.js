@@ -13,7 +13,10 @@ module.exports = (app, banco) => {
     app.post(
         "/consultas",
         jwtMiddleware.validateToken,
-        roleMiddleware.authorize("Administrador"),
+        roleMiddleware.authorize(
+            "Administrador",
+            "Médico"
+        ),
         middleware.validateBody,
         control.store
     );
@@ -43,7 +46,10 @@ module.exports = (app, banco) => {
     app.put(
         "/consultas/:id",
         jwtMiddleware.validateToken,
-        roleMiddleware.authorize("Administrador"),
+        roleMiddleware.authorize(
+            "Administrador",
+            "Médico"
+        ),
         middleware.validateBody,
         control.update
     );
@@ -51,7 +57,10 @@ module.exports = (app, banco) => {
     app.delete(
         "/consultas/:id",
         jwtMiddleware.validateToken,
-        roleMiddleware.authorize("Administrador"),
+        roleMiddleware.authorize(
+            "Administrador",
+            "Médico"
+        ),
         control.destroy
     );
 }

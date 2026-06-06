@@ -16,19 +16,37 @@ module.exports = class ConsultasService {
         this.#pacientesDAO = new PacientesDAO(banco);
     }
 
-    create = async (dados) => {
+    create = async (dados, user) => {
 
-        const medico = await this.#medicosDAO.findByCRM(dados.crm);
-        if (!medico) {
-            throw new ErrorResponse(404, "Médico não encontrado");
+        if (user.role === "Médico") {
+            dados.crm = user.crm;
         }
 
-        const paciente = await this.#pacientesDAO.findById(dados.cpf);
+        const medico =
+            await this.#medicosDAO.findByCRM(
+                dados.crm
+            );
+
+        if (!medico) {
+            throw new ErrorResponse(
+                404,
+                "Médico não encontrado"
+            );
+        }
+
+        const paciente = await this.#pacientesDAO.findById(
+            dados.cpf
+        );
+
         if (!paciente) {
-            throw new ErrorResponse(404, "Paciente não encontrado");
+            throw new ErrorResponse(
+                404,
+                "Paciente não encontrado"
+            );
         }
 
         const consulta = new Consultas();
+
         Object.assign(consulta, dados);
 
         return await this.#dao.create(consulta);
@@ -46,6 +64,45 @@ module.exports = class ConsultasService {
         return await this.#dao.findByMedico(crm);
     }
 
+    validarAcessoConsulta = async (id, user) => {
+
+        const consulta = await this.#dao.findById(id);
+
+        if (!consulta) {
+            throw new ErrorResponse(
+                404,
+                "Consulta não encontrada"
+            );
+        }
+
+        if (user.role === "Paciente") {
+
+            if (consulta.cpf !== user.cpf) {
+
+                throw new ErrorResponse(
+                    403,
+                    "Acesso negado"
+                );
+            }
+        }
+
+        if (user.role === "Médico") {
+
+            if (consulta.crm !== user.crm) {
+
+                throw new ErrorResponse(
+                    403,
+                    "Acesso negado"
+                );
+            }
+        }
+        if (user.role === "Administrador") {
+            return consulta;
+        }
+
+        return consulta;
+    }
+
 
     findById = async (id) => {
         const result = await this.#dao.findById(id);
@@ -57,46 +114,114 @@ module.exports = class ConsultasService {
         return result;
     }
 
-    update = async (id, dados) => {
+    update = async (id, dados, user) => {
 
-        const existente = await this.#dao.findById(id);
+        const existente =
+            await this.#dao.findById(id);
 
         if (!existente) {
-            throw new ErrorResponse(404, "Consulta não encontrada");
+
+            throw new ErrorResponse(
+                404,
+                "Consulta não encontrada"
+            );
         }
 
-        // valida CRM se enviado
+        if (
+            user.role === "Médico" &&
+            existente.crm !== user.crm
+        ) {
+
+            throw new ErrorResponse(
+                403,
+                "Acesso negado"
+            );
+        }
+
+        if (user.role === "Médico") {
+
+            dados.crm = user.crm;
+        }
+
         if (dados.crm) {
-            const medico = await this.#medicosDAO.findByCRM(dados.crm);
+
+            const medico =
+                await this.#medicosDAO.findByCRM(
+                    dados.crm
+                );
+
             if (!medico) {
-                throw new ErrorResponse(404, "Médico não encontrado");
+
+                throw new ErrorResponse(
+                    404,
+                    "Médico não encontrado"
+                );
             }
         }
 
         if (dados.cpf) {
-            const paciente = await this.#pacientesDAO.findById(dados.cpf);
+
+            const paciente =
+                await this.#pacientesDAO.findById(
+                    dados.cpf
+                );
+
             if (!paciente) {
-                throw new ErrorResponse(404, "Paciente não encontrado");
+
+                throw new ErrorResponse(
+                    404,
+                    "Paciente não encontrado"
+                );
             }
         }
 
         const consulta = new Consultas();
+
         Object.assign(consulta, dados);
+
         consulta.id_consulta = id;
 
-        const result = await this.#dao.update(consulta);
+        const result =
+            await this.#dao.update(consulta);
 
         return {
-            atualizado: result.changedRows > 0
+            atualizado:
+                result.changedRows > 0
         };
     }
 
-    delete = async (id) => {
+    delete = async (id, user) => {
+
+        const consulta =
+            await this.#dao.findById(id);
+
+        if (!consulta) {
+
+            throw new ErrorResponse(
+                404,
+                "Consulta não encontrada"
+            );
+        }
+
+        if (
+            user.role === "Médico" &&
+            consulta.crm !== user.crm
+        ) {
+
+            throw new ErrorResponse(
+                403,
+                "Acesso negado"
+            );
+        }
 
         const result = await this.#dao.delete(id);
 
         if (result.affectedRows === 0) {
-            throw new ErrorResponse(404, "Consulta não encontrada");
+
+            throw new ErrorResponse(
+                404,
+                "Consulta não encontrada"
+            );
         }
 
         return true;

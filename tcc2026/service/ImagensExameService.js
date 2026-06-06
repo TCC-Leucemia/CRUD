@@ -50,6 +50,54 @@ module.exports = class ImagensExameService {
         return imagem;
     }
 
+    findByCpf = async (cpf) => {
+        return await this.#dao.findByCpf(cpf);
+    }
+
+    findByCrm = async (crm) => {
+        return await this.#dao.findByCrm(crm);
+    }
+
+    validarAcessoImagem = async (idImagem,usuario) => {
+
+        const owner =
+            await this.#dao.findOwnerByImagemId(
+                idImagem
+            );
+
+        if (!owner) {
+
+            throw new ErrorResponse(
+                404,
+                "Imagem não encontrada"
+            );
+        }
+
+        if (
+            usuario.role === "Paciente" &&
+            owner.cpf !== usuario.cpf
+        ) {
+
+            throw new ErrorResponse(
+                403,
+                "Acesso negado"
+            );
+        }
+
+        if (
+            usuario.role === "Médico" &&
+            owner.crm !== usuario.crm
+        ) {
+
+            throw new ErrorResponse(
+                403,
+                "Acesso negado"
+            );
+        }
+
+        return true;
+    }
+
     update = async (id, dados) => {
 
         const existente = await this.#dao.findById(id);

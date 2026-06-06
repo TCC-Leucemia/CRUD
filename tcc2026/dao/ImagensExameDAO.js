@@ -77,6 +77,96 @@ module.exports = class ImagensExameDAO {
         });
     }
 
+    findByCpf = async (cpf) => {
+
+        const sql = `
+            SELECT ie.*
+            FROM imagens_exame ie
+            INNER JOIN exames e
+                ON e.id_exame = ie.id_exame
+            INNER JOIN consultas c
+                ON c.id_consulta = e.id_consulta
+            WHERE c.cpf = ?
+        `;
+
+        return new Promise((resolve, reject) => {
+
+            this.#banco.query(
+                sql,
+                [cpf],
+                (erro, resultado) => {
+
+                    if (erro) {
+                        reject(erro);
+                    } else {
+                        resolve(resultado);
+                    }
+                }
+            );
+        });
+    }
+
+    findByCrm = async (crm) => {
+
+        const sql = `
+            SELECT ie.*
+            FROM imagens_exame ie
+            INNER JOIN exames e
+                ON e.id_exame = ie.id_exame
+            INNER JOIN consultas c
+                ON c.id_consulta = e.id_consulta
+            WHERE c.crm = ?
+        `;
+
+        return new Promise((resolve, reject) => {
+
+            this.#banco.query(
+                sql,
+                [crm],
+                (erro, resultado) => {
+
+                    if (erro) {
+                        reject(erro);
+                    } else {
+                        resolve(resultado);
+                    }
+                }
+            );
+        });
+    }
+
+    findOwnerByImagemId = async (idImagem) => {
+
+        const sql = `
+            SELECT
+                ie.id_imagem,
+                c.cpf,
+                c.crm
+            FROM imagens_exame ie
+            INNER JOIN exames e
+                ON e.id_exame = ie.id_exame
+            INNER JOIN consultas c
+                ON c.id_consulta = e.id_consulta
+            WHERE ie.id_imagem = ?
+        `;
+
+        return new Promise((resolve, reject) => {
+
+            this.#banco.query(
+                sql,
+                [idImagem],
+                (erro, resultado) => {
+
+                    if (erro) {
+                        reject(erro);
+                    } else {
+                        resolve(resultado[0] || null);
+                    }
+                }
+            );
+        });
+    }
+
     update = async (imagem) => {
 
         const sql = `
