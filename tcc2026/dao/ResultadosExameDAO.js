@@ -53,6 +53,59 @@ module.exports = class ResultadosExameDAO {
         });
     }
 
+    findByCpf(cpf) {
+
+        const sql = `
+            SELECT re.*
+            FROM resultados_exame re
+            INNER JOIN exames e
+                ON e.id_exame = re.id_exame
+            INNER JOIN consultas c
+                ON c.id_consulta = e.id_consulta
+            WHERE c.cpf = ?
+        `;
+
+        return new Promise((resolve, reject) => {
+
+            this.#banco.query(
+                sql,
+                [cpf],
+                (erro, result) => {
+
+                    if (erro) reject(erro);
+                    else resolve(result);
+                }
+            );
+        });
+    }
+    findByCrm(crm) {
+
+        const sql = `
+            SELECT re.*
+            FROM resultados_exame re
+            INNER JOIN exames e
+                ON e.id_exame = re.id_exame
+            INNER JOIN consultas c
+                ON c.id_consulta = e.id_consulta
+            WHERE c.crm = ?
+        `;
+
+        return new Promise((resolve, reject) => {
+
+            this.#banco.query(
+                sql,
+                [crm],
+                (erro, result) => {
+
+                    if (erro) reject(erro);
+                    else resolve(result);
+                }
+            );
+        });
+    }
+    
+    
+
     async findById(id) {
 
         const sql = `

@@ -49,6 +49,56 @@ module.exports = class ExamesDAO {
         });
     }
 
+    findByCpf(cpf) {
+
+        const sql = `
+            SELECT e.*
+            FROM exames e
+            INNER JOIN consultas c
+                ON c.id_consulta = e.id_consulta
+            WHERE c.cpf = ?
+        `;
+
+        return new Promise((resolve, reject) => {
+
+            this.#banco.query(
+                sql,
+                [cpf],
+                (err, result) => {
+
+                    if (err) return reject(err);
+
+                    resolve(result);
+                }
+            );
+        });
+    }
+
+    findByCrm(crm) {
+
+        const sql = `
+            SELECT e.*
+            FROM exames e
+            INNER JOIN consultas c
+                ON c.id_consulta = e.id_consulta
+            WHERE c.crm = ?
+        `;
+
+        return new Promise((resolve, reject) => {
+
+            this.#banco.query(
+                sql,
+                [crm],
+                (err, result) => {
+
+                    if (err) return reject(err);
+
+                    resolve(result);
+                }
+            );
+        });
+    }
+
     update(exame) {
         const sql = `
             UPDATE exames 

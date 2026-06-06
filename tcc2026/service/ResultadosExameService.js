@@ -48,6 +48,16 @@ module.exports = class ResultadosExameService {
         return resultados;
     }
 
+    findByCpf = async (cpf) => {
+
+        return await this.#dao.findByCpf(cpf);
+    }
+
+    findByCrm = async (crm) => {
+
+        return await this.#dao.findByCrm(crm);
+    }
+
     findById = async (id) => {
 
         const resultado = await this.#dao.findById(id);

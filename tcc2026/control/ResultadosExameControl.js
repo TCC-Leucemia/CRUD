@@ -35,7 +35,24 @@ module.exports = class ResultadosExameControl {
 
         try {
 
-            const result = await this.#service.findAll();
+            let result;
+
+            if (req.user.role === "Paciente") {
+
+                result =
+                    await this.#service.findByCpf(
+                        req.user.cpf
+                    );
+
+            }
+            else if (req.user.role === "Médico") {
+
+                result =
+                    await this.#service.findByCrm(
+                        req.user.crm
+                    );
+
+            }
 
             return res.status(200).send({
                 status: true,

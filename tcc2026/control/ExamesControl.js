@@ -29,7 +29,27 @@ module.exports = class ExamesControl {
 
     index = async (req, res, next) => {
         try {
-            const dados = await this.#service.findAll();
+            let dados;
+
+            if (req.user.role === "Administrador") {
+
+                dados =
+                    await this.#service.findAll();
+            }
+            else if (req.user.role === "Médico") {
+
+                dados =
+                    await this.#service.findByCrm(
+                        req.user.crm
+                    );
+            }
+            else if (req.user.role === "Paciente") {
+
+                dados =
+                    await this.#service.findByCpf(
+                        req.user.cpf
+                    );
+            }
 
             res.status(200).send({ status: true, dados });
 
