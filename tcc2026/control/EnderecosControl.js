@@ -80,47 +80,28 @@ module.exports = class EnderecosControl {
     show = async (request, response, next) => {
         console.log("GET: /enderecos/:id_endereco - EnderecosControl.show()");
 
-        const id_endereco = request.params.id_endereco;
+        try {
 
-        if (!id_endereco) {
-            return response.status(400).send({
-                status: false,
-                msg: 'ID não informado',
-                codigo: '001',
-                dados: {}
-            });
-        }
+            const enderecosService =
+                new EnderecosService(this.#banco);
 
-        const enderecosService = new EnderecosService(this.#banco);
-
-        enderecosService.findById(id_endereco).then(resultado => {
-
-            if (!resultado) {
-                return response.status(404).send({
-                    status: false,
-                    msg: 'Endereço não encontrado',
-                    codigo: '004',
-                    dados: {}
-                });
-            }
+            const resultado =
+                await enderecosService.validarAcessoEndereco(
+                    request.params.id_endereco,
+                    request.user
+                );
 
             response.status(200).send({
                 status: true,
-                msg: 'Busca realizada com sucesso',
-                codigo: '002',
+                msg: "Busca realizada com sucesso",
+                codigo: "002",
                 dados: resultado
             });
 
-        }).catch(erro => {
-            console.log("ERRO REAL:", erro);
+        } catch (erro) {
 
-            response.status(500).send({
-                status: false,
-                msg: 'Erro ao buscar endereço',
-                codigo: '003',
-                dados: {}
-            });
-        });
+            next(erro);
+        }
     }
 
 

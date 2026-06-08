@@ -15,7 +15,10 @@ module.exports = class AnamneseControl {
 
             const service = new AnamneseService(this.#banco);
 
-            const resultado = await service.create(req.body);
+            const resultado = await service.create(
+                req.body,
+                req.user
+            );
 
             res.status(201).send({
                 status: true,
@@ -70,11 +73,14 @@ module.exports = class AnamneseControl {
 
         try {
 
-            const service = new AnamneseService(this.#banco);
+            const service =
+                new AnamneseService(this.#banco);
 
-            const resultado = await service.findById(
-                req.params.id_anamnese
-            );
+            const resultado =
+                await service.validarAcessoAnamnese(
+                    req.params.id_anamnese,
+                    req.user
+                );
 
             res.status(200).send({
                 status: true,
@@ -82,6 +88,7 @@ module.exports = class AnamneseControl {
             });
 
         } catch (erro) {
+
             next(erro);
         }
     }
@@ -94,7 +101,8 @@ module.exports = class AnamneseControl {
 
             const resultado = await service.update(
                 req.params.id_anamnese,
-                req.body
+                req.body,
+                req.user
             );
 
             res.status(200).send({
@@ -114,7 +122,10 @@ module.exports = class AnamneseControl {
 
             const service = new AnamneseService(this.#banco);
 
-            await service.delete(req.params.id_anamnese);
+            await service.delete(
+                req.params.id_anamnese,
+                req.user
+            );
 
             res.status(200).send({
                 status: true,

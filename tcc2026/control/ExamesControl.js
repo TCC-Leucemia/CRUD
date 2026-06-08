@@ -11,7 +11,11 @@ module.exports = class ExamesControl {
 
     store = async (req, res, next) => {
         try {
-            const result = await this.#service.create(req.body);
+            const result =
+                await this.#service.create(
+                    req.body,
+                    req.user
+                );
 
             res.status(201).send({
                 status: true,
@@ -59,19 +63,35 @@ module.exports = class ExamesControl {
     }
 
     show = async (req, res, next) => {
-        try {
-            const dados = await this.#service.findById(req.params.id);
 
-            res.status(200).send({ status: true, dados });
+        try {
+
+            const dados =
+                await this.#service
+                    .validarAcessoExame(
+                        req.params.id,
+                        req.user
+                    );
+
+            res.status(200).send({
+                status: true,
+                dados
+            });
 
         } catch (err) {
+
             next(err);
         }
     }
 
     update = async (req, res, next) => {
         try {
-            const result = await this.#service.update(req.params.id, req.body);
+            const result =
+                await this.#service.update(
+                    req.params.id,
+                    req.body,
+                    req.user
+                );
 
             res.status(200).send({
                 status: true,
@@ -86,7 +106,10 @@ module.exports = class ExamesControl {
 
     destroy = async (req, res, next) => {
         try {
-            await this.#service.delete(req.params.id);
+            await this.#service.delete(
+                req.params.id,
+                req.user
+            );
 
             res.status(200).send({
                 status: true,

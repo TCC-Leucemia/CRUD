@@ -22,26 +22,55 @@ module.exports = class AnamneseService {
         this.#consultasDAO = new ConsultasDAO(banco);
     }
 
-    create = async (dados) => {
+    create = async (dados, user) => {
 
-        const paciente = await this.#pacientesDAO.findById(dados.cpf);
+        dados.crm = user.crm;
+
+        const paciente =
+            await this.#pacientesDAO.findById(
+                dados.cpf
+            );
 
         if (!paciente) {
-            throw new ErrorResponse(404, "Paciente não encontrado");
+
+            throw new ErrorResponse(
+                404,
+                "Paciente não encontrado"
+            );
         }
 
-        const medico = await this.#medicosDAO.findByCRM(dados.crm);
+        const medico =
+            await this.#medicosDAO.findByCRM(
+                dados.crm
+            );
 
         if (!medico) {
-            throw new ErrorResponse(404, "Médico não encontrado");
+
+            throw new ErrorResponse(
+                404,
+                "Médico não encontrado"
+            );
         }
 
-        const consulta = await this.#consultasDAO.findById(
-            dados.id_consulta
-        );
+        const consulta =
+            await this.#consultasDAO.findById(
+                dados.id_consulta
+            );
 
         if (!consulta) {
-            throw new ErrorResponse(404, "Consulta não encontrada");
+
+            throw new ErrorResponse(
+                404,
+                "Consulta não encontrada"
+            );
+        }
+
+        if (consulta.crm !== user.crm) {
+
+            throw new ErrorResponse(
+                403,
+                "Você só pode criar anamnese para consultas vinculadas a você"
+            );
         }
 
         const anamnese = new Anamnese();
@@ -87,24 +116,76 @@ module.exports = class AnamneseService {
         return await this.#dao.findByCrm(crm);
     }
 
-    update = async (id, dados) => {
+    validarAcessoAnamnese = async (id, user) => {
 
-        const existente = await this.#dao.findById(id);
+        const anamnese =
+            await this.#dao.findById(id);
 
-        if (!existente) {
+        if (!anamnese) {
+
             throw new ErrorResponse(
                 404,
                 "Anamnese não encontrada"
             );
         }
 
+        if (
+            user.role === "Paciente" &&
+            anamnese.cpf !== user.cpf
+        ) {
+
+            throw new ErrorResponse(
+                403,
+                "Acesso negado"
+            );
+        }
+
+        if (
+            user.role === "Médico" &&
+            anamnese.crm !== user.crm
+        ) {
+
+            throw new ErrorResponse(
+                403,
+                "Acesso negado"
+            );
+        }
+
+        return anamnese;
+    }
+
+    update = async (id, dados, user) => {
+
+        const existente =
+            await this.#dao.findById(id);
+
+        if (!existente) {
+
+            throw new ErrorResponse(
+                404,
+                "Anamnese não encontrada"
+            );
+        }
+
+        if (existente.crm !== user.crm) {
+
+            throw new ErrorResponse(
+                403,
+                "Acesso negado"
+            );
+        }
+
+        dados.crm = user.crm;
+
         if (dados.cpf) {
 
-            const paciente = await this.#pacientesDAO.findById(
-                dados.cpf
-            );
+            const paciente =
+                await this.#pacientesDAO.findById(
+                    dados.cpf
+                );
 
             if (!paciente) {
+
                 throw new ErrorResponse(
                     404,
                     "Paciente não encontrado"
@@ -112,30 +193,39 @@ module.exports = class AnamneseService {
             }
         }
 
-        if (dados.crm) {
-
-            const medico = await this.#medicosDAO.findByCRM(
+        const medico =
+            await this.#medicosDAO.findByCRM(
                 dados.crm
             );
 
-            if (!medico) {
-                throw new ErrorResponse(
-                    404,
-                    "Médico não encontrado"
-                );
-            }
+        if (!medico) {
+
+            throw new ErrorResponse(
+                404,
+                "Médico não encontrado"
+            );
         }
 
         if (dados.id_consulta) {
 
-            const consulta = await this.#consultasDAO.findById(
-                dados.id_consulta
-            );
+            const consulta =
+                await this.#consultasDAO.findById(
+                    dados.id_consulta
+                );
 
             if (!consulta) {
+
                 throw new ErrorResponse(
                     404,
                     "Consulta não encontrada"
+                );
+            }
+
+            if (consulta.crm !== user.crm) {
+
+                throw new ErrorResponse(
+                    403,
+                    "Acesso negado"
                 );
             }
         }
@@ -146,18 +236,40 @@ module.exports = class AnamneseService {
 
         anamnese.id_anamnese = id;
 
-        const resultado = await this.#dao.update(anamnese);
+        const resultado =
+            await this.#dao.update(anamnese);
 
         return {
-            atualizado: resultado.changedRows > 0
+            atualizado:
+                resultado.changedRows > 0
         };
     }
 
-    delete = async (id) => {
+    delete = async (id, user) => {
 
-        const resultado = await this.#dao.delete(id);
+        const anamnese = await this.#dao.findById(id);
+
+        if (!anamnese) {
+
+            throw new ErrorResponse(
+                404,
+                "Anamnese não encontrada"
+            );
+        }
+
+        if (anamnese.crm !== user.crm) {
+
+            throw new ErrorResponse(
+                403,
+                "Acesso negado"
+            );
+        }
+
+        const resultado =
+            await this.#dao.delete(id);
 
         if (resultado.affectedRows === 0) {
+
             throw new ErrorResponse(
                 404,
                 "Anamnese não encontrada"

@@ -26,11 +26,16 @@ module.exports = function (app, banco) {
         roleMiddleware.authorize("Administrador"),
         enderecosControl.index
     );
-
+arguments
     app.get(
         "/enderecos/:id_endereco",
         jwtMiddleware.validateToken,
-        roleMiddleware.authorize("Administrador"),
+        roleMiddleware.authorize(
+            "Administrador",
+            "Médico",
+            "Paciente"
+        ),
+        enderecosMiddleware.validateIdParam,
         enderecosControl.show
     );
 
@@ -39,6 +44,7 @@ module.exports = function (app, banco) {
         jwtMiddleware.validateToken,
         roleMiddleware.authorize("Administrador"),
         enderecosMiddleware.validateIdParam,
+        enderecosMiddleware.validateBody,
         enderecosControl.update
     );
 
