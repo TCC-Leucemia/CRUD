@@ -118,31 +118,36 @@ module.exports = class LoginService {
                     dados.email
                 );
 
-        } else if (dados.tipo === "Paciente") {
+        }
+        else if (dados.tipo === "Paciente") {
 
             user =
                 await this.#dao.findPacienteByEmail(
                     dados.email
                 );
 
-        } else {
+        }
+        else if (dados.tipo === "Administrador") {
 
             user =
-                await this.#dao.findByEmail(
+                await this.#dao.findAdministradorByEmail(
                     dados.email
                 );
         }
 
         if (!user) {
+
             throw new ErrorResponse(
                 401,
                 "Usuário não encontrado"
             );
         }
 
-        const senhaHash = md5(dados.senha);
+        const senhaHash =
+            md5(dados.senha);
 
         if (senhaHash !== user.senha) {
+
             throw new ErrorResponse(
                 401,
                 "Senha inválida"
@@ -150,11 +155,17 @@ module.exports = class LoginService {
         }
 
         return {
+
             id_usuario: user.id_usuario,
+
             email: user.email,
+
             tipo: user.tipo,
+
             crm: user.crm,
+
             cpf: user.cpf,
+
             nome: user.nome
         };
     }

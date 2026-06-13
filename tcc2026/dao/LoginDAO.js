@@ -119,6 +119,34 @@ module.exports = class LoginDAO {
         });
     }
 
+    findAdministradorByEmail = async (email) => {
+
+        const sql = `
+            SELECT
+                l.id_usuario,
+                l.email,
+                l.senha,
+                l.tipo
+            FROM login l
+            WHERE l.email = ?
+            AND l.tipo = 'Administrador'
+        `;
+
+        return new Promise((resolve, reject) => {
+
+            this.#banco.query(
+                sql,
+                [email],
+                (err, result) => {
+
+                    if (err) return reject(err);
+
+                    resolve(result[0] || null);
+                }
+            );
+        });
+    }
+
     update = async (login) => {
         const sql = `
             UPDATE login 

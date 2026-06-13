@@ -71,6 +71,48 @@ module.exports = class ResultadosExameService {
 
         return resultado;
     }
+    validarAcessoResultado = async (
+        id_resultado,
+        user
+    ) => {
+
+        const resultado =
+            await this.#dao.findByIdWithConsulta(
+                id_resultado
+            );
+
+        if (!resultado) {
+
+            throw new ErrorResponse(
+                404,
+                "Resultado não encontrado"
+            );
+        }
+
+        if (
+            user.role === "Paciente" &&
+            resultado.cpf !== user.cpf
+        ) {
+
+            throw new ErrorResponse(
+                403,
+                "Acesso negado"
+            );
+        }
+
+        if (
+            user.role === "Médico" &&
+            resultado.crm !== user.crm
+        ) {
+
+            throw new ErrorResponse(
+                403,
+                "Acesso negado"
+            );
+        }
+
+        return resultado;
+    }
 
     update = async (id, dados) => {
 

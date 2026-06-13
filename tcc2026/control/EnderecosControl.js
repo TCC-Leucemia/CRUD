@@ -172,5 +172,35 @@ module.exports = class EnderecosControl {
             next(erro);
         }
     }
+
+    meuEndereco = async (
+        request,
+        response,
+        next
+    ) => {
+
+        try {
+
+            const enderecosService =
+                new EnderecosService(
+                    this.#banco
+                );
+
+            const resultado =
+                await enderecosService.findMeuEndereco(
+                    request.user
+                );
+
+            response.status(200).send({
+                status: true,
+                msg: "Endereço encontrado",
+                dados: resultado
+            });
+
+        } catch (erro) {
+
+            next(erro);
+        }
+    }
 }
 

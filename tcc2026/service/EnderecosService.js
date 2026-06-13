@@ -41,24 +41,7 @@ module.exports = class EnderecosService {
         return await this.#enderecosDAO.findById(id);
     }
 
-    validarAcessoEndereco = async (id_endereco, user) => {
-
-        const endereco =
-            await this.#enderecosDAO.findById(
-                id_endereco
-            );
-
-        if (!endereco) {
-
-            throw new ErrorResponse(
-                404,
-                "Endereço não encontrado"
-            );
-        }
-
-        if (user.role === "Administrador") {
-            return endereco;
-        }
+    findMeuEndereco = async (user) => {
 
         if (user.role === "Paciente") {
 
@@ -67,18 +50,16 @@ module.exports = class EnderecosService {
                     user.cpf
                 );
 
-            if (
-                !paciente ||
-                paciente.id_endereco != id_endereco
-            ) {
-
+            if (!paciente) {
                 throw new ErrorResponse(
-                    403,
-                    "Acesso negado"
+                    404,
+                    "Paciente não encontrado"
                 );
             }
 
-            return endereco;
+            return await this.#enderecosDAO.findById(
+                paciente.id_endereco
+            );
         }
 
         if (user.role === "Médico") {
@@ -88,18 +69,16 @@ module.exports = class EnderecosService {
                     user.crm
                 );
 
-            if (
-                !medico ||
-                medico.id_endereco != id_endereco
-            ) {
-
+            if (!medico) {
                 throw new ErrorResponse(
-                    403,
-                    "Acesso negado"
+                    404,
+                    "Médico não encontrado"
                 );
             }
 
-            return endereco;
+            return await this.#enderecosDAO.findById(
+                medico.id_endereco
+            );
         }
 
         throw new ErrorResponse(

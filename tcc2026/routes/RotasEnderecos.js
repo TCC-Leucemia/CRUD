@@ -1,7 +1,7 @@
 const { request, response } = require("express");
 const Enderecos = require('../model/Enderecos')
 const EnderecosControl = require('../control/EnderecosControl')
-const EnderecosMiddleware = require ('../middleware/EnderecosMiddleware')
+const EnderecosMiddleware = require('../middleware/EnderecosMiddleware')
 const JwtMiddleware = require("../middleware/JwtMiddleware");
 const RoleMiddleware = require("../middleware/RoleMiddleware");
 
@@ -26,18 +26,27 @@ module.exports = function (app, banco) {
         roleMiddleware.authorize("Administrador"),
         enderecosControl.index
     );
-arguments
+
+    app.get(
+        "/enderecos/meu-endereco",
+        jwtMiddleware.validateToken,
+        roleMiddleware.authorize(
+            "Médico",
+            "Paciente"
+        ),
+        enderecosControl.meuEndereco
+    );
+
     app.get(
         "/enderecos/:id_endereco",
         jwtMiddleware.validateToken,
         roleMiddleware.authorize(
-            "Administrador",
-            "Médico",
-            "Paciente"
+            "Administrador"
         ),
         enderecosMiddleware.validateIdParam,
         enderecosControl.show
     );
+
 
     app.put(
         "/enderecos/:id_endereco",

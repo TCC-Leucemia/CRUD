@@ -14,7 +14,6 @@ const rotas_resultados_exame = require("./routes/RotasResultadosExame");
 const rotas_analise_ia = require("./routes/RotasAnaliseIA");
 const rotasImagensExame = require("./routes/RotasImagensExame")
 const rotasAnamnese = require("./routes/RotasAnamnese");
-const rotasAdministradores = require("./routes/RotasAdministradores");
 
 const app = express();
 
@@ -49,7 +48,6 @@ rotas_resultados_exame(app, banco);
 rotas_analise_ia(app, banco);
 rotasImagensExame(app, banco);
 rotasAnamnese(app, banco);
-rotasAdministradores(app, banco);
 
 app.use((error, request, response, next) => {
     console.error("ERRO GLOBAL:", error);

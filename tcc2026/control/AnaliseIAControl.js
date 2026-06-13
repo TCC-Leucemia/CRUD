@@ -35,7 +35,10 @@ module.exports = class AnaliseIAControl {
 
         try {
 
-            const result = await this.#service.findAll();
+            const result =
+                await this.#service.findByCrm(
+                    req.user.crm
+                );
 
             return res.status(200).send({
                 status: true,
@@ -51,9 +54,11 @@ module.exports = class AnaliseIAControl {
 
         try {
 
-            const result = await this.#service.findById(
-                req.params.id_analise
-            );
+            const result =
+                await this.#service.validarAcessoAnalise(
+                    req.params.id_analise,
+                    req.user.crm
+                );
 
             return res.status(200).send({
                 status: true,
@@ -69,6 +74,10 @@ module.exports = class AnaliseIAControl {
 
         try {
 
+            await this.#service.validarAcessoAnalise(
+                req.params.id_analise,
+                req.user.crm
+            );
             await this.#service.update(
                 req.params.id_analise,
                 req.body
@@ -87,7 +96,11 @@ module.exports = class AnaliseIAControl {
     destroy = async (req, res, next) => {
 
         try {
-
+            await this.#service.validarAcessoAnalise(
+                req.params.id_analise,
+                req.user.crm
+            );
+            
             await this.#service.delete(
                 req.params.id_analise
             );

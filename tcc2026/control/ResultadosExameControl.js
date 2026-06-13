@@ -68,9 +68,11 @@ module.exports = class ResultadosExameControl {
 
         try {
 
-            const result = await this.#service.findById(
-                req.params.id_resultado
-            );
+            const result =
+                await this.#service.validarAcessoResultado(
+                    req.params.id_resultado,
+                    req.user
+                );
 
             return res.status(200).send({
                 status: true,
@@ -85,7 +87,10 @@ module.exports = class ResultadosExameControl {
     update = async (req, res, next) => {
 
         try {
-
+            await this.#service.validarAcessoResultado(
+                req.params.id_resultado,
+                req.user
+            );
             await this.#service.update(
                 req.params.id_resultado,
                 req.body
@@ -104,7 +109,10 @@ module.exports = class ResultadosExameControl {
     destroy = async (req, res, next) => {
 
         try {
-
+            await this.#service.validarAcessoResultado(
+                req.params.id_resultado,
+                req.user
+            );
             await this.#service.delete(
                 req.params.id_resultado
             );

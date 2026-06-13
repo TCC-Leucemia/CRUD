@@ -62,6 +62,32 @@ module.exports = class AnaliseIAService {
         return result;
     }
 
+    findByCrm = async (crm) => {
+        return await this.#dao.findByCrm(crm);
+    }
+
+    validarAcessoAnalise = async (
+        id_analise,
+        crm
+    ) => {
+
+        const analise =
+            await this.#dao.findByIdAndCrm(
+                id_analise,
+                crm
+            );
+
+        if (!analise) {
+
+            throw new ErrorResponse(
+                403,
+                "Acesso negado"
+            );
+        }
+
+        return analise;
+    }
+
     update = async (id, dados) => {
 
         const existente = await this.#dao.findById(id);
