@@ -106,6 +106,28 @@ module.exports = class ConsultasDAO {
             });
         });
     }
+    updateStatus(id_consulta, statusc) {
+
+        const sql = `
+            UPDATE consultas
+            SET statusc = ?
+            WHERE id_consulta = ?
+        `;
+
+        return new Promise((resolve, reject) => {
+
+            this.#banco.query(
+                sql,
+                [statusc, id_consulta],
+                (err, result) => {
+
+                    if (err) return reject(err);
+
+                    resolve(result);
+                }
+            );
+        });
+    }
 
     delete(id) {
         return new Promise((resolve, reject) => {

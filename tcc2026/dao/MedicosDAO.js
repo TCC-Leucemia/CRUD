@@ -49,6 +49,32 @@ module.exports = class MedicosDAO {
         });
     }
 
+    findMedicoByPaciente(cpf) {
+
+        const sql = `
+            SELECT DISTINCT m.*
+            FROM medicos m
+            INNER JOIN consultas c
+                ON c.crm = m.crm
+            WHERE c.cpf = ?
+        `;
+
+        return new Promise((resolve, reject) => {
+
+            this.#banco.query(
+                sql,
+                [cpf],
+                (err, result) => {
+
+                    if (err)
+                        return reject(err);
+
+                    resolve(result);
+                }
+            );
+        });
+    }
+
     update(medico) {
         const sql = `
         UPDATE medicos SET 

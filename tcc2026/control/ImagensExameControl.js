@@ -15,7 +15,10 @@ module.exports = class ImagensExameControl {
 
             const service = new ImagensExameService(this.#banco);
 
-            const resultado = await service.create(req.body);
+            const resultado = await service.create(
+                req.body,
+                req.user
+            );
 
             res.status(201).send({
                 status: true,
@@ -99,7 +102,8 @@ module.exports = class ImagensExameControl {
 
             const resultado = await service.update(
                 req.params.id_imagem,
-                req.body
+                req.body,
+                req.user
             );
 
             res.status(200).send({

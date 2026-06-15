@@ -15,7 +15,10 @@ module.exports = class ResultadosExameControl {
 
         try {
 
-            const result = await this.#service.create(req.body);
+            const result = await this.#service.create(
+                req.body,
+                req.user
+            );
 
             return res.status(201).send({
                 status: true,
@@ -93,7 +96,8 @@ module.exports = class ResultadosExameControl {
             );
             await this.#service.update(
                 req.params.id_resultado,
-                req.body
+                req.body,
+                req.user
             );
 
             return res.status(200).send({

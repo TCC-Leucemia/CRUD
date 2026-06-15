@@ -42,15 +42,8 @@ module.exports = class AnamneseControl {
 
             let resultado;
 
-            if (req.user.role === "Paciente") {
-
-                resultado =
-                    await service.findByCpf(
-                        req.user.cpf
-                    );
-
-            }
-            else if (req.user.role === "Médico") {
+            
+            if (req.user.role === "Médico") {
 
                 resultado =
                     await service.findByCrm(

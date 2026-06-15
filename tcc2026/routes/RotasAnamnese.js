@@ -23,14 +23,14 @@ module.exports = (app, banco) => {
     app.get(
         "/anamnese",
         jwt.validateToken,
-        role.authorize("Médico", "Paciente"),
+        role.authorize("Médico"),
         control.index
     );
 
     app.get(
         "/anamnese/:id_anamnese",
         jwt.validateToken,
-        role.authorize("Médico", "Paciente"),
+        role.authorize("Médico"),
         middleware.validateId,
         control.show
     );

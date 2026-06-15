@@ -146,6 +146,66 @@ module.exports = class LoginDAO {
             );
         });
     }
+    findMedicoByIdUsuario(id_usuario) {
+
+        const sql = `
+            SELECT
+                l.*,
+                m.crm,
+                m.nome,
+                m.cpf,
+                m.telefone,
+                m.especialidade
+            FROM login l
+            INNER JOIN medicos m
+                ON m.id_usuario = l.id_usuario
+            WHERE l.id_usuario = ?
+        `;
+
+        return new Promise((resolve, reject) => {
+
+            this.#banco.query(
+                sql,
+                [id_usuario],
+                (erro, result) => {
+
+                    if (erro) reject(erro);
+                    else resolve(result[0] || null);
+                }
+            );
+        });
+    }
+
+    findPacienteByIdUsuario(id_usuario) {
+
+        const sql = `
+            SELECT
+                l.*,
+                p.cpf,
+                p.nome,
+                p.data_nasc,
+                p.sexo,
+                p.telefone
+            FROM login l
+            INNER JOIN pacientes p
+                ON p.id_usuario = l.id_usuario
+            WHERE l.id_usuario = ?
+        `;
+
+        return new Promise((resolve, reject) => {
+
+            this.#banco.query(
+                sql,
+                [id_usuario],
+                (erro, result) => {
+
+                    if (erro) reject(erro);
+                    else resolve(result[0] || null);
+                }
+            );
+        });
+    }
+    
 
     update = async (login) => {
         const sql = `

@@ -46,10 +46,6 @@ module.exports = class ExamesService {
         return await this.#dao.create(exame);
     }
 
-    findAll = async () => {
-        return await this.#dao.findAll();
-    }
-
     findById = async (id) => {
         const exame = await this.#dao.findById(id);
 

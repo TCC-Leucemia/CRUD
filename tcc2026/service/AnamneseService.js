@@ -130,17 +130,6 @@ module.exports = class AnamneseService {
         }
 
         if (
-            user.role === "Paciente" &&
-            anamnese.cpf !== user.cpf
-        ) {
-
-            throw new ErrorResponse(
-                403,
-                "Acesso negado"
-            );
-        }
-
-        if (
             user.role === "Médico" &&
             anamnese.crm !== user.crm
         ) {

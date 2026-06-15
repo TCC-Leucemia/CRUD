@@ -15,7 +15,7 @@ module.exports = (app, banco) => {
     app.post(
         "/exames",
         jwt.validateToken,
-        role.authorize("Administrador", "Médico"),
+        role.authorize("Médico"),
         middleware.validateBody,
         control.store
     );
@@ -24,7 +24,6 @@ module.exports = (app, banco) => {
         "/exames",
         jwt.validateToken,
         role.authorize(
-            "Administrador",
             "Médico",
             "Paciente"
         ),
@@ -35,7 +34,6 @@ module.exports = (app, banco) => {
         "/exames/:id",
         jwt.validateToken,
         role.authorize(
-            "Administrador",
             "Médico",
             "Paciente"
         ),
@@ -47,7 +45,6 @@ module.exports = (app, banco) => {
         "/exames/:id",
         jwt.validateToken,
         role.authorize(
-            "Administrador",
             "Médico"
         ),
         middleware.validateId,
@@ -59,7 +56,6 @@ module.exports = (app, banco) => {
         "/exames/:id",
         jwt.validateToken,
         role.authorize(
-            "Administrador",
             "Médico"
         ),
         middleware.validateId,

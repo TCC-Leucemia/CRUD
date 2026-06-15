@@ -33,30 +33,80 @@ module.exports = class LoginService {
     }
 
     findAll = async () => {
-        return await this.#dao.findAll();
+
+        const usuarios =
+            await this.#dao.findAll();
+
+        const resultado = [];
+
+        for (const usuario of usuarios) {
+
+            if (usuario.tipo === "Paciente") {
+
+                const paciente =
+                    await this.#dao.findPacienteByIdUsuario(
+                        usuario.id_usuario
+                    );
+
+                resultado.push(paciente);
+            }
+            else if (usuario.tipo === "Médico") {
+
+                const medico =
+                    await this.#dao.findMedicoByIdUsuario(
+                        usuario.id_usuario
+                    );
+
+                resultado.push(medico);
+            }
+            else {
+
+                resultado.push(usuario);
+            }
+        }
+
+        return resultado;
     }
 
     findById = async (id) => {
 
-        const resultado =
+        const login =
             await this.#dao.findById(id);
 
-        if (!resultado) {
+        if (!login) {
+
             throw new ErrorResponse(
                 404,
                 "Usuário não encontrado"
             );
         }
 
-        return resultado;
+        if (login.tipo === "Paciente") {
+
+            const paciente =
+                await this.#dao.findPacienteByIdUsuario(id);
+
+            return paciente;
+        }
+
+        if (login.tipo === "Médico") {
+
+            const medico =
+                await this.#dao.findMedicoByIdUsuario(id);
+
+            return medico;
+        }
+
+        return login;
     }
 
-    update = async (id, dados) => {
+    update = async (id,dados,user) => {
 
         const existente =
             await this.#dao.findById(id);
 
         if (!existente) {
+
             throw new ErrorResponse(
                 404,
                 "Usuário não encontrado"
@@ -64,16 +114,38 @@ module.exports = class LoginService {
         }
 
         const emailExistente =
-            await this.#dao.findByEmail(dados.email);
+            await this.#dao.findByEmail(
+                dados.email
+            );
 
         if (
             emailExistente &&
             emailExistente.id_usuario != id
         ) {
+
             throw new ErrorResponse(
                 400,
                 "Email já está em uso"
             );
+        }
+
+        if (
+            user.role !== "Administrador"
+        ) {
+
+            if (
+                dados.tipo &&
+                dados.tipo !== existente.tipo
+            ) {
+
+                throw new ErrorResponse(
+                    403,
+                    "Você não pode alterar o tipo do usuário"
+                );
+            }
+
+            dados.tipo =
+                existente.tipo;
         }
 
         const login = new Login();
@@ -92,12 +164,46 @@ module.exports = class LoginService {
         };
     }
 
-    delete = async (id) => {
+    delete = async (id,user) => {
+
+        const login =
+            await this.#dao.findById(id);
+
+        if (!login) {
+
+            throw new ErrorResponse(
+                404,
+                "Usuário não encontrado"
+            );
+        }
+
+        if (
+            user.role !== "Administrador"
+        ) {
+
+            throw new ErrorResponse(
+                403,
+                "Acesso negado"
+            );
+        }
+
+        if (
+            login.tipo === "Administrador"
+        ) {
+
+            throw new ErrorResponse(
+                403,
+                "Administradores não podem ser excluídos"
+            );
+        }
 
         const resultado =
             await this.#dao.delete(id);
 
-        if (resultado.affectedRows === 0) {
+        if (
+            resultado.affectedRows === 0
+        ) {
+
             throw new ErrorResponse(
                 404,
                 "Usuário não encontrado para exclusão"
@@ -168,5 +274,32 @@ module.exports = class LoginService {
 
             nome: user.nome
         };
+    }
+
+    validarAcessoLogin = async (id_usuario,user) => {
+
+        const login =
+            await this.#dao.findById(id_usuario);
+
+        if (!login) {
+
+            throw new ErrorResponse(
+                404,
+                "Usuário não encontrado"
+            );
+        }
+
+        if (
+            user.role !== "Administrador" &&
+            login.id_usuario != user.id_usuario
+        ) {
+
+            throw new ErrorResponse(
+                403,
+                "Acesso negado"
+            );
+        }
+
+        return login;
     }
 }

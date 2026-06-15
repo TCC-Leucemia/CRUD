@@ -25,6 +25,19 @@ module.exports = (app, banco) => {
     );
 
     app.get(
+        "/medicos/meus-dados",
+        jwtMiddleware.validateToken,
+        roleMiddleware.authorize("Médico"),
+        control.meusDados
+    );
+    app.get(
+        "/medicos/meu-medico",
+        jwtMiddleware.validateToken,
+        roleMiddleware.authorize("Paciente"),
+        control.meuMedico
+    );
+
+    app.get(
         "/medicos",
         jwtMiddleware.validateToken,
         roleMiddleware.authorize("Administrador"),

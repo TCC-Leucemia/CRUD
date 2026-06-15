@@ -81,4 +81,24 @@ module.exports = class PacientesControl {
             next(err);
         }
     }
+
+    meusDados = async (req, res, next) => {
+
+        try {
+
+            const result =
+                await this.#service.findMeuPerfil(
+                    req.user.cpf
+                );
+
+            return res.status(200).send({
+                status: true,
+                dados: result
+            });
+
+        } catch (erro) {
+
+            next(erro);
+        }
+    }
 }

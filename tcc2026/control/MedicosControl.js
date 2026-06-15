@@ -75,4 +75,48 @@ module.exports = class MedicosControl {
             next(err);
         }
     }
+
+    meusDados = async (req, res, next) => {
+
+        try {
+
+            const dados =
+                await this.#service.findByCRM(
+                    req.user.crm
+                );
+
+            res.send({
+                status: true,
+                dados
+            });
+
+        } catch (err) {
+
+            next(err);
+        }
+    }
+
+    meuMedico = async (
+        req,
+        res,
+        next
+    ) => {
+
+        try {
+
+            const dados =
+                await this.#service.findByPaciente(
+                    req.user.cpf
+                );
+
+            res.send({
+                status: true,
+                dados
+            });
+
+        } catch (err) {
+
+            next(err);
+        }
+    }
 }

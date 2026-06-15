@@ -127,6 +127,36 @@ module.exports = class AnaliseIADAO {
         });
     }
 
+    findOwnerByExameId(idExame) {
+
+        const sql = `
+            SELECT
+                e.id_exame,
+                c.crm
+            FROM exames e
+            INNER JOIN consultas c
+                ON c.id_consulta = e.id_consulta
+            WHERE e.id_exame = ?
+        `;
+
+        return new Promise((resolve, reject) => {
+
+            this.#banco.query(
+                sql,
+                [idExame],
+                (erro, result) => {
+
+                    if (erro) {
+                        reject(erro);
+                    }
+                    else {
+                        resolve(result[0] || null);
+                    }
+                }
+            );
+        });
+    }
+
     async update(analise) {
 
         const sql = `

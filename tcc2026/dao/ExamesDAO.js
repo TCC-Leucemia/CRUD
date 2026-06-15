@@ -27,15 +27,6 @@ module.exports = class ExamesDAO {
         });
     }
 
-    findAll() {
-        return new Promise((resolve, reject) => {
-            this.#banco.query("SELECT * FROM exames", (err, result) => {
-                if (err) return reject(err);
-                resolve(result);
-            });
-        });
-    }
-
     findById(id) {
         return new Promise((resolve, reject) => {
             this.#banco.query(

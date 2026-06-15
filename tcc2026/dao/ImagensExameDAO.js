@@ -166,6 +166,35 @@ module.exports = class ImagensExameDAO {
             );
         });
     }
+    findOwnerByExameId = async (idExame) => {
+
+        const sql = `
+            SELECT
+                e.id_exame,
+                c.cpf,
+                c.crm
+            FROM exames e
+            INNER JOIN consultas c
+                ON c.id_consulta = e.id_consulta
+            WHERE e.id_exame = ?
+        `;
+
+        return new Promise((resolve, reject) => {
+
+            this.#banco.query(
+                sql,
+                [idExame],
+                (erro, resultado) => {
+
+                    if (erro) {
+                        reject(erro);
+                    } else {
+                        resolve(resultado[0] || null);
+                    }
+                }
+            );
+        });
+    }
 
     update = async (imagem) => {
 

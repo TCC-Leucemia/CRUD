@@ -76,6 +76,22 @@ module.exports = class PacientesService {
         return paciente;
     }
 
+    findMeuPerfil = async (cpf) => {
+
+        const paciente =
+            await this.#dao.findById(cpf);
+
+        if (!paciente) {
+
+            throw new ErrorResponse(
+                404,
+                "Paciente não encontrado"
+            );
+        }
+
+        return paciente;
+    }
+
     update = async (cpf, dados) => {
 
         const existente = await this.#dao.findById(cpf);

@@ -14,24 +14,54 @@ module.exports = class ResultadosExameService {
         this.#examesDAO = new ExamesDAO(banco);
     }
 
-    create = async (dados) => {
+    create = async (dados, user) => {
 
-        const exame = await this.#examesDAO.findById(
-            dados.id_exame
-        );
+        const exame =
+            await this.#examesDAO.findById(
+                dados.id_exame
+            );
 
         if (!exame) {
+
             throw new ErrorResponse(
                 404,
                 "Exame não encontrado"
             );
         }
 
+        const owner =
+            await this.#dao.findOwnerByExameId(
+                dados.id_exame
+            );
+
+        if (!owner) {
+
+            throw new ErrorResponse(
+                404,
+                "Exame não encontrado"
+            );
+        }
+
+        if (
+            owner.crm !== user.crm
+        ) {
+
+            throw new ErrorResponse(
+                403,
+                "Acesso negado"
+            );
+        }
+
         const resultado = new ResultadosExame();
 
-        Object.assign(resultado, dados);
+        Object.assign(
+            resultado,
+            dados
+        );
 
-        return await this.#dao.create(resultado);
+        return await this.#dao.create(
+            resultado
+        );
     }
 
     findAll = async () => {
@@ -114,35 +144,70 @@ module.exports = class ResultadosExameService {
         return resultado;
     }
 
-    update = async (id, dados) => {
+    update = async (id,dados,user) => {
 
-        const existente = await this.#dao.findById(id);
+        const existente =
+            await this.#dao.findById(id);
 
         if (!existente) {
+
             throw new ErrorResponse(
                 404,
                 "Resultado não encontrado"
             );
         }
 
-        const exame = await this.#examesDAO.findById(
-            dados.id_exame
-        );
+        if (dados.id_exame) {
 
-        if (!exame) {
-            throw new ErrorResponse(
-                404,
-                "Exame não encontrado"
-            );
+            const exame =
+                await this.#examesDAO.findById(
+                    dados.id_exame
+                );
+
+            if (!exame) {
+
+                throw new ErrorResponse(
+                    404,
+                    "Exame não encontrado"
+                );
+            }
+
+            const owner =
+                await this.#dao.findOwnerByExameId(
+                    dados.id_exame
+                );
+
+            if (
+                !owner ||
+                owner.crm !== user.crm
+            ) {
+
+                throw new ErrorResponse(
+                    403,
+                    "Acesso negado"
+                );
+            }
         }
 
-        const resultado = new ResultadosExame();
+        const resultado =
+            new ResultadosExame();
 
-        Object.assign(resultado, dados);
+        Object.assign(
+            resultado,
+            dados
+        );
 
         resultado.id_resultado = id;
 
-        return await this.#dao.update(resultado);
+        const res =
+            await this.#dao.update(
+                resultado
+            );
+
+        return {
+            atualizado:
+                res.changedRows > 0
+        };
     }
 
     delete = async (id) => {

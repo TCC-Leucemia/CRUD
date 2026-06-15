@@ -45,7 +45,17 @@ module.exports = class LoginControl {
 
     update = async (req, res, next) => {
         try {
-            const result = await this.#service.update(req.params.id, req.body);
+            await this.#service.validarAcessoLogin(
+                req.params.id,
+                req.user
+            );
+
+            const result =
+                await this.#service.update(
+                    req.params.id,
+                    req.body,
+                    req.user
+                );
             res.status(200).send({
                 status: true,
                 msg: result.atualizado
@@ -59,7 +69,10 @@ module.exports = class LoginControl {
 
     destroy = async (req, res, next) => {
         try {
-            await this.#service.delete(req.params.id);
+            await this.#service.delete(
+                req.params.id,
+                req.user
+            );
 
             res.status(200).send({
                 status: true,
@@ -116,6 +129,25 @@ module.exports = class LoginControl {
         } catch (err) {
 
             next(err);
+        }
+    }
+
+    meuLogin = async (req, res, next) => {
+
+        try {
+
+            const result =
+                await this.#service.findById(
+                    req.user.id_usuario
+                );
+
+            res.status(200).send({
+                status: true,
+                dados: result
+            });
+
+        } catch (erro) {
+            next(erro);
         }
     }
 }

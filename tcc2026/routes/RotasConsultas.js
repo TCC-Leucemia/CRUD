@@ -14,8 +14,7 @@ module.exports = (app, banco) => {
         "/consultas",
         jwtMiddleware.validateToken,
         roleMiddleware.authorize(
-            "Administrador",
-            "Médico"
+            "Administrador"
         ),
         middleware.validateBody,
         control.store
@@ -58,8 +57,7 @@ module.exports = (app, banco) => {
         "/consultas/:id",
         jwtMiddleware.validateToken,
         roleMiddleware.authorize(
-            "Administrador",
-            "Médico"
+            "Administrador"
         ),
         control.destroy
     );

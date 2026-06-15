@@ -35,12 +35,7 @@ module.exports = class ExamesControl {
         try {
             let dados;
 
-            if (req.user.role === "Administrador") {
-
-                dados =
-                    await this.#service.findAll();
-            }
-            else if (req.user.role === "Médico") {
+            if (req.user.role === "Médico") {
 
                 dados =
                     await this.#service.findByCrm(

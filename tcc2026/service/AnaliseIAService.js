@@ -14,7 +14,7 @@ module.exports = class AnaliseIAService {
         this.#examesDAO = new ExamesDAO(banco);
     }
 
-    create = async (dados) => {
+    create = async (dados, user) => {
 
         const exame = await this.#examesDAO.findById(
             dados.id_exame
@@ -26,7 +26,26 @@ module.exports = class AnaliseIAService {
                 "Exame não encontrado"
             );
         }
+        const owner =
+            await this.#dao.findOwnerByExameId(
+                dados.id_exame
+            );
 
+        if (!owner) {
+
+            throw new ErrorResponse(
+                404,
+                "Exame não vinculado a nenhuma consulta"
+            );
+        }
+
+        if (owner.crm !== user.crm) {
+
+            throw new ErrorResponse(
+                403,
+                "Acesso negado"
+            );
+        }
         const analise = new AnaliseIA();
 
         Object.assign(analise, dados);
@@ -88,7 +107,7 @@ module.exports = class AnaliseIAService {
         return analise;
     }
 
-    update = async (id, dados) => {
+    update = async (id, dados, user) => {
 
         const existente = await this.#dao.findById(id);
 
@@ -96,6 +115,26 @@ module.exports = class AnaliseIAService {
             throw new ErrorResponse(
                 404,
                 "Análise não encontrada"
+            );
+        }
+        const owner =
+            await this.#dao.findOwnerByExameId(
+                dados.id_exame
+            );
+
+        if (!owner) {
+
+            throw new ErrorResponse(
+                404,
+                "Exame não vinculado a nenhuma consulta"
+            );
+        }
+
+        if (owner.crm !== user.crm) {
+
+            throw new ErrorResponse(
+                403,
+                "Acesso negado"
             );
         }
 

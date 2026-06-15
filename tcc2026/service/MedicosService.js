@@ -38,6 +38,15 @@ module.exports = class MedicosService {
         return medico;
     }
 
+    findByPaciente = async (cpf) => {
+        const dados =
+            await this.#dao.findMedicoByPaciente(
+                cpf
+            );
+
+        return dados;
+    }
+
     update = async (crm, dados) => {
 
         const existente = await this.#dao.findByCRM(crm);

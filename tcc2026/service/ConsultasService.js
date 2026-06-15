@@ -127,67 +127,87 @@ module.exports = class ConsultasService {
             );
         }
 
-        if (
-            user.role === "Médico" &&
-            existente.crm !== user.crm
-        ) {
-
-            throw new ErrorResponse(
-                403,
-                "Acesso negado"
-            );
-        }
-
         if (user.role === "Médico") {
 
-            dados.crm = user.crm;
-        }
-
-        if (dados.crm) {
-
-            const medico =
-                await this.#medicosDAO.findByCRM(
-                    dados.crm
-                );
-
-            if (!medico) {
+            if (existente.crm !== user.crm) {
 
                 throw new ErrorResponse(
-                    404,
-                    "Médico não encontrado"
+                    403,
+                    "Acesso negado"
                 );
             }
+
+            const result =
+                await this.#dao.updateStatus(
+                    id,
+                    dados.statusc
+                );
+
+            return {
+                atualizado:
+                    result.changedRows > 0
+            };
         }
 
-        if (dados.cpf) {
+        if (user.role === "Administrador") {
 
-            const paciente =
-                await this.#pacientesDAO.findById(
-                    dados.cpf
-                );
+            if (dados.crm) {
 
-            if (!paciente) {
+                const medico =
+                    await this.#medicosDAO.findByCRM(
+                        dados.crm
+                    );
 
-                throw new ErrorResponse(
-                    404,
-                    "Paciente não encontrado"
-                );
+                if (!medico) {
+
+                    throw new ErrorResponse(
+                        404,
+                        "Médico não encontrado"
+                    );
+                }
             }
+
+            if (dados.cpf) {
+
+                const paciente =
+                    await this.#pacientesDAO.findById(
+                        dados.cpf
+                    );
+
+                if (!paciente) {
+
+                    throw new ErrorResponse(
+                        404,
+                        "Paciente não encontrado"
+                    );
+                }
+            }
+
+            const consulta = new Consultas();
+
+            Object.assign(
+                consulta,
+                existente,
+                dados
+            );
+
+            consulta.id_consulta = id;
+
+            const result =
+                await this.#dao.update(
+                    consulta
+                );
+
+            return {
+                atualizado:
+                    result.changedRows > 0
+            };
         }
 
-        const consulta = new Consultas();
-
-        Object.assign(consulta, dados);
-
-        consulta.id_consulta = id;
-
-        const result =
-            await this.#dao.update(consulta);
-
-        return {
-            atualizado:
-                result.changedRows > 0
-        };
+        throw new ErrorResponse(
+            403,
+            "Acesso negado"
+        );
     }
 
     delete = async (id, user) => {
