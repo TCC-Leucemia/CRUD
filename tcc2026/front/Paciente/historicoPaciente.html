@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HematoAI · Meu Histórico</title>
+  <link rel="stylesheet" href="../CSS/navbar.css">
+  <style>
+    body { background: var(--bg); }
+
+    .pac-wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 0 48px;
+    }
+
+    /* ── Navegação ────────────────────────────────────── */
+    .pac-nav {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 28px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 6px;
+      box-shadow: var(--shadow-sm);
+      max-width: 540px;
+    }
+
+    .pac-nav-btn {
+      flex: 1;
+      padding: 12px 20px;
+      border: none;
+      border-radius: var(--radius-lg);
+      font-size: .9rem;
+      font-weight: 700;
+      font-family: var(--font);
+      cursor: pointer;
+      transition: var(--transition);
+      background: transparent;
+      color: var(--text-2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .pac-nav-btn:hover { background: var(--bg); color: var(--text-1); }
+    .pac-nav-btn.ativo {
+      background: var(--red);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(185,28,28,.25);
+    }
+
+    /* ── Grid ──────────────────────────────────────────── */
+    .pac-grid {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    /* Lista lateral */
+    .lista-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      position: sticky;
+      top: 20px;
+    }
+
+    .lista-header {
+      padding: 15px 20px;
+      border-bottom: 1px solid var(--border);
+      font-weight: 700;
+      font-size: .875rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg);
+    }
+
+    .lista-body { overflow-y: auto; max-height: calc(100vh - 280px); }
+    .lista-body::-webkit-scrollbar { width: 4px; }
+    .lista-body::-webkit-scrollbar-thumb { background: var(--border-dark); border-radius: 2px; }
+
+    .lista-item {
+      padding: 15px 20px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .lista-item:last-child { border-bottom: none; }
+    .lista-item:hover { background: var(--bg); }
+    .lista-item.selecionado {
+      background: var(--red-light);
+      border-left: 3px solid var(--red);
+      padding-left: 17px;
+    }
+
+    .item-topo {
+      display: flex; align-items: center;
+      justify-content: space-between; margin-bottom: 4px;
+    }
+    .item-titulo { font-weight: 700; font-size: .875rem; color: var(--text-1); }
+    .item-data   { font-size: .72rem; color: var(--text-3); }
+    .item-sub    { font-size: .78rem; color: var(--text-2); margin-bottom: 6px; }
+
+    /* Painel de detalhe */
+    .detalhe-panel { display: flex; flex-direction: column; gap: 14px; }
+
+    .detalhe-vazio {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 70px 20px;
+      color: var(--text-3);
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .detalhe-secao {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      animation: fadeUp .2s ease;
+    }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+
+    .detalhe-secao-header {
+      padding: 13px 22px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      font-weight: 700; font-size: .875rem;
+      display: flex; align-items: center; gap: 8px;
+      color: var(--text-1);
+    }
+
+    .detalhe-secao-body { padding: 20px 22px; }
+
+    .detalhe-linha {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 6px 14px;
+      margin-bottom: 10px;
+      font-size: .875rem;
+    }
+    .detalhe-linha:last-child { margin-bottom: 0; }
+    .detalhe-label { color: var(--text-2); font-weight: 600; font-size: .82rem; }
+    .detalhe-valor { color: var(--text-1); }
+
+    /* Diagnóstico do médico */
+    .diagnostico-box {
+      background: var(--blue-light);
+      border: 1px solid #bfdbfe;
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+    }
+    .diagnostico-label {
+      font-size: .68rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1px;
+      color: var(--blue); margin-bottom: 8px;
+    }
+    .diagnostico-texto {
+      font-size: .875rem;
+      line-height: 1.75;
+      color: var(--text-1);
+      white-space: pre-wrap;
+    }
+    .badge-diagnostico {
+      display: inline-block;
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: .78rem;
+      font-weight: 700;
+    }
+    .diag-alta     { background: var(--red-mid);      color: var(--red);    }
+    .diag-moderada { background: var(--yellow-light); color: var(--yellow); }
+    .diag-baixa    { background: var(--green-light);  color: var(--green);  }
+    .diag-sem      { background: #f1f5f9;             color: #475569;       }
+
+    /* ── Calendário ────────────────────────────────────── */
+    .calendario-wrapper {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-sm);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .cal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .cal-header .mes-ano {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--text-1);
+    }
+    .cal-nav-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 40px;
+      padding: 6px 14px;
+      font-size: .85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      color: var(--text-2);
+    }
+    .cal-nav-btn:hover {
+      background: var(--bg);
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      text-align: center;
+    }
+    .cal-grid .weekday {
+      font-weight: 700;
+      font-size: .7rem;
+      text-transform: uppercase;
+      color: var(--text-3);
+      padding: 6px 0;
+    }
+    .cal-grid .day {
+      padding: 8px 0;
+      border-radius: var(--radius-md);
+      font-size: .85rem;
+      font-weight: 500;
+      color: var(--text-1);
+      transition: var(--transition);
+      cursor: default;
+      position: relative;
+    }
+    .cal-grid .day.other-month {
+      color: var(--text-3);
+      opacity: .5;
+    }
+    .cal-grid .day.has-consulta {
+      background: var(--red-light);
+      color: var(--red);
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .cal-grid .day.has-consulta:hover {
+      background: var(--red-mid);
+    }
+    .cal-grid .day.today {
+      border: 2px solid var(--red);
+      background: var(--surface);
+    }
+    .cal-grid .day .lembrete-badge {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      background: var(--red);
+      color: white;
+      font-size: .55rem;
+      font-weight: 700;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ── Modo escuro ── */
+    .dark-mode .diagnostico-box {
+      background: #1e3a8a;
+      border-color: #3b82f6;
+    }
+    .dark-mode .diagnostico-label {
+      color: #93c5fd;
+    }
+    .dark-mode .diagnostico-texto {
+      color: #e2e8f0;
+    }
+    .dark-mode .diag-alta     { background: #7f1d1d; color: #fca5a5; }
+    .dark-mode .diag-moderada { background: #78350f; color: #fcd34d; }
+    .dark-mode .diag-baixa    { background: #1e3a8a; color: #93c5fd; }
+    .dark-mode .diag-sem      { background: #334155; color: #cbd5e1; }
+
+    .dark-mode .calendario-wrapper {
+      background: var(--surface);
+      border-color: var(--border);
+    }
+    .dark-mode .cal-grid .day.has-consulta {
+      background: #7f1d1d;
+      color: #fca5a5;
+    }
+    .dark-mode .cal-grid .day.today {
+      border-color: var(--red);
+      background: var(--surface);
+    }
+    .dark-mode .cal-grid .day.other-month {
+      color: var(--text-3);
+    }
+
+    .dark-mode .badge.badge-green {
+      background: #064e3b;
+      color: #6ee7b7;
+    }
+    .dark-mode .badge.badge-blue {
+      background: #1e3a8a;
+      color: #93c5fd;
+    }
+    .dark-mode .badge.badge-yellow {
+      background: #78350f;
+      color: #fcd34d;
+    }
+    .dark-mode .badge.badge-gray {
+      background: #334155;
+      color: #cbd5e1;
+    }
+    .dark-mode .badge.badge-purple {
+      background: #4c1d95;
+      color: #c4b5fd;
+    }
+
+    .dark-mode .lista-item { border-bottom-color: var(--border); }
+    .dark-mode .lista-item.selecionado { background: #1e293b; border-left-color: var(--red); }
+    .dark-mode .item-titulo { color: var(--text-1); }
+    .dark-mode .item-data   { color: var(--text-3); }
+    .dark-mode .item-sub    { color: var(--text-2); }
+    .dark-mode .detalhe-secao { background: var(--surface); border-color: var(--border); }
+    .dark-mode .detalhe-secao-header { background: var(--bg); border-bottom-color: var(--border); color: var(--text-1); }
+    .dark-mode .detalhe-label { color: var(--text-2); }
+    .dark-mode .detalhe-valor { color: var(--text-1); }
+    .dark-mode .detalhe-vazio { background: var(--surface); border-color: var(--border); color: var(--text-3); }
+    .dark-mode .pac-nav { background: var(--surface); border-color: var(--border); }
+    .dark-mode .pac-nav-btn { color: var(--text-2); }
+    .dark-mode .pac-nav-btn:hover { background: var(--bg); color: var(--text-1); }
+
+    /* Botão Exportar PDF */
+    .btn-exportar-pdf {
+      background: var(--red);
+      border: none;
+      color: white;
+      padding: 13px 28px;
+      border-radius: 40px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: var(--transition);
+      width: 50%;
+      margin-top: 4px;
+      font-family: var(--font);
+      box-shadow: 0 2px 8px rgba(185,28,28,0.3);
+      display: none;
+    }
+    .btn-exportar-pdf:hover {
+      background: var(--red-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(185,28,28,0.4);
+    }
+    .btn-exportar-pdf:active { transform: translateY(0); }
+
+    @media (max-width: 900px) {
+      .pac-grid { grid-template-columns: 1fr; }
+      .lista-panel { position: static; }
+      .lista-body { max-height: 340px; }
+    }
+    @media (max-width: 540px) {
+      .pac-nav { max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<button class="sidebar-toggle" id="sidebarToggle">☰</button>
+
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <div class="main-content">
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>Meu Histórico Clínico</h1>
+        <p>Consulte suas consultas e exames realizados no HematoAI</p>
+      </div>
+      <div class="page-header-right">
+        <span class="badge badge-green">Paciente</span>
+      </div>
+    </div>
+
+    <div class="page-body">
+      <div class="pac-wrap">
+
+        <!-- ── Calendário ─────────────────────────────────── -->
+        <div class="calendario-wrapper" id="calendarioWrapper">
+          <div class="cal-header">
+            <button class="cal-nav-btn" id="calAnterior">◀</button>
+            <span class="mes-ano" id="mesAno"></span>
+            <button class="cal-nav-btn" id="calProximo">▶</button>
+          </div>
+          <div class="cal-grid" id="calGrid"></div>
+        </div>
+
+        <!-- ── Navegação Consultas / Exames ──────────────── -->
+        <div class="pac-nav">
+          <button class="pac-nav-btn ativo" id="btnConsultas">Consultas</button>
+          <button class="pac-nav-btn" id="btnExames">Exames</button>
+        </div>
+
+        <!-- ── Grid ───────────────────────────────────────── -->
+        <div class="pac-grid">
+
+          <!-- Lista lateral -->
+          <div class="lista-panel">
+            <div class="lista-header">
+              <span id="listaTitulo">Minhas Consultas</span>
+              <span class="badge badge-gray" id="listaContador">0</span>
+            </div>
+            <div class="lista-body" id="listaBody"></div>
+          </div>
+
+          <!-- Detalhe + Botão -->
+          <div style="display:flex;flex-direction:column;gap:14px;align-items:center;">
+            <div class="detalhe-panel" id="detalhePanel" style="width:100%;">
+              <div class="detalhe-vazio">
+                <p style="font-size:.95rem;font-weight:700;color:var(--text-2);margin-bottom:8px;">
+                  Selecione um item
+                </p>
+                <p style="font-size:.82rem;">
+                  Clique em um registro à esquerda para ver os detalhes completos.
+                </p>
+              </div>
+            </div>
+            <button class="btn-exportar-pdf" id="btnExportarPDF">📄 Exportar PDF</button>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../JS/navbar.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════════
+   DADOS FICTÍCIOS — substituir por chamada à API real
+═══════════════════════════════════════════════════════ */
+
+// Consultas (sem anamnese e sem IA)
+const CONSULTAS = [
+  {
+    id: 1,
+    medico: 'Dr. Carlos Mendes',
+    crm: '12345-SP',
+    especialidade: 'Hematologia',
+    data: '2026-03-05',
+    tipo: 'Hemograma Completo',
+    status: 'Finalizado',
+  },
+  {
+    id: 2,
+    medico: 'Dra. Ana Lima',
+    crm: '54321-RJ',
+    especialidade: 'Oncologia',
+    data: '2026-01-18',
+    tipo: 'Mielograma',
+    status: 'Finalizado',
+  },
+  {
+    id: 3,
+    medico: 'Dr. João Silva',
+    crm: '99999-MG',
+    especialidade: 'Hematologia',
+    data: '2025-11-22',
+    tipo: 'Consulta de Rotina',
+    status: 'Finalizado',
+  },
+  {
+    id: 4,
+    medico: 'Dra. Ana Lima',
+    crm: '54321-RJ',
+    especialidade: 'Oncologia',
+    data: '2026-04-10',
+    tipo: 'Consulta de Acompanhamento',
+    status: 'Pendente',
+  },
+];
+
+// Exames (com diagnóstico do médico – tabela resultados_exame)
+const EXAMES = [
+  {
+    id: 1,
+    tipo: 'Hemograma Completo',
+    data: '2026-03-05',
+    medico: 'Dr. Carlos Mendes',
+    laboratorio: 'Lab HematoAI — Unidade Central',
+    status: 'Finalizado',
+    diagnostico: {
+      resultado_texto: 'Pancitopenia parcial com linfocitose acentuada. Morfologia linfocitária atípica em 35% das células. Indicado encaminhamento para imunofenotipagem.',
+      suspeita_leucemia: 'Moderada',
+      tipo_leucemia: 'LLC',
+      data_resultado: '2026-03-06',
+    },
+  },
+  {
+    id: 2,
+    tipo: 'Mielograma',
+    data: '2026-01-18',
+    medico: 'Dra. Ana Lima',
+    laboratorio: 'Lab HematoAI — Unidade Sul',
+    status: 'Finalizado',
+    diagnostico: {
+      resultado_texto: 'Hipoplasia eritróide e megacariocítica. Predominância de blastos com morfologia característica de LMA. Citogenética pendente.',
+      suspeita_leucemia: 'Alta',
+      tipo_leucemia: 'LMA',
+      data_resultado: '2026-01-20',
+    },
+  },
+  {
+    id: 3,
+    tipo: 'Hemograma de Controle',
+    data: '2025-11-22',
+    medico: 'Dr. João Silva',
+    laboratorio: 'Lab HematoAI — Unidade Central',
+    status: 'Finalizado',
+    diagnostico: {
+      resultado_texto: 'Todos os parâmetros dentro dos valores de referência. Nenhuma alteração morfológica identificada. Próximo exame recomendado em 6 meses.',
+      suspeita_leucemia: 'Sem suspeita',
+      tipo_leucemia: 'Não identificado',
+      data_resultado: '2025-11-23',
+    },
+  },
+  {
+    id: 4,
+    tipo: 'PCR e VHS',
+    data: '2026-03-05',
+    medico: 'Dr. Carlos Mendes',
+    laboratorio: 'Lab HematoAI — Unidade Central',
+    status: 'Finalizado',
+    diagnostico: {
+      resultado_texto: 'Marcadores inflamatórios elevados, compatíveis com processo proliferativo sistêmico identificado no hemograma. Monitoramento recomendado.',
+      suspeita_leucemia: 'Baixa',
+      tipo_leucemia: 'Não identificado',
+      data_resultado: '2026-03-07',
+    },
+  },
+];
+
+/* ═══════════════════════════════════════════════════════
+   ESTADO
+═══════════════════════════════════════════════════════ */
+let viewAtiva  = 'consultas';
+let idSelecionado = null;
+
+// Sessão
+localStorage.setItem('hematoai_session', JSON.stringify({
+  tipo: 'Paciente',
+  nome: 'Ana Paula Lima',
+  email: 'paciente@email.com',
+  cpf: '33333333333'
+}));
+
+// Inicializar sidebar
+if (typeof HematoAI !== 'undefined' && HematoAI.initSidebar) {
+  HematoAI.initSidebar('historico');
+}
+
+/* ═══════════════════════════════════════════════════════
+   CALENDÁRIO
+═══════════════════════════════════════════════════════ */
+let mesAtual = new Date().getMonth();
+let anoAtual = new Date().getFullYear();
+
+function renderCalendario(mes, ano) {
+  const grid = document.getElementById('calGrid');
+  const mesAnoEl = document.getElementById('mesAno');
+  const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  mesAnoEl.textContent = `${meses[mes]} ${ano}`;
+
+  const primeiroDia = new Date(ano, mes, 1).getDay(); // 0=Dom
+  const diasNoMes = new Date(ano, mes + 1, 0).getDate();
+  const hoje = new Date();
+
+  // Dias do mês anterior para preencher
+  const diasMesAnterior = new Date(ano, mes, 0).getDate();
+
+  let html = '';
+  // Cabeçalho dos dias da semana
+  const semana = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+  semana.forEach(d => html += `<div class="weekday">${d}</div>`);
+
+  // Dias do mês anterior
+  for (let i = primeiroDia; i > 0; i--) {
+    const dia = diasMesAnterior - i + 1;
+    html += `<div class="day other-month">${dia}</div>`;
+  }
+
+  // Dias do mês atual
+  for (let d = 1; d <= diasNoMes; d++) {
+    const dataStr = `${ano}-${String(mes+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday = (d === hoje.getDate() && mes === hoje.getMonth() && ano === hoje.getFullYear());
+    const temConsulta = CONSULTAS.some(c => c.data === dataStr);
+    let classes = 'day';
+    if (temConsulta) classes += ' has-consulta';
+    if (isToday) classes += ' today';
+    html += `<div class="${classes}" data-data="${dataStr}">${d}`;
+    // Lembrete se consulta futura
+    if (temConsulta && new Date(dataStr) > hoje) {
+      html += `<span class="lembrete-badge">!</span>`;
+    }
+    html += `</div>`;
+  }
+
+  grid.innerHTML = html;
+
+  // Adicionar evento de clique nos dias com consulta para selecionar a consulta
+  document.querySelectorAll('.day.has-consulta').forEach(el => {
+    el.addEventListener('click', function() {
+      const data = this.dataset.data;
+      const consulta = CONSULTAS.find(c => c.data === data);
+      if (consulta) {
+        // Muda para a aba consultas e seleciona o item
+        setView('consultas');
+        idSelecionado = consulta.id;
+        renderLista(CONSULTAS, 'consulta');
+        renderDetalheConsulta(consulta);
+        document.getElementById('btnExportarPDF').style.display = 'block';
+      }
+    });
+  });
+}
+
+document.getElementById('calAnterior').addEventListener('click', () => {
+  if (mesAtual === 0) { mesAtual = 11; anoAtual--; }
+  else mesAtual--;
+  renderCalendario(mesAtual, anoAtual);
+});
+document.getElementById('calProximo').addEventListener('click', () => {
+  if (mesAtual === 11) { mesAtual = 0; anoAtual++; }
+  else mesAtual++;
+  renderCalendario(mesAtual, anoAtual);
+});
+
+/* ═══════════════════════════════════════════════════════
+   NAVEGAÇÃO
+═══════════════════════════════════════════════════════ */
+document.getElementById('btnConsultas').addEventListener('click', () => setView('consultas'));
+document.getElementById('btnExames').addEventListener('click',   () => setView('exames'));
+
+function setView(view) {
+  viewAtiva = view;
+  idSelecionado = null;
+
+  document.getElementById('btnConsultas').classList.toggle('ativo', view === 'consultas');
+  document.getElementById('btnExames').classList.toggle('ativo',    view === 'exames');
+
+  if (view === 'consultas') {
+    document.getElementById('listaTitulo').textContent = 'Minhas Consultas';
+    renderLista(CONSULTAS, 'consulta');
+  } else {
+    document.getElementById('listaTitulo').textContent = 'Meus Exames';
+    renderLista(EXAMES, 'exame');
+  }
+
+  document.getElementById('detalhePanel').innerHTML = `
+    <div class="detalhe-vazio">
+      <p style="font-size:.95rem;font-weight:700;color:var(--text-2);margin-bottom:8px;">Selecione um item</p>
+      <p style="font-size:.82rem;">Clique em um registro à esquerda para ver os detalhes completos.</p>
+    </div>`;
+  document.getElementById('btnExportarPDF').style.display = 'none';
+}
+
+/* ═══════════════════════════════════════════════════════
+   RENDERIZAR LISTA
+═══════════════════════════════════════════════════════ */
+function renderLista(dados, tipo) {
+  const body = document.getElementById('listaBody');
+  document.getElementById('listaContador').textContent = dados.length;
+  body.innerHTML = '';
+
+  if (!dados.length) {
+    body.innerHTML = `<div class="empty-state" style="padding:40px 20px">
+      <p>Nenhum registro encontrado.</p></div>`;
+    return;
+  }
+
+  dados.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'lista-item' + (idSelecionado === item.id ? ' selecionado' : '');
+
+    if (tipo === 'consulta') {
+      div.innerHTML = `
+        <div class="item-topo">
+          <span class="item-titulo">${item.tipo}</span>
+          <span class="item-data">${formatarData(item.data)}</span>
+        </div>
+        <div class="item-sub">${item.medico} · ${item.especialidade}</div>
+        <span class="badge badge-${corStatus(item.status)}" style="font-size:.68rem">${item.status}</span>`;
+      div.addEventListener('click', () => {
+        idSelecionado = item.id;
+        renderLista(CONSULTAS, 'consulta');
+        renderDetalheConsulta(item);
+        document.getElementById('btnExportarPDF').style.display = 'block';
+      });
+    } else {
+      // Exames
+      const diag = item.diagnostico || {};
+      div.innerHTML = `
+        <div class="item-topo">
+          <span class="item-titulo">${item.tipo}</span>
+          <span class="item-data">${formatarData(item.data)}</span>
+        </div>
+        <div class="item-sub">${item.medico} · ${item.laboratorio}</div>
+        <span class="badge badge-${corStatus(item.status)}" style="font-size:.68rem">${item.status}</span>`;
+      div.addEventListener('click', () => {
+        idSelecionado = item.id;
+        renderLista(EXAMES, 'exame');
+        renderDetalheExame(item);
+        document.getElementById('btnExportarPDF').style.display = 'block';
+      });
+    }
+
+    body.appendChild(div);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════
+   DETALHE CONSULTA (sem anamnese/IA)
+═══════════════════════════════════════════════════════ */
+function renderDetalheConsulta(c) {
+  document.getElementById('detalhePanel').innerHTML = `
+    <div class="detalhe-secao">
+      <div class="detalhe-secao-header">Dados da Consulta</div>
+      <div class="detalhe-secao-body">
+        <div class="detalhe-linha">
+          <span class="detalhe-label">Médico</span>
+          <span class="detalhe-valor"><strong>${c.medico}</strong></span>
+        </div>
+        <div class="detalhe-linha">
+          <span class="detalhe-label">CRM</span>
+          <span class="detalhe-valor" style="font-family:var(--font-mono);font-size:.82rem">${c.crm}</span>
+        </div>
+        <div class="detalhe-linha">
+          <span class="detalhe-label">Especialidade</span>
+          <span class="detalhe-valor">${c.especialidade}</span>
+        </div>
+        <div class="detalhe-linha">
+          <span class="detalhe-label">Data</span>
+          <span class="detalhe-valor">${formatarDataLonga(c.data)}</span>
+        </div>
+        <div class="detalhe-linha">
+          <span class="detalhe-label">Tipo</span>
+          <span class="detalhe-valor">${c.tipo}</span>
+        </div>
+        <div class="detalhe-linha">
+          <span class="detalhe-label">Status</span>
+          <span class="detalhe-valor">
+            <span class="badge badge-${corStatus(c.status)}">${c.status}</span>
+          </span>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* ═══════════════════════════════════════════════════════
+   DETALHE EXAME (com diagnóstico do médico)
+═══════════════════════════════════════════════════════ */
+function renderDetalheExame(e) {
+  const d = e.diagnostico || {};
+  const suspeitaMap = { 'Alta':'diag-alta', 'Moderada':'diag-moderada', 'Baixa':'diag-baixa', 'Sem suspeita':'diag-sem' };
+  const classeSuspeita = suspeitaMap[d.suspeita_leucemia] || 'diag-sem';
+
+  document.getElementById('detalhePanel').innerHTML = `
+    <div class="detalhe-secao">
+      <div class="detalhe-secao-header">Informações do Exame</div>
+      <div class="detalhe-secao-body">
+        <div class="detalhe-linha">
+          <span class="detalhe-label">Tipo</span>
+          <span class="detalhe-valor"><strong>${e.tipo}</strong></span>
+        </div>
+        <div class="detalhe-linha">
+          <span class="detalhe-label">Data</span>
+          <span class="detalhe-valor">${formatarDataLonga(e.data)}</span>
+        </div>
+        <div class="detalhe-linha">
+          <span class="detalhe-label">Médico</span>
+          <span class="detalhe-valor">${e.medico}</span>
+        </div>
+        <div class="detalhe-linha">
+          <span class="detalhe-label">Laboratório</span>
+          <span class="detalhe-valor">${e.laboratorio}</span>
+        </div>
+        <div class="detalhe-linha">
+          <span class="detalhe-label">Status</span>
+          <span class="detalhe-valor">
+            <span class="badge badge-${corStatus(e.status)}">${e.status}</span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="detalhe-secao">
+      <div class="detalhe-secao-header">Diagnóstico do Médico</div>
+      <div class="detalhe-secao-body">
+        <div class="diagnostico-box">
+          <div class="diagnostico-label">Resultado do Exame</div>
+          <div class="diagnostico-texto">${d.resultado_texto || 'Não informado'}</div>
+          <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+            <span class="badge-diagnostico ${classeSuspeita}">${d.suspeita_leucemia || '—'}</span>
+            ${d.tipo_leucemia && d.tipo_leucemia !== 'Não identificado'
+              ? `<span class="badge badge-purple">Tipo: ${d.tipo_leucemia}</span>`
+              : ''}
+          </div>
+          <div style="margin-top:10px;font-size:.78rem;color:var(--text-3);">
+            Data do resultado: ${formatarData(d.data_resultado) || '—'}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* ═══════════════════════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════════════════════ */
+function corStatus(s) {
+  return { Finalizado:'green', 'Em andamento':'blue', Pendente:'yellow' }[s] || 'gray';
+}
+function formatarData(d) {
+  if (!d) return '—';
+  return new Date(d + 'T00:00:00').toLocaleDateString('pt-BR');
+}
+function formatarDataLonga(d) {
+  if (!d) return '—';
+  return new Date(d + 'T00:00:00').toLocaleDateString('pt-BR', {
+    day: '2-digit', month: 'long', year: 'numeric'
+  });
+}
+
+// Botão Exportar PDF (simulação)
+document.getElementById('btnExportarPDF').addEventListener('click', function() {
+  HematoAI.showToast('PDF exportado com sucesso!', 'success');
+});
+
+/* ── Inicializa calendário e lista ── */
+renderCalendario(mesAtual, anoAtual);
+setView('consultas');
+</script>
+</body>
+</html>

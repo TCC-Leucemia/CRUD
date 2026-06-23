@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="pt-BR" id="htmlRoot">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HematoAI · Configurações</title>
+  <link rel="stylesheet" href="../CSS/navbar.css">
+  <style>
+    .settings-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+
+    .settings-section {
+      margin-bottom: 28px;
+    }
+
+    .settings-section-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-1);
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .settings-section-title svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--red);
+    }
+
+    .theme-toggle-container {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .theme-option {
+      flex: 1;
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .theme-option:hover {
+      border-color: var(--red);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .theme-option.active {
+      border-color: var(--red);
+      background: var(--bg);
+    }
+
+    .theme-icon {
+      font-size: 2.5rem;
+      margin-bottom: 12px;
+    }
+
+    .theme-name {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--text-1);
+      margin-bottom: 4px;
+    }
+
+    .theme-desc {
+      font-size: 0.72rem;
+      color: var(--text-3);
+    }
+
+    .password-form {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 20px;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .info-message {
+      background: var(--blue-light);
+      border: 1px solid #bfdbfe;
+      border-radius: var(--radius-lg);
+      padding: 12px 16px;
+      font-size: 0.82rem;
+      color: var(--blue);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .info-message svg {
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 768px) {
+      .settings-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .password-strength {
+      margin-top: 6px;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .password-strength-bar {
+      height: 100%;
+      width: 0%;
+      transition: width 0.3s ease;
+      border-radius: 2px;
+    }
+
+    .strength-weak { background: #dc2626; width: 33%; }
+    .strength-medium { background: #f59e0b; width: 66%; }
+    .strength-strong { background: #10b981; width: 100%; }
+
+    .strength-text {
+      font-size: 0.7rem;
+      margin-top: 4px;
+      color: var(--text-3);
+    }
+
+    .field-hint {
+      font-size: 0.72rem;
+      color: var(--text-3);
+      margin-top: 4px;
+    }
+
+    /* ── MODO ESCURO - CORREÇÃO ── */
+    .dark-mode {
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --border: #334155;
+      --text-1: #f1f5f9;
+      --text-2: #cbd5e1;
+      --text-3: #94a3b8;
+      --red: #ef4444;
+      --red-light: #7f1d1d;
+      --blue: #3b82f6;
+      --blue-light: #1e3a8a;
+      --green: #10b981;
+      --green-light: #064e3b;
+      --purple: #a855f7;
+      --purple-light: #4c1d95;
+      --yellow: #f59e0b;
+      --yellow-light: #78350f;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Transição suave para o tema */
+    body, .card, .quick-card, .sidebar, .modal, input, select, button {
+      transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+
+<button class="sidebar-toggle" id="sidebarToggle">☰</button>
+
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <div class="main-content">
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>Configurações</h1>
+        <p>Preferências do sistema e segurança da conta</p>
+      </div>
+      <div class="page-header-right">
+        <span class="badge badge-green">Administrador</span>
+      </div>
+    </div>
+
+    <div class="page-body">
+      <div class="settings-grid">
+        
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Aparência</span>
+          </div>
+          <div class="card-body">
+            <div class="settings-section">
+              <div class="settings-section-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="5"/>
+                  <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                </svg>
+                Tema do Sistema
+              </div>
+              <div class="theme-toggle-container">
+                <div class="theme-option" id="themeLight">
+                  <div class="theme-icon">☀️</div>
+                  <div class="theme-name">Claro</div>
+                  <div class="theme-desc">Tema padrão com fundo claro</div>
+                </div>
+                <div class="theme-option" id="themeDark">
+                  <div class="theme-icon">🌙</div>
+                  <div class="theme-name">Escuro</div>
+                  <div class="theme-desc">Reduz o brilho para conforto visual</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="info-message">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              <span>A preferência de tema é salva automaticamente e persistirá em todos os acessos.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Segurança</span>
+          </div>
+          <div class="card-body">
+            <div class="settings-section">
+              <div class="settings-section-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2L3 7v7c0 5.5 9 8 9 8s9-2.5 9-8V7l-9-5z"/>
+                  <path d="M12 12v4M12 8h.01"/>
+                </svg>
+                Alterar Credenciais
+              </div>
+              
+              <div class="password-form">
+                <div class="form-grid">
+                  <div class="form-group col-span-2">
+                    <label>E-mail atual *</label>
+                    <input type="email" id="emailAtual" placeholder="admin@hematoai.com">
+                  </div>
+                  <div class="form-group">
+                    <label>Senha atual *</label>
+                    <input type="password" id="senhaAtual" placeholder="••••••••">
+                  </div>
+                  <div class="form-group">
+                    <label>Novo e-mail</label>
+                    <input type="email" id="novoEmail" placeholder="novo@email.com">
+                    <div class="field-hint">Deixe em branco para manter o mesmo</div>
+                  </div>
+                  <div class="form-group">
+                    <label>Nova senha</label>
+                    <input type="password" id="novaSenha" placeholder="Nova senha">
+                  </div>
+                  <div class="form-group">
+                    <label>Confirmar nova senha</label>
+                    <input type="password" id="confirmarSenha" placeholder="Confirme a nova senha">
+                  </div>
+                  <div class="form-group col-span-2" id="senhaStrengthContainer" style="display: none;">
+                    <div class="password-strength">
+                      <div class="password-strength-bar" id="strengthBar"></div>
+                    </div>
+                    <div class="strength-text" id="strengthText"></div>
+                  </div>
+                </div>
+                
+                <div class="form-actions">
+                  <button class="btn btn-ghost" id="btnCancelarAlteracao">Cancelar</button>
+                  <button class="btn btn-primary" id="btnSalvarCredenciais">Salvar Alterações</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="info-message" style="margin-top: 16px; background: var(--yellow-light); border-color: #fde68a; color: #d97706;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              <span>Recomendamos alterar sua senha periodicamente para maior segurança.</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="card" style="margin-top: 24px;">
+        <div class="card-header">
+          <span class="card-title">Sessão Atual</span>
+        </div>
+        <div class="card-body">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="width: 40px; height: 40px; background: var(--red-light); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                  <span style="font-size: 1.2rem;">👤</span>
+                </div>
+                <div>
+                  <div style="font-weight: 700; color: var(--text-1);" id="usuarioNome">Administrador</div>
+                  <div style="font-size: 0.75rem; color: var(--text-3);" id="usuarioEmail">admin@hematoai.com</div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <button class="btn btn-outline" id="btnSairSistema">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline; margin-right: 6px;">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                  <polyline points="16 17 21 12 16 7"/>
+                  <line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+                Sair do Sistema
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="../JS/navbar.js"></script>
+<script>
+  // ============================================
+  // CONFIGURAÇÕES - USANDO FUNÇÕES GLOBAIS
+  // ============================================
+  
+  // Carregar tema ao iniciar
+  const temaAtual = localStorage.getItem('hematoai_theme') || 'light';
+  
+  // Atualizar UI dos botões de tema
+  function atualizarBotoesTema(tema) {
+    const themeLight = document.getElementById('themeLight');
+    const themeDark = document.getElementById('themeDark');
+    if (themeLight) themeLight.classList.toggle('active', tema === 'light');
+    if (themeDark) themeDark.classList.toggle('active', tema === 'dark');
+  }
+
+  // Aplicar tema usando a função global
+  function aplicarTemaConfig(tema) {
+    if (typeof HematoAI !== 'undefined' && HematoAI.aplicarTema) {
+      HematoAI.aplicarTema(tema);
+    } else {
+      // Fallback caso a função não esteja disponível
+      if (tema === 'dark') {
+        document.body.classList.add('dark-mode');
+        document.documentElement.setAttribute('data-theme', 'dark');
+      } else {
+        document.body.classList.remove('dark-mode');
+        document.documentElement.removeAttribute('data-theme');
+      }
+      localStorage.setItem('hematoai_theme', tema);
+    }
+    atualizarBotoesTema(tema);
+  }
+
+  // Event listeners dos botões
+  document.getElementById('themeLight').addEventListener('click', function() {
+    aplicarTemaConfig('light');
+  });
+  
+  document.getElementById('themeDark').addEventListener('click', function() {
+    aplicarTemaConfig('dark');
+  });
+
+  // Inicializar
+  atualizarBotoesTema(temaAtual);
+  
+  // Carregar dados do usuário
+  let usuarioLogado = {
+    nome: 'Administrador HematoAI',
+    email: 'admin@hematoai.com',
+    senha: 'admin123'
+  };
+
+  function carregarDadosUsuario() {
+    const usuarioNome = document.getElementById('usuarioNome');
+    const usuarioEmail = document.getElementById('usuarioEmail');
+    if (usuarioNome) usuarioNome.textContent = usuarioLogado.nome;
+    if (usuarioEmail) usuarioEmail.textContent = usuarioLogado.email;
+  }
+
+  // Força de senha
+  function verificarForcaSenha(senha) {
+    const container = document.getElementById('senhaStrengthContainer');
+    const bar = document.getElementById('strengthBar');
+    const text = document.getElementById('strengthText');
+    
+    if (!container || !bar || !text) return;
+    
+    if (!senha || senha.length === 0) {
+      container.style.display = 'none';
+      return;
+    }
+    
+    container.style.display = 'block';
+    
+    let forca = 0;
+    if (senha.length >= 8) forca++;
+    if (senha.match(/[a-z]/) && senha.match(/[A-Z]/)) forca++;
+    if (senha.match(/[0-9]/)) forca++;
+    if (senha.match(/[^a-zA-Z0-9]/)) forca++;
+    
+    if (forca <= 1) {
+      bar.className = 'password-strength-bar strength-weak';
+      text.textContent = 'Força: Fraca - Use pelo menos 8 caracteres com letras, números e símbolos';
+      text.style.color = '#dc2626';
+    } else if (forca <= 2) {
+      bar.className = 'password-strength-bar strength-medium';
+      text.textContent = 'Força: Média - Boa, mas pode melhorar';
+      text.style.color = '#f59e0b';
+    } else {
+      bar.className = 'password-strength-bar strength-strong';
+      text.textContent = 'Força: Forte - Excelente senha!';
+      text.style.color = '#10b981';
+    }
+  }
+
+  document.getElementById('novaSenha').addEventListener('input', function(e) {
+    verificarForcaSenha(e.target.value);
+  });
+
+  // Validar e salvar credenciais
+  function validarCredenciais() {
+    const emailAtual = document.getElementById('emailAtual')?.value.trim() || '';
+    const senhaAtual = document.getElementById('senhaAtual')?.value || '';
+    const novoEmail = document.getElementById('novoEmail')?.value.trim() || '';
+    const novaSenha = document.getElementById('novaSenha')?.value || '';
+    const confirmarSenha = document.getElementById('confirmarSenha')?.value || '';
+    
+    if (!emailAtual || !senhaAtual) {
+      if (typeof HematoAI !== 'undefined') HematoAI.showToast('Preencha o e-mail e senha atuais.', 'error');
+      return false;
+    }
+    
+    if (emailAtual !== usuarioLogado.email) {
+      if (typeof HematoAI !== 'undefined') HematoAI.showToast('E-mail atual incorreto.', 'error');
+      return false;
+    }
+    
+    if (senhaAtual !== usuarioLogado.senha) {
+      if (typeof HematoAI !== 'undefined') HematoAI.showToast('Senha atual incorreta.', 'error');
+      return false;
+    }
+    
+    if (novaSenha && novaSenha !== confirmarSenha) {
+      if (typeof HematoAI !== 'undefined') HematoAI.showToast('As novas senhas não coincidem.', 'error');
+      return false;
+    }
+    
+    if (novaSenha && novaSenha.length < 8) {
+      if (typeof HematoAI !== 'undefined') HematoAI.showToast('A nova senha deve ter no mínimo 8 caracteres.', 'error');
+      return false;
+    }
+    
+    if (novoEmail && !novoEmail.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+      if (typeof HematoAI !== 'undefined') HematoAI.showToast('E-mail inválido.', 'error');
+      return false;
+    }
+    
+    return true;
+  }
+
+  function salvarCredenciais() {
+    if (!validarCredenciais()) return;
+    
+    const novoEmail = document.getElementById('novoEmail')?.value.trim() || '';
+    const novaSenha = document.getElementById('novaSenha')?.value || '';
+    
+    if (novoEmail) {
+      usuarioLogado.email = novoEmail;
+      
+      if (localStorage.getItem('hematoai_session')) {
+        const session = JSON.parse(localStorage.getItem('hematoai_session'));
+        session.email = novoEmail;
+        localStorage.setItem('hematoai_session', JSON.stringify(session));
+      }
+    }
+    
+    if (novaSenha) {
+      usuarioLogado.senha = novaSenha;
+    }
+    
+    carregarDadosUsuario();
+    
+    document.getElementById('emailAtual').value = '';
+    document.getElementById('senhaAtual').value = '';
+    document.getElementById('novoEmail').value = '';
+    document.getElementById('novaSenha').value = '';
+    document.getElementById('confirmarSenha').value = '';
+    document.getElementById('senhaStrengthContainer').style.display = 'none';
+    
+    if (typeof HematoAI !== 'undefined') HematoAI.showToast('Credenciais atualizadas com sucesso!', 'success');
+  }
+
+  function cancelarAlteracao() {
+    document.getElementById('emailAtual').value = '';
+    document.getElementById('senhaAtual').value = '';
+    document.getElementById('novoEmail').value = '';
+    document.getElementById('novaSenha').value = '';
+    document.getElementById('confirmarSenha').value = '';
+    document.getElementById('senhaStrengthContainer').style.display = 'none';
+    if (typeof HematoAI !== 'undefined') HematoAI.showToast('Alterações canceladas.', 'info');
+  }
+
+  function sairSistema() {
+    if (typeof HematoAI !== 'undefined') {
+      HematoAI.confirmDialog(
+        'Tem certeza que deseja sair do sistema?',
+        () => {
+          localStorage.removeItem('hematoai_session');
+          window.location.href = 'login.html';
+        }
+      );
+    }
+  }
+
+  // Event listeners
+  document.getElementById('btnSalvarCredenciais').addEventListener('click', salvarCredenciais);
+  document.getElementById('btnCancelarAlteracao').addEventListener('click', cancelarAlteracao);
+  document.getElementById('btnSairSistema').addEventListener('click', sairSistema);
+
+  // Inicializar sidebar e dados
+  if (!localStorage.getItem('hematoai_session')) {
+    if (typeof HematoAI !== 'undefined' && HematoAI.setSession) {
+      HematoAI.setSession({ tipo: 'Administrador', nome: 'Administrador HematoAI', email: 'admin@hematoai.com' });
+    }
+  } else {
+    const session = JSON.parse(localStorage.getItem('hematoai_session'));
+    if (session.email) usuarioLogado.email = session.email;
+    if (session.nome) usuarioLogado.nome = session.nome;
+  }
+
+  if (typeof HematoAI !== 'undefined' && HematoAI.initSidebar) {
+    HematoAI.initSidebar('configuracoes');
+  }
+
+  carregarDadosUsuario();
+</script>
+</body>
+</html>

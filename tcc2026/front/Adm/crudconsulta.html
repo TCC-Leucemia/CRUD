@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HematoAI · Gerenciar Consultas</title>
+  <link rel="stylesheet" href="../CSS/navbar.css">
+  <style>
+    .filter-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .filter-select {
+      padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 40px;
+      font-size: 0.85rem;
+      background: var(--surface);
+      color: var(--text-1);
+      font-family: var(--font);
+      outline: none;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .filter-select:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(185,28,28,0.08);
+    }
+
+    /* Status pills */
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .status-pill::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+    }
+
+    .status-pendente    { background: var(--yellow-light); color: var(--yellow); }
+    .status-pendente::before    { background: var(--yellow); }
+    .status-andamento   { background: var(--blue-light);   color: var(--blue); }
+    .status-andamento::before   { background: var(--blue); }
+    .status-finalizado  { background: var(--green-light);  color: var(--green); }
+    .status-finalizado::before  { background: var(--green); }
+
+    /* Loading */
+    .table-loading {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+      gap: 12px;
+      color: var(--text-2);
+      font-size: 0.875rem;
+    }
+    .spinner-sm {
+      width: 20px; height: 20px;
+      border: 3px solid var(--border);
+      border-top-color: var(--red);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Detail grid */
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      gap: 10px 16px;
+      font-size: 0.875rem;
+    }
+    .detail-key   { color: var(--text-2); font-weight: 600; }
+    .detail-value { color: var(--text-1); }
+
+    /* Info box */
+    .info-box {
+      background: var(--yellow-light);
+      border: 1px solid #fde68a;
+      border-radius: var(--radius-lg);
+      padding: 14px 16px;
+      font-size: 0.82rem;
+      color: var(--yellow);
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+
+    /* Date hint */
+    .field-hint {
+      font-size: 0.72rem;
+      color: var(--text-3);
+      margin-top: 3px;
+    }
+  </style>
+</head>
+<body>
+
+<button class="sidebar-toggle" id="sidebarToggle">&#9776;</button>
+
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <div class="main-content">
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>Gerenciar Consultas</h1>
+        <p>Agendamento e controle de consultas do sistema</p>
+      </div>
+      <div class="page-header-right">
+        <button class="btn btn-primary" id="btnNovaConsulta">Nova Consulta</button>
+      </div>
+    </div>
+
+    <div class="page-body">
+      <!-- Tabela -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Lista de Consultas</span>
+          <div class="filter-row">
+            <div class="search-bar" style="max-width:260px">
+              <input type="text" id="searchConsulta" placeholder="CPF paciente ou CRM médico...">
+            </div>
+            <select id="filterStatus" class="filter-select">
+              <option value="">Todos os status</option>
+              <option value="Pendente">Pendente</option>
+              <option value="Em andamento">Em andamento</option>
+              <option value="Finalizado">Finalizado</option>
+            </select>
+            <select id="filterTipo" class="filter-select">
+              <option value="">Todos os tipos</option>
+              <option value="Hemograma">Hemograma</option>
+              <option value="Mielograma">Mielograma</option>
+              <option value="Consulta clínica">Consulta clínica</option>
+              <option value="Retorno">Retorno</option>
+            </select>
+            <button class="btn btn-ghost btn-sm" id="btnRecarregar">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+              </svg>
+              Atualizar
+            </button>
+          </div>
+        </div>
+
+        <div class="table-loading" id="tableLoading">
+          <div class="spinner-sm"></div>
+          <span>Carregando consultas...</span>
+        </div>
+
+        <div class="table-wrapper" id="tableWrapper" style="border:none;border-radius:0 0 var(--radius-xl) var(--radius-xl)">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Paciente (CPF)</th>
+                <th>Médico (CRM)</th>
+                <th>Data da Consulta</th>
+                <th>Tipo</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyConsultas"></tbody>
+          </table>
+          <div class="empty-state" id="emptyState" style="display:none">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5" style="margin-bottom:14px">
+              <rect x="3" y="4" width="18" height="18" rx="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            <p>Nenhuma consulta encontrada.</p>
+            <p style="font-size:0.78rem;color:var(--text-3);margin-top:4px">Ajuste os filtros ou agende uma nova consulta.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ── Modal Formulário ── -->
+<div class="modal-overlay" id="modalConsulta">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modalTitulo">Nova Consulta</h2>
+      <button class="btn-close-modal" id="closeModalConsulta">&#10005;</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="info-box" id="infoBox">
+        A data da consulta deve ser uma data futura. Preencha os dados de paciente e médico corretamente.
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>CPF do Paciente *</label>
+          <input type="text" id="cCpf" placeholder="000.000.000-00" maxlength="14">
+          <div class="field-hint">Apenas pacientes cadastrados no sistema.</div>
+        </div>
+        <div class="form-group">
+          <label>CRM do Médico *</label>
+          <input type="text" id="cCrm" placeholder="Ex: 12345" maxlength="11">
+          <div class="field-hint">Apenas médicos cadastrados no sistema.</div>
+        </div>
+        <div class="form-group">
+          <label>Data e Hora *</label>
+          <input type="datetime-local" id="cData">
+          <div class="field-hint">Deve ser uma data futura.</div>
+        </div>
+        <div class="form-group">
+          <label>Tipo de Consulta</label>
+          <select id="cTipo">
+            <option value="">Selecione (opcional)</option>
+            <option value="Hemograma">Hemograma</option>
+            <option value="Mielograma">Mielograma</option>
+            <option value="Consulta clínica">Consulta clínica</option>
+            <option value="Retorno">Retorno</option>
+          </select>
+        </div>
+        <div class="form-group col-span-2">
+          <label>Status *</label>
+          <select id="cStatus">
+            <option value="">Selecione</option>
+            <option value="Pendente">Pendente</option>
+            <option value="Em andamento">Em andamento</option>
+            <option value="Finalizado">Finalizado</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="cancelarConsulta">Cancelar</button>
+      <button class="btn btn-primary" id="salvarConsulta">Salvar Consulta</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Modal Detalhes ── -->
+<div class="modal-overlay" id="modalDetalhes">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Detalhes da Consulta</h2>
+      <button class="btn-close-modal" id="closeModalDetalhes">&#10005;</button>
+    </div>
+    <div class="modal-body" id="detalheBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="fecharDetalhes">Fechar</button>
+      <button class="btn btn-outline" id="editarDetalhe">Editar Consulta</button>
+    </div>
+  </div>
+</div>
+
+<script src="../JS/navbar.js"></script>
+<script>
+/* ══════════════════════════════════════════════════════════════
+   HematoAI · CRUD de Consultas — dados em memória (sem API)
+══════════════════════════════════════════════════════════════ */
+
+  if (!localStorage.getItem('hematoai_session')) {
+    HematoAI.setSession({ tipo: 'Administrador', nome: 'Admin HematoAI' });
+  }
+  HematoAI.initSidebar('consultas');
+
+  /* ── Dados de demonstração ── */
+  let proximoId = 4;
+  let consultas = [
+    { id_consulta: 1, cpf: '11111111111', crm: '12345-SP', data_consulta: '2025-06-10T08:00:00', tipo_consulta: 'Hemograma',       statusc: 'Finalizado'   },
+    { id_consulta: 2, cpf: '22222222222', crm: '54321-RJ', data_consulta: '2025-07-01T10:00:00', tipo_consulta: 'Consulta clínica', statusc: 'Pendente'     },
+    { id_consulta: 3, cpf: '33333333333', crm: '99999-MG', data_consulta: '2025-07-15T14:30:00', tipo_consulta: 'Retorno',          statusc: 'Em andamento' },
+  ];
+
+  /* ── Estado ── */
+  let filtradas  = [];
+  let modoEdicao = false;
+  let idEdicao   = null;
+  let idDetalhe  = null;
+
+  /* ── Helpers ── */
+  function formatarCPF(cpf) {
+    const c = String(cpf).replace(/\D/g, '').padStart(11, '0');
+    return c.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+  }
+
+  function formatarDataHora(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function statusPill(s) {
+    const map = { 'Pendente': 'pendente', 'Em andamento': 'andamento', 'Finalizado': 'finalizado' };
+    return `<span class="status-pill status-${map[s] || 'pendente'}">${s}</span>`;
+  }
+
+  /* ── Carregar / renderizar ── */
+  function carregar() {
+    filtradas = [...consultas];
+    aplicarFiltros();
+    atualizarKPIs(consultas);
+  }
+
+  function renderTabela(data) {
+    const tbody = document.getElementById('tbodyConsultas');
+    const empty = document.getElementById('emptyState');
+    tbody.innerHTML = '';
+
+    if (!data.length) {
+      empty.style.display = '';
+      return;
+    }
+    empty.style.display = 'none';
+
+    data.forEach(c => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td style="font-family:var(--font-mono);font-size:0.78rem;color:var(--text-3)">#${c.id_consulta}</td>
+        <td style="font-family:var(--font-mono);font-size:0.8rem">${formatarCPF(c.cpf || '')}</td>
+        <td><span class="badge badge-blue">${c.crm}</span></td>
+        <td style="font-size:0.85rem">${formatarDataHora(c.data_consulta)}</td>
+        <td>${c.tipo_consulta || '<span style="color:var(--text-3)">—</span>'}</td>
+        <td>${statusPill(c.statusc)}</td>
+        <td>
+          <div class="td-actions">
+            <button class="btn btn-ghost btn-sm" onclick="abrirDetalhes(${c.id_consulta})">Ver</button>
+            <button class="btn btn-ghost btn-sm" onclick="abrirEdicao(${c.id_consulta})">Editar</button>
+            <button class="btn btn-danger btn-sm" onclick="confirmarExclusao(${c.id_consulta})">Excluir</button>
+          </div>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  /* ── KPIs ── */
+  function atualizarKPIs(data) {
+    document.getElementById('kpiTotal').textContent      = data.length;
+    document.getElementById('kpiPendente').textContent   = data.filter(c => c.statusc === 'Pendente').length;
+    document.getElementById('kpiAndamento').textContent  = data.filter(c => c.statusc === 'Em andamento').length;
+    document.getElementById('kpiFinalizado').textContent = data.filter(c => c.statusc === 'Finalizado').length;
+  }
+
+  /* ── Filtros ── */
+  function aplicarFiltros() {
+    const q      = document.getElementById('searchConsulta').value.toLowerCase();
+    const status = document.getElementById('filterStatus').value;
+    const tipo   = document.getElementById('filterTipo').value;
+
+    filtradas = consultas.filter(c =>
+      (!q      || (c.cpf || '').toLowerCase().includes(q) || (c.crm || '').toLowerCase().includes(q)) &&
+      (!status || c.statusc === status) &&
+      (!tipo   || c.tipo_consulta === tipo)
+    );
+    renderTabela(filtradas);
+  }
+
+  document.getElementById('searchConsulta').addEventListener('input',  aplicarFiltros);
+  document.getElementById('filterStatus').addEventListener('change',   aplicarFiltros);
+  document.getElementById('filterTipo').addEventListener('change',     aplicarFiltros);
+  document.getElementById('btnRecarregar').addEventListener('click',   carregar);
+
+  /* ── Máscara CPF ── */
+  document.getElementById('cCpf').addEventListener('input', function () {
+    let v = this.value.replace(/\D/g, '').slice(0, 11);
+    v = v.replace(/(\d{3})(\d)/, '$1.$2');
+    v = v.replace(/(\d{3})\.(\d{3})(\d)/, '$1.$2.$3');
+    v = v.replace(/(\d{3})\.(\d{3})\.(\d{3})(\d)/, '$1.$2.$3-$4');
+    this.value = v;
+  });
+
+  /* ── Data mínima ── */
+  function setMinDatetime() {
+    const agora   = new Date();
+    agora.setMinutes(agora.getMinutes() + 10);
+    const offset  = agora.getTimezoneOffset() * 60000;
+    document.getElementById('cData').min = new Date(agora - offset).toISOString().slice(0, 16);
+  }
+
+  /* ── Abrir modal novo ── */
+  document.getElementById('btnNovaConsulta').addEventListener('click', () => {
+    modoEdicao = false;
+    idEdicao   = null;
+    document.getElementById('modalTitulo').textContent = 'Nova Consulta';
+    document.getElementById('infoBox').style.display   = '';
+    document.getElementById('cCpf').value    = '';
+    document.getElementById('cCrm').value    = '';
+    document.getElementById('cData').value   = '';
+    document.getElementById('cTipo').value   = '';
+    document.getElementById('cStatus').value = 'Pendente';
+    setMinDatetime();
+    HematoAI.openModal(document.getElementById('modalConsulta'));
+  });
+
+  /* ── Salvar consulta ── */
+  document.getElementById('salvarConsulta').addEventListener('click', () => {
+    const cpf    = document.getElementById('cCpf').value.replace(/\D/g, '');
+    const crm    = document.getElementById('cCrm').value.trim();
+    const data   = document.getElementById('cData').value;
+    const tipo   = document.getElementById('cTipo').value;
+    const status = document.getElementById('cStatus').value;
+
+    if (!cpf || cpf.length !== 11) { HematoAI.showToast('CPF inválido.', 'error'); return; }
+    if (!crm)                       { HematoAI.showToast('CRM obrigatório.', 'error'); return; }
+    if (!data)                      { HematoAI.showToast('Data da consulta obrigatória.', 'error'); return; }
+    if (!status)                    { HematoAI.showToast('Selecione o status.', 'error'); return; }
+
+    if (modoEdicao) {
+      const idx = consultas.findIndex(x => x.id_consulta === idEdicao);
+      if (idx >= 0) {
+        consultas[idx] = {
+          ...consultas[idx],
+          cpf,
+          crm,
+          data_consulta: new Date(data).toISOString(),
+          statusc:       status,
+          tipo_consulta: tipo || null,
+        };
+      }
+      HematoAI.showToast('Consulta atualizada com sucesso!', 'success');
+    } else {
+      consultas.push({
+        id_consulta:   proximoId++,
+        cpf,
+        crm,
+        data_consulta: new Date(data).toISOString(),
+        statusc:       status,
+        tipo_consulta: tipo || null,
+      });
+      HematoAI.showToast('Consulta criada com sucesso!', 'success');
+    }
+
+    HematoAI.closeModal(document.getElementById('modalConsulta'));
+    carregar();
+  });
+
+  /* ── Editar ── */
+  function abrirEdicao(id) {
+    const c = consultas.find(x => x.id_consulta === id);
+    if (!c) return;
+
+    modoEdicao = true;
+    idEdicao   = id;
+    document.getElementById('modalTitulo').textContent = `Editar Consulta #${id}`;
+    document.getElementById('infoBox').style.display   = 'none';
+
+    document.getElementById('cCpf').value    = formatarCPF(c.cpf || '');
+    document.getElementById('cCrm').value    = c.crm;
+    document.getElementById('cTipo').value   = c.tipo_consulta || '';
+    document.getElementById('cStatus').value = c.statusc;
+
+    if (c.data_consulta) {
+      const d = new Date(c.data_consulta);
+      const offset = d.getTimezoneOffset() * 60000;
+      document.getElementById('cData').value = new Date(d - offset).toISOString().slice(0, 16);
+    }
+
+    document.getElementById('cData').removeAttribute('min');
+    HematoAI.openModal(document.getElementById('modalConsulta'));
+  }
+
+  /* ── Detalhes ── */
+  function abrirDetalhes(id) {
+    idDetalhe = id;
+    const c   = consultas.find(x => x.id_consulta === id);
+
+    if (!c) {
+      document.getElementById('detalheBody').innerHTML =
+        '<p style="color:var(--red);padding:20px">Consulta não encontrada.</p>';
+    } else {
+      document.getElementById('detalheBody').innerHTML = `
+        <div class="detail-grid">
+          <span class="detail-key">ID</span>
+          <span class="detail-value" style="font-family:var(--font-mono)">#${c.id_consulta}</span>
+          <span class="detail-key">Paciente (CPF)</span>
+          <span class="detail-value" style="font-family:var(--font-mono)">${formatarCPF(c.cpf || '')}</span>
+          <span class="detail-key">Médico (CRM)</span>
+          <span class="detail-value"><span class="badge badge-blue">${c.crm}</span></span>
+          <span class="detail-key">Data e Hora</span>
+          <span class="detail-value">${formatarDataHora(c.data_consulta)}</span>
+          <span class="detail-key">Tipo</span>
+          <span class="detail-value">${c.tipo_consulta || '—'}</span>
+          <span class="detail-key">Status</span>
+          <span class="detail-value">${statusPill(c.statusc)}</span>
+        </div>
+      `;
+    }
+
+    HematoAI.openModal(document.getElementById('modalDetalhes'));
+  }
+
+  document.getElementById('closeModalDetalhes').addEventListener('click', () =>
+    HematoAI.closeModal(document.getElementById('modalDetalhes')));
+  document.getElementById('fecharDetalhes').addEventListener('click', () =>
+    HematoAI.closeModal(document.getElementById('modalDetalhes')));
+  document.getElementById('editarDetalhe').addEventListener('click', () => {
+    HematoAI.closeModal(document.getElementById('modalDetalhes'));
+    if (idDetalhe) abrirEdicao(idDetalhe);
+  });
+
+  /* ── Excluir ── */
+  function confirmarExclusao(id) {
+    HematoAI.confirmDialog(
+      `Deseja excluir a consulta <strong>#${id}</strong>?<br>
+       Os exames vinculados a esta consulta também poderão ser afetados.`,
+      () => {
+        consultas = consultas.filter(x => x.id_consulta !== id);
+        HematoAI.showToast('Consulta excluída com sucesso.', 'success');
+        carregar();
+      }
+    );
+  }
+
+  /* ── Fechar modais ── */
+  ['closeModalConsulta','cancelarConsulta'].forEach(id => {
+    document.getElementById(id).addEventListener('click', () =>
+      HematoAI.closeModal(document.getElementById('modalConsulta')));
+  });
+  document.getElementById('modalConsulta').addEventListener('click', e => {
+    if (e.target === document.getElementById('modalConsulta'))
+      HematoAI.closeModal(document.getElementById('modalConsulta'));
+  });
+
+  /* ── Init ── */
+  carregar();
+</script>
+</body>
+</html>

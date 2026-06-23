@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HematoAI · Análises IA</title>
+  <link rel="stylesheet" href="../CSS/navbar.css">
+  <style>
+    .filter-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .filter-select {
+      padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 40px;
+      font-size: 0.85rem;
+      background: var(--surface);
+      color: var(--text-1);
+      font-family: var(--font);
+      outline: none;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .filter-select:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(185,28,28,0.08);
+    }
+
+    .suspeita-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+    .suspeita-alta { background: #fee2e2; color: #dc2626; }
+    .suspeita-moderada { background: #fef3c7; color: #d97706; }
+    .suspeita-baixa { background: #dbeafe; color: #2563eb; }
+    .suspeita-sem { background: #dcfce7; color: #15803d; }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .status-pill::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
+    }
+    .status-pendente { background: #fef3c7; color: #d97706; }
+    .status-pendente::before { background: #d97706; }
+    .status-andamento { background: #dbeafe; color: #2563eb; }
+    .status-andamento::before { background: #2563eb; }
+    .status-finalizado { background: #dcfce7; color: #15803d; }
+    .status-finalizado::before { background: #15803d; }
+
+    .tipo-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+    .tipo-hemograma { background: var(--red-light); color: var(--red); }
+    .tipo-mielograma { background: var(--purple-light); color: var(--purple); }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 10px 16px;
+      font-size: 0.875rem;
+    }
+    .detail-key { color: var(--text-2); font-weight: 600; }
+    .detail-value { color: var(--text-1); }
+
+    .resultado-texto {
+      background: var(--bg);
+      padding: 16px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      font-size: 0.85rem;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      min-height: 80px;
+    }
+
+    .info-box {
+      background: var(--blue-light);
+      border: 1px solid #bfdbfe;
+      border-radius: var(--radius-lg);
+      padding: 14px 16px;
+      font-size: 0.82rem;
+      color: var(--blue);
+      line-height: 1.6;
+      margin-bottom: 18px;
+    }
+
+    .btn-success {
+      background: #15803d;
+      color: white;
+      box-shadow: 0 2px 8px rgba(21,128,61,0.3);
+    }
+    .btn-success:hover {
+      background: #166534;
+      box-shadow: 0 4px 16px rgba(21,128,61,0.4);
+      transform: translateY(-1px);
+    }
+  </style>
+</head>
+<body>
+
+<button class="sidebar-toggle" id="sidebarToggle">☰</button>
+
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <div class="main-content">
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>Análises IA</h1>
+        <p>Resultados da inteligência artificial para diagnóstico</p>
+      </div>
+      <div class="page-header-right">
+        <button class="btn btn-success" id="btnNovaAnalise">+ Nova Análise IA</button>
+      </div>
+    </div>
+
+    <div class="page-body">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Lista de Análises</span>
+          <div class="filter-row">
+            <div class="search-bar" style="max-width:280px">
+              <input type="text" id="searchAnalise" placeholder="Paciente, CPF ou ID do exame...">
+            </div>
+            <select id="filterSuspeita" class="filter-select">
+              <option value="">Todas as suspeitas</option>
+              <option value="Alta">Alta</option>
+              <option value="Moderada">Moderada</option>
+              <option value="Baixa">Baixa</option>
+              <option value="Sem suspeita">Sem suspeita</option>
+            </select>
+            <select id="filterStatus" class="filter-select">
+              <option value="">Todos os status</option>
+              <option value="Pendente">Pendente</option>
+              <option value="Em andamento">Em andamento</option>
+              <option value="Finalizado">Finalizado</option>
+            </select>
+            <button class="btn btn-ghost btn-sm" id="btnRecarregar">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+              </svg>
+              Atualizar
+            </button>
+          </div>
+        </div>
+
+        <div class="table-wrapper" style="border:none;border-radius:0 0 var(--radius-xl) var(--radius-xl)">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Paciente</th>
+                <th>CPF</th>
+                <th>Data Consulta</th>
+                <th>ID Exame</th>
+                <th>Tipo</th>
+                <th>Suspeita</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyAnalises"></tbody>
+          </table>
+          <div class="empty-state" id="emptyState" style="display:none">
+            <p>Nenhuma análise IA encontrada.</p>
+            <p style="font-size:0.78rem;color:var(--text-3);margin-top:4px">Ajuste os filtros ou aguarde novas análises.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Detalhes -->
+<div class="modal-overlay" id="modalDetalhes">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Detalhes da Análise IA</h2>
+      <button class="btn-close-modal" id="closeModalDetalhes">✕</button>
+    </div>
+    <div class="modal-body" id="detalheBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="fecharDetalhes">Fechar</button>
+      <button class="btn btn-primary" id="btnBaixarPDFDetalhe">📄 Baixar PDF</button>
+    </div>
+  </div>
+</div>
+
+<script src="../JS/navbar.js"></script>
+<script>
+  if (!localStorage.getItem('hematoai_session')) {
+    HematoAI.setSession({ tipo: 'Médico', nome: 'Dr. Usuário', crm: '00000-SP' });
+  }
+  HematoAI.initSidebar('analises-ia');
+
+  // ============================================
+  // DADOS DE DEMONSTRAÇÃO
+  // ============================================
+  
+  // Mapeamento de pacientes
+  const pacientes = {
+    '11111111111': 'Maria Oliveira',
+    '22222222222': 'Pedro Alves',
+    '33333333333': 'Ana Paula Lima'
+  };
+
+  // Mapeamento de exames (ID do exame -> { paciente, tipo, data_consulta })
+  const examesInfo = {
+    1: { cpf: '11111111111', tipo: 'Hemograma', data_consulta: '2025-06-10T08:00:00' },
+    2: { cpf: '11111111111', tipo: 'Mielograma', data_consulta: '2025-06-10T08:00:00' },
+    3: { cpf: '22222222222', tipo: 'Hemograma', data_consulta: '2025-07-01T10:00:00' },
+    4: { cpf: '33333333333', tipo: 'Hemograma', data_consulta: '2025-07-15T14:30:00' }
+  };
+
+  let analises = [
+    { id_analise: 1, id_exame: 1, resultado_ia: 'Presença de células blásticas atípicas. Sugerente de LMA.\nRecomenda-se confirmação com exames complementares.', suspeita_ia: 'Alta', tipo_leucemia_ia: 'LMA', confianca: 94.5, statusc: 'Finalizado', data_analise: '2025-06-10' },
+    { id_analise: 2, id_exame: 2, resultado_ia: 'Alterações discretas nos parâmetros hematológicos.\nRecomenda-se novo exame em 30 dias para acompanhamento.', suspeita_ia: 'Baixa', tipo_leucemia_ia: 'Não identificado', confianca: 62.3, statusc: 'Em andamento', data_analise: '2025-06-15' },
+    { id_analise: 3, id_exame: 3, resultado_ia: 'Aguardando processamento da amostra para análise completa.', suspeita_ia: 'Sem suspeita', tipo_leucemia_ia: 'Não identificado', confianca: 0, statusc: 'Pendente', data_analise: null },
+  ];
+
+  let filtrados = [];
+  let idDetalhe = null;
+
+  // ============================================
+  // FUNÇÕES AUXILIARES
+  // ============================================
+  
+  function getPacientePorExame(idExame) {
+    const info = examesInfo[idExame];
+    if (!info) return { nome: '—', cpf: '—', tipo: '—', data_consulta: null };
+    return {
+      nome: pacientes[info.cpf] || '—',
+      cpf: info.cpf || '—',
+      tipo: info.tipo || '—',
+      data_consulta: info.data_consulta || null
+    };
+  }
+
+  function formatarCPF(cpf) {
+    if (!cpf || cpf === '—') return '—';
+    const c = String(cpf).replace(/\D/g, '').padStart(11, '0');
+    return c.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+  }
+
+  function formatarDataHora(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function suspeitaBadge(suspeita) {
+    const map = { 'Alta': 'alta', 'Moderada': 'moderada', 'Baixa': 'baixa', 'Sem suspeita': 'sem' };
+    return `<span class="suspeita-badge suspeita-${map[suspeita] || 'sem'}">${suspeita || '—'}</span>`;
+  }
+
+  function statusPill(s) {
+    const map = { 'Pendente': 'pendente', 'Em andamento': 'andamento', 'Finalizado': 'finalizado' };
+    return `<span class="status-pill status-${map[s] || 'pendente'}">${s}</span>`;
+  }
+
+  function tipoBadge(tipo) {
+    if (tipo === 'Hemograma') return `<span class="tipo-badge tipo-hemograma">Hemograma</span>`;
+    if (tipo === 'Mielograma') return `<span class="tipo-badge tipo-mielograma">Mielograma</span>`;
+    return `<span style="color:var(--text-3)">—</span>`;
+  }
+
+  function formatarData(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    return d.toLocaleDateString('pt-BR');
+  }
+
+  // ============================================
+  // RENDERIZAÇÃO
+  // ============================================
+  
+  function renderTabela(data) {
+    const tbody = document.getElementById('tbodyAnalises');
+    const empty = document.getElementById('emptyState');
+    tbody.innerHTML = '';
+
+    if (!data.length) {
+      empty.style.display = '';
+      return;
+    }
+    empty.style.display = 'none';
+
+    data.forEach(a => {
+      const paciente = getPacientePorExame(a.id_exame);
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td style="font-family:var(--font-mono);font-size:0.78rem;color:var(--text-3)">#${a.id_analise}</td>
+        <td style="font-weight:600;font-size:0.85rem">${paciente.nome}</td>
+        <td style="font-family:var(--font-mono);font-size:0.8rem">${formatarCPF(paciente.cpf)}</td>
+        <td style="font-size:0.8rem">${formatarDataHora(paciente.data_consulta)}</td>
+        <td style="font-family:var(--font-mono);font-size:0.82rem;color:var(--blue)">#${a.id_exame}</td>
+        <td>${tipoBadge(paciente.tipo)}</td>
+        <td>${suspeitaBadge(a.suspeita_ia)}</td>
+        <td>${statusPill(a.statusc)}</td>
+        <td>
+          <div class="td-actions">
+            <button class="btn btn-ghost btn-sm" onclick="abrirDetalhes(${a.id_analise})">Ver</button>
+            <button class="btn btn-danger btn-sm" onclick="confirmarExclusao(${a.id_analise})">Excluir</button>
+          </div>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  // ============================================
+  // CARREGAR E FILTRAR
+  // ============================================
+  
+  function carregar() {
+    filtrados = [...analises];
+    aplicarFiltros();
+  }
+
+  function aplicarFiltros() {
+    const q = document.getElementById('searchAnalise').value.toLowerCase();
+    const suspeita = document.getElementById('filterSuspeita').value;
+    const status = document.getElementById('filterStatus').value;
+
+    filtrados = analises.filter(a => {
+      const paciente = getPacientePorExame(a.id_exame);
+      const matchPaciente = paciente.nome.toLowerCase().includes(q) || 
+                           paciente.cpf.includes(q) || 
+                           String(a.id_exame).includes(q);
+      return matchPaciente &&
+        (!suspeita || a.suspeita_ia === suspeita) &&
+        (!status || a.statusc === status);
+    });
+    renderTabela(filtrados);
+  }
+
+  document.getElementById('searchAnalise').addEventListener('input', aplicarFiltros);
+  document.getElementById('filterSuspeita').addEventListener('change', aplicarFiltros);
+  document.getElementById('filterStatus').addEventListener('change', aplicarFiltros);
+  document.getElementById('btnRecarregar').addEventListener('click', carregar);
+
+  // ============================================
+  // REDIRECIONAR PARA NOVA ANÁLISE
+  // ============================================
+  
+  document.getElementById('btnNovaAnalise').addEventListener('click', () => {
+    window.location.href = 'nova_analise_ia.html';
+  });
+
+  // ============================================
+  // DETALHES
+  // ============================================
+  
+  function abrirDetalhes(id) {
+    idDetalhe = id;
+    const a = analises.find(x => x.id_analise === id);
+
+    if (!a) {
+      document.getElementById('detalheBody').innerHTML = '<p style="color:var(--red);padding:20px">Análise não encontrada.</p>';
+    } else {
+      const paciente = getPacientePorExame(a.id_exame);
+      document.getElementById('detalheBody').innerHTML = `
+        <div class="detail-grid">
+          <span class="detail-key">ID</span>
+          <span class="detail-value" style="font-family:var(--font-mono)">#${a.id_analise}</span>
+          <span class="detail-key">Paciente</span>
+          <span class="detail-value" style="font-weight:600">${paciente.nome}</span>
+          <span class="detail-key">CPF</span>
+          <span class="detail-value" style="font-family:var(--font-mono)">${formatarCPF(paciente.cpf)}</span>
+          <span class="detail-key">Data da Consulta</span>
+          <span class="detail-value">${formatarDataHora(paciente.data_consulta)}</span>
+          <span class="detail-key">ID Exame</span>
+          <span class="detail-value" style="font-family:var(--font-mono);color:var(--blue)">#${a.id_exame}</span>
+          <span class="detail-key">Tipo de Exame</span>
+          <span class="detail-value">${tipoBadge(paciente.tipo)}</span>
+          <span class="detail-key">Suspeita</span>
+          <span class="detail-value">${suspeitaBadge(a.suspeita_ia)}</span>
+          <span class="detail-key">Tipo Leucemia</span>
+          <span class="detail-value"><span class="badge badge-purple">${a.tipo_leucemia_ia || 'Não identificado'}</span></span>
+          <span class="detail-key">Confiança</span>
+          <span class="detail-value" style="font-weight:700;color:${a.confianca >= 80 ? '#15803d' : a.confianca >= 50 ? '#d97706' : '#94a3b8'}">${a.confianca ? a.confianca + '%' : '—'}</span>
+          <span class="detail-key">Status</span>
+          <span class="detail-value">${statusPill(a.statusc)}</span>
+          <span class="detail-key">Data</span>
+          <span class="detail-value">${formatarData(a.data_analise)}</span>
+          <span class="detail-key">Resultado IA</span>
+          <span class="detail-value"><div class="resultado-texto">${a.resultado_ia}</div></span>
+        </div>
+      `;
+    }
+
+    HematoAI.openModal(document.getElementById('modalDetalhes'));
+  }
+
+  // ============================================
+  // BAIXAR PDF
+  // ============================================
+  
+  document.getElementById('btnBaixarPDFDetalhe').addEventListener('click', () => {
+    const a = analises.find(x => x.id_analise === idDetalhe);
+    if (!a) {
+      HematoAI.showToast('Análise não encontrada.', 'error');
+      return;
+    }
+
+    const paciente = getPacientePorExame(a.id_exame);
+    const conteudoPDF = `
+HEMATOAI - RELATÓRIO DE ANÁLISE IA
+=============================================
+ID da Análise: #${a.id_analise}
+Paciente: ${paciente.nome}
+CPF: ${formatarCPF(paciente.cpf)}
+Data da Consulta: ${formatarDataHora(paciente.data_consulta)}
+ID do Exame: #${a.id_exame}
+Tipo de Exame: ${paciente.tipo}
+Data da Análise: ${formatarData(a.data_analise)}
+Status: ${a.statusc}
+
+---------------------------------------------
+RESULTADO DA ANÁLISE:
+${a.resultado_ia}
+
+---------------------------------------------
+SUSPEITA: ${a.suspeita_ia}
+TIPO DE LEUCEMIA: ${a.tipo_leucemia_ia || 'Não identificado'}
+CONFIANÇA: ${a.confianca ? a.confianca + '%' : '—'}
+
+---------------------------------------------
+Este relatório é gerado automaticamente pelo sistema HematoAI.
+Consulte um especialista para validação do diagnóstico.
+`;
+
+    const blob = new Blob([conteudoPDF], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const aLink = document.createElement('a');
+    aLink.href = url;
+    aLink.download = `analise_ia_${a.id_analise}.pdf`;
+    document.body.appendChild(aLink);
+    aLink.click();
+    document.body.removeChild(aLink);
+    URL.revokeObjectURL(url);
+    
+    HematoAI.showToast('PDF baixado com sucesso!', 'success');
+  });
+
+  // ============================================
+  // FECHAR MODAIS
+  // ============================================
+  
+  document.getElementById('closeModalDetalhes').addEventListener('click', () => HematoAI.closeModal(document.getElementById('modalDetalhes')));
+  document.getElementById('fecharDetalhes').addEventListener('click', () => HematoAI.closeModal(document.getElementById('modalDetalhes')));
+
+  // ============================================
+  // EXCLUIR
+  // ============================================
+  
+  function confirmarExclusao(id) {
+    HematoAI.confirmDialog(
+      `Deseja excluir a análise IA <strong>#${id}</strong>?<br>Esta ação não pode ser desfeita.`,
+      () => {
+        analises = analises.filter(x => x.id_analise !== id);
+        HematoAI.showToast('Análise excluída com sucesso.', 'success');
+        carregar();
+      }
+    );
+  }
+
+  // ============================================
+  // INICIALIZAÇÃO
+  // ============================================
+  
+  carregar();
+</script>
+</body>
+</html>

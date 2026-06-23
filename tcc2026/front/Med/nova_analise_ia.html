@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HematoAI · Nova Análise IA</title>
+  <link rel="stylesheet" href="../CSS/navbar.css">
+  <style>
+    .form-section {
+      background: var(--surface);
+      border-radius: var(--radius-2xl);
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border);
+      padding: 28px;
+      margin-bottom: 24px;
+    }
+
+    .form-section-title {
+      font-size: 1rem;
+      font-weight: 800;
+      margin-bottom: 22px;
+      color: var(--text-1);
+      border-left: 4px solid var(--red);
+      padding-left: 14px;
+      letter-spacing: -0.2px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .input-group.full-width { grid-column: span 2; }
+
+    .input-group label {
+      font-weight: 700;
+      font-size: 0.75rem;
+      color: var(--text-2);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .input-group input,
+    .input-group select,
+    .input-group textarea {
+      padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: 0.875rem;
+      transition: var(--transition);
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text-1);
+      outline: none;
+      width: 100%;
+    }
+
+    .input-group input:focus,
+    .input-group select:focus,
+    .input-group textarea:focus {
+      border-color: var(--red);
+      background: var(--surface);
+      box-shadow: 0 0 0 3px rgba(185,28,28,0.08);
+    }
+
+    .input-group textarea {
+      resize: vertical;
+      min-height: 90px;
+      line-height: 1.6;
+    }
+
+    .upload-area {
+      border: 2px dashed var(--border-dark);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+      background: var(--bg);
+    }
+
+    .upload-area:hover,
+    .upload-area.drag-over {
+      border-color: var(--red);
+      background: var(--red-light);
+    }
+
+    .upload-text {
+      font-size: 0.875rem;
+      color: var(--text-2);
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+
+    .upload-hint { font-size: 0.75rem; color: var(--text-3); }
+    #imagensInput { display: none; }
+
+    .file-preview {
+      margin-top: 12px;
+      display: none;
+      align-items: center;
+      gap: 14px;
+      padding: 14px;
+      background: var(--bg);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+    }
+
+    .file-preview img {
+      width: 72px;
+      height: 72px;
+      object-fit: cover;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+    }
+
+    .file-info { flex: 1; }
+    .file-name { font-size: 0.875rem; font-weight: 600; color: var(--text-1); margin-bottom: 3px; }
+    .file-size { font-size: 0.75rem; color: var(--text-3); }
+
+    .remove-file {
+      background: transparent;
+      border: 1px solid var(--border);
+      padding: 5px 12px;
+      font-size: 0.75rem;
+      color: var(--text-2);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: var(--font);
+    }
+    .remove-file:hover {
+      background: var(--red-light);
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    .btn-gerar {
+      background: var(--red);
+      border: none;
+      color: white;
+      padding: 13px 28px;
+      border-radius: 40px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: var(--transition);
+      width: 100%;
+      margin-top: 16px;
+      font-family: var(--font);
+      box-shadow: 0 2px 8px rgba(185,28,28,0.3);
+    }
+
+    .btn-gerar:hover:not(:disabled) {
+      background: var(--red-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(185,28,28,0.4);
+    }
+    .btn-gerar:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+    .resultados-section {
+      background: var(--bg);
+      border-radius: var(--radius-2xl);
+      padding: 28px;
+      border: 1px solid var(--border);
+    }
+
+    .resultados-section h3 {
+      font-size: 1rem;
+      font-weight: 800;
+      margin-bottom: 20px;
+      color: var(--text-1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      letter-spacing: -0.2px;
+    }
+
+    .result-card {
+      background: var(--surface);
+      border-radius: var(--radius-xl);
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-sm);
+      border-left: 4px solid var(--red);
+    }
+
+    .result-label {
+      font-weight: 700;
+      color: var(--red);
+      margin-bottom: 8px;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+    }
+
+    .result-value {
+      font-size: 0.875rem;
+      color: var(--text-1);
+      line-height: 1.7;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .laudo-completo {
+      font-family: var(--font-mono);
+      background: var(--bg);
+      padding: 16px;
+      border-radius: var(--radius-md);
+      font-size: 0.82rem;
+      line-height: 1.7;
+      border: 1px solid var(--border);
+    }
+
+    .btn-pdf {
+      background: var(--surface);
+      border: 2px solid var(--red);
+      color: var(--red);
+      padding: 11px 24px;
+      border-radius: 40px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-top: 4px;
+      width: 100%;
+      font-family: var(--font);
+    }
+
+    .btn-pdf:hover {
+      background: var(--red);
+      color: white;
+      box-shadow: 0 4px 16px rgba(185,28,28,0.3);
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 3px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .hidden { display: none !important; }
+
+    @media (max-width: 700px) {
+      .input-group.full-width { grid-column: span 1; }
+    }
+  </style>
+</head>
+<body>
+
+<button class="sidebar-toggle" id="sidebarToggle">☰</button>
+
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <div class="main-content">
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>Nova Análise IA</h1>
+        <p>Preencha a anamnese, envie a lâmina e gere o laudo automaticamente</p>
+      </div>
+      <div class="page-header-right">
+        <a href="crudanaliseia.html" class="btn btn-ghost btn-sm">← Voltar para análises</a>
+      </div>
+    </div>
+
+    <div class="page-body">
+      <!-- Formulário -->
+      <div class="form-section">
+        <div class="form-section-title">Anamnese e imagens do paciente</div>
+        <form id="formAnamnese">
+          <div class="form-grid">
+            <div class="input-group">
+              <label for="nome">Nome completo</label>
+              <input type="text" id="nome" placeholder="Ex: Maria da Silva" required>
+            </div>
+            <div class="input-group">
+              <label for="idade">Idade (anos)</label>
+              <input type="number" id="idade" placeholder="Ex: 56" required>
+            </div>
+            <div class="input-group">
+              <label for="sexo">Sexo</label>
+              <select id="sexo" required>
+                <option value="">Selecione</option>
+                <option value="Feminino">Feminino</option>
+                <option value="Masculino">Masculino</option>
+                <option value="Prefiro não informar">Prefiro não informar</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label for="idExame">ID do Exame</label>
+              <input type="number" id="idExame" placeholder="Ex: 1" required>
+            </div>
+            <div class="input-group full-width">
+              <label for="sintomas">Sintomas apresentados</label>
+              <textarea id="sintomas" placeholder="Ex: fadiga, febre, perda de peso, equimoses..." required></textarea>
+            </div>
+            <div class="input-group full-width">
+              <label for="historico">Histórico clínico relevante</label>
+              <textarea id="historico" placeholder="Ex: Doenças prévias, tratamentos anteriores, histórico familiar..." required></textarea>
+            </div>
+            <div class="input-group full-width">
+              <label>Lâmina digital</label>
+              <div class="upload-area" id="uploadArea">
+                <div class="upload-text">📁 Clique ou arraste a imagem</div>
+                <div class="upload-hint">Suporta JPG, PNG, JPEG. Máximo 10MB.</div>
+                <input type="file" id="imagensInput" accept="image/jpeg,image/png,image/jpg">
+              </div>
+              <div class="file-preview" id="filePreview">
+                <img id="previewImage" src="" alt="Preview">
+                <div class="file-info">
+                  <div class="file-name" id="fileName"></div>
+                  <div class="file-size" id="fileSize"></div>
+                </div>
+                <button type="button" class="remove-file" id="removeFile">Remover</button>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="btn-gerar" id="btnGerarLaudo">Gerar laudo com IA</button>
+        </form>
+      </div>
+
+      <!-- Resultados -->
+      <div id="resultadosArea" class="resultados-section hidden">
+        <h3>📋 Laudo gerado pela IA</h3>
+        <div class="result-card">
+          <div class="result-label">📝 Laudo Completo</div>
+          <div class="result-value laudo-completo" id="laudoCompleto">---</div>
+        </div>
+        <button class="btn-pdf" id="btnBaixarPDF">📄 Baixar PDF do laudo</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="../JS/navbar.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  // ============================================
+  // SESSÃO & SIDEBAR
+  // ============================================
+  if (!localStorage.getItem('hematoai_session')) {
+    HematoAI.setSession({ tipo: 'Médico', nome: 'Dr. Usuário', crm: '00000-SP' });
+  }
+  HematoAI.initSidebar('analises-ia');
+
+  // ============================================
+  // ELEMENTOS
+  // ============================================
+  const btnGerar      = document.getElementById('btnGerarLaudo');
+  const resultadosDiv = document.getElementById('resultadosArea');
+  const laudoEl       = document.getElementById('laudoCompleto');
+  const btnPDF        = document.getElementById('btnBaixarPDF');
+  const uploadArea    = document.getElementById('uploadArea');
+  const imagensInput  = document.getElementById('imagensInput');
+  const filePreview   = document.getElementById('filePreview');
+  const previewImage  = document.getElementById('previewImage');
+  const fileName      = document.getElementById('fileName');
+  const fileSize      = document.getElementById('fileSize');
+  const removeFileBtn = document.getElementById('removeFile');
+
+  let pdfUrlAtual = null;
+
+  // ============================================
+  // UPLOAD
+  // ============================================
+  uploadArea.addEventListener('click', () => imagensInput.click());
+
+  uploadArea.addEventListener('dragover', e => {
+    e.preventDefault();
+    uploadArea.classList.add('drag-over');
+  });
+
+  uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('drag-over'));
+
+  uploadArea.addEventListener('drop', e => {
+    e.preventDefault();
+    uploadArea.classList.remove('drag-over');
+    const files = e.dataTransfer.files;
+    if (files.length > 0 && files[0].type.startsWith('image/')) {
+      imagensInput.files = files;
+      handleFilePreview(files[0]);
+    } else {
+      HematoAI.showToast('Por favor, envie apenas imagens (JPG, PNG, JPEG)', 'error');
+    }
+  });
+
+  imagensInput.addEventListener('change', e => {
+    if (e.target.files && e.target.files[0]) handleFilePreview(e.target.files[0]);
+  });
+
+  removeFileBtn.addEventListener('click', () => {
+    imagensInput.value = '';
+    filePreview.style.display = 'none';
+    uploadArea.style.display = '';
+    previewImage.src = '';
+    pdfUrlAtual = null;
+  });
+
+  function handleFilePreview(file) {
+    if (!file || !file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      previewImage.src = e.target.result;
+      fileName.textContent = file.name;
+      fileSize.textContent = (file.size / 1024).toFixed(2) + ' KB';
+      filePreview.style.display = 'flex';
+      uploadArea.style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // ============================================
+  // GERAR LAUDO
+  // ============================================
+  async function gerarLaudo() {
+    const nome      = document.getElementById('nome').value.trim();
+    const idade     = document.getElementById('idade').value.trim();
+    const sexo      = document.getElementById('sexo').value;
+    const sintomas  = document.getElementById('sintomas').value.trim();
+    const historico = document.getElementById('historico').value.trim();
+    const idExame   = document.getElementById('idExame').value.trim();
+    const imagemFile = imagensInput.files[0];
+
+    if (!nome || !idade || !sexo || !sintomas || !historico || !idExame) {
+      HematoAI.showToast('Preencha todos os campos da anamnese.', 'error');
+      return;
+    }
+
+    if (!imagemFile) {
+      HematoAI.showToast('Selecione uma imagem da lâmina.', 'error');
+      return;
+    }
+
+    const textoOriginal = btnGerar.innerHTML;
+    btnGerar.innerHTML  = '<span class="loading-spinner"></span> Analisando células...';
+    btnGerar.disabled   = true;
+    resultadosDiv.classList.add('hidden');
+
+    try {
+      const formData = new FormData();
+      formData.append('imagem',   imagemFile);
+      formData.append('idade',    idade);
+      formData.append('sexo',     sexo);
+      formData.append('sintomas', sintomas);
+      formData.append('historia', historico);
+      formData.append('nome',     nome);
+      formData.append('idExame',  idExame);
+
+      console.log('📤 Enviando para o servidor...');
+
+      // Simulação de resposta (substituir pela chamada real)
+      // const response = await fetch('http://localhost:3000/analisar', {
+      //   method: 'POST',
+      //   body: formData
+      // });
+      // const data = await response.json();
+
+      // SIMULAÇÃO DE RESPOSTA (REMOVER QUANDO INTEGRAR)
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      const data = {
+        laudo: `RELATÓRIO DE ANÁLISE HEMATOLÓGICA\n\nPaciente: ${nome}\nIdade: ${idade} anos\nSexo: ${sexo}\n\nSINTOMAS: ${sintomas}\n\nHISTÓRICO: ${historico}\n\nANÁLISE:\n- Hemoglobina: 9.8 g/dL (baixo)\n- Leucócitos: 25,000 µL (elevado)\n- Plaquetas: 45,000 µL (baixo)\n- Presença de células blásticas atípicas: 15%\n\nSUSPEITA: ALTA - Leucemia Mieloide Aguda (LMA)\nCONFIANÇA: 94.5%\n\nRECOMENDAÇÃO:\n- Realizar mielograma para confirmação\n- Avaliar necessidade de internação\n- Iniciar suporte transfusional imediato\n\nEste laudo foi gerado automaticamente pelo sistema HematoAI.`,
+        pdfUrl: null
+      };
+
+      if (data.laudo) {
+        laudoEl.textContent = data.laudo;
+        pdfUrlAtual = data.pdfUrl;
+        resultadosDiv.classList.remove('hidden');
+        resultadosDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        HematoAI.showToast('Laudo gerado com sucesso!', 'success');
+      } else {
+        throw new Error(data.laudo || 'Erro desconhecido ao gerar laudo');
+      }
+
+    } catch (error) {
+      console.error('❌ Erro:', error);
+      laudoEl.textContent = `ERRO NA ANÁLISE\n\n${error.message}`;
+      resultadosDiv.classList.remove('hidden');
+      HematoAI.showToast('Erro ao gerar análise.', 'error');
+    } finally {
+      btnGerar.innerHTML = textoOriginal;
+      btnGerar.disabled  = false;
+    }
+  }
+
+  // ============================================
+  // BAIXAR PDF
+  // ============================================
+  function baixarPDF() {
+    const laudo = laudoEl.textContent;
+    if (laudo && laudo !== '---') {
+      const blob = new Blob([laudo], { type: 'application/pdf' });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href     = url;
+      a.download = `laudo_ia_${Date.now()}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      HematoAI.showToast('Laudo baixado como PDF!', 'success');
+    } else {
+      HematoAI.showToast('Nenhum laudo disponível para download.', 'error');
+    }
+  }
+
+  // ============================================
+  // EVENT LISTENERS
+  // ============================================
+  btnGerar.addEventListener('click', gerarLaudo);
+  btnPDF.addEventListener('click', baixarPDF);
+
+  // ============================================
+  // TESTAR CONEXÃO (OPCIONAL)
+  // ============================================
+  // fetch('http://localhost:3000/', { method: 'HEAD' })
+  //   .then(() => console.log('✅ Servidor conectado'))
+  //   .catch(() => console.warn('⚠️ Servidor não está respondendo'));
+});
+</script>
+</body>
+</html>

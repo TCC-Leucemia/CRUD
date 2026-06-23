@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>HematoAI · Diagnóstico assistido por IA para Leucemia</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background-color: transparent; 
+            color: #1a1f2c;
+            line-height: 1.5;
+            scroll-behavior: smooth;
+        }
+
+        :root {
+            --medical-red: #b91c1c;
+            --medical-red-dark: #991b1b;
+            --medical-red-light: #fee2e2;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-150: #edeef0;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-700: #374151;
+            --gray-900: #111827;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Container principal (para o conteúdo abaixo do header) */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 32px;
+        }
+
+        /* ========== HEADER (agora em tela cheia, com fundo branco) ========== */
+        .header {
+            width: 100%;
+            background-color: white;   /* garante que o fundo cubra de ponta a ponta */
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .header-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 20px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .logo-link {
+            text-decoration: none;
+            display: inline-flex;
+            align-items: baseline;
+            gap: 6px;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+            border-radius: 12px;
+            padding: 4px 8px 4px 4px;
+            background: transparent;
+        }
+        .logo-link:hover {
+            opacity: 0.85;
+            background-color: var(--gray-50);
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background-color: var(--medical-red);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            color: white;
+            font-family: monospace;
+        }
+
+        .logo-text {
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            color: var(--gray-900);
+            position: relative;
+            top: 4px;
+        }
+
+        .logo-text span {
+            color: var(--medical-red);
+        }
+
+        .tagline {
+            font-size: 0.8rem;
+            color: var(--gray-700);
+            margin-left: 6px;
+            font-weight: 400;
+            border-left: 1px solid var(--gray-300);
+            padding-left: 10px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid var(--medical-red);
+            color: var(--medical-red);
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-outline:hover {
+            background-color: var(--medical-red-light);
+            border-color: var(--medical-red-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-solid {
+            background-color: var(--medical-red);
+            border: none;
+            color: white;
+            padding: 8px 24px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-solid:hover {
+            background-color: var(--medical-red-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .divider-vertical {
+            width: 1px;
+            height: 30px;
+            background-color: var(--gray-200);
+            margin: 0 4px;
+        }
+
+        /* ========== MAIN ========== */
+        .hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 64px 0 80px;
+            min-height: calc(100vh - 180px);
+        }
+
+        .hero-content {
+            max-width: 880px;
+            margin: 0 auto;
+        }
+
+        .badge {
+            display: inline-block;
+            background-color: white;
+            color: var(--medical-red-dark);
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 4px 14px;
+            border-radius: 30px;
+            margin-bottom: 24px;
+            letter-spacing: 0.3px;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 20px;
+            color: var(--gray-900);
+        }
+
+        .hero h1 strong {
+            color: var(--medical-red);
+            font-weight: 800;
+        }
+
+        .hero-description {
+            font-size: 1.2rem;
+            color: var(--gray-700);
+            margin-bottom: 48px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .how-it-works {
+            background: var(--medical-red-light);
+            border-radius: 28px;
+            box-shadow: var(--shadow-lg);
+            padding: 32px 32px 40px;
+            margin-top: 20px;
+            border: 1px solid var(--gray-100);
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--gray-900);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .section-title .accent {
+            color: var(--medical-red);
+        }
+
+        .steps-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 32px;
+            margin-top: 32px;
+        }
+
+        .step-card {
+            flex: 1;
+            min-width: 200px;
+            background: var(--gray-50);
+            border-radius: 24px;
+            padding: 24px 16px;
+            transition: transform 0.2s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .step-card:hover {
+            transform: translateY(-6px);
+            border-bottom-color: var(--medical-red);
+            background: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .step-number {
+            background-color: var(--medical-red);
+            color: white;
+            width: 44px;
+            height: 44px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            border-radius: 60px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .step-card h3 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--gray-900);
+        }
+
+        .step-card p {
+            color: var(--gray-700);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .precision-note {
+            margin-top: 44px;
+            background: var(--gray-50);
+            border-radius: 48px;
+            padding: 20px 28px;
+            display: inline-flex;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            border: 1px solid var(--gray-200);
+        }
+
+        .precision-badge {
+            background-color: white;
+            border-radius: 60px;
+            padding: 6px 18px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--medical-red);
+            border: 1px solid var(--medical-red-light);
+        }
+
+        .precision-text {
+            color: var(--gray-700);
+            font-size: 0.95rem;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 32px 0 24px;
+            border-top: 1px solid var(--gray-200);
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: var(--gray-700);
+            background-color: white;   /* garante legibilidade sobre o overlay */
+        }
+
+        .bg-accent {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(185,28,28,0.02) 0%, rgba(255,255,255,0) 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @media (max-width: 800px) {
+            .container {
+                padding: 0 24px;
+            }
+            .header-inner {
+                padding: 20px 24px;
+                flex-direction: column;
+                gap: 16px;
+                align-items: stretch;
+            }
+            .nav-buttons {
+                justify-content: flex-end;
+                width: 100%;
+            }
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            .hero-description {
+                font-size: 1rem;
+            }
+            .steps-grid {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .step-card {
+                width: 100%;
+            }
+            .logo-text {
+                font-size: 1.2rem;
+            }
+            .tagline {
+                display: none;
+            }
+        }
+
+        @media (max-width: 550px) {
+            .nav-buttons {
+                justify-content: center;
+            }
+            .hero {
+                padding: 40px 0 60px;
+            }
+            .how-it-works {
+                padding: 24px 20px;
+            }
+            .precision-note {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="bg-accent"></div>
+
+<!-- HEADER EM TELA CHEIA, FORA DO CONTAINER PRINCIPAL -->
+<header class="header">
+    <div class="header-inner">
+        <a href="telaInicial" class="logo-link" aria-label="Voltar à página inicial">
+            <div class="logo-icon">H</div>
+            <div class="logo-text">Hemato<span>AI</span></div>
+            <div class="tagline">Inteligência em Hematologia</div>
+        </a>
+        <div class="nav-buttons">
+            <button class="btn-outline" id="btnContato" aria-label="Contato">
+                Contato
+            </button>
+            <div class="divider-vertical"></div>
+            <button class="btn-outline" id="btnLogin" aria-label="Acesso médico">
+                Entrar
+            </button>
+        </div>
+    </div>
+</header>
+
+<!-- CONTEÚDO PRINCIPAL DENTRO DO CONTAINER -->
+<div class="container">
+    <main class="hero">
+        <div class="hero-content">
+            <div class="badge">Inovação Clínica · IA Generativa</div>
+            <h1>Diagnóstico assistido por IA para <strong>leucemia</strong></h1>
+            <p class="hero-description">
+                Potencialize a precisão do seu laudo com nossa plataforma. O médico preenche a anamnese, anexa imagens celulares, e a inteligência artificial fornece uma análise estruturada com nível de confiança e recomendação clínica.
+            </p>
+
+            <div class="how-it-works">
+                <div class="section-title">
+                    <span>Como a plataforma funciona</span>
+                    <span class="accent">→</span>
+                </div>
+                <div class="steps-grid">
+                    <div class="step-card">
+                        <div class="step-number">1</div>
+                        <h3>Preenchimento clínico</h3>
+                        <p>O médico registra anamnese completa: nome, idade, sexo, sintomas, histórico do paciente e anexa as imagens de células sanguíneas.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">2</div>
+                        <h3>Análise por IA generativa</h3>
+                        <p>Nosso modelo processa os dados e imagens, identificando padrões morfológicos sugestivos de leucemia, com métricas de precisão e justificativa.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">3</div>
+                        <h3>Laudo inteligente</h3>
+                        <p>Resultado completo: análise detalhada, grau de certeza e laudo final com recomendação. Disponível para médico e para paciente (acesso restrito).</p>
+                    </div>
+                </div>
+
+                <div class="precision-note">
+                    <span class="precision-badge">Alta acurácia validada</span>
+                    <span class="precision-text">A IA fornece nível de confiança para cada predição — suporte objetivo à decisão médica.</span>
+                </div>
+                <div style="margin-top: 28px; font-size: 0.85rem; color: var(--gray-700);">
+                    O paciente acompanha o resultado por meio de área restrita: visualização do laudo final e download do PDF. <br>
+                    Enquanto o laudo não estiver concluído, status <strong>"Em andamento"</strong> é exibido.
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>HematoAI · Tecnologia de apoio ao diagnóstico hematológico · Uso exclusivo por profissionais de saúde e pacientes autorizados</p>
+        <p style="margin-top: 8px; font-size: 0.7rem;">© 2025 · Diretrizes éticas e regulatórias · Versão clínica 2.0</p>
+    </footer>
+</div>
+
+<script>
+    (function() {
+        const btnContato = document.getElementById('btnContato');
+        const btnLogin = document.getElementById('btnLogin');
+
+        if (btnContato) {
+            btnContato.addEventListener('click', () => {
+                alert("Central de suporte médico: contato@hematoai.com.br | Telefone: (11) 4000-1234\nHorário comercial: segunda a sexta, 8h às 18h.");
+            });
+        }
+
+        if (btnLogin) {
+            btnLogin.addEventListener('click', () => {
+                window.location.href = "login";
+            });
+        }
+    })();
+</script>
+</body>
+</html>

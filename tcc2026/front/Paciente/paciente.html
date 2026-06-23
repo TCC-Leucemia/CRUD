@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HematoAI · Meu Painel</title>
+  <link rel="stylesheet" href="../CSS/navbar.css">
+  <style>
+    .pac-dashboard {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .stats-indicators {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .stat-indicator-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 18px;
+      text-align: center;
+    }
+
+    .stat-indicator-number {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--red);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .stat-indicator-label {
+      font-size: 0.8rem;
+      color: var(--text-2);
+      font-weight: 500;
+    }
+
+    .pac-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .activity-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 13px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-dot {
+      width: 9px; height: 9px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .activity-text { flex: 1; font-size: 0.85rem; color: var(--text-1); }
+    .activity-time { font-size: 0.72rem; color: var(--text-3); white-space: nowrap; }
+
+    .recent-list-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .recent-list-item:last-child { border-bottom: none; }
+
+    .recent-list-info { flex: 1; }
+    .recent-list-name {
+      font-weight: 600;
+      font-size: 0.875rem;
+      color: var(--text-1);
+      margin-bottom: 3px;
+    }
+    .recent-list-detail {
+      font-size: 0.75rem;
+      color: var(--text-3);
+    }
+    .recent-list-date {
+      font-size: 0.72rem;
+      color: var(--text-3);
+      white-space: nowrap;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 0.68rem;
+      font-weight: 700;
+    }
+    .status-finalizado { background: #dcfce7; color: #15803d; }
+    .status-andamento { background: #dbeafe; color: #2563eb; }
+    .status-pendente { background: #fef3c7; color: #d97706; }
+
+    /* ── Modo escuro: correções para o laudo IA ── */
+    .dark-mode .ia-box {
+      background: #1e293b;
+      border-color: #334155;
+    }
+
+    .dark-mode .ia-box .ia-label {
+      color: #93c5fd;
+    }
+
+    .dark-mode .ia-box .ia-texto {
+      color: #e2e8f0;
+    }
+
+    .dark-mode .ia-box .badge-suspeita {
+      color: #f1f5f9 !important;
+    }
+
+    .dark-mode .ia-box .badge-suspeita.suspeita-alta {
+      background: #7f1d1d;
+      color: #fca5a5 !important;
+    }
+
+    .dark-mode .ia-box .badge-suspeita.suspeita-moderada {
+      background: #78350f;
+      color: #fcd34d !important;
+    }
+
+    .dark-mode .ia-box .badge-suspeita.suspeita-baixa {
+      background: #1e3a8a;
+      color: #93c5fd !important;
+    }
+
+    .dark-mode .ia-box .badge-suspeita.suspeita-sem {
+      background: #334155;
+      color: #cbd5e1 !important;
+    }
+
+    .dark-mode .ia-box .conf-label {
+      color: #94a3b8;
+    }
+
+    .dark-mode .ia-box .conf-fill {
+      background: linear-gradient(90deg, #3b82f6, #6366f1);
+    }
+
+    /* ── Modo escuro: badges de status ── */
+    .dark-mode .status-badge.status-finalizado {
+      background: #064e3b;
+      color: #6ee7b7;
+    }
+    .dark-mode .status-badge.status-andamento {
+      background: #1e3a8a;
+      color: #93c5fd;
+    }
+    .dark-mode .status-badge.status-pendente {
+      background: #78350f;
+      color: #fcd34d;
+    }
+
+    /* ── Outros ajustes escuros ── */
+    .dark-mode .recent-list-item {
+      border-bottom-color: var(--border);
+    }
+    .dark-mode .recent-list-name {
+      color: var(--text-1);
+    }
+    .dark-mode .recent-list-detail {
+      color: var(--text-3);
+    }
+    .dark-mode .recent-list-date {
+      color: var(--text-3);
+    }
+
+    @media (max-width: 1024px) {
+      .pac-grid { grid-template-columns: 1fr; }
+      .stats-indicators { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .stats-indicators { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<button class="sidebar-toggle" id="sidebarToggle">☰</button>
+
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <div class="main-content">
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>Meu Painel</h1>
+        <p id="headerDate">Bem-vindo ao HematoAI</p>
+      </div>
+      <div class="page-header-right">
+        <span class="badge badge-green">Paciente</span>
+      </div>
+    </div>
+
+    <div class="page-body">
+      <div class="pac-dashboard">
+
+        <!-- Indicadores -->
+        <div class="stats-indicators">
+          <div class="stat-indicator-card">
+            <div class="stat-indicator-number" id="totalConsultas">0</div>
+            <div class="stat-indicator-label">Consultas</div>
+          </div>
+          <div class="stat-indicator-card">
+            <div class="stat-indicator-number" id="totalExames">0</div>
+            <div class="stat-indicator-label">Exames</div>
+          </div>
+          <div class="stat-indicator-card">
+            <div class="stat-indicator-number" id="totalResultados">0</div>
+            <div class="stat-indicator-label">Resultados</div>
+          </div>
+          <div class="stat-indicator-card">
+            <div class="stat-indicator-number" id="totalAnalises">0</div>
+            <div class="stat-indicator-label">Análises IA</div>
+          </div>
+        </div>
+
+        <!-- Grid de cards -->
+        <div class="pac-grid">
+          <!-- Últimas Consultas -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Últimas Consultas</span>
+              <a href="historicoPaciente.html" class="btn btn-outline btn-sm">Ver todas →</a>
+            </div>
+            <div class="card-body">
+              <div id="ultimasConsultas">
+                <div class="recent-list-item">
+                  <div class="recent-list-info">
+                    <div class="recent-list-name">Consulta com Dr. Carlos Mendes</div>
+                    <div class="recent-list-detail">Hemograma Completo</div>
+                  </div>
+                  <span class="status-badge status-finalizado">Finalizado</span>
+                </div>
+                <div class="recent-list-item">
+                  <div class="recent-list-info">
+                    <div class="recent-list-name">Consulta com Dra. Ana Lima</div>
+                    <div class="recent-list-detail">Mielograma</div>
+                  </div>
+                  <span class="status-badge status-finalizado">Finalizado</span>
+                </div>
+                <div class="recent-list-item">
+                  <div class="recent-list-info">
+                    <div class="recent-list-name">Consulta com Dr. João Silva</div>
+                    <div class="recent-list-detail">Consulta de Rotina</div>
+                  </div>
+                  <span class="status-badge status-finalizado">Finalizado</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Últimos Exames -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Últimos Exames</span>
+              <a href="historicoPaciente.html" class="btn btn-outline btn-sm">Ver todos →</a>
+            </div>
+            <div class="card-body">
+              <div id="ultimosExames">
+                <div class="recent-list-item">
+                  <div class="recent-list-info">
+                    <div class="recent-list-name">Hemograma Completo</div>
+                    <div class="recent-list-detail">Dr. Carlos Mendes</div>
+                  </div>
+                  <span class="status-badge status-finalizado">Finalizado</span>
+                </div>
+                <div class="recent-list-item">
+                  <div class="recent-list-info">
+                    <div class="recent-list-name">Mielograma</div>
+                    <div class="recent-list-detail">Dra. Ana Lima</div>
+                  </div>
+                  <span class="status-badge status-finalizado">Finalizado</span>
+                </div>
+                <div class="recent-list-item">
+                  <div class="recent-list-info">
+                    <div class="recent-list-name">Hemograma de Controle</div>
+                    <div class="recent-list-detail">Dr. João Silva</div>
+                  </div>
+                  <span class="status-badge status-finalizado">Finalizado</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Atividades Recentes -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Atividades Recentes</span>
+            </div>
+            <div class="card-body">
+              <div id="atividadesRecentes">
+                <div class="activity-item">
+                  <div class="activity-dot" style="background:var(--green)"></div>
+                  <span class="activity-text">Novo resultado disponível: Hemograma</span>
+                  <span class="activity-time">há 1h</span>
+                </div>
+                <div class="activity-item">
+                  <div class="activity-dot" style="background:var(--blue)"></div>
+                  <span class="activity-text">Consulta agendada com Dr. Carlos</span>
+                  <span class="activity-time">há 2d</span>
+                </div>
+                <div class="activity-item">
+                  <div class="activity-dot" style="background:var(--red)"></div>
+                  <span class="activity-text">Nova análise IA disponível</span>
+                  <span class="activity-time">há 5d</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Resumo de Saúde -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Resumo de Saúde</span>
+            </div>
+            <div class="card-body">
+              <div style="display:flex;flex-direction:column;gap:12px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">
+                  <span style="font-size:0.82rem;color:var(--text-2);">Última consulta</span>
+                  <span style="font-weight:600;font-size:0.85rem;">05/03/2026</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">
+                  <span style="font-size:0.82rem;color:var(--text-2);">Próximo exame</span>
+                  <span style="font-weight:600;font-size:0.85rem;">—</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">
+                  <span style="font-size:0.82rem;color:var(--text-2);">Total de exames</span>
+                  <span style="font-weight:600;font-size:0.85rem;" id="totalExamesResumo">4</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;">
+                  <span style="font-size:0.82rem;color:var(--text-2);">Última análise IA</span>
+                  <span style="font-weight:600;font-size:0.85rem;">05/03/2026</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../JS/navbar.js"></script>
+<script>
+  // ============================================
+  // FORÇAR SESSÃO COMO PACIENTE (SOLUÇÃO 1)
+  // ============================================
+  localStorage.setItem('hematoai_session', JSON.stringify({
+    tipo: 'Paciente',
+    nome: 'Ana Paula Lima',
+    email: 'paciente@email.com',
+    cpf: '33333333333'
+  }));
+
+  // ============================================
+  // INICIALIZAÇÃO
+  // ============================================
+  
+  if (typeof HematoAI !== 'undefined' && HematoAI.initSidebar) {
+    HematoAI.initSidebar('paciente');
+  } else {
+    console.warn("HematoAI não definido. Verifique o arquivo JS/navbar.js");
+  }
+  
+  const dataAtual = new Date().toLocaleDateString('pt-BR', { 
+    weekday: 'long', 
+    day: 'numeric', 
+    month: 'long', 
+    year: 'numeric' 
+  });
+  const headerElement = document.getElementById('headerDate');
+  if (headerElement) {
+    headerElement.textContent = dataAtual;
+  }
+  
+  // ============================================
+  // CARREGAR DADOS (simulação)
+  // ============================================
+  
+  async function carregarDadosDashboard() {
+    try {
+      const dadosExemplo = {
+        totalConsultas: 12,
+        totalExames: 8,
+        totalResultados: 6,
+        totalAnalises: 4
+      };
+      
+      document.getElementById('totalConsultas').textContent = dadosExemplo.totalConsultas;
+      document.getElementById('totalExames').textContent = dadosExemplo.totalExames;
+      document.getElementById('totalResultados').textContent = dadosExemplo.totalResultados;
+      document.getElementById('totalAnalises').textContent = dadosExemplo.totalAnalises;
+      document.getElementById('totalExamesResumo').textContent = dadosExemplo.totalExames;
+      
+    } catch (error) {
+      console.error('Erro ao carregar dados:', error);
+    }
+  }
+  
+  carregarDadosDashboard();
+</script>
+</body>
+</html>

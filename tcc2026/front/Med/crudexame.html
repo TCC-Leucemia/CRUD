@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HematoAI · Gerenciar Exames</title>
+  <link rel="stylesheet" href="../CSS/navbar.css">
+  <style>
+    .filter-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .filter-select {
+      padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 40px;
+      font-size: 0.85rem;
+      background: var(--surface);
+      color: var(--text-1);
+      font-family: var(--font);
+      outline: none;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .filter-select:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(185,28,28,0.08);
+    }
+
+    /* Status pills */
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .status-pill::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+    }
+    .status-pendente   { background: var(--yellow-light); color: var(--yellow); }
+    .status-pendente::before   { background: var(--yellow); }
+    .status-andamento  { background: var(--blue-light);   color: var(--blue); }
+    .status-andamento::before  { background: var(--blue); }
+    .status-finalizado { background: var(--green-light);  color: var(--green); }
+    .status-finalizado::before { background: var(--green); }
+
+    /* Tipo exame */
+    .tipo-hemograma  { background: var(--red-light);    color: var(--red); }
+    .tipo-mielograma { background: var(--purple-light);  color: var(--purple); }
+    .tipo-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+
+    /* Loading */
+    .table-loading {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+      gap: 12px;
+      color: var(--text-2);
+      font-size: 0.875rem;
+    }
+    .spinner-sm {
+      width: 20px; height: 20px;
+      border: 3px solid var(--border);
+      border-top-color: var(--red);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Detail grid */
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 10px 16px;
+      font-size: 0.875rem;
+    }
+    .detail-key   { color: var(--text-2); font-weight: 600; }
+    .detail-value { color: var(--text-1); }
+
+    /* Info box */
+    .info-box {
+      background: var(--blue-light);
+      border: 1px solid #bfdbfe;
+      border-radius: var(--radius-lg);
+      padding: 14px 16px;
+      font-size: 0.82rem;
+      color: var(--blue);
+      line-height: 1.6;
+      margin-bottom: 18px;
+    }
+
+    /* Field hint */
+    .field-hint {
+      font-size: 0.72rem;
+      color: var(--text-3);
+      margin-top: 3px;
+    }
+
+    /* Exame tipo selector */
+    .tipo-selector {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .tipo-option {
+      border: 2px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      cursor: pointer;
+      transition: var(--transition);
+      text-align: center;
+    }
+
+    .tipo-option:hover {
+      border-color: var(--red);
+      background: var(--red-light);
+    }
+
+    .tipo-option.selected {
+      border-color: var(--red);
+      background: var(--red-light);
+    }
+
+    .tipo-option-label {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-1);
+      margin-top: 8px;
+    }
+
+    .tipo-option-sub {
+      font-size: 0.72rem;
+      color: var(--text-3);
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+
+<button class="sidebar-toggle" id="sidebarToggle">&#9776;</button>
+
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <div class="main-content">
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>Gerenciar Exames</h1>
+        <p>Cadastro e acompanhamento de exames laboratoriais</p>
+      </div>
+      <div class="page-header-right">
+        <button class="btn btn-primary" id="btnNovoExame">Novo Exame</button>
+      </div>
+    </div>
+
+    <div class="page-body">
+      <!-- Tabela -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Lista de Exames</span>
+          <div class="filter-row">
+            <div class="search-bar" style="max-width:240px">
+              <input type="text" id="searchExame" placeholder="Paciente, CPF ou ID...">
+            </div>
+            <select id="filterTipo" class="filter-select">
+              <option value="">Todos os tipos</option>
+              <option value="Hemograma">Hemograma</option>
+              <option value="Mielograma">Mielograma</option>
+            </select>
+            <select id="filterStatus" class="filter-select">
+              <option value="">Todos os status</option>
+              <option value="Pendente">Pendente</option>
+              <option value="Em andamento">Em andamento</option>
+              <option value="Finalizado">Finalizado</option>
+            </select>
+            <button class="btn btn-ghost btn-sm" id="btnRecarregar">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+              </svg>
+              Atualizar
+            </button>
+          </div>
+        </div>
+
+        <div class="table-loading" id="tableLoading">
+          <div class="spinner-sm"></div>
+          <span>Carregando exames...</span>
+        </div>
+
+        <div class="table-wrapper" id="tableWrapper" style="border:none;border-radius:0 0 var(--radius-xl) var(--radius-xl)">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Paciente</th>
+                <th>CPF</th>
+                <th>Data Consulta</th>
+                <th>ID Consulta</th>
+                <th>Tipo</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyExames"></tbody>
+          </table>
+          <div class="empty-state" id="emptyState" style="display:none">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5" style="margin-bottom:14px">
+              <path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/>
+            </svg>
+            <p>Nenhum exame encontrado.</p>
+            <p style="font-size:0.78rem;color:var(--text-3);margin-top:4px">Ajuste os filtros ou cadastre um novo exame.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ── Modal Formulário ── -->
+<div class="modal-overlay" id="modalExame">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modalTitulo">Novo Exame</h2>
+      <button class="btn-close-modal" id="closeModalExame">&#10005;</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="info-box" id="infoBox">
+        O exame deve estar vinculado a uma consulta existente. Informe o ID da consulta corretamente.
+      </div>
+
+      <div class="form-grid" style="margin-bottom:20px">
+        <div class="form-group col-span-2">
+          <label>ID da Consulta *</label>
+          <input type="number" id="eConsultaId" placeholder="Ex: 1" min="1">
+          <div class="field-hint">O exame será vinculado à consulta informada. A consulta deve existir no sistema.</div>
+        </div>
+      </div>
+
+      <!-- Tipo de exame -->
+      <div style="margin-bottom:20px">
+        <label style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:var(--text-2);display:block;margin-bottom:10px">Tipo de Exame *</label>
+        <div class="tipo-selector">
+          <div class="tipo-option" id="tipoHemograma" onclick="selecionarTipo('Hemograma')">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#b91c1c" stroke-width="1.5" style="margin:0 auto;display:block">
+              <ellipse cx="12" cy="5" rx="9" ry="3"/>
+              <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+              <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+            </svg>
+            <div class="tipo-option-label">Hemograma</div>
+            <div class="tipo-option-sub">Análise do sangue periférico</div>
+          </div>
+          <div class="tipo-option" id="tipoMielograma" onclick="selecionarTipo('Mielograma')">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" style="margin:0 auto;display:block">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+            <div class="tipo-option-label">Mielograma</div>
+            <div class="tipo-option-sub">Análise da medula óssea</div>
+          </div>
+        </div>
+        <input type="hidden" id="eTipo">
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Data e Hora do Exame</label>
+          <input type="datetime-local" id="eData">
+          <div class="field-hint">Deve ser uma data futura. Opcional.</div>
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select id="eStatus">
+            <option value="Pendente">Pendente</option>
+            <option value="Em andamento">Em andamento</option>
+            <option value="Finalizado">Finalizado</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="cancelarExame">Cancelar</button>
+      <button class="btn btn-primary" id="salvarExame">Salvar Exame</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Modal Detalhes ── -->
+<div class="modal-overlay" id="modalDetalhes">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Detalhes do Exame</h2>
+      <button class="btn-close-modal" id="closeModalDetalhes">&#10005;</button>
+    </div>
+    <div class="modal-body" id="detalheBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="fecharDetalhes">Fechar</button>
+      <button class="btn btn-outline" id="editarDetalhe">Editar Exame</button>
+    </div>
+  </div>
+</div>
+
+<script src="../JS/navbar.js"></script>
+<script>
+/* ══════════════════════════════════════════════════════════════
+   HematoAI · CRUD de Exames — dados em memória (sem API)
+══════════════════════════════════════════════════════════════ */
+
+  if (!localStorage.getItem('hematoai_session')) {
+    HematoAI.setSession({ tipo: 'Médico', nome: 'Dr. Usuário', crm: '00000-SP' });
+  }
+  HematoAI.initSidebar('exames-crud');
+
+  /* ── Dados de demonstração com pacientes e consultas ── */
+  let proximoId = 4;
+  
+  // Simulação de pacientes vinculados às consultas
+  const pacientes = {
+    1: { nome: 'Maria Oliveira', cpf: '111.111.111-11' },
+    2: { nome: 'Pedro Alves', cpf: '222.222.222-22' },
+    3: { nome: 'Ana Paula Lima', cpf: '333.333.333-33' }
+  };
+
+  // Simulação de datas das consultas
+  const consultasInfo = {
+    1: { data_consulta: '2025-06-10T08:00:00' },
+    2: { data_consulta: '2025-07-01T10:00:00' },
+    3: { data_consulta: '2025-07-15T14:30:00' }
+  };
+
+  let exames = [
+    { id_exame: 1, id_consulta: 1, tipo_exame: 'Hemograma',   data_exame: '2025-06-10T08:00:00', statusc: 'Finalizado'   },
+    { id_exame: 2, id_consulta: 1, tipo_exame: 'Mielograma',  data_exame: '2025-06-15T10:30:00', statusc: 'Em andamento' },
+    { id_exame: 3, id_consulta: 2, tipo_exame: 'Hemograma',   data_exame: '2025-07-01T09:00:00', statusc: 'Pendente'     },
+  ];
+
+  /* ── Estado ── */
+  let filtrados       = [];
+  let modoEdicao      = false;
+  let idEdicao        = null;
+  let idDetalhe       = null;
+  let tipoSelecionado = '';
+
+  /* ── Helpers de formatação ── */
+  function formatarDataHora(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function getPacientePorConsulta(idConsulta) {
+    return pacientes[idConsulta] || { nome: '—', cpf: '—' };
+  }
+
+  function getDataConsulta(idConsulta) {
+    return consultasInfo[idConsulta]?.data_consulta || null;
+  }
+
+  /* ── Status / tipo helpers ── */
+  function statusPill(s) {
+    const map = { 'Pendente': 'pendente', 'Em andamento': 'andamento', 'Finalizado': 'finalizado' };
+    return `<span class="status-pill status-${map[s] || 'pendente'}">${s}</span>`;
+  }
+
+  function tipoBadge(tipo) {
+    if (tipo === 'Hemograma')  return `<span class="tipo-badge tipo-hemograma">Hemograma</span>`;
+    if (tipo === 'Mielograma') return `<span class="tipo-badge tipo-mielograma">Mielograma</span>`;
+    return `<span style="color:var(--text-3)">—</span>`;
+  }
+
+  /* ── Seletor de tipo ── */
+  function selecionarTipo(tipo) {
+    tipoSelecionado = tipo;
+    document.getElementById('eTipo').value = tipo;
+    document.getElementById('tipoHemograma').classList.toggle('selected', tipo === 'Hemograma');
+    document.getElementById('tipoMielograma').classList.toggle('selected', tipo === 'Mielograma');
+  }
+
+  /* ── Carregar / renderizar ── */
+  function carregar() {
+    filtrados = [...exames];
+    aplicarFiltros();
+    atualizarKPIs(exames);
+  }
+
+  function renderTabela(data) {
+    const tbody = document.getElementById('tbodyExames');
+    const empty = document.getElementById('emptyState');
+    tbody.innerHTML = '';
+
+    if (!data.length) {
+      empty.style.display = '';
+      return;
+    }
+    empty.style.display = 'none';
+
+    data.forEach(e => {
+      const paciente = getPacientePorConsulta(e.id_consulta);
+      const dataConsulta = getDataConsulta(e.id_consulta);
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td style="font-family:var(--font-mono);font-size:0.78rem;color:var(--text-3)">#${e.id_exame}</td>
+        <td style="font-weight:600;font-size:0.85rem">${paciente.nome}</td>
+        <td style="font-family:var(--font-mono);font-size:0.8rem">${paciente.cpf}</td>
+        <td style="font-size:0.8rem">${formatarDataHora(dataConsulta)}</td>
+        <td style="font-family:var(--font-mono);font-size:0.82rem;color:var(--blue)">#${e.id_consulta}</td>
+        <td>${tipoBadge(e.tipo_exame)}</td>
+        <td>${statusPill(e.statusc)}</td>
+        <td>
+          <div class="td-actions">
+            <button class="btn btn-ghost btn-sm" onclick="abrirDetalhes(${e.id_exame})">Ver</button>
+            <button class="btn btn-ghost btn-sm" onclick="abrirEdicao(${e.id_exame})">Editar</button>
+            <button class="btn btn-danger btn-sm" onclick="confirmarExclusao(${e.id_exame})">Excluir</button>
+          </div>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  /* ── KPIs ── */
+  function atualizarKPIs(data) {
+    document.getElementById('kpiTotal').textContent      = data.length;
+    document.getElementById('kpiHemograma').textContent  = data.filter(e => e.tipo_exame === 'Hemograma').length;
+    document.getElementById('kpiMielograma').textContent = data.filter(e => e.tipo_exame === 'Mielograma').length;
+    document.getElementById('kpiPendente').textContent   = data.filter(e => e.statusc === 'Pendente').length;
+    document.getElementById('kpiFinalizado').textContent = data.filter(e => e.statusc === 'Finalizado').length;
+  }
+
+  /* ── Filtros ── */
+  function aplicarFiltros() {
+    const q      = document.getElementById('searchExame').value.toLowerCase();
+    const tipo   = document.getElementById('filterTipo').value;
+    const status = document.getElementById('filterStatus').value;
+
+    filtrados = exames.filter(e => {
+      const paciente = getPacientePorConsulta(e.id_consulta);
+      const matchPaciente = paciente.nome.toLowerCase().includes(q) || 
+                           paciente.cpf.includes(q) || 
+                           String(e.id_exame).includes(q) || 
+                           String(e.id_consulta).includes(q);
+      
+      return matchPaciente &&
+        (!tipo   || e.tipo_exame === tipo) &&
+        (!status || e.statusc === status);
+    });
+    renderTabela(filtrados);
+  }
+
+  document.getElementById('searchExame').addEventListener('input',   aplicarFiltros);
+  document.getElementById('filterTipo').addEventListener('change',   aplicarFiltros);
+  document.getElementById('filterStatus').addEventListener('change', aplicarFiltros);
+  document.getElementById('btnRecarregar').addEventListener('click', carregar);
+
+  /* ── Abrir modal novo ── */
+  document.getElementById('btnNovoExame').addEventListener('click', () => {
+    modoEdicao      = false;
+    idEdicao        = null;
+    tipoSelecionado = '';
+
+    document.getElementById('modalTitulo').textContent = 'Novo Exame';
+    document.getElementById('infoBox').style.display   = '';
+    document.getElementById('eConsultaId').value       = '';
+    document.getElementById('eTipo').value             = '';
+    document.getElementById('eData').value             = '';
+    document.getElementById('eStatus').value           = 'Pendente';
+    document.getElementById('eConsultaId').disabled    = false;
+
+    document.getElementById('tipoHemograma').classList.remove('selected');
+    document.getElementById('tipoMielograma').classList.remove('selected');
+
+    const agora = new Date();
+    agora.setMinutes(agora.getMinutes() + 10);
+    const offset = agora.getTimezoneOffset() * 60000;
+    document.getElementById('eData').min = new Date(agora - offset).toISOString().slice(0, 16);
+
+    HematoAI.openModal(document.getElementById('modalExame'));
+  });
+
+  /* ── Salvar exame ── */
+  document.getElementById('salvarExame').addEventListener('click', () => {
+    const idConsulta = parseInt(document.getElementById('eConsultaId').value);
+    const tipo       = document.getElementById('eTipo').value || tipoSelecionado;
+    const data       = document.getElementById('eData').value;
+    const status     = document.getElementById('eStatus').value;
+
+    if (!idConsulta || idConsulta <= 0) {
+      HematoAI.showToast('ID da consulta inválido.', 'error');
+      return;
+    }
+    if (!tipo) {
+      HematoAI.showToast('Selecione o tipo de exame.', 'error');
+      return;
+    }
+
+    if (modoEdicao) {
+      const idx = exames.findIndex(x => x.id_exame === idEdicao);
+      if (idx >= 0) {
+        exames[idx] = {
+          ...exames[idx],
+          tipo_exame: tipo,
+          statusc:    status,
+          data_exame: data ? new Date(data).toISOString() : exames[idx].data_exame,
+        };
+      }
+      HematoAI.showToast('Exame atualizado com sucesso!', 'success');
+    } else {
+      exames.push({
+        id_exame:    proximoId++,
+        id_consulta: idConsulta,
+        tipo_exame:  tipo,
+        statusc:     status || 'Pendente',
+        data_exame:  data ? new Date(data).toISOString() : null,
+      });
+      HematoAI.showToast('Exame cadastrado com sucesso!', 'success');
+    }
+
+    HematoAI.closeModal(document.getElementById('modalExame'));
+    carregar();
+  });
+
+  /* ── Editar ── */
+  function abrirEdicao(id) {
+    const e = exames.find(x => x.id_exame === id);
+    if (!e) return;
+
+    modoEdicao      = true;
+    idEdicao        = id;
+    tipoSelecionado = e.tipo_exame;
+
+    document.getElementById('modalTitulo').textContent   = `Editar Exame #${id}`;
+    document.getElementById('infoBox').style.display     = 'none';
+    document.getElementById('eConsultaId').value         = e.id_consulta;
+    document.getElementById('eConsultaId').disabled      = true;
+    document.getElementById('eTipo').value               = e.tipo_exame;
+    document.getElementById('eStatus').value             = e.statusc;
+
+    document.getElementById('tipoHemograma').classList.toggle('selected', e.tipo_exame === 'Hemograma');
+    document.getElementById('tipoMielograma').classList.toggle('selected', e.tipo_exame === 'Mielograma');
+
+    if (e.data_exame) {
+      const d      = new Date(e.data_exame);
+      const offset = d.getTimezoneOffset() * 60000;
+      document.getElementById('eData').value = new Date(d - offset).toISOString().slice(0, 16);
+    } else {
+      document.getElementById('eData').value = '';
+    }
+    document.getElementById('eData').removeAttribute('min');
+
+    HematoAI.openModal(document.getElementById('modalExame'));
+  }
+
+  /* ── Detalhes ── */
+  function abrirDetalhes(id) {
+    idDetalhe = id;
+    const e   = exames.find(x => x.id_exame === id);
+
+    if (!e) {
+      document.getElementById('detalheBody').innerHTML =
+        '<p style="color:var(--red);padding:20px">Exame não encontrado.</p>';
+    } else {
+      const paciente = getPacientePorConsulta(e.id_consulta);
+      const dataConsulta = getDataConsulta(e.id_consulta);
+      document.getElementById('detalheBody').innerHTML = `
+        <div class="detail-grid">
+          <span class="detail-key">ID do Exame</span>
+          <span class="detail-value" style="font-family:var(--font-mono)">#${e.id_exame}</span>
+          <span class="detail-key">Paciente</span>
+          <span class="detail-value" style="font-weight:600">${paciente.nome}</span>
+          <span class="detail-key">CPF do Paciente</span>
+          <span class="detail-value" style="font-family:var(--font-mono)">${paciente.cpf}</span>
+          <span class="detail-key">Data da Consulta</span>
+          <span class="detail-value">${formatarDataHora(dataConsulta)}</span>
+          <span class="detail-key">ID da Consulta</span>
+          <span class="detail-value" style="font-family:var(--font-mono)">
+            <a href="crudconsulta" style="color:var(--blue)">#${e.id_consulta}</a>
+          </span>
+          <span class="detail-key">Tipo de Exame</span>
+          <span class="detail-value">${tipoBadge(e.tipo_exame)}</span>
+          <span class="detail-key">Data do Exame</span>
+          <span class="detail-value">${formatarDataHora(e.data_exame)}</span>
+          <span class="detail-key">Status</span>
+          <span class="detail-value">${statusPill(e.statusc)}</span>
+        </div>
+      `;
+    }
+
+    HematoAI.openModal(document.getElementById('modalDetalhes'));
+  }
+
+  document.getElementById('closeModalDetalhes').addEventListener('click', () =>
+    HematoAI.closeModal(document.getElementById('modalDetalhes')));
+  document.getElementById('fecharDetalhes').addEventListener('click', () =>
+    HematoAI.closeModal(document.getElementById('modalDetalhes')));
+  document.getElementById('editarDetalhe').addEventListener('click', () => {
+    HematoAI.closeModal(document.getElementById('modalDetalhes'));
+    if (idDetalhe) abrirEdicao(idDetalhe);
+  });
+
+  /* ── Excluir ── */
+  function confirmarExclusao(id) {
+    HematoAI.confirmDialog(
+      `Deseja excluir o exame <strong>#${id}</strong>?<br>
+       Imagens e resultados vinculados também poderão ser afetados.`,
+      () => {
+        exames = exames.filter(x => x.id_exame !== id);
+        HematoAI.showToast('Exame excluído com sucesso.', 'success');
+        carregar();
+      }
+    );
+  }
+
+  /* ── Fechar modais ── */
+  ['closeModalExame','cancelarExame'].forEach(id => {
+    document.getElementById(id).addEventListener('click', () =>
+      HematoAI.closeModal(document.getElementById('modalExame')));
+  });
+  document.getElementById('modalExame').addEventListener('click', e => {
+    if (e.target === document.getElementById('modalExame'))
+      HematoAI.closeModal(document.getElementById('modalExame'));
+  });
+
+  /* ── Init ── */
+  carregar();
+</script>
+</body>
+</html>

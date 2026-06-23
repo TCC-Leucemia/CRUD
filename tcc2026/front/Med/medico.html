@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HematoAI · Painel do Médico</title>
+  <link rel="stylesheet" href="../CSS/navbar.css">
+  <style>
+    .med-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .quick-action-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+
+    .quick-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 22px 18px;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+      text-decoration: none;
+      display: block;
+    }
+    .quick-card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-3px);
+      border-color: var(--red);
+    }
+    .quick-card-icon  { font-size: 2rem; margin-bottom: 8px; }
+    .quick-card-label { font-size: 0.875rem; font-weight: 700; color: var(--text-1); }
+    .quick-card-sub   { font-size: 0.72rem; color: var(--text-3); margin-top: 3px; }
+
+    .stats-indicators {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .stat-indicator-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 18px;
+      text-align: center;
+    }
+
+    .stat-indicator-number {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--red);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .stat-indicator-label {
+      font-size: 0.8rem;
+      color: var(--text-2);
+      font-weight: 500;
+    }
+
+    .activity-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 13px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-dot {
+      width: 9px; height: 9px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .activity-text { flex: 1; font-size: 0.85rem; color: var(--text-1); }
+    .activity-time { font-size: 0.72rem; color: var(--text-3); white-space: nowrap; }
+
+    @media (max-width: 1024px) {
+      .med-grid { grid-template-columns: 1fr; }
+      .quick-action-grid { grid-template-columns: repeat(2, 1fr); }
+      .stats-indicators { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .quick-action-grid { grid-template-columns: 1fr; }
+      .stats-indicators { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<button class="sidebar-toggle" id="sidebarToggle">☰</button>
+
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <div class="main-content">
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>Painel do Médico</h1>
+        <p id="headerDate">Bem-vindo ao sistema HematoAI</p>
+      </div>
+      <div class="page-header-right">
+        <span class="badge badge-green">Sistema operacional</span>
+      </div>
+    </div>
+
+    <div class="page-body">
+      <!-- INDICADORES ESTATÍSTICOS -->
+      <div class="stats-indicators">
+        <div class="stat-indicator-card">
+          <div class="stat-indicator-number" id="totalConsultas">0</div>
+          <div class="stat-indicator-label">Consultas</div>
+        </div>
+        <div class="stat-indicator-card">
+          <div class="stat-indicator-number" id="totalExames">0</div>
+          <div class="stat-indicator-label">Exames</div>
+        </div>
+        <div class="stat-indicator-card">
+          <div class="stat-indicator-number" id="totalPacientes">0</div>
+          <div class="stat-indicator-label">Pacientes</div>
+        </div>
+        <div class="stat-indicator-card">
+          <div class="stat-indicator-number" id="totalAnalises">0</div>
+          <div class="stat-indicator-label">Análises IA</div>
+        </div>
+      </div>
+
+      <!-- QUICK ACTIONS -->
+      <div class="quick-action-grid">
+        <div class="quick-card" onclick="verConsultas()">
+          <div class="quick-card-icon">📋</div>
+          <div class="quick-card-label">Consultas</div>
+          <div class="quick-card-sub">Visualizar e atualizar status</div>
+        </div>
+        <div class="quick-card" onclick="verExames()">
+          <div class="quick-card-icon">🔬</div>
+          <div class="quick-card-label">Exames</div>
+          <div class="quick-card-sub">Gerenciar exames</div>
+        </div>
+        <div class="quick-card" onclick="verResultados()">
+          <div class="quick-card-icon">📊</div>
+          <div class="quick-card-label">Resultados</div>
+          <div class="quick-card-sub">Laudos e diagnósticos</div>
+        </div>
+        <div class="quick-card" onclick="verAnamnese()">
+          <div class="quick-card-icon">📝</div>
+          <div class="quick-card-label">Anamnese</div>
+          <div class="quick-card-sub">Histórico dos pacientes</div>
+        </div>
+      </div>
+
+      <div class="med-grid">
+        <!-- CARD: CONSULTAS RECENTES -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Consultas Recentes</span>
+            <a href="crudconsulta_med.html" class="btn btn-outline btn-sm">Ver todas →</a>
+          </div>
+          <div class="card-body">
+            <div id="listaConsultasRecentes">
+              <div class="activity-item">
+                <div class="activity-dot" style="background:#15803d"></div>
+                <span class="activity-text">Consulta #1045 - Maria Oliveira</span>
+                <span class="activity-time">Finalizada</span>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot" style="background:var(--blue)"></div>
+                <span class="activity-text">Consulta #1046 - Pedro Alves</span>
+                <span class="activity-time">Em andamento</span>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot" style="background:var(--yellow)"></div>
+                <span class="activity-text">Consulta #1047 - Ana Lima</span>
+                <span class="activity-time">Pendente</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD: EXAMES RECENTES -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Exames Recentes</span>
+            <a href="crudexame.html" class="btn btn-outline btn-sm">Ver todos →</a>
+          </div>
+          <div class="card-body">
+            <div id="listaExamesRecentes">
+              <div class="activity-item">
+                <div class="activity-dot" style="background:#15803d"></div>
+                <span class="activity-text">Hemograma - #E001</span>
+                <span class="activity-time">Finalizado</span>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot" style="background:var(--blue)"></div>
+                <span class="activity-text">Mielograma - #E002</span>
+                <span class="activity-time">Em andamento</span>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot" style="background:var(--yellow)"></div>
+                <span class="activity-text">Hemograma - #E003</span>
+                <span class="activity-time">Pendente</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD: ANÁLISES IA -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Análises IA</span>
+            <a href="crudanaliseia.html" class="btn btn-outline btn-sm">Ver todas →</a>
+          </div>
+          <div class="card-body">
+            <div id="listaAnalisesIA">
+              <div class="activity-item">
+                <div class="activity-dot" style="background:var(--red)"></div>
+                <span class="activity-text">Alta suspeita - LMA</span>
+                <span class="activity-time">Confiança: 94%</span>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot" style="background:#d97706"></div>
+                <span class="activity-text">Moderada - LLC</span>
+                <span class="activity-time">Confiança: 78%</span>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot" style="background:#15803d"></div>
+                <span class="activity-text">Baixa suspeita</span>
+                <span class="activity-time">Confiança: 45%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD: ATIVIDADES RECENTES -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Atividades Recentes</span>
+            <a href="historico.html" class="btn btn-outline btn-sm">Ver histórico →</a>
+          </div>
+          <div class="card-body">
+            <div id="listaAtividades">
+              <div class="activity-item">
+                <div class="activity-dot" style="background:var(--blue)"></div>
+                <span class="activity-text">Novo exame cadastrado - Hemograma</span>
+                <span class="activity-time">há 1h</span>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot" style="background:var(--red)"></div>
+                <span class="activity-text">Status da consulta #1045 atualizado</span>
+                <span class="activity-time">há 2h</span>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot" style="background:#15803d"></div>
+                <span class="activity-text">Nova análise IA gerada</span>
+                <span class="activity-time">há 3h</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /page-body -->
+  </div><!-- /main-content -->
+</div><!-- /app-layout -->
+
+<script src="../JS/navbar.js"></script>
+<script>
+  // ============================================
+  // FUNÇÕES PARA QUICK ACTIONS
+  // ============================================
+  // Forçar sessão como Médico (temporário para teste)
+  localStorage.setItem('hematoai_session', JSON.stringify({
+    tipo: 'Médico',
+    nome: 'Dr. Usuário',
+    crm: '00000-SP',
+    email: 'medico@hospital.com'
+  }));
+  function verConsultas() {
+    window.location.href = 'crudconsulta_med.html';
+  }
+  
+  function verExames() {
+    window.location.href = 'crudexame.html';
+  }
+  
+  function verResultados() {
+    window.location.href = 'crudresultado.html';
+  }
+  
+  function verAnamnese() {
+    window.location.href = 'crudanamnese.html';
+  }
+  
+  // ============================================
+  // CARREGAMENTO DE DADOS (API FUTURA)
+  // ============================================
+  
+  async function carregarDadosDashboard() {
+    try {
+      // Simulação de dados estáticos
+      const dadosExemplo = {
+        totalConsultas: 28,
+        totalExames: 15,
+        totalPacientes: 42,
+        totalAnalises: 8
+      };
+      
+      document.getElementById('totalConsultas').textContent = dadosExemplo.totalConsultas;
+      document.getElementById('totalExames').textContent = dadosExemplo.totalExames;
+      document.getElementById('totalPacientes').textContent = dadosExemplo.totalPacientes;
+      document.getElementById('totalAnalises').textContent = dadosExemplo.totalAnalises;
+      
+    } catch (error) {
+      console.error('Erro ao carregar dados do dashboard:', error);
+    }
+  }
+  
+  // Inicialização da Sessão e Sidebar
+  if (!localStorage.getItem('hematoai_session')) {
+    if (typeof HematoAI !== 'undefined' && HematoAI.setSession) {
+        HematoAI.setSession({ tipo: 'Médico', nome: 'Dr. Usuário', crm: '00000-SP' });
+    }
+  }
+  
+  if (typeof HematoAI !== 'undefined' && HematoAI.initSidebar) {
+      HematoAI.initSidebar('anamnese');
+  } else {
+      console.warn("HematoAI não definido. Verifique o arquivo JS/navbar.js");
+  }
+  
+  // Atualizar data no header
+  const dataAtual = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  const headerElement = document.getElementById('headerDate');
+  if (headerElement) {
+      headerElement.textContent = dataAtual;
+  }
+  
+  // Carregar dados do dashboard
+  carregarDadosDashboard();
+</script>
+</body>
+</html>

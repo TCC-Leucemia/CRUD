@@ -12,14 +12,6 @@ module.exports = (app, banco) => {
     const jwt = new JwtMiddleware();
     const role = new RoleMiddleware();
 
-    app.post(
-        "/analise-ia",
-        jwt.validateToken,
-        role.authorize("Médico"),
-        middleware.validateBody,
-        control.store
-    );
-
     app.get(
         "/analise-ia",
         jwt.validateToken,
@@ -33,15 +25,6 @@ module.exports = (app, banco) => {
         role.authorize("Médico"),
         middleware.validateId,
         control.show
-    );
-
-    app.put(
-        "/analise-ia/:id_analise",
-        jwt.validateToken,
-        role.authorize("Médico"),
-        middleware.validateId,
-        middleware.validateBody,
-        control.update
     );
 
     app.delete(

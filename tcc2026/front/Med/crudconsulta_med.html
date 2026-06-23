@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HematoAI · Consultas (Médico)</title>
+  <link rel="stylesheet" href="../CSS/navbar.css">
+  <style>
+    .filter-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .filter-select {
+      padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 40px;
+      font-size: 0.85rem;
+      background: var(--surface);
+      color: var(--text-1);
+      font-family: var(--font);
+      outline: none;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .filter-select:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(185,28,28,0.08);
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .status-pill::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
+    }
+    .status-pendente { background: #fef3c7; color: #d97706; }
+    .status-pendente::before { background: #d97706; }
+    .status-andamento { background: #dbeafe; color: #2563eb; }
+    .status-andamento::before { background: #2563eb; }
+    .status-finalizado { background: #dcfce7; color: #15803d; }
+    .status-finalizado::before { background: #15803d; }
+
+    .info-box {
+      background: #fef3c7;
+      border: 1px solid #fde68a;
+      border-radius: var(--radius-lg);
+      padding: 14px 16px;
+      font-size: 0.82rem;
+      color: #d97706;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 10px 16px;
+      font-size: 0.875rem;
+    }
+    .detail-key { color: var(--text-2); font-weight: 600; }
+    .detail-value { color: var(--text-1); }
+  </style>
+</head>
+<body>
+
+<button class="sidebar-toggle" id="sidebarToggle">☰</button>
+
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <div class="main-content">
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>Minhas Consultas</h1>
+        <p>Visualização e atualização de status das consultas</p>
+      </div>
+      <div class="page-header-right">
+        <span class="badge badge-blue">Apenas leitura e status</span>
+      </div>
+    </div>
+
+    <div class="page-body">
+      <div class="info-box">
+        ⚠️ Você pode visualizar todas as suas consultas e alterar apenas o <strong>status</strong>.
+        As demais informações são somente leitura.
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Lista de Consultas</span>
+          <div class="filter-row">
+            <div class="search-bar" style="max-width:240px">
+              <input type="text" id="searchConsulta" placeholder="Buscar por paciente...">
+            </div>
+            <select id="filterStatus" class="filter-select">
+              <option value="">Todos os status</option>
+              <option value="Pendente">Pendente</option>
+              <option value="Em andamento">Em andamento</option>
+              <option value="Finalizado">Finalizado</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-wrapper" style="border:none;border-radius:0 0 var(--radius-xl) var(--radius-xl)">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Paciente</th>
+                <th>CPF</th>
+                <th>Data</th>
+                <th>Tipo</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyConsultas"></tbody>
+          </table>
+          <div class="empty-state" id="emptyState" style="display:none">
+            <p>Nenhuma consulta encontrada.</p>
+            <p style="font-size:0.78rem;color:var(--text-3);margin-top:4px">Ajuste os filtros ou aguarde novas consultas.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Editar Status -->
+<div class="modal-overlay" id="modalStatus">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Atualizar Status da Consulta</h2>
+      <button class="btn-close-modal" id="closeModalStatus">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group col-span-2">
+          <label>Novo Status *</label>
+          <select id="novoStatus">
+            <option value="Pendente">Pendente</option>
+            <option value="Em andamento">Em andamento</option>
+            <option value="Finalizado">Finalizado</option>
+          </select>
+        </div>
+      </div>
+      <input type="hidden" id="editandoId">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="cancelarStatus">Cancelar</button>
+      <button class="btn btn-primary" id="salvarStatus">Atualizar Status</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Detalhes -->
+<div class="modal-overlay" id="modalDetalhes">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Detalhes da Consulta</h2>
+      <button class="btn-close-modal" id="closeModalDetalhes">✕</button>
+    </div>
+    <div class="modal-body" id="detalheBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="fecharDetalhes">Fechar</button>
+      <button class="btn btn-outline" id="editarStatusDetalhe">Alterar Status</button>
+    </div>
+  </div>
+</div>
+
+<script src="../JS/navbar.js"></script>
+<script>
+  if (!localStorage.getItem('hematoai_session')) {
+    HematoAI.setSession({ tipo: 'Médico', nome: 'Dr. Usuário', crm: '00000-SP' });
+  }
+  HematoAI.initSidebar('consultas');
+
+  // ============================================
+  // DADOS DE DEMONSTRAÇÃO
+  // ============================================
+  
+  // Mapeamento de pacientes (CPF -> Nome)
+  const pacientes = {
+    '11111111111': 'Maria Oliveira',
+    '22222222222': 'Pedro Alves',
+    '33333333333': 'Ana Paula Lima',
+    '44444444444': 'Roberto Santos',
+    '55555555555': 'Carla Mendonça'
+  };
+
+  // CRM do médico logado (apenas para referência)
+  const medicoCRM = '12345-SP';
+
+  let consultas = [
+    { id_consulta: 1, cpf: '11111111111', crm: '12345-SP', data_consulta: '2025-06-10T08:00:00', tipo_consulta: 'Hemograma', statusc: 'Finalizado' },
+    { id_consulta: 2, cpf: '22222222222', crm: '12345-SP', data_consulta: '2025-07-01T10:00:00', tipo_consulta: 'Consulta clínica', statusc: 'Pendente' },
+    { id_consulta: 3, cpf: '33333333333', crm: '12345-SP', data_consulta: '2025-07-15T14:30:00', tipo_consulta: 'Retorno', statusc: 'Em andamento' },
+    { id_consulta: 4, cpf: '44444444444', crm: '12345-SP', data_consulta: '2025-07-20T09:00:00', tipo_consulta: 'Hemograma', statusc: 'Pendente' },
+  ];
+
+  let idDetalhe = null;
+  let idEditar = null;
+
+  // ============================================
+  // FUNÇÕES AUXILIARES
+  // ============================================
+  
+  function getNomePaciente(cpf) {
+    return pacientes[cpf] || 'Paciente não encontrado';
+  }
+
+  function formatarCPF(cpf) {
+    const c = String(cpf).replace(/\D/g, '').padStart(11, '0');
+    return c.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+  }
+
+  function formatarDataHora(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function statusPill(s) {
+    const map = { 'Pendente': 'pendente', 'Em andamento': 'andamento', 'Finalizado': 'finalizado' };
+    return `<span class="status-pill status-${map[s] || 'pendente'}">${s}</span>`;
+  }
+
+  // ============================================
+  // RENDERIZAÇÃO
+  // ============================================
+  
+  function renderTabela(data) {
+    const tbody = document.getElementById('tbodyConsultas');
+    const empty = document.getElementById('emptyState');
+    tbody.innerHTML = '';
+
+    if (!data.length) {
+      empty.style.display = '';
+      return;
+    }
+    empty.style.display = 'none';
+
+    data.forEach(c => {
+      const nomePaciente = getNomePaciente(c.cpf);
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td style="font-family:var(--font-mono);font-size:0.78rem;color:var(--text-3)">${c.id_consulta}</td>
+        <td style="font-weight:600;font-size:0.85rem">${nomePaciente}</td>
+        <td style="font-family:var(--font-mono);font-size:0.8rem">${formatarCPF(c.cpf || '')}</td>
+        <td style="font-size:0.85rem">${formatarDataHora(c.data_consulta)}</td>
+        <td>${c.tipo_consulta || '<span style="color:var(--text-3)">—</span>'}</td>
+        <td>${statusPill(c.statusc)}</td>
+        <td>
+          <div class="td-actions">
+            <button class="btn btn-ghost btn-sm" onclick="abrirDetalhes(${c.id_consulta})">Ver</button>
+            <button class="btn btn-outline btn-sm" onclick="abrirEditarStatus(${c.id_consulta})">Alterar Status</button>
+          </div>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  // ============================================
+  // FILTROS
+  // ============================================
+  
+  function aplicarFiltros() {
+    const q = document.getElementById('searchConsulta').value.toLowerCase();
+    const status = document.getElementById('filterStatus').value;
+
+    const filtradas = consultas.filter(c => {
+      const nomePaciente = getNomePaciente(c.cpf).toLowerCase();
+      return (nomePaciente.includes(q) || c.cpf.includes(q)) &&
+             (!status || c.statusc === status);
+    });
+    renderTabela(filtradas);
+  }
+
+  document.getElementById('searchConsulta').addEventListener('input', aplicarFiltros);
+  document.getElementById('filterStatus').addEventListener('change', aplicarFiltros);
+
+  // ============================================
+  // AÇÕES
+  // ============================================
+  
+  function abrirDetalhes(id) {
+    idDetalhe = id;
+    const c = consultas.find(x => x.id_consulta === id);
+
+    if (!c) {
+      document.getElementById('detalheBody').innerHTML = '<p style="color:var(--red);padding:20px">Consulta não encontrada.</p>';
+    } else {
+      const nomePaciente = getNomePaciente(c.cpf);
+      document.getElementById('detalheBody').innerHTML = `
+        <div class="detail-grid">
+          <span class="detail-key">ID</span>
+          <span class="detail-value" style="font-family:var(--font-mono)">${c.id_consulta}</span>
+          <span class="detail-key">Paciente</span>
+          <span class="detail-value" style="font-weight:600">${nomePaciente}</span>
+          <span class="detail-key">CPF</span>
+          <span class="detail-value" style="font-family:var(--font-mono)">${formatarCPF(c.cpf || '')}</span>
+          <span class="detail-key">Data e Hora</span>
+          <span class="detail-value">${formatarDataHora(c.data_consulta)}</span>
+          <span class="detail-key">Tipo</span>
+          <span class="detail-value">${c.tipo_consulta || '—'}</span>
+          <span class="detail-key">Status</span>
+          <span class="detail-value">${statusPill(c.statusc)}</span>
+        </div>
+      `;
+    }
+
+    HematoAI.openModal(document.getElementById('modalDetalhes'));
+  }
+
+  function abrirEditarStatus(id) {
+    const c = consultas.find(x => x.id_consulta === id);
+    if (!c) return;
+
+    idEditar = id;
+    document.getElementById('editandoId').value = id;
+    document.getElementById('novoStatus').value = c.statusc;
+    HematoAI.openModal(document.getElementById('modalStatus'));
+  }
+
+  // ============================================
+  // SALVAR STATUS
+  // ============================================
+  
+  document.getElementById('salvarStatus').addEventListener('click', function() {
+    const id = parseInt(document.getElementById('editandoId').value);
+    const novoStatus = document.getElementById('novoStatus').value;
+
+    if (!novoStatus) {
+      HematoAI.showToast('Selecione um status.', 'error');
+      return;
+    }
+
+    const idx = consultas.findIndex(x => x.id_consulta === id);
+    if (idx >= 0) {
+      consultas[idx].statusc = novoStatus;
+      HematoAI.showToast('Status atualizado com sucesso!', 'success');
+      HematoAI.closeModal(document.getElementById('modalStatus'));
+      aplicarFiltros();
+    }
+  });
+
+  // ============================================
+  // FECHAR MODAIS
+  // ============================================
+  
+  document.getElementById('closeModalStatus').addEventListener('click', () => HematoAI.closeModal(document.getElementById('modalStatus')));
+  document.getElementById('cancelarStatus').addEventListener('click', () => HematoAI.closeModal(document.getElementById('modalStatus')));
+
+  document.getElementById('closeModalDetalhes').addEventListener('click', () => HematoAI.closeModal(document.getElementById('modalDetalhes')));
+  document.getElementById('fecharDetalhes').addEventListener('click', () => HematoAI.closeModal(document.getElementById('modalDetalhes')));
+
+  document.getElementById('editarStatusDetalhe').addEventListener('click', function() {
+    HematoAI.closeModal(document.getElementById('modalDetalhes'));
+    if (idDetalhe) abrirEditarStatus(idDetalhe);
+  });
+
+  // ============================================
+  // INICIALIZAÇÃO
+  // ============================================
+  
+  renderTabela(consultas);
+</script>
+</body>
+</html>

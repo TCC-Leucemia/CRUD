@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HematoAI · Gerenciar Anamnese</title>
+  <link rel="stylesheet" href="../CSS/navbar.css">
+  <style>
+    .filter-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .filter-select {
+      padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 40px;
+      font-size: 0.85rem;
+      background: var(--surface);
+      color: var(--text-1);
+      font-family: var(--font);
+      outline: none;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .filter-select:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(185,28,28,0.08);
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 10px 16px;
+      font-size: 0.875rem;
+    }
+    .detail-key { color: var(--text-2); font-weight: 600; }
+    .detail-value { color: var(--text-1); }
+
+    .anamnese-texto {
+      background: var(--bg);
+      padding: 16px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      font-size: 0.85rem;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      min-height: 80px;
+    }
+
+    .info-box {
+      background: #fef3c7;
+      border: 1px solid #fde68a;
+      border-radius: var(--radius-lg);
+      padding: 14px 16px;
+      font-size: 0.82rem;
+      color: #d97706;
+      line-height: 1.6;
+      margin-bottom: 18px;
+    }
+  </style>
+</head>
+<body>
+
+<button class="sidebar-toggle" id="sidebarToggle">☰</button>
+
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <div class="main-content">
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>Anamneses dos Pacientes</h1>
+        <p>Histórico clínico e sintomas dos pacientes</p>
+      </div>
+      <div class="page-header-right">
+        <span class="badge badge-blue">Visualização e edição</span>
+      </div>
+    </div>
+
+    <div class="page-body">
+      <div class="info-box">
+        ⚠️ Você pode visualizar, editar e excluir as anamneses dos seus pacientes.
+        Para cadastrar uma nova anamnese, utilize a funcionalidade <strong>"Nova Análise IA"</strong>.
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Lista de Anamneses</span>
+          <div class="filter-row">
+            <div class="search-bar" style="max-width:240px">
+              <input type="text" id="searchAnamnese" placeholder="Buscar por paciente ou CPF...">
+            </div>
+            <button class="btn btn-ghost btn-sm" id="btnRecarregar">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+              </svg>
+              Atualizar
+            </button>
+          </div>
+        </div>
+
+        <div class="table-wrapper" style="border:none;border-radius:0 0 var(--radius-xl) var(--radius-xl)">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Paciente</th>
+                <th>CPF</th>
+                <th>Data Consulta</th>
+                <th>Consulta</th>
+                <th>Sintomas</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyAnamneses"></tbody>
+          </table>
+          <div class="empty-state" id="emptyState" style="display:none">
+            <p>Nenhuma anamnese encontrada.</p>
+            <p style="font-size:0.78rem;color:var(--text-3);margin-top:4px">Ajuste os filtros ou aguarde novos registros.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Formulário (Apenas Edição) -->
+<div class="modal-overlay" id="modalAnamnese">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h2 id="modalTitulo">Editar Anamnese</h2>
+      <button class="btn-close-modal" id="closeModalAnamnese">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="info-box" style="background:var(--blue-light);border-color:#bfdbfe;color:var(--blue);">
+        ✏️ Você está editando a anamnese do paciente. Altere os campos conforme necessário.
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Paciente</label>
+          <input type="text" id="aPacienteNome" disabled style="background:var(--bg);opacity:0.7;font-weight:600;">
+        </div>
+        <div class="form-group">
+          <label>CPF</label>
+          <input type="text" id="aCpf" disabled style="background:var(--bg);opacity:0.7;">
+        </div>
+        <div class="form-group">
+          <label>ID da Consulta</label>
+          <input type="number" id="aIdConsulta" disabled style="background:var(--bg);opacity:0.7;">
+        </div>
+        <div class="form-group"><!-- spacer --></div>
+        <div class="form-group col-span-2">
+          <label>Sintomas *</label>
+          <textarea id="aSintomas" rows="4" placeholder="Descreva os sintomas apresentados pelo paciente..."></textarea>
+        </div>
+        <div class="form-group col-span-2">
+          <label>Comorbidades</label>
+          <textarea id="aComorbidades" rows="3" placeholder="Doenças prévias, condições crônicas, histórico familiar..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="cancelarAnamnese">Cancelar</button>
+      <button class="btn btn-primary" id="salvarAnamnese">Salvar Alterações</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Detalhes -->
+<div class="modal-overlay" id="modalDetalhes">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Detalhes da Anamnese</h2>
+      <button class="btn-close-modal" id="closeModalDetalhes">✕</button>
+    </div>
+    <div class="modal-body" id="detalheBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="fecharDetalhes">Fechar</button>
+      <button class="btn btn-outline" id="editarDetalhe">Editar Anamnese</button>
+    </div>
+  </div>
+</div>
+
+<script src="../JS/navbar.js"></script>
+<script>
+  if (!localStorage.getItem('hematoai_session')) {
+    HematoAI.setSession({ tipo: 'Médico', nome: 'Dr. Usuário', crm: '00000-SP' });
+  }
+  HematoAI.initSidebar('anamnese');
+
+  // ============================================
+  // DADOS DE DEMONSTRAÇÃO
+  // ============================================
+  
+  // Mapeamento de pacientes
+  const pacientes = {
+    '11111111111': 'Maria Oliveira',
+    '22222222222': 'Pedro Alves',
+    '33333333333': 'Ana Paula Lima'
+  };
+
+  // Datas das consultas
+  const consultasInfo = {
+    1: { data_consulta: '2025-06-10T08:00:00' },
+    2: { data_consulta: '2025-07-01T10:00:00' },
+    3: { data_consulta: '2025-07-15T14:30:00' }
+  };
+
+  let proximoId = 4;
+  let anamneses = [
+    { id_anamnese: 1, cpf: '11111111111', id_consulta: 1, sintomas: 'Fadiga intensa, febre baixa, perda de peso', comorbidades: 'Hipertensão controlada' },
+    { id_anamnese: 2, cpf: '22222222222', id_consulta: 2, sintomas: 'Dor óssea, sangramento gengival, palidez', comorbidades: 'Diabetes tipo 2' },
+    { id_anamnese: 3, cpf: '33333333333', id_consulta: 3, sintomas: 'Linfonodos aumentados, sudorese noturna', comorbidades: '' },
+  ];
+
+  let filtrados = [];
+  let modoEdicao = false;
+  let idEdicao = null;
+  let idDetalhe = null;
+
+  // ============================================
+  // FUNÇÕES AUXILIARES
+  // ============================================
+  
+  function getNomePaciente(cpf) {
+    return pacientes[cpf] || 'Paciente não encontrado';
+  }
+
+  function getDataConsulta(idConsulta) {
+    return consultasInfo[idConsulta]?.data_consulta || null;
+  }
+
+  function formatarCPF(cpf) {
+    if (!cpf) return '—';
+    const c = String(cpf).replace(/\D/g, '').padStart(11, '0');
+    return c.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+  }
+
+  function formatarDataHora(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  // ============================================
+  // RENDERIZAÇÃO
+  // ============================================
+  
+  function renderTabela(data) {
+    const tbody = document.getElementById('tbodyAnamneses');
+    const empty = document.getElementById('emptyState');
+    tbody.innerHTML = '';
+
+    if (!data.length) {
+      empty.style.display = '';
+      return;
+    }
+    empty.style.display = 'none';
+
+    data.forEach(a => {
+      const nomePaciente = getNomePaciente(a.cpf);
+      const dataConsulta = getDataConsulta(a.id_consulta);
+      const sintomasPreview = a.sintomas.length > 60 ? a.sintomas.substring(0, 60) + '...' : a.sintomas;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td style="font-family:var(--font-mono);font-size:0.78rem;color:var(--text-3)">#${a.id_anamnese}</td>
+        <td style="font-weight:600;font-size:0.85rem">${nomePaciente}</td>
+        <td style="font-family:var(--font-mono);font-size:0.8rem">${formatarCPF(a.cpf)}</td>
+        <td style="font-size:0.8rem">${formatarDataHora(dataConsulta)}</td>
+        <td style="font-family:var(--font-mono);font-size:0.82rem;color:var(--blue)">#${a.id_consulta}</td>
+        <td style="font-size:0.82rem">${sintomasPreview}</td>
+        <td>
+          <div class="td-actions">
+            <button class="btn btn-ghost btn-sm" onclick="abrirDetalhes(${a.id_anamnese})">Ver</button>
+            <button class="btn btn-ghost btn-sm" onclick="abrirEdicao(${a.id_anamnese})">Editar</button>
+            <button class="btn btn-danger btn-sm" onclick="confirmarExclusao(${a.id_anamnese})">Excluir</button>
+          </div>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  // ============================================
+  // CARREGAR E FILTRAR
+  // ============================================
+  
+  function carregar() {
+    filtrados = [...anamneses];
+    aplicarFiltros();
+  }
+
+  function aplicarFiltros() {
+    const q = document.getElementById('searchAnamnese').value.toLowerCase();
+
+    filtrados = anamneses.filter(a => {
+      const nomePaciente = getNomePaciente(a.cpf).toLowerCase();
+      return nomePaciente.includes(q) || a.cpf.includes(q) || String(a.id_consulta).includes(q);
+    });
+    renderTabela(filtrados);
+  }
+
+  document.getElementById('searchAnamnese').addEventListener('input', aplicarFiltros);
+  document.getElementById('btnRecarregar').addEventListener('click', carregar);
+
+  // ============================================
+  // EDITAR
+  // ============================================
+  
+  function abrirEdicao(id) {
+    const a = anamneses.find(x => x.id_anamnese === id);
+    if (!a) return;
+
+    modoEdicao = true;
+    idEdicao = id;
+    const nomePaciente = getNomePaciente(a.cpf);
+    
+    document.getElementById('modalTitulo').textContent = `Editar Anamnese - ${nomePaciente}`;
+    document.getElementById('aPacienteNome').value = nomePaciente;
+    document.getElementById('aCpf').value = formatarCPF(a.cpf);
+    document.getElementById('aIdConsulta').value = a.id_consulta;
+    document.getElementById('aSintomas').value = a.sintomas;
+    document.getElementById('aComorbidades').value = a.comorbidades || '';
+    HematoAI.openModal(document.getElementById('modalAnamnese'));
+  }
+
+  // ============================================
+  // SALVAR EDIÇÃO
+  // ============================================
+  
+  document.getElementById('salvarAnamnese').addEventListener('click', () => {
+    const sintomas = document.getElementById('aSintomas').value.trim();
+    const comorbidades = document.getElementById('aComorbidades').value.trim();
+
+    if (!sintomas) {
+      HematoAI.showToast('Os sintomas são obrigatórios.', 'error');
+      return;
+    }
+
+    const idx = anamneses.findIndex(x => x.id_anamnese === idEdicao);
+    if (idx >= 0) {
+      anamneses[idx] = {
+        ...anamneses[idx],
+        sintomas: sintomas,
+        comorbidades: comorbidades
+      };
+      HematoAI.showToast('Anamnese atualizada com sucesso!', 'success');
+      HematoAI.closeModal(document.getElementById('modalAnamnese'));
+      carregar();
+    }
+  });
+
+  // ============================================
+  // DETALHES
+  // ============================================
+  
+  function abrirDetalhes(id) {
+    idDetalhe = id;
+    const a = anamneses.find(x => x.id_anamnese === id);
+
+    if (!a) {
+      document.getElementById('detalheBody').innerHTML = '<p style="color:var(--red);padding:20px">Anamnese não encontrada.</p>';
+    } else {
+      const nomePaciente = getNomePaciente(a.cpf);
+      const dataConsulta = getDataConsulta(a.id_consulta);
+      document.getElementById('detalheBody').innerHTML = `
+        <div class="detail-grid">
+          <span class="detail-key">ID</span>
+          <span class="detail-value" style="font-family:var(--font-mono)">#${a.id_anamnese}</span>
+          <span class="detail-key">Paciente</span>
+          <span class="detail-value" style="font-weight:600">${nomePaciente}</span>
+          <span class="detail-key">CPF</span>
+          <span class="detail-value" style="font-family:var(--font-mono)">${formatarCPF(a.cpf)}</span>
+          <span class="detail-key">Data da Consulta</span>
+          <span class="detail-value">${formatarDataHora(dataConsulta)}</span>
+          <span class="detail-key">ID Consulta</span>
+          <span class="detail-value" style="font-family:var(--font-mono);color:var(--blue)">#${a.id_consulta}</span>
+          <span class="detail-key">Sintomas</span>
+          <span class="detail-value"><div class="anamnese-texto">${a.sintomas}</div></span>
+          <span class="detail-key">Comorbidades</span>
+          <span class="detail-value"><div class="anamnese-texto" style="min-height:auto;background:var(--yellow-light);border-color:#fde68a;">${a.comorbidades || 'Nenhuma comorbidade informada.'}</div></span>
+        </div>
+      `;
+    }
+
+    HematoAI.openModal(document.getElementById('modalDetalhes'));
+  }
+
+  // ============================================
+  // EXCLUIR
+  // ============================================
+  
+  function confirmarExclusao(id) {
+    HematoAI.confirmDialog(
+      `Deseja excluir a anamnese <strong>#${id}</strong>?<br>Esta ação não pode ser desfeita.`,
+      () => {
+        anamneses = anamneses.filter(x => x.id_anamnese !== id);
+        HematoAI.showToast('Anamnese excluída com sucesso.', 'success');
+        carregar();
+      }
+    );
+  }
+
+  // ============================================
+  // FECHAR MODAIS
+  // ============================================
+  
+  document.getElementById('closeModalDetalhes').addEventListener('click', () => HematoAI.closeModal(document.getElementById('modalDetalhes')));
+  document.getElementById('fecharDetalhes').addEventListener('click', () => HematoAI.closeModal(document.getElementById('modalDetalhes')));
+  document.getElementById('editarDetalhe').addEventListener('click', () => {
+    HematoAI.closeModal(document.getElementById('modalDetalhes'));
+    if (idDetalhe) abrirEdicao(idDetalhe);
+  });
+
+  ['closeModalAnamnese','cancelarAnamnese'].forEach(id => {
+    document.getElementById(id).addEventListener('click', () => HematoAI.closeModal(document.getElementById('modalAnamnese')));
+  });
+  document.getElementById('modalAnamnese').addEventListener('click', e => {
+    if (e.target === document.getElementById('modalAnamnese')) HematoAI.closeModal(document.getElementById('modalAnamnese'));
+  });
+
+  // ============================================
+  // INICIALIZAÇÃO
+  // ============================================
+  
+  carregar();
+</script>
+</body>
+</html>

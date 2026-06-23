@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HematoAI · Gerenciar Médicos</title>
+  <link rel="stylesheet" href="../CSS/navbar.css">
+  <style>
+    .filter-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .filter-select {
+      padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 40px;
+      font-size: 0.85rem;
+      background: var(--surface);
+      color: var(--text-1);
+      font-family: var(--font);
+      outline: none;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .filter-select:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(185,28,28,0.08);
+    }
+
+    /* Wizard Progress Bar */
+    .wizard-progress {
+      margin-bottom: 28px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .wizard-steps {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .wizard-step {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: var(--bg);
+      border-radius: var(--radius-lg);
+      transition: var(--transition);
+      cursor: pointer;
+    }
+
+    .wizard-step.active {
+      background: var(--surface);
+      border: 1.5px solid var(--red);
+    }
+
+    .wizard-step.completed {
+      background: var(--surface);
+      border: 1.5px solid #15803d;
+    }
+
+    .step-number {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--border);
+      border-radius: 50%;
+      font-weight: 700;
+      font-size: 0.875rem;
+      color: var(--text-2);
+      transition: var(--transition);
+    }
+
+    .wizard-step.active .step-number {
+      background: var(--red);
+      color: white;
+    }
+
+    .wizard-step.completed .step-number {
+      background: #15803d;
+      color: white;
+    }
+
+    .step-info {
+      flex: 1;
+    }
+
+    .step-title {
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: var(--text-1);
+      margin-bottom: 2px;
+    }
+
+    .step-desc {
+      font-size: 0.72rem;
+      color: var(--text-3);
+    }
+
+    .step-check {
+      color: #15803d;
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    /* Wizard Content */
+    .wizard-step-content {
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateX(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .form-section-label {
+      grid-column: 1 / -1;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-3);
+      padding-top: 4px;
+      margin-top: 8px;
+      border-top: 1px solid var(--border);
+    }
+
+    .wizard-buttons {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .btn-group-right {
+      display: flex;
+      gap: 12px;
+    }
+
+    .form-group.disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .field-static {
+      background: var(--bg);
+      padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: 0.875rem;
+      color: var(--text-1);
+      cursor: not-allowed;
+    }
+
+    /* Loading state for CEP */
+    .cep-loading {
+      position: relative;
+    }
+    .cep-loading::after {
+      content: "⏳";
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+<button class="sidebar-toggle" id="sidebarToggle">☰</button>
+
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <div class="main-content">
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>Gerenciar Médicos</h1>
+        <p>Cadastro, edição e exclusão de médicos do sistema</p>
+      </div>
+      <div class="page-header-right">
+        <button class="btn btn-primary" id="btnNovoMedico">+ Novo Médico</button>
+      </div>
+    </div>
+
+    <div class="page-body">
+      <!-- Tabela -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Lista de Médicos</span>
+          <div class="filter-row">
+            <div class="search-bar" style="max-width:280px">
+              <input type="text" id="searchMedico" placeholder="Buscar por nome, CRM, especialidade...">
+            </div>
+            <select id="filterEsp" class="filter-select">
+              <option value="">Todas especialidades</option>
+              <option>Hematologia</option>
+              <option>Oncologia</option>
+              <option>Clínica Geral</option>
+              <option>Pediatria</option>
+              <option>Medicina Interna</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-wrapper" style="border:none;border-radius:0 0 var(--radius-xl) var(--radius-xl)">
+          <table id="tableMedicos">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>CRM</th>
+                <th>CPF</th>
+                <th>Especialidade</th>
+                <th>E-mail</th>
+                <th>Telefone</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyMedicos"></tbody>
+          </table>
+
+          <div class="empty-state" id="emptyMedicos" style="display:none">
+            <p>Nenhum médico encontrado.</p>
+            <p style="font-size:0.78rem;color:var(--text-3);margin-top:4px">Tente ajustar os filtros de busca.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Wizard -->
+<div class="modal-overlay" id="modalMedico">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h2 id="modalMedicoTitulo">Cadastro de Médico</h2>
+      <button class="btn-close-modal" id="closeModalMedico">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- Wizard Progress -->
+      <div class="wizard-progress">
+        <div class="wizard-steps">
+          <div class="wizard-step" data-step="0" id="step1Indicator">
+            <div class="step-number" id="step1Number">1</div>
+            <div class="step-info">
+              <div class="step-title">Credenciais</div>
+              <div class="step-desc">Acesso ao sistema</div>
+            </div>
+            <div class="step-check" id="step1Check" style="display:none;">✓</div>
+          </div>
+          <div class="wizard-step" data-step="1" id="step2Indicator">
+            <div class="step-number" id="step2Number">2</div>
+            <div class="step-info">
+              <div class="step-title">Dados do Médico</div>
+              <div class="step-desc">Informações profissionais</div>
+            </div>
+            <div class="step-check" id="step2Check" style="display:none;">✓</div>
+          </div>
+          <div class="wizard-step" data-step="2" id="step3Indicator">
+            <div class="step-number" id="step3Number">3</div>
+            <div class="step-info">
+              <div class="step-title">Endereço</div>
+              <div class="step-desc">Localização profissional</div>
+            </div>
+            <div class="step-check" id="step3Check" style="display:none;">✓</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 1: Credenciais -->
+      <div id="step1Content" class="wizard-step-content">
+        <div class="form-grid">
+          <div class="form-group col-span-2">
+            <label>E-mail *</label>
+            <input type="email" id="fEmail" placeholder="medico@hospital.com" autocomplete="off">
+          </div>
+          <div class="form-group col-span-2">
+            <label>Senha *</label>
+            <input type="password" id="fSenha" placeholder="Mínimo 8 caracteres" autocomplete="off">
+          </div>
+          <div class="form-group col-span-2">
+            <label>Tipo de Usuário</label>
+            <div class="field-static">Médico</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Dados do Médico -->
+      <div id="step2Content" class="wizard-step-content" style="display:none;">
+        <div class="form-grid">
+          <div class="form-group col-span-2">
+            <label>Nome Completo *</label>
+            <input type="text" id="fNome" placeholder="Dr. Nome Sobrenome">
+          </div>
+          <div class="form-group">
+            <label>CRM *</label>
+            <input type="text" id="fCrm" placeholder="00000-SP">
+          </div>
+          <div class="form-group">
+            <label>CPF *</label>
+            <input type="text" id="fCpf" placeholder="000.000.000-00" maxlength="14">
+          </div>
+          <div class="form-group">
+            <label>Especialidade *</label>
+            <select id="fEsp">
+              <option value="">Selecione</option>
+              <option>Hematologia</option>
+              <option>Oncologia</option>
+              <option>Clínica Geral</option>
+              <option>Pediatria</option>
+              <option>Medicina Interna</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Telefone</label>
+            <input type="text" id="fTelefone" placeholder="(11) 99999-0000">
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Endereço -->
+      <div id="step3Content" class="wizard-step-content" style="display:none;">
+        <div class="form-grid">
+          <div class="form-group col-span-2">
+            <label>CEP *</label>
+            <input type="text" id="fCep" placeholder="00000-000" maxlength="9">
+            <small style="color: var(--text-3); font-size: 0.7rem; margin-top: 4px; display: block;">Digite o CEP e aguarde o preenchimento automático</small>
+          </div>
+          <div class="form-group col-span-2">
+            <label>Rua *</label>
+            <input type="text" id="fRua" placeholder="Rua, Av., etc.">
+          </div>
+          <div class="form-group">
+            <label>Número *</label>
+            <input type="number" id="fNumero" placeholder="123">
+          </div>
+          <div class="form-group">
+            <label>Bairro *</label>
+            <input type="text" id="fBairro" placeholder="Bairro">
+          </div>
+          <div class="form-group">
+            <label>Cidade *</label>
+            <input type="text" id="fCidade" placeholder="Cidade">
+          </div>
+          <div class="form-group">
+            <label>Estado *</label>
+            <input type="text" id="fEstado" placeholder="SP" maxlength="2">
+          </div>
+        </div>
+      </div>
+
+      <!-- Wizard Buttons -->
+      <div class="wizard-buttons">
+        <button class="btn btn-ghost" id="btnVoltar" style="display:none;">← Voltar</button>
+        <div class="btn-group-right">
+          <button class="btn btn-ghost" id="cancelModalMedico">Cancelar</button>
+          <button class="btn btn-primary" id="btnProximo">Próximo →</button>
+          <button class="btn btn-primary" id="btnFinalizar" style="display:none;">✓ Finalizar Cadastro</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../JS/navbar.js"></script>
+<script>
+  if (!localStorage.getItem('hematoai_session')) {
+    HematoAI.setSession({ tipo: 'Administrador', nome: 'Admin HematoAI' });
+  }
+  HematoAI.initSidebar('medicos');
+
+  // Demo data
+  let medicos = [
+    { crm: '12345-SP', nome: 'Dr. Carlos Mendes', cpf: '111.111.111-11', especialidade: 'Hematologia', email: 'carlos@hospital.com', telefone: '(11) 99999-0001', endereco: { rua: 'Rua das Flores', numero: '123', bairro: 'Centro', cidade: 'São Paulo', estado: 'SP', cep: '01000-000' } },
+    { crm: '54321-RJ', nome: 'Dra. Ana Lima',     cpf: '222.222.222-22', especialidade: 'Oncologia',   email: 'ana@hospital.com',    telefone: '(21) 98888-0002', endereco: { rua: 'Av. Atlântica', numero: '500', bairro: 'Copacabana', cidade: 'Rio de Janeiro', estado: 'RJ', cep: '22000-000' } },
+    { crm: '99999-MG', nome: 'Dr. João Silva',    cpf: '333.333.333-33', especialidade: 'Hematologia', email: 'joao@hospital.com',   telefone: '(31) 97777-0003', endereco: { rua: 'Rua da Bahia', numero: '789', bairro: 'Centro', cidade: 'Belo Horizonte', estado: 'MG', cep: '30000-000' } },
+  ];
+  let editingCrm = null;
+
+  // Wizard state
+  let currentStep = 0;
+  let wizardData = {
+    login: {
+      email: "",
+      senha: "",
+      tipo: "Médico"
+    },
+    medico: {
+      crm: "",
+      nome: "",
+      cpf: "",
+      telefone: "",
+      especialidade: ""
+    },
+    endereco: {
+      rua: "",
+      numero: "",
+      bairro: "",
+      cidade: "",
+      estado: "",
+      cep: ""
+    }
+  };
+
+  // Função para buscar CEP na API ViaCEP
+  async function buscarCEP(cep) {
+    // Remove caracteres não numéricos
+    cep = cep.replace(/\D/g, '');
+    
+    // Valida se tem 8 dígitos
+    if (cep.length !== 8) {
+      return;
+    }
+    
+    const cepField = document.getElementById('fCep');
+    const originalPlaceholder = cepField.placeholder;
+    
+    // Mostra loading
+    cepField.classList.add('cep-loading');
+    cepField.placeholder = 'Buscando...';
+    
+    try {
+      // Chama a API ViaCEP
+      const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+      const data = await response.json();
+      
+      // Verifica se o CEP foi encontrado
+      if (!data.erro) {
+        // Preenche os campos automaticamente
+        document.getElementById('fRua').value = data.logradouro || '';
+        document.getElementById('fBairro').value = data.bairro || '';
+        document.getElementById('fCidade').value = data.localidade || '';
+        document.getElementById('fEstado').value = data.uf || '';
+        
+        // Salva os dados no wizardData
+        wizardData.endereco.rua = data.logradouro || '';
+        wizardData.endereco.bairro = data.bairro || '';
+        wizardData.endereco.cidade = data.localidade || '';
+        wizardData.endereco.estado = data.uf || '';
+        wizardData.endereco.cep = cepField.value;
+        
+        // Mostra mensagem de sucesso
+        if (typeof HematoAI !== 'undefined' && HematoAI.showToast) {
+          HematoAI.showToast('Endereço preenchido automaticamente!', 'success');
+        }
+        
+        // Destaca os campos preenchidos com uma animação suave
+        const camposPreenchidos = ['fRua', 'fBairro', 'fCidade', 'fEstado'];
+        camposPreenchidos.forEach(campoId => {
+          const campo = document.getElementById(campoId);
+          if (campo && campo.value) {
+            campo.style.transition = 'all 0.3s ease';
+            campo.style.backgroundColor = 'rgba(21, 128, 61, 0.1)';
+            setTimeout(() => {
+              campo.style.backgroundColor = '';
+            }, 1000);
+          }
+        });
+      } else {
+        // CEP não encontrado
+        if (typeof HematoAI !== 'undefined' && HematoAI.showToast) {
+          HematoAI.showToast('CEP não encontrado. Verifique o número digitado.', 'error');
+        }
+        // Limpa os campos
+        document.getElementById('fRua').value = '';
+        document.getElementById('fBairro').value = '';
+        document.getElementById('fCidade').value = '';
+        document.getElementById('fEstado').value = '';
+      }
+    } catch (error) {
+      console.error('Erro ao buscar CEP:', error);
+      if (typeof HematoAI !== 'undefined' && HematoAI.showToast) {
+        HematoAI.showToast('Erro ao buscar CEP. Tente novamente.', 'error');
+      }
+    } finally {
+      // Remove loading
+      cepField.classList.remove('cep-loading');
+      cepField.placeholder = originalPlaceholder;
+    }
+  }
+
+  // Função para debounce (evita muitas chamadas à API enquanto digita)
+  let debounceTimeout;
+  function debounceBuscarCEP(cep) {
+    clearTimeout(debounceTimeout);
+    debounceTimeout = setTimeout(() => {
+      buscarCEP(cep);
+    }, 800); // Aguarda 800ms após o usuário parar de digitar
+  }
+
+  // Mask functions
+  function maskCPF(cpf) {
+    cpf = cpf.replace(/\D/g, '');
+    cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2');
+    cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2');
+    cpf = cpf.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+    return cpf;
+  }
+
+  function maskTelefone(tel) {
+    tel = tel.replace(/\D/g, '');
+    tel = tel.replace(/(\d{2})(\d)/, '($1) $2');
+    tel = tel.replace(/(\d{5})(\d)/, '$1-$2');
+    return tel;
+  }
+
+  function maskCEP(cep) {
+    cep = cep.replace(/\D/g, '');
+    cep = cep.replace(/(\d{5})(\d)/, '$1-$2');
+    return cep;
+  }
+
+  // Input masks
+  document.getElementById('fCpf')?.addEventListener('input', function(e) {
+    e.target.value = maskCPF(e.target.value);
+  });
+  document.getElementById('fTelefone')?.addEventListener('input', function(e) {
+    e.target.value = maskTelefone(e.target.value);
+  });
+  document.getElementById('fCep')?.addEventListener('input', function(e) {
+    const maskedValue = maskCEP(e.target.value);
+    e.target.value = maskedValue;
+    
+    // Dispara a busca automática quando o CEP estiver completo (9 caracteres com máscara = 8 dígitos)
+    const cepNumeros = maskedValue.replace(/\D/g, '');
+    if (cepNumeros.length === 8) {
+      debounceBuscarCEP(maskedValue);
+    }
+  });
+
+  // Wizard navigation functions
+  function updateWizardUI() {
+    // Hide/show step contents
+    document.getElementById('step1Content').style.display = currentStep === 0 ? 'block' : 'none';
+    document.getElementById('step2Content').style.display = currentStep === 1 ? 'block' : 'none';
+    document.getElementById('step3Content').style.display = currentStep === 2 ? 'block' : 'none';
+
+    // Update step indicators
+    for (let i = 0; i < 3; i++) {
+      const stepDiv = document.getElementById(`step${i+1}Indicator`);
+      const stepNumber = document.getElementById(`step${i+1}Number`);
+      const stepCheck = document.getElementById(`step${i+1}Check`);
+      
+      if (i === currentStep) {
+        stepDiv.classList.add('active');
+        stepDiv.classList.remove('completed');
+      } else if (isStepCompleted(i)) {
+        stepDiv.classList.add('completed');
+        stepDiv.classList.remove('active');
+        if (stepCheck) stepCheck.style.display = 'block';
+        if (stepNumber) stepNumber.style.display = 'none';
+      } else {
+        stepDiv.classList.remove('active', 'completed');
+        if (stepCheck) stepCheck.style.display = 'none';
+        if (stepNumber) stepNumber.style.display = 'flex';
+      }
+    }
+
+    // Update buttons
+    const btnVoltar = document.getElementById('btnVoltar');
+    const btnProximo = document.getElementById('btnProximo');
+    const btnFinalizar = document.getElementById('btnFinalizar');
+
+    if (currentStep === 0) {
+      btnVoltar.style.display = 'none';
+    } else {
+      btnVoltar.style.display = 'block';
+    }
+
+    if (currentStep === 2) {
+      btnProximo.style.display = 'none';
+      btnFinalizar.style.display = 'block';
+    } else {
+      btnProximo.style.display = 'block';
+      btnFinalizar.style.display = 'none';
+    }
+  }
+
+  function isStepCompleted(step) {
+    if (step === 0) {
+      return wizardData.login.email && wizardData.login.senha;
+    } else if (step === 1) {
+      return wizardData.medico.nome && wizardData.medico.crm && wizardData.medico.cpf && wizardData.medico.especialidade;
+    } else if (step === 2) {
+      return true;
+    }
+    return false;
+  }
+
+  function saveCurrentStepData() {
+    if (currentStep === 0) {
+      wizardData.login.email = document.getElementById('fEmail').value;
+      wizardData.login.senha = document.getElementById('fSenha').value;
+    } else if (currentStep === 1) {
+      wizardData.medico.nome = document.getElementById('fNome').value;
+      wizardData.medico.crm = document.getElementById('fCrm').value;
+      wizardData.medico.cpf = document.getElementById('fCpf').value;
+      wizardData.medico.especialidade = document.getElementById('fEsp').value;
+      wizardData.medico.telefone = document.getElementById('fTelefone').value;
+    } else if (currentStep === 2) {
+      wizardData.endereco.cep = document.getElementById('fCep').value;
+      wizardData.endereco.rua = document.getElementById('fRua').value;
+      wizardData.endereco.numero = document.getElementById('fNumero').value;
+      wizardData.endereco.bairro = document.getElementById('fBairro').value;
+      wizardData.endereco.cidade = document.getElementById('fCidade').value;
+      wizardData.endereco.estado = document.getElementById('fEstado').value;
+    }
+  }
+
+  function loadStepData() {
+    if (currentStep === 0) {
+      document.getElementById('fEmail').value = wizardData.login.email;
+      document.getElementById('fSenha').value = wizardData.login.senha;
+    } else if (currentStep === 1) {
+      document.getElementById('fNome').value = wizardData.medico.nome;
+      document.getElementById('fCrm').value = wizardData.medico.crm;
+      document.getElementById('fCpf').value = wizardData.medico.cpf;
+      document.getElementById('fEsp').value = wizardData.medico.especialidade;
+      document.getElementById('fTelefone').value = wizardData.medico.telefone;
+    } else if (currentStep === 2) {
+      document.getElementById('fCep').value = wizardData.endereco.cep;
+      document.getElementById('fRua').value = wizardData.endereco.rua;
+      document.getElementById('fNumero').value = wizardData.endereco.numero;
+      document.getElementById('fBairro').value = wizardData.endereco.bairro;
+      document.getElementById('fCidade').value = wizardData.endereco.cidade;
+      document.getElementById('fEstado').value = wizardData.endereco.estado;
+    }
+  }
+
+  function validateCurrentStep() {
+    if (currentStep === 0) {
+      const email = document.getElementById('fEmail').value;
+      const senha = document.getElementById('fSenha').value;
+      if (!email || !senha) {
+        HematoAI.showToast('Preencha o e-mail e a senha.', 'error');
+        return false;
+      }
+      if (senha.length < 8) {
+        HematoAI.showToast('A senha deve ter no mínimo 8 caracteres.', 'error');
+        return false;
+      }
+      if (!email.includes('@') || !email.includes('.')) {
+        HematoAI.showToast('Digite um e-mail válido.', 'error');
+        return false;
+      }
+    } else if (currentStep === 1) {
+      const nome = document.getElementById('fNome').value;
+      const crm = document.getElementById('fCrm').value;
+      const cpf = document.getElementById('fCpf').value;
+      const esp = document.getElementById('fEsp').value;
+      
+      if (!nome || !crm || !cpf || !esp) {
+        HematoAI.showToast('Preencha todos os campos obrigatórios.', 'error');
+        return false;
+      }
+      if (crm.length < 5) {
+        HematoAI.showToast('CRM inválido. Use o formato: 12345-SP', 'error');
+        return false;
+      }
+      if (cpf.replace(/\D/g, '').length !== 11) {
+        HematoAI.showToast('CPF inválido. Deve conter 11 dígitos.', 'error');
+        return false;
+      }
+    } else if (currentStep === 2) {
+      const cep = document.getElementById('fCep').value;
+      const rua = document.getElementById('fRua').value;
+      const numero = document.getElementById('fNumero').value;
+      const bairro = document.getElementById('fBairro').value;
+      const cidade = document.getElementById('fCidade').value;
+      const estado = document.getElementById('fEstado').value;
+      
+      if (!cep || !rua || !numero || !bairro || !cidade || !estado) {
+        HematoAI.showToast('Preencha todos os campos de endereço.', 'error');
+        return false;
+      }
+      if (cep.replace(/\D/g, '').length !== 8) {
+        HematoAI.showToast('CEP inválido.', 'error');
+        return false;
+      }
+    }
+    return true;
+  }
+
+  function nextStep() {
+    saveCurrentStepData();
+    if (!validateCurrentStep()) return;
+    
+    if (currentStep < 2) {
+      currentStep++;
+      loadStepData();
+      updateWizardUI();
+    }
+  }
+
+  function prevStep() {
+    saveCurrentStepData();
+    if (currentStep > 0) {
+      currentStep--;
+      loadStepData();
+      updateWizardUI();
+    }
+  }
+
+  function finalizeCadastro() {
+    saveCurrentStepData();
+    
+    // Validate all steps before finalizing
+    if (!wizardData.login.email || !wizardData.login.senha) {
+      HematoAI.showToast('Complete as credenciais de acesso.', 'error');
+      currentStep = 0;
+      loadStepData();
+      updateWizardUI();
+      return;
+    }
+    if (!wizardData.medico.nome || !wizardData.medico.crm || !wizardData.medico.cpf || !wizardData.medico.especialidade) {
+      HematoAI.showToast('Complete os dados do médico.', 'error');
+      currentStep = 1;
+      loadStepData();
+      updateWizardUI();
+      return;
+    }
+    if (!wizardData.endereco.cep || !wizardData.endereco.rua || !wizardData.endereco.numero || 
+        !wizardData.endereco.bairro || !wizardData.endereco.cidade || !wizardData.endereco.estado) {
+      HematoAI.showToast('Complete os dados de endereço.', 'error');
+      currentStep = 2;
+      loadStepData();
+      updateWizardUI();
+      return;
+    }
+    
+    // Check if CRM already exists
+    if (!editingCrm && medicos.find(x => x.crm === wizardData.medico.crm)) {
+      HematoAI.showToast('CRM já cadastrado no sistema.', 'error');
+      return;
+    }
+    
+    // Create complete object
+    const medicoCompleto = {
+      crm: wizardData.medico.crm,
+      nome: wizardData.medico.nome,
+      cpf: wizardData.medico.cpf,
+      especialidade: wizardData.medico.especialidade,
+      email: wizardData.login.email,
+      telefone: wizardData.medico.telefone,
+      endereco: { ...wizardData.endereco }
+    };
+    
+    console.log('Dados completos do médico:', medicoCompleto);
+    console.log('Estrutura solicitada:', wizardData);
+    
+    // Add to medicos array
+    if (editingCrm) {
+      const idx = medicos.findIndex(x => x.crm === editingCrm);
+      if (idx >= 0) {
+        medicos[idx] = medicoCompleto;
+      }
+      HematoAI.showToast('Médico atualizado com sucesso!', 'success');
+    } else {
+      medicos.push(medicoCompleto);
+      HematoAI.showToast('Médico cadastrado com sucesso!', 'success');
+    }
+    
+    // Close modal and reset
+    HematoAI.closeModal(modalEl);
+    renderTable(medicos);
+    resetWizard();
+  }
+
+  function resetWizard() {
+    currentStep = 0;
+    wizardData = {
+      login: { email: "", senha: "", tipo: "Médico" },
+      medico: { crm: "", nome: "", cpf: "", telefone: "", especialidade: "" },
+      endereco: { rua: "", numero: "", bairro: "", cidade: "", estado: "", cep: "" }
+    };
+    editingCrm = null;
+    document.getElementById('fEmail').value = '';
+    document.getElementById('fSenha').value = '';
+    document.getElementById('fNome').value = '';
+    document.getElementById('fCrm').value = '';
+    document.getElementById('fCpf').value = '';
+    document.getElementById('fEsp').value = '';
+    document.getElementById('fTelefone').value = '';
+    document.getElementById('fCep').value = '';
+    document.getElementById('fRua').value = '';
+    document.getElementById('fNumero').value = '';
+    document.getElementById('fBairro').value = '';
+    document.getElementById('fCidade').value = '';
+    document.getElementById('fEstado').value = '';
+    updateWizardUI();
+  }
+
+  // Render table function
+  function renderTable(data) {
+    const tbody = document.getElementById('tbodyMedicos');
+    const empty = document.getElementById('emptyMedicos');
+    tbody.innerHTML = '';
+
+    if (!data.length) {
+      empty.style.display = '';
+      return;
+    }
+    empty.style.display = 'none';
+
+    data.forEach(m => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><strong>${m.nome}</strong></td>
+        <td><span class="badge badge-blue">${m.crm}</span></td>
+        <td style="font-family:var(--font-mono);font-size:0.8rem">${m.cpf}</td>
+        <td><span class="badge badge-purple">${m.especialidade}</span></td>
+        <td style="font-size:0.82rem">${m.email}</td>
+        <td style="font-size:0.82rem">${m.telefone || '—'}</td>
+        <td>
+          <div class="td-actions">
+            <button class="btn btn-ghost btn-sm" onclick="editarMedico('${m.crm}')">Editar</button>
+            <button class="btn btn-danger btn-sm" onclick="deletarMedico('${m.crm}')">Excluir</button>
+          </div>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function applyFilter() {
+    const q   = document.getElementById('searchMedico').value.toLowerCase();
+    const esp = document.getElementById('filterEsp').value;
+    renderTable(medicos.filter(m =>
+      (!q   || m.nome.toLowerCase().includes(q) || m.crm.toLowerCase().includes(q) || m.especialidade.toLowerCase().includes(q)) &&
+      (!esp || m.especialidade === esp)
+    ));
+  }
+
+  window.editarMedico = function(crm) {
+    editingCrm = crm;
+    const m = medicos.find(x => x.crm === crm);
+    if (!m) return;
+    
+    // Load data into wizard
+    wizardData.login.email = m.email;
+    wizardData.login.senha = '********';
+    wizardData.medico.nome = m.nome;
+    wizardData.medico.crm = m.crm;
+    wizardData.medico.cpf = m.cpf;
+    wizardData.medico.especialidade = m.especialidade;
+    wizardData.medico.telefone = m.telefone || '';
+    if (m.endereco) {
+      wizardData.endereco = { ...m.endereco };
+    } else {
+      wizardData.endereco = { rua: "", numero: "", bairro: "", cidade: "", estado: "", cep: "" };
+    }
+    
+    currentStep = 0;
+    loadStepData();
+    updateWizardUI();
+    HematoAI.openModal(modalEl);
+    document.getElementById('modalMedicoTitulo').textContent = `Editar Médico - ${m.nome}`;
+  };
+
+  window.deletarMedico = function(crm) {
+    const m = medicos.find(x => x.crm === crm);
+    HematoAI.confirmDialog(
+      `Deseja excluir o médico <strong>${m?.nome}</strong>?<br>Esta ação não pode ser desfeita.`,
+      () => {
+        medicos = medicos.filter(x => x.crm !== crm);
+        renderTable(medicos);
+        HematoAI.showToast('Médico excluído com sucesso.', 'success');
+      }
+    );
+  };
+
+  // Event listeners
+  document.getElementById('searchMedico').addEventListener('input', applyFilter);
+  document.getElementById('filterEsp').addEventListener('change', applyFilter);
+  
+  const modalEl = document.getElementById('modalMedico');
+  document.getElementById('closeModalMedico').addEventListener('click', () => HematoAI.closeModal(modalEl));
+  document.getElementById('cancelModalMedico').addEventListener('click', () => HematoAI.closeModal(modalEl));
+  modalEl.addEventListener('click', e => { if (e.target === modalEl) HematoAI.closeModal(modalEl); });
+  
+  document.getElementById('btnNovoMedico').addEventListener('click', () => {
+    resetWizard();
+    editingCrm = null;
+    document.getElementById('modalMedicoTitulo').textContent = 'Cadastro de Médico';
+    HematoAI.openModal(modalEl);
+  });
+  
+  document.getElementById('btnProximo').addEventListener('click', nextStep);
+  document.getElementById('btnVoltar').addEventListener('click', prevStep);
+  document.getElementById('btnFinalizar').addEventListener('click', finalizeCadastro);
+  
+  // Click on step indicators to navigate
+  document.getElementById('step1Indicator').addEventListener('click', () => {
+    if (currentStep > 0) {
+      saveCurrentStepData();
+      currentStep = 0;
+      loadStepData();
+      updateWizardUI();
+    }
+  });
+  document.getElementById('step2Indicator').addEventListener('click', () => {
+    if (currentStep !== 1) {
+      saveCurrentStepData();
+      if (isStepCompleted(0)) {
+        currentStep = 1;
+        loadStepData();
+        updateWizardUI();
+      } else {
+        HematoAI.showToast('Complete as credenciais primeiro.', 'error');
+      }
+    }
+  });
+  document.getElementById('step3Indicator').addEventListener('click', () => {
+    if (currentStep !== 2) {
+      saveCurrentStepData();
+      if (isStepCompleted(0) && isStepCompleted(1)) {
+        currentStep = 2;
+        loadStepData();
+        updateWizardUI();
+      } else {
+        HematoAI.showToast('Complete as etapas anteriores primeiro.', 'error');
+      }
+    }
+  });
+
+  // Initial render
+  renderTable(medicos);
+  updateWizardUI();
+</script>
+</body>
+</html>

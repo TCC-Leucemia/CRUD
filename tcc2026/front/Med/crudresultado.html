@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HematoAI · Gerenciar Resultados</title>
+  <link rel="stylesheet" href="../CSS/navbar.css">
+  <style>
+    .filter-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .filter-select {
+      padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 40px;
+      font-size: 0.85rem;
+      background: var(--surface);
+      color: var(--text-1);
+      font-family: var(--font);
+      outline: none;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .filter-select:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(185,28,28,0.08);
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .status-pill::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
+    }
+    .status-pendente { background: #fef3c7; color: #d97706; }
+    .status-pendente::before { background: #d97706; }
+    .status-andamento { background: #dbeafe; color: #2563eb; }
+    .status-andamento::before { background: #2563eb; }
+    .status-finalizado { background: #dcfce7; color: #15803d; }
+    .status-finalizado::before { background: #15803d; }
+
+    .tipo-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+    .tipo-hemograma { background: var(--red-light); color: var(--red); }
+    .tipo-mielograma { background: var(--purple-light); color: var(--purple); }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 10px 16px;
+      font-size: 0.875rem;
+    }
+    .detail-key { color: var(--text-2); font-weight: 600; }
+    .detail-value { color: var(--text-1); }
+
+    .resultado-texto {
+      background: var(--bg);
+      padding: 16px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      font-size: 0.85rem;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      min-height: 100px;
+    }
+
+    .info-box {
+      background: var(--blue-light);
+      border: 1px solid #bfdbfe;
+      border-radius: var(--radius-lg);
+      padding: 14px 16px;
+      font-size: 0.82rem;
+      color: var(--blue);
+      line-height: 1.6;
+      margin-bottom: 18px;
+    }
+  </style>
+</head>
+<body>
+
+<button class="sidebar-toggle" id="sidebarToggle">☰</button>
+
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <div class="main-content">
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>Gerenciar Resultados de Exames</h1>
+        <p>Cadastro e acompanhamento de resultados laboratoriais</p>
+      </div>
+      <div class="page-header-right">
+        <button class="btn btn-primary" id="btnNovoResultado">Novo Resultado</button>
+      </div>
+    </div>
+
+    <div class="page-body">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Lista de Resultados</span>
+          <div class="filter-row">
+            <div class="search-bar" style="max-width:260px">
+              <input type="text" id="searchResultado" placeholder="Paciente, CPF ou ID do exame...">
+            </div>
+            <select id="filterStatus" class="filter-select">
+              <option value="">Todos os status</option>
+              <option value="Pendente">Pendente</option>
+              <option value="Em andamento">Em andamento</option>
+              <option value="Finalizado">Finalizado</option>
+            </select>
+            <button class="btn btn-ghost btn-sm" id="btnRecarregar">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+              </svg>
+              Atualizar
+            </button>
+          </div>
+        </div>
+
+        <div class="table-wrapper" style="border:none;border-radius:0 0 var(--radius-xl) var(--radius-xl)">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Paciente</th>
+                <th>CPF</th>
+                <th>Data Consulta</th>
+                <th>ID Exame</th>
+                <th>Tipo</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyResultados"></tbody>
+          </table>
+          <div class="empty-state" id="emptyState" style="display:none">
+            <p>Nenhum resultado encontrado.</p>
+            <p style="font-size:0.78rem;color:var(--text-3);margin-top:4px">Ajuste os filtros ou cadastre um novo resultado.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Formulário -->
+<div class="modal-overlay" id="modalResultado">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h2 id="modalTitulo">Novo Resultado</h2>
+      <button class="btn-close-modal" id="closeModalResultado">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="info-box">
+        Os resultados são vinculados a um exame existente. Preencha o ID do exame e os dados do resultado.
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>ID do Exame *</label>
+          <input type="number" id="rIdExame" placeholder="Ex: 1" min="1">
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select id="rStatus">
+            <option value="Pendente">Pendente</option>
+            <option value="Em andamento">Em andamento</option>
+            <option value="Finalizado">Finalizado</option>
+          </select>
+        </div>
+        <div class="form-group col-span-2">
+          <label>Resultado *</label>
+          <textarea id="rResultado" rows="6" placeholder="Descreva o resultado do exame..."></textarea>
+        </div>
+        <div class="form-group col-span-2">
+          <label>Observações adicionais</label>
+          <textarea id="rObservacoes" rows="3" placeholder="Observações complementares (opcional)"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="cancelarResultado">Cancelar</button>
+      <button class="btn btn-primary" id="salvarResultado">Salvar Resultado</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Detalhes -->
+<div class="modal-overlay" id="modalDetalhes">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Detalhes do Resultado</h2>
+      <button class="btn-close-modal" id="closeModalDetalhes">✕</button>
+    </div>
+    <div class="modal-body" id="detalheBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="fecharDetalhes">Fechar</button>
+      <button class="btn btn-outline" id="editarDetalhe">Editar Resultado</button>
+    </div>
+  </div>
+</div>
+
+<script src="../JS/navbar.js"></script>
+<script>
+  if (!localStorage.getItem('hematoai_session')) {
+    HematoAI.setSession({ tipo: 'Médico', nome: 'Dr. Usuário', crm: '00000-SP' });
+  }
+  HematoAI.initSidebar('exames-crud');
+
+  // ============================================
+  // DADOS DE DEMONSTRAÇÃO
+  // ============================================
+  
+  // Mapeamento de pacientes (CPF -> Nome)
+  const pacientes = {
+    '11111111111': 'Maria Oliveira',
+    '22222222222': 'Pedro Alves',
+    '33333333333': 'Ana Paula Lima',
+    '44444444444': 'Roberto Santos'
+  };
+
+  // Mapeamento de exames (ID do exame -> { paciente, tipo, data_consulta })
+  const examesInfo = {
+    1: { cpf: '11111111111', tipo: 'Hemograma', data_consulta: '2025-06-10T08:00:00' },
+    2: { cpf: '11111111111', tipo: 'Mielograma', data_consulta: '2025-06-10T08:00:00' },
+    3: { cpf: '22222222222', tipo: 'Hemograma', data_consulta: '2025-07-01T10:00:00' },
+    4: { cpf: '33333333333', tipo: 'Hemograma', data_consulta: '2025-07-15T14:30:00' }
+  };
+
+  let proximoId = 4;
+  let resultados = [
+    { id_resultado: 1, id_exame: 1, statusc: 'Finalizado', resultado: 'Hemograma normal. Todos os parâmetros dentro dos limites de referência.', observacoes: '' },
+    { id_resultado: 2, id_exame: 2, statusc: 'Em andamento', resultado: 'Análise em andamento. Aguardando confirmação dos valores.', observacoes: 'Necessita revisão' },
+    { id_resultado: 3, id_exame: 3, statusc: 'Pendente', resultado: 'Aguardando processamento da amostra.', observacoes: '' },
+  ];
+
+  let filtrados = [];
+  let modoEdicao = false;
+  let idEdicao = null;
+  let idDetalhe = null;
+
+  // ============================================
+  // FUNÇÕES AUXILIARES
+  // ============================================
+  
+  function getPacientePorExame(idExame) {
+    const info = examesInfo[idExame];
+    if (!info) return { nome: '—', cpf: '—', tipo: '—', data_consulta: null };
+    return {
+      nome: pacientes[info.cpf] || '—',
+      cpf: info.cpf || '—',
+      tipo: info.tipo || '—',
+      data_consulta: info.data_consulta || null
+    };
+  }
+
+  function formatarCPF(cpf) {
+    if (!cpf || cpf === '—') return '—';
+    const c = String(cpf).replace(/\D/g, '').padStart(11, '0');
+    return c.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+  }
+
+  function formatarDataHora(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function statusPill(s) {
+    const map = { 'Pendente': 'pendente', 'Em andamento': 'andamento', 'Finalizado': 'finalizado' };
+    return `<span class="status-pill status-${map[s] || 'pendente'}">${s}</span>`;
+  }
+
+  function tipoBadge(tipo) {
+    if (tipo === 'Hemograma') return `<span class="tipo-badge tipo-hemograma">Hemograma</span>`;
+    if (tipo === 'Mielograma') return `<span class="tipo-badge tipo-mielograma">Mielograma</span>`;
+    return `<span style="color:var(--text-3)">—</span>`;
+  }
+
+  // ============================================
+  // RENDERIZAÇÃO
+  // ============================================
+  
+  function renderTabela(data) {
+    const tbody = document.getElementById('tbodyResultados');
+    const empty = document.getElementById('emptyState');
+    tbody.innerHTML = '';
+
+    if (!data.length) {
+      empty.style.display = '';
+      return;
+    }
+    empty.style.display = 'none';
+
+    data.forEach(r => {
+      const paciente = getPacientePorExame(r.id_exame);
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td style="font-family:var(--font-mono);font-size:0.78rem;color:var(--text-3)">#${r.id_resultado}</td>
+        <td style="font-weight:600;font-size:0.85rem">${paciente.nome}</td>
+        <td style="font-family:var(--font-mono);font-size:0.8rem">${formatarCPF(paciente.cpf)}</td>
+        <td style="font-size:0.8rem">${formatarDataHora(paciente.data_consulta)}</td>
+        <td style="font-family:var(--font-mono);font-size:0.82rem;color:var(--blue)">#${r.id_exame}</td>
+        <td>${tipoBadge(paciente.tipo)}</td>
+        <td>${statusPill(r.statusc)}</td>
+        <td>
+          <div class="td-actions">
+            <button class="btn btn-ghost btn-sm" onclick="abrirDetalhes(${r.id_resultado})">Ver</button>
+            <button class="btn btn-ghost btn-sm" onclick="abrirEdicao(${r.id_resultado})">Editar</button>
+            <button class="btn btn-danger btn-sm" onclick="confirmarExclusao(${r.id_resultado})">Excluir</button>
+          </div>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  // ============================================
+  // CARREGAR E FILTRAR
+  // ============================================
+  
+  function carregar() {
+    filtrados = [...resultados];
+    aplicarFiltros();
+  }
+
+  function aplicarFiltros() {
+    const q = document.getElementById('searchResultado').value.toLowerCase();
+    const status = document.getElementById('filterStatus').value;
+
+    filtrados = resultados.filter(r => {
+      const paciente = getPacientePorExame(r.id_exame);
+      const matchPaciente = paciente.nome.toLowerCase().includes(q) || 
+                           paciente.cpf.includes(q) || 
+                           String(r.id_exame).includes(q);
+      return matchPaciente && (!status || r.statusc === status);
+    });
+    renderTabela(filtrados);
+  }
+
+  document.getElementById('searchResultado').addEventListener('input', aplicarFiltros);
+  document.getElementById('filterStatus').addEventListener('change', aplicarFiltros);
+  document.getElementById('btnRecarregar').addEventListener('click', carregar);
+
+  // ============================================
+  // CRUD - ABRIR MODAL
+  // ============================================
+  
+  document.getElementById('btnNovoResultado').addEventListener('click', () => {
+    modoEdicao = false;
+    idEdicao = null;
+    document.getElementById('modalTitulo').textContent = 'Novo Resultado';
+    document.getElementById('rIdExame').value = '';
+    document.getElementById('rStatus').value = 'Pendente';
+    document.getElementById('rResultado').value = '';
+    document.getElementById('rObservacoes').value = '';
+    HematoAI.openModal(document.getElementById('modalResultado'));
+  });
+
+  // ============================================
+  // CRUD - SALVAR
+  // ============================================
+  
+  document.getElementById('salvarResultado').addEventListener('click', () => {
+    const idExame = parseInt(document.getElementById('rIdExame').value);
+    const status = document.getElementById('rStatus').value;
+    const resultado = document.getElementById('rResultado').value.trim();
+    const observacoes = document.getElementById('rObservacoes').value.trim();
+
+    if (!idExame || idExame <= 0) {
+      HematoAI.showToast('ID do exame inválido.', 'error');
+      return;
+    }
+    if (!resultado) {
+      HematoAI.showToast('O resultado é obrigatório.', 'error');
+      return;
+    }
+
+    // Verifica se o exame existe no mapeamento
+    if (!examesInfo[idExame]) {
+      HematoAI.showToast('Exame não encontrado. Verifique o ID.', 'error');
+      return;
+    }
+
+    if (modoEdicao) {
+      const idx = resultados.findIndex(x => x.id_resultado === idEdicao);
+      if (idx >= 0) {
+        resultados[idx] = {
+          ...resultados[idx],
+          id_exame: idExame,
+          statusc: status,
+          resultado: resultado,
+          observacoes: observacoes
+        };
+      }
+      HematoAI.showToast('Resultado atualizado com sucesso!', 'success');
+    } else {
+      resultados.push({
+        id_resultado: proximoId++,
+        id_exame: idExame,
+        statusc: status,
+        resultado: resultado,
+        observacoes: observacoes,
+        data_criacao: new Date().toISOString()
+      });
+      HematoAI.showToast('Resultado cadastrado com sucesso!', 'success');
+    }
+
+    HematoAI.closeModal(document.getElementById('modalResultado'));
+    carregar();
+  });
+
+  // ============================================
+  // CRUD - EDITAR
+  // ============================================
+  
+  function abrirEdicao(id) {
+    const r = resultados.find(x => x.id_resultado === id);
+    if (!r) return;
+
+    modoEdicao = true;
+    idEdicao = id;
+    document.getElementById('modalTitulo').textContent = `Editar Resultado #${id}`;
+    document.getElementById('rIdExame').value = r.id_exame;
+    document.getElementById('rStatus').value = r.statusc;
+    document.getElementById('rResultado').value = r.resultado;
+    document.getElementById('rObservacoes').value = r.observacoes || '';
+    HematoAI.openModal(document.getElementById('modalResultado'));
+  }
+
+  // ============================================
+  // CRUD - DETALHES
+  // ============================================
+  
+  function abrirDetalhes(id) {
+    idDetalhe = id;
+    const r = resultados.find(x => x.id_resultado === id);
+
+    if (!r) {
+      document.getElementById('detalheBody').innerHTML = '<p style="color:var(--red);padding:20px">Resultado não encontrado.</p>';
+    } else {
+      const paciente = getPacientePorExame(r.id_exame);
+      document.getElementById('detalheBody').innerHTML = `
+        <div class="detail-grid">
+          <span class="detail-key">ID</span>
+          <span class="detail-value" style="font-family:var(--font-mono)">#${r.id_resultado}</span>
+          <span class="detail-key">Paciente</span>
+          <span class="detail-value" style="font-weight:600">${paciente.nome}</span>
+          <span class="detail-key">CPF</span>
+          <span class="detail-value" style="font-family:var(--font-mono)">${formatarCPF(paciente.cpf)}</span>
+          <span class="detail-key">Data da Consulta</span>
+          <span class="detail-value">${formatarDataHora(paciente.data_consulta)}</span>
+          <span class="detail-key">ID Exame</span>
+          <span class="detail-value" style="font-family:var(--font-mono);color:var(--blue)">#${r.id_exame}</span>
+          <span class="detail-key">Tipo de Exame</span>
+          <span class="detail-value">${tipoBadge(paciente.tipo)}</span>
+          <span class="detail-key">Status</span>
+          <span class="detail-value">${statusPill(r.statusc)}</span>
+          <span class="detail-key">Resultado</span>
+          <span class="detail-value"><div class="resultado-texto">${r.resultado}</div></span>
+          ${r.observacoes ? `
+            <span class="detail-key">Observações</span>
+            <span class="detail-value"><div class="resultado-texto" style="min-height:auto;background:var(--yellow-light);border-color:#fde68a;">${r.observacoes}</div></span>
+          ` : ''}
+          <span class="detail-key">Data</span>
+          <span class="detail-value">${formatarDataHora(r.data_criacao)}</span>
+        </div>
+      `;
+    }
+
+    HematoAI.openModal(document.getElementById('modalDetalhes'));
+  }
+
+  // ============================================
+  // FECHAR MODAIS
+  // ============================================
+  
+  document.getElementById('closeModalDetalhes').addEventListener('click', () => HematoAI.closeModal(document.getElementById('modalDetalhes')));
+  document.getElementById('fecharDetalhes').addEventListener('click', () => HematoAI.closeModal(document.getElementById('modalDetalhes')));
+  document.getElementById('editarDetalhe').addEventListener('click', () => {
+    HematoAI.closeModal(document.getElementById('modalDetalhes'));
+    if (idDetalhe) abrirEdicao(idDetalhe);
+  });
+
+  // ============================================
+  // CRUD - EXCLUIR
+  // ============================================
+  
+  function confirmarExclusao(id) {
+    HematoAI.confirmDialog(
+      `Deseja excluir o resultado <strong>#${id}</strong>?<br>Esta ação não pode ser desfeita.`,
+      () => {
+        resultados = resultados.filter(x => x.id_resultado !== id);
+        HematoAI.showToast('Resultado excluído com sucesso.', 'success');
+        carregar();
+      }
+    );
+  }
+
+  // ============================================
+  // FECHAR MODAIS
+  // ============================================
+  
+  ['closeModalResultado','cancelarResultado'].forEach(id => {
+    document.getElementById(id).addEventListener('click', () => HematoAI.closeModal(document.getElementById('modalResultado')));
+  });
+  document.getElementById('modalResultado').addEventListener('click', e => {
+    if (e.target === document.getElementById('modalResultado')) HematoAI.closeModal(document.getElementById('modalResultado'));
+  });
+
+  // ============================================
+  // INICIALIZAÇÃO
+  // ============================================
+  
+  carregar();
+</script>
+</body>
+</html>
