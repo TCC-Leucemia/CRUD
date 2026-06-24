@@ -342,8 +342,9 @@
         <p>HematoAI · Sistema de apoio ao diagnóstico hematológico · Segurança e confidencialidade</p>
     </footer>
 </div>
-
+<script src="JS/api.js"></script>
 <script>
+    
     (function() {
         // Contato
         const btnContato = document.getElementById('btnContatoLogin');
@@ -356,45 +357,93 @@
         // Formulário de login
         const formLogin = document.getElementById('formLogin');
         if (formLogin) {
-            formLogin.addEventListener('submit', (e) => {
+            formLogin.addEventListener('submit', async (e) => {
+
                 e.preventDefault();
 
                 const tipo = document.getElementById('tipoUsuario').value;
                 const email = document.getElementById('email').value.trim();
                 const senha = document.getElementById('senha').value.trim();
 
-                if (!tipo) {
-                    alert("Por favor, selecione o tipo de usuário (Administrador, Médico ou Paciente).");
-                    return;
+                try {
+
+                    const resposta = await fetch(
+                        "http://localhost:3000/auth",
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                email: email,
+                                senha: senha,
+                                tipo: tipo
+                            })
+                        }
+                    );
+
+                    const dados = await resposta.json();
+
+                    console.log("Resposta API:", dados);
+
+                    if (!resposta.ok || !dados.status) {
+
+                        alert(dados.msg || "Login inválido");
+                        return;
+                    }
+
+                    // Salva token JWT
+                    localStorage.setItem(
+                        "token",
+                        dados.token
+                    );
+
+                    // Salva usuário
+                    localStorage.setItem(
+                        "usuario",
+                        JSON.stringify(dados.usuario)
+                    );
+
+                    // Mantém compatibilidade com navbar.js
+                    localStorage.setItem(
+                        "hematoai_session",
+                        JSON.stringify({
+                            tipo: dados.usuario.role,
+                            email: dados.usuario.email,
+                            id_usuario: dados.usuario.id_usuario
+                        })
+                    );
+
+                    // Redirecionamento
+                    switch (dados.usuario.role) {
+
+                        case "Administrador":
+                            window.location.href =
+                                "Adm/administrador.html";
+                            break;
+
+                        case "Médico":
+                            window.location.href =
+                                "Med/medico.html";
+                            break;
+
+                        case "Paciente":
+                            window.location.href =
+                                "Paciente/paciente.html";
+                            break;
+
+                        default:
+                            alert("Perfil inválido");
+                    }
+
+                } catch (erro) {
+
+                    console.error("Erro:", erro);
+
+                    alert(
+                        "Não foi possível conectar ao servidor."
+                    );
                 }
-                if (!email || !senha) {
-                    alert("Preencha o e-mail e a senha para acessar o sistema.");
-                    return;
-                }
-
-                // Mapeamento de tipo para pasta e arquivo
-                const rotas = {
-                    'Administrador': 'Adm/administrador.html',
-                    'Médico': 'Med/medico.html',
-                    'Paciente': 'Paciente/paciente.html'
-                };
-
-                const destino = rotas[tipo];
-                if (!destino) {
-                    alert("Tipo de usuário inválido.");
-                    return;
-                }
-
-                // Salva a sessão (simulada) para uso nas páginas
-                localStorage.setItem('hematoai_session', JSON.stringify({
-                    tipo: tipo,
-                    nome: tipo === 'Administrador' ? 'Administrador HematoAI' :
-                          tipo === 'Médico' ? 'Dr. Usuário' : 'Paciente',
-                    email: email
-                }));
-
-                // Redireciona
-                window.location.href = destino;
             });
         }
     })();

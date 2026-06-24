@@ -4,6 +4,8 @@ console.log(process.env.JWT_SECRET);
 const express = require('express');
 const mysql = require('mysql');
 
+const cors = require('cors');
+
 const rotas_enderecos = require("./routes/RotasEnderecos")
 const rotas_login = require("./routes/RotasLogin");
 const rotas_pacientes = require("./routes/RotasPacientes")
@@ -16,6 +18,8 @@ const rotasImagensExame = require("./routes/RotasImagensExame")
 const rotasAnamnese = require("./routes/RotasAnamnese");
 
 const app = express();
+
+app.use(cors());
 
 app.use(express.json());
 

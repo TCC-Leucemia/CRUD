@@ -26,13 +26,14 @@ module.exports = class EnderecosControl {
                 estado,
                 cep
             });
+            console.log(resultado);
 
             response.status(201).send({
                 status: true,
                 msg: 'Cadastrado com sucesso.',
                 codigo: '002',
                 dados: {
-                    id_enderecos: resultado.insertId,
+                    id_endereco: resultado,
                     rua,
                     numero,
                     bairro,

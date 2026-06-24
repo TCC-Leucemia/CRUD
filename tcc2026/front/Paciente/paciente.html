@@ -351,10 +351,13 @@
 </div>
 
 <script src="../JS/navbar.js"></script>
+<script src="../JS/auth.js"></script>
 <script>
-  // ============================================
-  // FORÇAR SESSÃO COMO PACIENTE (SOLUÇÃO 1)
-  // ============================================
+  const usuario =JSON.parse(localStorage.getItem("usuario"));
+
+  if (!usuario ||usuario.role !== "Paciente") {
+      window.location.href = "../login.html";
+  }
   localStorage.setItem('hematoai_session', JSON.stringify({
     tipo: 'Paciente',
     nome: 'Ana Paula Lima',
@@ -408,6 +411,7 @@
   }
   
   carregarDadosDashboard();
+  verificarPerfil("Paciente");
 </script>
 </body>
 </html>

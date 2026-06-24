@@ -273,11 +273,13 @@
 </div><!-- /app-layout -->
 
 <script src="../JS/navbar.js"></script>
+<script src="../JS/auth.js"></script>
 <script>
-  // ============================================
-  // FUNÇÕES PARA QUICK ACTIONS
-  // ============================================
-  // Forçar sessão como Médico (temporário para teste)
+  const usuario =JSON.parse(localStorage.getItem("usuario"));
+
+  if (!usuario ||usuario.role !== "Médico") {
+      window.location.href ="../login.html";
+  }
   localStorage.setItem('hematoai_session', JSON.stringify({
     tipo: 'Médico',
     nome: 'Dr. Usuário',
@@ -346,6 +348,7 @@
   
   // Carregar dados do dashboard
   carregarDadosDashboard();
+  verificarPerfil("Médico");
 </script>
 </body>
 </html>

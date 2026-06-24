@@ -341,11 +341,21 @@
 </div><!-- /app-layout -->
 
 <script src="../JS/navbar.js"></script>
+<script src="../JS/auth.js"></script>
 <script>
   // ============================================
   // FUNÇÕES PARA GERENCIAMENTO (Quick Actions)
   // ============================================
-  
+  const usuario =JSON.parse(localStorage.getItem("usuario"));
+
+  if (!usuario) {
+      window.location.href ="../login.html";
+  }
+
+  if (usuario.role !=="Administrador") {
+      alert("Acesso negado!");
+      window.location.href ="../login.html";
+  }
   function gerenciarMedicos() {
     window.location.href = 'crudmedico.html';
   }
@@ -402,6 +412,8 @@
   
   // Carregar dados do dashboard
   carregarDadosDashboard();
+  verificarPerfil("Administrador");
+
 </script>
 </body>
 </html>

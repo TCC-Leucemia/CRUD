@@ -382,6 +382,7 @@
 </div>
 
 <script src="../JS/navbar.js"></script>
+<script src="../JS/auth.js"></script>
 <script>
   if (!localStorage.getItem('hematoai_session')) {
     HematoAI.setSession({ tipo: 'Administrador', nome: 'Admin HematoAI' });
@@ -945,6 +946,7 @@
   // Initial render
   renderTable(medicos);
   updateWizardUI();
+  verificarPerfil("Administrador");
 </script>
 </body>
 </html>
