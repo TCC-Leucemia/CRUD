@@ -215,7 +215,7 @@
               <option value="">Todas especialidades</option>
               <option>Hematologia</option>
               <option>Oncologia</option>
-              <option>Clínica Geral</option>
+              <option>Clínico Geral</option>
               <option>Pediatria</option>
               <option>Medicina Interna</option>
             </select>
@@ -325,7 +325,7 @@
               <option value="">Selecione</option>
               <option>Hematologia</option>
               <option>Oncologia</option>
-              <option>Clínica Geral</option>
+              <option>Clínico Geral</option>
               <option>Pediatria</option>
               <option>Medicina Interna</option>
             </select>
@@ -383,21 +383,17 @@
 
 <script src="../JS/navbar.js"></script>
 <script src="../JS/auth.js"></script>
+<script src="../JS/api.js"></script>
 <script>
   if (!localStorage.getItem('hematoai_session')) {
     HematoAI.setSession({ tipo: 'Administrador', nome: 'Admin HematoAI' });
   }
   HematoAI.initSidebar('medicos');
 
-  // Demo data
-  let medicos = [
-    { crm: '12345-SP', nome: 'Dr. Carlos Mendes', cpf: '111.111.111-11', especialidade: 'Hematologia', email: 'carlos@hospital.com', telefone: '(11) 99999-0001', endereco: { rua: 'Rua das Flores', numero: '123', bairro: 'Centro', cidade: 'São Paulo', estado: 'SP', cep: '01000-000' } },
-    { crm: '54321-RJ', nome: 'Dra. Ana Lima',     cpf: '222.222.222-22', especialidade: 'Oncologia',   email: 'ana@hospital.com',    telefone: '(21) 98888-0002', endereco: { rua: 'Av. Atlântica', numero: '500', bairro: 'Copacabana', cidade: 'Rio de Janeiro', estado: 'RJ', cep: '22000-000' } },
-    { crm: '99999-MG', nome: 'Dr. João Silva',    cpf: '333.333.333-33', especialidade: 'Hematologia', email: 'joao@hospital.com',   telefone: '(31) 97777-0003', endereco: { rua: 'Rua da Bahia', numero: '789', bairro: 'Centro', cidade: 'Belo Horizonte', estado: 'MG', cep: '30000-000' } },
-  ];
+  let medicos = [];
   let editingCrm = null;
+  let medicoEditando = null;
 
-  // Wizard state
   let currentStep = 0;
   let wizardData = {
     login: {
@@ -721,69 +717,196 @@
     }
   }
 
-  function finalizeCadastro() {
+  async function finalizeCadastro() {
+
     saveCurrentStepData();
-    
-    // Validate all steps before finalizing
-    if (!wizardData.login.email || !wizardData.login.senha) {
-      HematoAI.showToast('Complete as credenciais de acesso.', 'error');
-      currentStep = 0;
-      loadStepData();
-      updateWizardUI();
-      return;
+
+    try {
+
+      if (editingCrm) {
+
+        // Atualiza endereço
+        const respEndereco = await put(
+            "/enderecos/" + medicoEditando.id_endereco,
+            {
+                rua: wizardData.endereco.rua,
+                numero: wizardData.endereco.numero,
+                bairro: wizardData.endereco.bairro,
+                cidade: wizardData.endereco.cidade,
+                estado: wizardData.endereco.estado,
+                cep: wizardData.endereco.cep.replace(/\D/g, "")
+            }
+        );
+
+        const dadosEndereco = await respEndereco.json();
+
+        if (!respEndereco.ok) {
+            HematoAI.showToast(
+                dadosEndereco.msg || "Erro ao atualizar endereço",
+                "error"
+            );
+            return;
+        }
+
+        console.log("Endereço atualizado.");
+
+        // Atualiza login
+        const bodyLogin = {
+            email: wizardData.login.email,
+            tipo: "Médico"
+        };
+
+        // Só envia a senha se ela foi alterada
+        if (
+            wizardData.login.senha &&
+            wizardData.login.senha !== "********"
+        ) {
+            bodyLogin.senha = wizardData.login.senha;
+        }
+
+        const respLogin = await put(
+            "/login/" + medicoEditando.id_usuario,
+            bodyLogin
+        );
+
+        const dadosLogin = await respLogin.json();
+
+        if (!respLogin.ok) {
+            HematoAI.showToast(
+                dadosLogin.msg || "Erro ao atualizar login",
+                "error"
+            );
+            return;
+        }
+
+        console.log("Login atualizado.");
+
+        // Atualiza médico
+        const respMedico = await put(
+            "/medicos/" + medicoEditando.crm,
+            {
+                nome: wizardData.medico.nome,
+                email: wizardData.login.email,
+                cpf: wizardData.medico.cpf.replace(/\D/g, ""),
+                telefone: wizardData.medico.telefone,
+                especialidade: wizardData.medico.especialidade,
+                id_usuario: medicoEditando.id_usuario,
+                id_endereco: medicoEditando.id_endereco
+            }
+        );
+
+        const dadosMedico = await respMedico.json();
+
+        if (!respMedico.ok) {
+            HematoAI.showToast(
+                dadosMedico.msg || "Erro ao atualizar médico",
+                "error"
+            );
+            return;
+        }
+
+        console.log("Médico atualizado.");
+
+        HematoAI.showToast(
+            "Médico atualizado com sucesso!",
+            "success"
+        );
+
+        HematoAI.closeModal(modalEl);
+
+        await carregarMedicos();
+
+        resetWizard();
+
+        editingCrm = null;
+        medicoEditando = null;
+
+        return;
     }
-    if (!wizardData.medico.nome || !wizardData.medico.crm || !wizardData.medico.cpf || !wizardData.medico.especialidade) {
-      HematoAI.showToast('Complete os dados do médico.', 'error');
-      currentStep = 1;
-      loadStepData();
-      updateWizardUI();
-      return;
-    }
-    if (!wizardData.endereco.cep || !wizardData.endereco.rua || !wizardData.endereco.numero || 
-        !wizardData.endereco.bairro || !wizardData.endereco.cidade || !wizardData.endereco.estado) {
-      HematoAI.showToast('Complete os dados de endereço.', 'error');
-      currentStep = 2;
-      loadStepData();
-      updateWizardUI();
-      return;
-    }
-    
-    // Check if CRM already exists
-    if (!editingCrm && medicos.find(x => x.crm === wizardData.medico.crm)) {
-      HematoAI.showToast('CRM já cadastrado no sistema.', 'error');
-      return;
-    }
-    
-    // Create complete object
-    const medicoCompleto = {
-      crm: wizardData.medico.crm,
-      nome: wizardData.medico.nome,
-      cpf: wizardData.medico.cpf,
-      especialidade: wizardData.medico.especialidade,
-      email: wizardData.login.email,
-      telefone: wizardData.medico.telefone,
-      endereco: { ...wizardData.endereco }
-    };
-    
-    console.log('Dados completos do médico:', medicoCompleto);
-    console.log('Estrutura solicitada:', wizardData);
-    
-    // Add to medicos array
-    if (editingCrm) {
-      const idx = medicos.findIndex(x => x.crm === editingCrm);
-      if (idx >= 0) {
-        medicos[idx] = medicoCompleto;
+
+      const respEndereco = await post("/enderecos",{
+        rua: wizardData.endereco.rua,
+        numero: wizardData.endereco.numero,
+        bairro: wizardData.endereco.bairro,
+        cidade: wizardData.endereco.cidade,
+        estado: wizardData.endereco.estado,
+        cep: wizardData.endereco.cep.replace(/\D/g, "")
+      });
+
+      const dadosEndereco = await respEndereco.json();
+
+      if (!respEndereco.ok) {
+        HematoAI.showToast(
+          dadosEndereco.msg || "Erro ao cadastrar endereço",
+          "error"
+        );
+        return;
       }
-      HematoAI.showToast('Médico atualizado com sucesso!', 'success');
-    } else {
-      medicos.push(medicoCompleto);
-      HematoAI.showToast('Médico cadastrado com sucesso!', 'success');
+
+      const id_endereco =
+        dadosEndereco.dados.id_endereco;
+
+
+      const respLogin = await post("/login",{
+        email: wizardData.login.email,
+        senha: wizardData.login.senha,
+        tipo: "Médico"
+      });
+
+      const dadosLogin =
+        await respLogin.json();
+
+      if (!respLogin.ok) {
+        HematoAI.showToast(
+          dadosLogin.msg || "Erro ao criar login",
+          "error"
+        );
+        return;
+      }
+
+      const id_usuario =
+        dadosLogin.dados.insertId;
+
+      const respMedico = await post("/medicos",{
+        crm: wizardData.medico.crm,
+        nome: wizardData.medico.nome,
+        email: wizardData.login.email,
+        cpf: wizardData.medico.cpf.replace(/\D/g, ""),
+        telefone: wizardData.medico.telefone,
+        especialidade: wizardData.medico.especialidade,
+        id_usuario,
+        id_endereco
+      });
+
+      const dadosMedico =
+        await respMedico.json();
+
+      if (!respMedico.ok) {
+        HematoAI.showToast(
+          dadosMedico.msg || "Erro ao cadastrar médico",
+          "error"
+        );
+        return;
+      }
+
+      HematoAI.showToast(
+        "Médico cadastrado com sucesso!",
+        "success"
+      );
+
+      HematoAI.closeModal(modalEl);
+      await carregarMedicos();
+      resetWizard();
+
+    } catch (erro) {
+
+      console.error(erro);
+
+      HematoAI.showToast(
+        "Erro ao conectar com o servidor",
+        "error"
+      );
     }
-    
-    // Close modal and reset
-    HematoAI.closeModal(modalEl);
-    renderTable(medicos);
-    resetWizard();
   }
 
   function resetWizard() {
@@ -810,7 +933,39 @@
     updateWizardUI();
   }
 
-  // Render table function
+  async function carregarMedicos() {
+
+    try {
+        const resposta = await get("/medicos");
+
+        const dados = await resposta.json();
+
+        if (!resposta.ok) {
+
+            HematoAI.showToast(
+                dados.msg || "Erro ao carregar médicos.",
+                "error"
+            );
+
+            return;
+        }
+
+        medicos = dados.dados;
+
+        renderTable(medicos);
+
+    } catch (erro) {
+
+        console.error(erro);
+
+        HematoAI.showToast(
+            "Erro ao conectar ao servidor.",
+            "error"
+        );
+    }
+  }
+
+
   function renderTable(data) {
     const tbody = document.getElementById('tbodyMedicos');
     const empty = document.getElementById('emptyMedicos');
@@ -854,6 +1009,8 @@
   window.editarMedico = function(crm) {
     editingCrm = crm;
     const m = medicos.find(x => x.crm === crm);
+    medicoEditando = m;
+    console.log(m);
     if (!m) return;
     
     // Load data into wizard
@@ -877,15 +1034,49 @@
     document.getElementById('modalMedicoTitulo').textContent = `Editar Médico - ${m.nome}`;
   };
 
-  window.deletarMedico = function(crm) {
+  window.deletarMedico = function (crm) {
+
     const m = medicos.find(x => x.crm === crm);
+
     HematoAI.confirmDialog(
-      `Deseja excluir o médico <strong>${m?.nome}</strong>?<br>Esta ação não pode ser desfeita.`,
-      () => {
-        medicos = medicos.filter(x => x.crm !== crm);
-        renderTable(medicos);
-        HematoAI.showToast('Médico excluído com sucesso.', 'success');
-      }
+
+        `Deseja excluir o médico <strong>${m?.nome}</strong>?<br>Esta ação não pode ser desfeita.`,
+
+        async () => {
+
+            try {
+
+                const resposta = await del("/medicos/" + crm);
+
+                const dados = await resposta.json();
+
+                if (!resposta.ok) {
+
+                    HematoAI.showToast(
+                        dados.msg || "Erro ao excluir médico.",
+                        "error"
+                    );
+
+                    return;
+                }
+
+                await carregarMedicos();
+
+                HematoAI.showToast(
+                    "Médico excluído com sucesso.",
+                    "success"
+                );
+
+            } catch (erro) {
+
+                console.error(erro);
+
+                HematoAI.showToast(
+                    "Erro ao conectar com o servidor.",
+                    "error"
+                );
+            }
+        }
     );
   };
 
@@ -943,9 +1134,8 @@
     }
   });
 
-  // Initial render
-  renderTable(medicos);
   updateWizardUI();
+  carregarMedicos();
   verificarPerfil("Administrador");
 </script>
 </body>
