@@ -1,14 +1,7 @@
-/* =====================================================
-   HematoAI — Shared Navbar & Utilities
-   JS/navbar.js · Incluir em todas as páginas internas
-   ===================================================== */
+
 
 (function () {
   'use strict';
-
-  // ============================================
-  // CARREGAR TEMA IMEDIATAMENTE (ANTES DE TUDO)
-  // ============================================
   const THEME_KEY = 'hematoai_theme';
 
   function aplicarTemaImediato() {
@@ -24,12 +17,8 @@
     }
   }
 
-  // Executar IMEDIATAMENTE antes de qualquer outra coisa
   aplicarTemaImediato();
 
-  // ============================================
-  // GERENCIAMENTO DE TEMA (DARK/LIGHT MODE)
-  // ============================================
 
   function aplicarTema(tema) {
     const htmlRoot = document.getElementById('htmlRoot') || document.documentElement;
@@ -54,8 +43,6 @@
     aplicarTema(tema);
     window.dispatchEvent(new CustomEvent('temaAlterado', { detail: { tema } }));
   }
-
-  /* ---------- Configuração de menus por perfil ---------- */
   const NAV_CONFIG = {
     Médico: [
       { icon: '🏥', label: 'Dashboard', href: 'medico.html', id: 'anamnese' },
@@ -74,16 +61,60 @@
     Paciente: [
       { icon: '🏠', label: 'Meu Painel', href: 'paciente.html', id: 'paciente' },
       { icon: '📋', label: 'Meu Histórico', href: 'historicoPaciente.html', id: 'historico' },
-      // Configurações removido daqui porque vai para o BOTTOM_NAV
+      {icon: '🧬', label: "Resultados", href: "resultadosExame.html"},
     ],
   };
 
-  const BOTTOM_NAV = [
-    { icon: '⚙️', label: 'Configurações', href: 'configuracoes_paciente.html', id: 'config' },
-    { icon: '🚪', label: 'Sair', href: '#', id: 'sair', cls: 'logout' },
-  ];
+  const BOTTOM_NAV = {
+    Administrador: [
+      {
+        icon: '⚙️',
+        label: 'Configurações',
+        href: 'configuracoes.html',
+        id: 'config'
+      },
+      {
+        icon: '🚪',
+        label: 'Sair',
+        href: '#',
+        id: 'sair',
+        cls: 'logout'
+      }
+    ],
 
-  /* ---------- Sessão ---------- */
+    Médico: [
+      {
+        icon: '⚙️',
+        label: 'Configurações',
+        href: 'configuracoes_med.html',
+        id: 'config'
+      },
+      {
+        icon: '🚪',
+        label: 'Sair',
+        href: '#',
+        id: 'sair',
+        cls: 'logout'
+      }
+    ],
+
+    Paciente: [
+      {
+        icon: '⚙️',
+        label: 'Configurações',
+        href: 'configuracoes_paciente.html',
+        id: 'config'
+      },
+      {
+        icon: '🚪',
+        label: 'Sair',
+        href: '#',
+        id: 'sair',
+        cls: 'logout'
+      }
+    ]
+  };
+
   function getSession() {
     try { return JSON.parse(localStorage.getItem('hematoai_session')) || {}; }
     catch { return {}; }
@@ -95,7 +126,6 @@
     localStorage.removeItem('hematoai_session');
   }
 
-  /* ---------- Sidebar ---------- */
   function initSidebar(activePage) {
     const session = getSession();
     const role = session.tipo || 'Administrador';
@@ -133,7 +163,9 @@
     });
 
     const bottomNav = document.getElementById('navBottom');
-    BOTTOM_NAV.forEach(item => {
+    const bottomItems = BOTTOM_NAV[role] || BOTTOM_NAV["Administrador"];
+
+    bottomItems.forEach(item => {
       const a = document.createElement('a');
       a.href = item.href;
       a.className = 'nav-item' + (item.cls ? ` ${item.cls}` : '') + (activePage === item.id ? ' active' : '');
@@ -142,9 +174,6 @@
       bottomNav.appendChild(a);
     });
 
-    // ============================================
-    // EVENTO PARA SAIR (Logout)
-    // ============================================
     const sairBtn = document.getElementById('nav-sair');
     if (sairBtn) {
       sairBtn.addEventListener('click', function (e) {

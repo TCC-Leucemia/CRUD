@@ -43,11 +43,35 @@ module.exports = class ExamesDAO {
     findByCpf(cpf) {
 
         const sql = `
-            SELECT e.*
+            SELECT
+                e.id_exame,
+                e.id_consulta,
+                e.tipo_exame,
+                e.data_exame,
+                e.statusc,
+
+                m.nome AS medico,
+                m.especialidade,
+
+                r.resultado_texto,
+                r.suspeita_leucemia,
+                r.tipo_leucemia,
+                r.data_resultado
+
             FROM exames e
+
             INNER JOIN consultas c
                 ON c.id_consulta = e.id_consulta
+
+            INNER JOIN medicos m
+                ON m.crm = c.crm
+
+            LEFT JOIN resultados_exame r
+                ON r.id_exame = e.id_exame
+
             WHERE c.cpf = ?
+
+            ORDER BY e.data_exame DESC
         `;
 
         return new Promise((resolve, reject) => {
@@ -60,19 +84,47 @@ module.exports = class ExamesDAO {
                     if (err) return reject(err);
 
                     resolve(result);
+
                 }
             );
+
         });
+
     }
 
+    
     findByCrm(crm) {
 
         const sql = `
-            SELECT e.*
+            SELECT
+                e.id_exame,
+                e.id_consulta,
+                e.tipo_exame,
+                e.data_exame,
+                e.statusc,
+
+                m.nome AS medico,
+                m.especialidade,
+
+                r.resultado_texto,
+                r.suspeita_leucemia,
+                r.tipo_leucemia,
+                r.data_resultado
+
             FROM exames e
+
             INNER JOIN consultas c
                 ON c.id_consulta = e.id_consulta
+
+            INNER JOIN medicos m
+                ON m.crm = c.crm
+
+            LEFT JOIN resultados_exame r
+                ON r.id_exame = e.id_exame
+
             WHERE c.crm = ?
+
+            ORDER BY e.data_exame DESC
         `;
 
         return new Promise((resolve, reject) => {
@@ -85,11 +137,12 @@ module.exports = class ExamesDAO {
                     if (err) return reject(err);
 
                     resolve(result);
+
                 }
             );
+
         });
     }
-
     update(exame) {
         const sql = `
             UPDATE exames 

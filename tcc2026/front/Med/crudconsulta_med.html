@@ -190,39 +190,12 @@
   }
   HematoAI.initSidebar('consultas');
 
-  // ============================================
-  // DADOS DE DEMONSTRAÇÃO
-  // ============================================
-  
-  // Mapeamento de pacientes (CPF -> Nome)
-  const pacientes = {
-    '11111111111': 'Maria Oliveira',
-    '22222222222': 'Pedro Alves',
-    '33333333333': 'Ana Paula Lima',
-    '44444444444': 'Roberto Santos',
-    '55555555555': 'Carla Mendonça'
-  };
-
-  // CRM do médico logado (apenas para referência)
   const medicoCRM = '12345-SP';
 
-  let consultas = [
-    { id_consulta: 1, cpf: '11111111111', crm: '12345-SP', data_consulta: '2025-06-10T08:00:00', tipo_consulta: 'Hemograma', statusc: 'Finalizado' },
-    { id_consulta: 2, cpf: '22222222222', crm: '12345-SP', data_consulta: '2025-07-01T10:00:00', tipo_consulta: 'Consulta clínica', statusc: 'Pendente' },
-    { id_consulta: 3, cpf: '33333333333', crm: '12345-SP', data_consulta: '2025-07-15T14:30:00', tipo_consulta: 'Retorno', statusc: 'Em andamento' },
-    { id_consulta: 4, cpf: '44444444444', crm: '12345-SP', data_consulta: '2025-07-20T09:00:00', tipo_consulta: 'Hemograma', statusc: 'Pendente' },
-  ];
+  let consultas = [];
 
   let idDetalhe = null;
   let idEditar = null;
-
-  // ============================================
-  // FUNÇÕES AUXILIARES
-  // ============================================
-  
-  function getNomePaciente(cpf) {
-    return pacientes[cpf] || 'Paciente não encontrado';
-  }
 
   function formatarCPF(cpf) {
     const c = String(cpf).replace(/\D/g, '').padStart(11, '0');
@@ -240,9 +213,30 @@
     return `<span class="status-pill status-${map[s] || 'pendente'}">${s}</span>`;
   }
 
-  // ============================================
-  // RENDERIZAÇÃO
-  // ============================================
+  async function carregarConsultas() {
+
+    const token = localStorage.getItem("token");
+
+    const response = await fetch(
+        "http://localhost:3000/consultas",
+        {
+            headers: {
+                Authorization: "Bearer " + token
+            }
+        }
+    );
+
+    const dados = await response.json();
+
+    if (!dados.status) {
+        HematoAI.showToast("Erro ao carregar consultas", "error");
+        return;
+    }
+
+    consultas = dados.dados;
+
+    aplicarFiltros();
+  }
   
   function renderTabela(data) {
     const tbody = document.getElementById('tbodyConsultas');
@@ -256,7 +250,7 @@
     empty.style.display = 'none';
 
     data.forEach(c => {
-      const nomePaciente = getNomePaciente(c.cpf);
+      const nomePaciente = c.paciente;
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td style="font-family:var(--font-mono);font-size:0.78rem;color:var(--text-3)">${c.id_consulta}</td>
@@ -285,9 +279,15 @@
     const status = document.getElementById('filterStatus').value;
 
     const filtradas = consultas.filter(c => {
-      const nomePaciente = getNomePaciente(c.cpf).toLowerCase();
-      return (nomePaciente.includes(q) || c.cpf.includes(q)) &&
-             (!status || c.statusc === status);
+
+        const nomePaciente = (c.paciente || "").toLowerCase();
+
+        return (
+            nomePaciente.includes(q) ||
+            c.cpf.includes(q)
+        ) &&
+        (!status || c.statusc === status);
+
     });
     renderTabela(filtradas);
   }
@@ -306,7 +306,7 @@
     if (!c) {
       document.getElementById('detalheBody').innerHTML = '<p style="color:var(--red);padding:20px">Consulta não encontrada.</p>';
     } else {
-      const nomePaciente = getNomePaciente(c.cpf);
+      const nomePaciente = c.paciente;
       document.getElementById('detalheBody').innerHTML = `
         <div class="detail-grid">
           <span class="detail-key">ID</span>
@@ -342,23 +342,76 @@
   // SALVAR STATUS
   // ============================================
   
-  document.getElementById('salvarStatus').addEventListener('click', function() {
-    const id = parseInt(document.getElementById('editandoId').value);
-    const novoStatus = document.getElementById('novoStatus').value;
+  document.getElementById("salvarStatus").addEventListener(
+    "click",
+    async function () {
 
-    if (!novoStatus) {
-      HematoAI.showToast('Selecione um status.', 'error');
-      return;
-    }
+        const id = parseInt(
+            document.getElementById("editandoId").value
+        );
 
-    const idx = consultas.findIndex(x => x.id_consulta === id);
-    if (idx >= 0) {
-      consultas[idx].statusc = novoStatus;
-      HematoAI.showToast('Status atualizado com sucesso!', 'success');
-      HematoAI.closeModal(document.getElementById('modalStatus'));
-      aplicarFiltros();
+        const novoStatus =
+            document.getElementById("novoStatus").value;
+
+        if (!novoStatus) {
+            HematoAI.showToast(
+                "Selecione um status.",
+                "error"
+            );
+            return;
+        }
+
+        try {
+
+            const token =
+                localStorage.getItem("token");
+
+            const response = await fetch(
+                `http://localhost:3000/consultas/${id}`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: "Bearer " + token
+                    },
+                    body: JSON.stringify({
+                        statusc: novoStatus
+                    })
+                }
+            );
+
+            const dados = await response.json();
+
+            if (!dados.status) {
+                HematoAI.showToast(
+                    dados.msg,
+                    "error"
+                );
+                return;
+            }
+
+            HematoAI.showToast(
+                dados.msg,
+                "success"
+            );
+
+            HematoAI.closeModal(
+                document.getElementById("modalStatus")
+            );
+
+            await carregarConsultas();
+
+        } catch (erro) {
+
+            HematoAI.showToast(
+                "Erro ao atualizar status.",
+                "error"
+            );
+
+            console.error(erro);
+        }
     }
-  });
+  );
 
   // ============================================
   // FECHAR MODAIS
@@ -375,12 +428,7 @@
     if (idDetalhe) abrirEditarStatus(idDetalhe);
   });
 
-  // ============================================
-  // INICIALIZAÇÃO
-  // ============================================
-  
-  renderTabela(consultas);
-  verificarPerfil("Médico");
+  carregarConsultas();
 </script>
 </body>
 </html>

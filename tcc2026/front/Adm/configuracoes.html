@@ -253,10 +253,6 @@
               
               <div class="password-form">
                 <div class="form-grid">
-                  <div class="form-group col-span-2">
-                    <label>E-mail atual *</label>
-                    <input type="email" id="emailAtual" placeholder="admin@hematoai.com">
-                  </div>
                   <div class="form-group">
                     <label>Senha atual *</label>
                     <input type="password" id="senhaAtual" placeholder="••••••••">
@@ -338,6 +334,8 @@
 </div>
 
 <script src="../JS/navbar.js"></script>
+<script src="../JS/api.js"></script>
+<script src="../JS/auth.js"></script>
 <script>
   // ============================================
   // CONFIGURAÇÕES - USANDO FUNÇÕES GLOBAIS
@@ -381,21 +379,20 @@
     aplicarTemaConfig('dark');
   });
 
-  // Inicializar
   atualizarBotoesTema(temaAtual);
-  
-  // Carregar dados do usuário
+
   let usuarioLogado = {
-    nome: 'Administrador HematoAI',
-    email: 'admin@hematoai.com',
-    senha: 'admin123'
+    nome: '',
+    email: ''
   };
 
   function carregarDadosUsuario() {
-    const usuarioNome = document.getElementById('usuarioNome');
-    const usuarioEmail = document.getElementById('usuarioEmail');
-    if (usuarioNome) usuarioNome.textContent = usuarioLogado.nome;
-    if (usuarioEmail) usuarioEmail.textContent = usuarioLogado.email;
+
+    document.getElementById("usuarioNome").textContent =
+        usuarioLogado.nome;
+
+    document.getElementById("usuarioEmail").textContent =
+        usuarioLogado.email;
   }
 
   // Força de senha
@@ -438,26 +435,15 @@
     verificarForcaSenha(e.target.value);
   });
 
-  // Validar e salvar credenciais
+  // Validar credenciais (sem verificar e-mail atual)
   function validarCredenciais() {
-    const emailAtual = document.getElementById('emailAtual')?.value.trim() || '';
     const senhaAtual = document.getElementById('senhaAtual')?.value || '';
     const novoEmail = document.getElementById('novoEmail')?.value.trim() || '';
     const novaSenha = document.getElementById('novaSenha')?.value || '';
     const confirmarSenha = document.getElementById('confirmarSenha')?.value || '';
     
-    if (!emailAtual || !senhaAtual) {
-      if (typeof HematoAI !== 'undefined') HematoAI.showToast('Preencha o e-mail e senha atuais.', 'error');
-      return false;
-    }
-    
-    if (emailAtual !== usuarioLogado.email) {
-      if (typeof HematoAI !== 'undefined') HematoAI.showToast('E-mail atual incorreto.', 'error');
-      return false;
-    }
-    
-    if (senhaAtual !== usuarioLogado.senha) {
-      if (typeof HematoAI !== 'undefined') HematoAI.showToast('Senha atual incorreta.', 'error');
+    if (!senhaAtual) {
+      if (typeof HematoAI !== 'undefined') HematoAI.showToast('Preencha a senha atual.', 'error');
       return false;
     }
     
@@ -479,40 +465,102 @@
     return true;
   }
 
-  function salvarCredenciais() {
-    if (!validarCredenciais()) return;
-    
-    const novoEmail = document.getElementById('novoEmail')?.value.trim() || '';
-    const novaSenha = document.getElementById('novaSenha')?.value || '';
-    
-    if (novoEmail) {
-      usuarioLogado.email = novoEmail;
-      
-      if (localStorage.getItem('hematoai_session')) {
-        const session = JSON.parse(localStorage.getItem('hematoai_session'));
-        session.email = novoEmail;
-        localStorage.setItem('hematoai_session', JSON.stringify(session));
-      }
+  async function carregarUsuario() {
+
+    try {
+
+        const resp = await get("/login/meu-login");
+
+        const dados = await resp.json();
+
+        if (!resp.ok) {
+            HematoAI.showToast(
+                dados.msg || "Erro ao carregar usuário.",
+                "error"
+            );
+            return;
+        }
+
+        usuarioLogado = dados.dados;
+
+        carregarDadosUsuario();
+
+    } catch (erro) {
+
+        console.error(erro);
+
+        HematoAI.showToast(
+            "Erro ao conectar ao servidor.",
+            "error"
+        );
     }
-    
-    if (novaSenha) {
-      usuarioLogado.senha = novaSenha;
+  }
+
+  async function salvarCredenciais() {
+    if (!validarCredenciais()) {
+        return;
     }
-    
-    carregarDadosUsuario();
-    
-    document.getElementById('emailAtual').value = '';
-    document.getElementById('senhaAtual').value = '';
-    document.getElementById('novoEmail').value = '';
-    document.getElementById('novaSenha').value = '';
-    document.getElementById('confirmarSenha').value = '';
-    document.getElementById('senhaStrengthContainer').style.display = 'none';
-    
-    if (typeof HematoAI !== 'undefined') HematoAI.showToast('Credenciais atualizadas com sucesso!', 'success');
+
+    try {
+        const body = {
+            senhaAtual: document.getElementById("senhaAtual").value
+        };
+
+        const novoEmail =
+            document.getElementById("novoEmail").value.trim();
+
+        const novaSenha =
+            document.getElementById("novaSenha").value;
+
+        if (!novoEmail && !novaSenha) {
+            HematoAI.showToast(
+                "Informe um novo e-mail ou uma nova senha.",
+                "warning"
+            );
+            return;
+        }
+
+        if (novoEmail) {
+            body.novoEmail = novoEmail;
+        }
+
+        if (novaSenha) {
+            body.novaSenha = novaSenha;
+        }
+
+        const resp = await put(
+            "/login/alterar-credenciais",
+            body
+        );
+
+        const dados = await resp.json();
+
+        if (!resp.ok) {
+            HematoAI.showToast(dados.msg || "Erro ao atualizar credenciais.", "error");
+            return;
+        }
+
+        await carregarUsuario();
+
+        // Limpa os campos após sucesso
+        document.getElementById('senhaAtual').value = '';
+        document.getElementById('novoEmail').value = '';
+        document.getElementById('novaSenha').value = '';
+        document.getElementById('confirmarSenha').value = '';
+        document.getElementById('senhaStrengthContainer').style.display = 'none';
+        document.getElementById("strengthBar").className = "password-strength-bar";
+
+        document.getElementById("strengthText").textContent = "";
+
+        HematoAI.showToast("Credenciais atualizadas com sucesso!", "success");
+
+    } catch (erro) {
+        console.error(erro);
+        HematoAI.showToast("Erro ao conectar ao servidor.", "error");
+    }
   }
 
   function cancelarAlteracao() {
-    document.getElementById('emailAtual').value = '';
     document.getElementById('senhaAtual').value = '';
     document.getElementById('novoEmail').value = '';
     document.getElementById('novaSenha').value = '';
@@ -538,23 +586,23 @@
   document.getElementById('btnCancelarAlteracao').addEventListener('click', cancelarAlteracao);
   document.getElementById('btnSairSistema').addEventListener('click', sairSistema);
 
-  // Inicializar sidebar e dados
-  if (!localStorage.getItem('hematoai_session')) {
-    if (typeof HematoAI !== 'undefined' && HematoAI.setSession) {
-      HematoAI.setSession({ tipo: 'Administrador', nome: 'Administrador HematoAI', email: 'admin@hematoai.com' });
+  carregarUsuario();
+  
+  // Função de verificação de perfil (assumindo que existe no auth.js)
+  if (typeof verificarPerfil !== 'undefined') {
+    verificarPerfil("Administrador");
+  }
+
+  window.addEventListener("DOMContentLoaded", async () => {
+    if (typeof HematoAI !== "undefined") {
+        HematoAI.initSidebar("configuracoes");
     }
-  } else {
-    const session = JSON.parse(localStorage.getItem('hematoai_session'));
-    if (session.email) usuarioLogado.email = session.email;
-    if (session.nome) usuarioLogado.nome = session.nome;
-  }
-
-  if (typeof HematoAI !== 'undefined' && HematoAI.initSidebar) {
-    HematoAI.initSidebar('configuracoes');
-  }
-
-  carregarDadosUsuario();
-  verificarPerfil("Administrador");
+    await carregarUsuario();
+    if (typeof verificarPerfil !== "undefined") {
+        verificarPerfil("Administrador");
+    }
+  });
+  
 </script>
 </body>
 </html>

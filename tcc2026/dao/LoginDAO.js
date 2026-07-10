@@ -8,14 +8,18 @@ module.exports = class LoginDAO {
         this.#banco = banco;
     }
 
-    create = async (login) => {
+    getConnection() {
+        return this.#banco;
+    }
+
+    create = async (login, connection = this.#banco) => {
         const sql = `
             INSERT INTO login (email, senha, tipo)
             VALUES (?, ?, ?)
         `;
 
         return new Promise((resolve, reject) => {
-            this.#banco.query(sql, [login.email, login.senha, login.tipo],
+            connection.query(sql, [login.email, login.senha, login.tipo],
                 (err, result) => {
                     if (err) return reject(err);
                     resolve(result);
@@ -207,27 +211,63 @@ module.exports = class LoginDAO {
     }
     
 
-    update = async (login) => {
+    update = async (login, connection = this.#banco) => {
         const sql = `
-            UPDATE login 
-            SET email=?, senha=?, tipo=? 
+            UPDATE login
+            SET email=?, senha=?, tipo=?
             WHERE id_usuario=?
         `;
 
+        console.log("DADOS RECEBIDOS:");
+        console.log(login);
+
         return new Promise((resolve, reject) => {
-            this.#banco.query(sql,
+            connection.query(
+                sql,
                 [login.email, login.senha, login.tipo, login.id_usuario],
                 (err, result) => {
-                    if (err) return reject(err);
+
+                    if (err) {
+                        console.error(err);
+                        return reject(err);
+                    }
+
+                    console.log("RESULTADO DO UPDATE:");
+                    console.log(result);
+
                     resolve(result);
                 }
             );
         });
     }
+    updateCredenciais = async (id_usuario, email, senha) => {
 
-    delete = async (id) => {
+        const sql = `
+            UPDATE login
+            SET email = ?, senha = ?
+            WHERE id_usuario = ?
+        `;
+
         return new Promise((resolve, reject) => {
-            this.#banco.query("DELETE FROM login WHERE id_usuario = ?", [id],
+
+            this.#banco.query(
+                sql,
+                [email, senha, id_usuario],
+                (err, result) => {
+
+                    if (err) return reject(err);
+
+                    resolve(result);
+                }
+            );
+
+        });
+
+    }
+
+    delete = async (id, connection = this.#banco) => {
+        return new Promise((resolve, reject) => {
+            connection.query("DELETE FROM login WHERE id_usuario = ?", [id],
                 (err, result) => {
                     if (err) return reject(err);
                     resolve(result);

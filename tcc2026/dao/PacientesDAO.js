@@ -33,13 +33,49 @@ module.exports = class PacientesDAO {
     }
 
     findAll = async () => {
-        return new Promise((resolve, reject) => {
-            this.#banco.query("SELECT * FROM pacientes", [],
-                (err, result) => err ? reject(err) : resolve(result)
-            );
-        });
-    }
 
+        const sql = `
+            SELECT
+                p.*,
+                e.rua,
+                e.numero,
+                e.bairro,
+                e.cidade,
+                e.estado,
+                e.cep
+            FROM pacientes p
+            LEFT JOIN enderecos e
+                ON p.id_endereco = e.id_endereco
+        `;
+
+        return new Promise((resolve, reject) => {
+
+            this.#banco.query(sql, [], (err, result) => {
+
+                if (err) return reject(err);
+
+                const pacientes = result.map(p => ({
+
+                    ...p,
+
+                    endereco: {
+                        rua: p.rua,
+                        numero: p.numero,
+                        bairro: p.bairro,
+                        cidade: p.cidade,
+                        estado: p.estado,
+                        cep: p.cep
+                    }
+
+                }));
+
+                resolve(pacientes);
+
+            });
+
+        });
+
+    }
     findById = async (cpf) => {
         return new Promise((resolve, reject) => {
             this.#banco.query("SELECT * FROM pacientes WHERE cpf = ?", [cpf],
@@ -96,6 +132,23 @@ module.exports = class PacientesDAO {
                     resolve(result[0] || null);
                 }
             );
+        });
+    }
+
+    findByCPF(cpf) {
+        return new Promise((resolve, reject) => {
+
+            this.#banco.query(
+                "SELECT * FROM pacientes WHERE cpf = ?",
+                [cpf],
+                (err, result) => {
+
+                    if (err) return reject(err);
+
+                    resolve(result[0] || null);
+                }
+            );
+
         });
     }
 

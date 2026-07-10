@@ -399,6 +399,8 @@
 </div>
 
 <script src="../JS/navbar.js"></script>
+<script src="../JS/auth.js"></script>
+<script src="../JS/api.js"></script>
 <script>
   if (!localStorage.getItem('hematoai_session')) {
     HematoAI.setSession({ tipo: 'Administrador', nome: 'Admin HematoAI' });
@@ -406,12 +408,9 @@
   HematoAI.initSidebar('pacientes');
 
   // Demo data
-  let pacientes = [
-    { cpf: '11111111111', nome: 'Ana Clara Souza', data_nasc: '1990-03-15', sexo: 'Feminino', email: 'ana@email.com', telefone: '(11) 99999-0001', endereco: { cep: '01000-000', rua: 'Rua das Flores', numero: '123', bairro: 'Centro', cidade: 'São Paulo', estado: 'SP' } },
-    { cpf: '22222222222', nome: 'Bruno Lima', data_nasc: '1985-07-22', sexo: 'Masculino', email: 'bruno@email.com', telefone: '(21) 98888-0002', endereco: { cep: '22000-000', rua: 'Av. Atlântica', numero: '500', bairro: 'Copacabana', cidade: 'Rio de Janeiro', estado: 'RJ' } },
-    { cpf: '33333333333', nome: 'Carla Mendonça', data_nasc: '1978-11-30', sexo: 'Feminino', email: 'carla@email.com', telefone: '(31) 97777-0003', endereco: { cep: '30000-000', rua: 'Rua da Bahia', numero: '789', bairro: 'Centro', cidade: 'Belo Horizonte', estado: 'MG' } },
-  ];
+  let pacientes = [];
   let editingCpf = null;
+  let pacienteEditando = null;
 
   // Wizard state
   let currentStep = 0;
@@ -504,6 +503,39 @@
     }
   }
 
+  async function carregarPacientes() {
+
+    try {
+
+        const resposta = await get("/pacientes");
+
+        const dados = await resposta.json();
+
+        if (!resposta.ok) {
+
+            HematoAI.showToast(
+                dados.msg || "Erro ao carregar pacientes.",
+                "error"
+            );
+
+            return;
+        }
+
+        pacientes = dados.dados;
+
+        renderTable(pacientes);
+
+    } catch (erro) {
+
+        console.error(erro);
+
+        HematoAI.showToast(
+            "Erro ao conectar ao servidor.",
+            "error"
+        );
+    }
+  }
+
   let debounceTimeout;
   function debounceBuscarCEP(cep) {
     clearTimeout(debounceTimeout);
@@ -539,10 +571,17 @@
     return c.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
   }
 
-  function formatarData(iso) {
-    if (!iso) return '—';
-    const d = new Date(iso + 'T00:00:00');
-    return d.toLocaleDateString('pt-BR');
+  function formatarData(data) {
+
+    if (!data) return "—";
+
+    const d = new Date(data);
+
+    if (isNaN(d.getTime())) {
+        return "—";
+    }
+
+    return d.toLocaleDateString("pt-BR");
   }
 
   // Input masks
@@ -645,7 +684,7 @@
     if (currentStep === 0) {
       document.getElementById('pCpf').value = maskCPF(wizardData.paciente.cpf);
       document.getElementById('pNome').value = wizardData.paciente.nome;
-      document.getElementById('pDataNasc').value = wizardData.paciente.data_nasc;
+      document.getElementById("pDataNasc").value =wizardData.paciente.data_nasc? wizardData.paciente.data_nasc.split("T")[0]: "";
       document.getElementById('pSexo').value = wizardData.paciente.sexo;
       document.getElementById('pEmail').value = wizardData.paciente.email;
       document.getElementById('pTelefone').value = wizardData.paciente.telefone;
@@ -743,75 +782,375 @@
     }
   }
 
-  function finalizeCadastro() {
+  async function finalizeCadastro() {
     saveCurrentStepData();
-    
-    if (!wizardData.paciente.cpf || !wizardData.paciente.nome || !wizardData.paciente.sexo || !wizardData.paciente.email) {
-      HematoAI.showToast('Complete os dados pessoais.', 'error');
-      currentStep = 0;
-      loadStepData();
-      updateWizardUI();
-      return;
+
+    if (!validateCurrentStep()) return;
+
+    if (!validarWizard()) return;
+
+    try {
+
+        if (editingCpf) {
+            await atualizarPacienteCompleto();
+        } else {
+            await cadastrarPacienteCompleto();
+        }
+
+        HematoAI.closeModal(modalEl);
+
+        await carregarPacientes();
+
+        resetWizard();
+
+    } catch (erro) {
+
+        console.error(erro);
+
+        HematoAI.showToast(
+            "Erro ao conectar ao servidor.",
+            "error"
+        );
     }
-    if (!wizardData.endereco.cep || !wizardData.endereco.rua || !wizardData.endereco.numero || 
-        !wizardData.endereco.bairro || !wizardData.endereco.cidade || !wizardData.endereco.estado) {
-      HematoAI.showToast('Complete os dados de endereço.', 'error');
-      currentStep = 1;
-      loadStepData();
-      updateWizardUI();
-      return;
-    }
-    if (!wizardData.login.email || !wizardData.login.senha) {
-      HematoAI.showToast('Complete as credenciais de acesso.', 'error');
-      currentStep = 2;
-      loadStepData();
-      updateWizardUI();
-      return;
-    }
-    
-    if (!editingCpf && pacientes.find(x => x.cpf === wizardData.paciente.cpf)) {
-      HematoAI.showToast('CPF já cadastrado no sistema.', 'error');
-      return;
-    }
-    
-    const pacienteCompleto = {
-      cpf: wizardData.paciente.cpf,
-      nome: wizardData.paciente.nome,
-      data_nasc: wizardData.paciente.data_nasc || null,
-      sexo: wizardData.paciente.sexo,
-      email: wizardData.paciente.email,
-      telefone: wizardData.paciente.telefone,
-      endereco: { ...wizardData.endereco }
-    };
-    
-    console.log('Dados completos do paciente:', pacienteCompleto);
-    console.log('Estrutura para envio à API:', {
-      paciente: wizardData.paciente,
-      endereco: wizardData.endereco,
-      login: {
-        email: wizardData.login.email,
-        senha: wizardData.login.senha,
-        tipo: wizardData.login.tipo
-      }
-    });
-    
-    if (editingCpf) {
-      const idx = pacientes.findIndex(x => x.cpf === editingCpf);
-      if (idx >= 0) {
-        pacientes[idx] = pacienteCompleto;
-      }
-      HematoAI.showToast('Paciente atualizado com sucesso!', 'success');
-    } else {
-      pacientes.push(pacienteCompleto);
-      HematoAI.showToast('Paciente cadastrado com sucesso!', 'success');
-    }
-    
-    HematoAI.closeModal(modalEl);
-    renderTable(pacientes);
-    resetWizard();
   }
 
+  function validarWizard() {
+
+    if (!wizardData.paciente.cpf ||
+        !wizardData.paciente.nome ||
+        !wizardData.paciente.sexo ||
+        !wizardData.paciente.email) {
+
+        HematoAI.showToast(
+            "Complete os dados pessoais.",
+            "error"
+        );
+
+        currentStep = 0;
+
+        loadStepData();
+
+        updateWizardUI();
+
+        return false;
+    }
+
+    if (!wizardData.endereco.cep ||
+        !wizardData.endereco.rua ||
+        !wizardData.endereco.numero ||
+        !wizardData.endereco.bairro ||
+        !wizardData.endereco.cidade ||
+        !wizardData.endereco.estado) {
+
+        HematoAI.showToast(
+            "Complete os dados de endereço.",
+            "error"
+        );
+
+        currentStep = 1;
+
+        loadStepData();
+
+        updateWizardUI();
+
+        return false;
+    }
+
+    if (!wizardData.login.email ||
+        !wizardData.login.senha) {
+
+        HematoAI.showToast(
+            "Complete as credenciais.",
+            "error"
+        );
+
+        currentStep = 2;
+
+        loadStepData();
+
+        updateWizardUI();
+
+        return false;
+    }
+
+    if (!editingCpf &&
+        pacientes.find(x => x.cpf === wizardData.paciente.cpf)) {
+
+        HematoAI.showToast(
+            "CPF já cadastrado.",
+            "error"
+        );
+
+        return false;
+    }
+
+    return true;
+  }
+
+  async function atualizarPacienteCompleto() {
+
+    await atualizarEndereco();
+
+    await atualizarLogin();
+
+    await atualizarPaciente();
+
+    HematoAI.showToast(
+        "Paciente atualizado com sucesso!",
+        "success"
+    );
+
+    editingCpf = null;
+
+    pacienteEditando = null;
+  }
+
+  async function rollbackCadastro(id_usuario, id_endereco) {
+
+    try {
+
+        if (id_usuario !== null) {
+            await del("/login/" + id_usuario);
+        }
+
+        if (id_endereco !== null) {
+            await del("/enderecos/" + id_endereco);
+        }
+
+    } catch (erro) {
+
+        console.error("Erro no rollback:", erro);
+
+    }
+
+  }
+
+  async function cadastrarPacienteCompleto() {
+
+    let id_usuario = null;
+    let id_endereco = null;
+
+    try {
+
+        id_endereco = await cadastrarEndereco();
+
+        id_usuario = await cadastrarLogin();
+
+        await cadastrarPaciente(
+            id_usuario,
+            id_endereco
+        );
+
+        HematoAI.showToast(
+            "Paciente cadastrado com sucesso!",
+            "success"
+        );
+
+        // evita rollback caso algum erro aconteça depois
+        id_usuario = null;
+        id_endereco = null;
+
+    } catch (erro) {
+
+        await rollbackCadastro(
+            id_usuario,
+            id_endereco
+        );
+
+        throw erro;
+    }
+  }
+
+  async function atualizarEndereco() {
+
+    const respEndereco = await put(
+        "/enderecos/" + pacienteEditando.id_endereco,
+        {
+            rua: wizardData.endereco.rua,
+            numero: wizardData.endereco.numero,
+            bairro: wizardData.endereco.bairro,
+            cidade: wizardData.endereco.cidade,
+            estado: wizardData.endereco.estado,
+            cep: wizardData.endereco.cep.replace(/\D/g, "")
+        }
+    );
+
+    const dadosEndereco = await respEndereco.json();
+
+    if (!respEndereco.ok) {
+
+        HematoAI.showToast(
+            dadosEndereco.msg || "Erro ao atualizar endereço.",
+            "error"
+        );
+
+        throw new Error("Erro ao atualizar endereço");
+    }
+
+    console.log("Endereço atualizado.");
+  }
+
+  async function atualizarLogin() {
+
+    const bodyLogin = {
+        email: wizardData.login.email,
+        tipo: "Paciente"
+    };
+
+    if (
+        wizardData.login.senha &&
+        wizardData.login.senha !== "********"
+    ) {
+        bodyLogin.senha = wizardData.login.senha;
+    }
+
+    const respLogin = await put(
+        "/login/" + pacienteEditando.id_usuario,
+        bodyLogin
+    );
+
+    const dadosLogin = await respLogin.json();
+
+    if (!respLogin.ok) {
+
+        HematoAI.showToast(
+            dadosLogin.msg || "Erro ao atualizar login.",
+            "error"
+        );
+
+        throw new Error("Erro ao atualizar login");
+    }
+
+    console.log("Login atualizado.");
+  }
+
+  async function atualizarPaciente() {
+
+    const respPaciente = await put(
+        "/pacientes/" + pacienteEditando.cpf,
+        {
+            cpf: pacienteEditando.cpf,
+            nome: wizardData.paciente.nome,
+            data_nasc: wizardData.paciente.data_nasc,
+            sexo: wizardData.paciente.sexo,
+            email: wizardData.login.email,
+            telefone: wizardData.paciente.telefone,
+            id_usuario: pacienteEditando.id_usuario,
+            id_endereco: pacienteEditando.id_endereco
+        }
+    );
+
+    const dadosPaciente = await respPaciente.json();
+
+    if (!respPaciente.ok) {
+
+        HematoAI.showToast(
+            dadosPaciente.msg || "Erro ao atualizar paciente.",
+            "error"
+        );
+
+        throw new Error("Erro ao atualizar paciente");
+    }
+
+    console.log("Paciente atualizado.");
+  }
+
+  async function cadastrarEndereco() {
+
+    const respEndereco = await post(
+        "/enderecos",
+        {
+            rua: wizardData.endereco.rua,
+            numero: wizardData.endereco.numero,
+            bairro: wizardData.endereco.bairro,
+            cidade: wizardData.endereco.cidade,
+            estado: wizardData.endereco.estado,
+            cep: wizardData.endereco.cep.replace(/\D/g, "")
+        }
+    );
+
+    const dadosEndereco = await respEndereco.json();
+
+    if (!respEndereco.ok) {
+
+        HematoAI.showToast(
+            dadosEndereco.msg || "Erro ao cadastrar endereço.",
+            "error"
+        );
+
+        throw new Error("Erro ao cadastrar endereço");
+    }
+
+    console.log("Endereço cadastrado.");
+
+    return dadosEndereco.dados.id_endereco;
+  }
+
+  async function cadastrarLogin() {
+
+    const respLogin = await post(
+        "/login",
+        {
+            email: wizardData.login.email,
+            senha: wizardData.login.senha,
+            tipo: "Paciente"
+        }
+    );
+
+    const dadosLogin = await respLogin.json();
+
+    if (!respLogin.ok) {
+
+        HematoAI.showToast(
+            dadosLogin.msg || "Erro ao criar login.",
+            "error"
+        );
+
+        throw new Error("Erro ao criar login");
+    }
+
+    console.log("Login criado.");
+
+    return dadosLogin.dados.insertId;
+  }
+
+  async function cadastrarPaciente(
+    id_usuario,
+    id_endereco
+) {
+
+    const respPaciente = await post(
+        "/pacientes",
+        {
+            cpf: wizardData.paciente.cpf,
+            nome: wizardData.paciente.nome,
+            data_nasc: wizardData.paciente.data_nasc,
+            sexo: wizardData.paciente.sexo,
+            email: wizardData.login.email,
+            telefone: wizardData.paciente.telefone,
+            id_usuario,
+            id_endereco
+        }
+    );
+
+    const dadosPaciente = await respPaciente.json();
+
+    if (!respPaciente.ok) {
+
+        HematoAI.showToast(
+            dadosPaciente.msg || "Erro ao cadastrar paciente.",
+            "error"
+        );
+
+        throw new Error("Erro ao cadastrar paciente");
+    }
+
+    console.log("Paciente cadastrado.");
+  }
+
+
   function resetWizard() {
+    document.getElementById("pCpf").disabled = false;
     currentStep = 0;
     wizardData = {
       paciente: { cpf: "", nome: "", data_nasc: "", sexo: "", email: "", telefone: "" },
@@ -883,16 +1222,22 @@
 
   window.editarPaciente = function(cpf) {
     editingCpf = cpf;
+    document.getElementById("pCpf").disabled = true;
     const p = pacientes.find(x => x.cpf === cpf);
+    
     if (!p) return;
+    
+    pacienteEditando = p;
     
     wizardData.paciente = {
       cpf: p.cpf,
       nome: p.nome,
-      data_nasc: p.data_nasc || '',
+      data_nasc: p.data_nasc
+          ? p.data_nasc.split("T")[0]
+          : "",
       sexo: p.sexo,
       email: p.email,
-      telefone: p.telefone || ''
+      telefone: p.telefone || ""
     };
     wizardData.endereco = p.endereco || { cep: "", rua: "", numero: "", bairro: "", cidade: "", estado: "" };
     wizardData.login.email = p.email;
@@ -906,13 +1251,43 @@
   };
 
   window.deletarPaciente = function(cpf, nome) {
+
     HematoAI.confirmDialog(
-      `Deseja excluir permanentemente o paciente <strong>${nome}</strong>?<br>Esta ação não pode ser desfeita.`,
-      () => {
-        pacientes = pacientes.filter(x => x.cpf !== cpf);
-        renderTable(pacientes);
-        HematoAI.showToast('Paciente excluído com sucesso.', 'success');
-      }
+        `Deseja excluir permanentemente o paciente <strong>${nome}</strong>?<br>Esta ação não pode ser desfeita.`,
+        async () => {
+
+            try {
+
+                const resposta = await del("/pacientes/" + cpf);
+
+                const dados = await resposta.json();
+
+                if (!resposta.ok) {
+                    HematoAI.showToast(
+                        dados.msg || "Erro ao excluir paciente.",
+                        "error"
+                    );
+                    return;
+                }
+
+                HematoAI.showToast(
+                    "Paciente excluído com sucesso!",
+                    "success"
+                );
+
+                await carregarPacientes();
+
+            } catch (erro) {
+
+                console.error(erro);
+
+                HematoAI.showToast(
+                    "Erro ao conectar ao servidor.",
+                    "error"
+                );
+            }
+
+        }
     );
   };
 
@@ -971,7 +1346,7 @@
   });
 
   // Initial render
-  renderTable(pacientes);
+  carregarPacientes();
   updateWizardUI();
   verificarPerfil("Administrador");
 </script>

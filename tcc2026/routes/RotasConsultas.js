@@ -49,7 +49,7 @@ module.exports = (app, banco) => {
             "Administrador",
             "Médico"
         ),
-        middleware.validateBody,
+        middleware.validateUpdate,
         control.update
     );
 

@@ -7,8 +7,11 @@ module.exports = class EnderecosDAO {
     constructor(banco) {
         this.#banco = banco;
     }
+    getConnection() {
+        return this.#banco;
+    }
 
-    async create(endereco) {
+    async create(endereco, connection = this.#banco) {
         const sql = `
             INSERT INTO enderecos (rua, numero, bairro, cidade, estado, cep)
             VALUES (?, ?, ?, ?, ?, ?)
@@ -53,7 +56,7 @@ module.exports = class EnderecosDAO {
         });
     }
 
-    async update(endereco) {
+    async update(endereco, connection = this.#banco) {
         const sql = `
             UPDATE enderecos 
             SET rua=?, numero=?, bairro=?, cidade=?, estado=?, cep=? 
@@ -71,18 +74,18 @@ module.exports = class EnderecosDAO {
         ];
 
         return new Promise((resolve, reject) => {
-            this.#banco.query(sql, params, (erro, resultado) => {
+            connection.query(sql, params, (erro, resultado) => {
                 if (erro) return reject(erro);
                 resolve(resultado.affectedRows > 0);
             });
         });
     }
 
-    async delete(id) {
+    async delete(id, connection = this.#banco) {
         const sql = `DELETE FROM enderecos WHERE id_endereco = ?`;
 
         return new Promise((resolve, reject) => {
-            this.#banco.query(sql, [id], (erro, resultado) => {
+            connection.query(sql, [id], (erro, resultado) => {
                 if (erro) return reject(erro);
                 resolve(resultado.affectedRows > 0);
             });

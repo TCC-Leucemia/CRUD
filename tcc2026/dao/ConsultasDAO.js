@@ -30,60 +30,128 @@ module.exports = class ConsultasDAO {
 
     findAll() {
         return new Promise((resolve, reject) => {
-            this.#banco.query("SELECT * FROM consultas", (err, result) => {
+
+            const sql = `
+                SELECT
+                    c.*,
+                    p.nome AS paciente,
+                    m.nome AS medico,
+                    m.especialidade
+                FROM consultas c
+                INNER JOIN pacientes p
+                ON p.cpf = c.cpf
+                INNER JOIN medicos m
+                ON m.crm = c.crm
+            `;
+
+            this.#banco.query(sql, (err, result) => {
                 if (err) return reject(err);
                 resolve(result);
             });
+
         });
     }
 
     findById(id) {
+
+        const sql = `
+        SELECT
+            c.*,
+            p.nome AS paciente,
+            m.nome AS medico,
+            m.especialidade
+        FROM consultas c
+        INNER JOIN pacientes p
+            ON p.cpf = c.cpf
+        INNER JOIN medicos m
+            ON m.crm = c.crm
+        WHERE c.id_consulta = ?
+        `;
+
         return new Promise((resolve, reject) => {
+
             this.#banco.query(
-                "SELECT * FROM consultas WHERE id_consulta = ?",
+                sql,
                 [id],
                 (err, result) => {
+
                     if (err) return reject(err);
+
                     resolve(result[0] || null);
+
                 }
             );
+
         });
     }
 
     findByPaciente(cpf) {
 
+        const sql = `
+            SELECT
+                c.*,
+                p.nome AS paciente,
+                m.nome AS medico,
+                m.especialidade
+            FROM consultas c
+            INNER JOIN pacientes p
+                ON p.cpf = c.cpf
+            INNER JOIN medicos m
+                ON m.crm = c.crm
+            WHERE c.cpf = ?
+        `;
+
         return new Promise((resolve, reject) => {
 
             this.#banco.query(
-                "SELECT * FROM consultas WHERE cpf = ?",
+                sql,
                 [cpf],
                 (err, result) => {
 
                     if (err) return reject(err);
 
                     resolve(result);
+
                 }
             );
+
         });
+
     }
 
     findByMedico(crm) {
 
+        const sql = `
+            SELECT
+                c.*,
+                p.nome AS paciente,
+                m.nome AS medico,
+                m.especialidade
+            FROM consultas c
+            INNER JOIN pacientes p
+                ON p.cpf = c.cpf
+            INNER JOIN medicos m
+                ON m.crm = c.crm
+            WHERE c.crm = ?
+        `;
+
         return new Promise((resolve, reject) => {
 
             this.#banco.query(
-                "SELECT * FROM consultas WHERE crm = ?",
+                sql,
                 [crm],
                 (err, result) => {
 
                     if (err) return reject(err);
 
                     resolve(result);
+
                 }
             );
-        });
-    }
 
+        });
+
+    }
 
     update(consulta) {
         const sql = `

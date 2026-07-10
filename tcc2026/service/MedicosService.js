@@ -1,13 +1,19 @@
 const MedicosDAO = require("../dao/MedicosDAO");
+const LoginDAO = require("../dao/LoginDAO");
+const EnderecosDAO = require("../dao/EnderecosDAO");
 const Medicos = require("../model/Medicos");
 const ErrorResponse = require("../utils/ErrorResponse");
 
 module.exports = class MedicosService {
 
     #dao;
+    #loginDAO;
+    #enderecoDAO;
 
     constructor(banco) {
         this.#dao = new MedicosDAO(banco);
+        this.#loginDAO = new LoginDAO(banco);
+        this.#enderecoDAO = new EnderecosDAO(banco);
     }
 
     create = async (dados) => {
@@ -66,11 +72,31 @@ module.exports = class MedicosService {
 
     delete = async (crm) => {
 
+        const medico = await this.#dao.findByCRM(crm);
+
+        if (!medico) {
+            throw new ErrorResponse(
+                404,
+                "Médico não encontrado"
+            );
+        }
+
         const result = await this.#dao.delete(crm);
 
         if (result.affectedRows === 0) {
-            throw new ErrorResponse(404, "Médico não encontrado");
+            throw new ErrorResponse(
+                404,
+                "Médico não encontrado"
+            );
         }
+
+        await this.#loginDAO.delete(
+            medico.id_usuario
+        );
+
+        await this.#enderecoDAO.delete(
+            medico.id_endereco
+        );
 
         return true;
     }

@@ -30,7 +30,7 @@ module.exports = (app, banco) => {
         ),
         control.meuLogin
     );
-    
+
     app.get(
         "/login",
         jwt.validateToken,
@@ -47,6 +47,19 @@ module.exports = (app, banco) => {
         ),
         control.show
     );
+
+    app.put(
+        "/login/alterar-credenciais",
+        jwt.validateToken,
+        role.authorize(
+            "Administrador",
+            "Médico",
+            "Paciente"
+        ),
+        middleware.validateAlterarCredenciais,
+        control.alterarCredenciais
+    );
+
     app.put(
         "/login/:id",
         jwt.validateToken,

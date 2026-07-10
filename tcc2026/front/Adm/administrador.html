@@ -9,39 +9,9 @@
     /* ESTILOS EXISTENTES - PRESERVADOS */
     .admin-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 20px;
     }
-
-    .quick-action-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-      margin-bottom: 28px;
-      max-width: 800px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .quick-card {
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-xl);
-      padding: 22px 18px;
-      text-align: center;
-      cursor: pointer;
-      transition: var(--transition);
-      text-decoration: none;
-      display: block;
-    }
-    .quick-card:hover {
-      box-shadow: var(--shadow-md);
-      transform: translateY(-3px);
-      border-color: var(--red);
-    }
-    .quick-card-icon  { font-size: 2rem; margin-bottom: 8px; }
-    .quick-card-label { font-size: 0.875rem; font-weight: 700; color: var(--text-1); }
-    .quick-card-sub   { font-size: 0.72rem; color: var(--text-3); margin-top: 3px; }
 
     .activity-item {
       display: flex;
@@ -137,12 +107,11 @@
     }
 
     @media (max-width: 1024px) {
-      .admin-grid { grid-template-columns: 1fr; }
-      .quick-action-grid { grid-template-columns: repeat(2, 1fr); }
+      .admin-grid { grid-template-columns: repeat(2, 1fr); }
       .stats-indicators { grid-template-columns: repeat(2, 1fr); }
     }
-    @media (max-width: 600px) {
-      .quick-action-grid { grid-template-columns: 1fr; }
+    @media (max-width: 700px) {
+      .admin-grid { grid-template-columns: 1fr; }
       .stats-indicators { grid-template-columns: 1fr; }
     }
   </style>
@@ -179,25 +148,6 @@
         <div class="stat-indicator-card">
           <div class="stat-indicator-number" id="totalConsultas">0</div>
           <div class="stat-indicator-label">Consultas Realizadas</div>
-        </div>
-      </div>
-
-      <!-- QUICK ACTIONS (ATALHOS) - SOMENTE O QUE O ADMIN TEM ACESSO -->
-      <div class="quick-action-grid">
-        <div class="quick-card" onclick="gerenciarMedicos()">
-          <div class="quick-card-icon">👨‍⚕️</div>
-          <div class="quick-card-label">Gerenciar Corpo Clínico</div>
-          <div class="quick-card-sub">Cadastrar, editar, excluir</div>
-        </div>
-        <div class="quick-card" onclick="gerenciarPacientes()">
-          <div class="quick-card-icon">👤</div>
-          <div class="quick-card-label">Gerenciar Pacientes</div>
-          <div class="quick-card-sub">Cadastrar, editar, excluir</div>
-        </div>
-        <div class="quick-card" onclick="verConsultas()">
-          <div class="quick-card-icon">📋</div>
-          <div class="quick-card-label">Consultas</div>
-          <div class="quick-card-sub">Histórico completo</div>
         </div>
       </div>
 
@@ -268,43 +218,6 @@
           </div>
         </div>
 
-        <!-- CARD: ATIVIDADES RECENTES DO SISTEMA -->
-        <div class="card">
-          <div class="card-header">
-            <span class="card-title">Atividades Recentes</span>
-            <a href="atividades.html" class="btn btn-outline btn-sm">Ver histórico →</a>
-          </div>
-          <div class="card-body">
-            <div id="listaAtividadesRecentes">
-              <div class="activity-item">
-                <div class="activity-dot" style="background:var(--blue)"></div>
-                <span class="activity-text">Novo paciente cadastrado: Pedro Alves</span>
-                <span class="activity-time">há 1h</span>
-              </div>
-              <div class="activity-item">
-                <div class="activity-dot" style="background:var(--red)"></div>
-                <span class="activity-text">Médico Dr. João Silva alterou status da consulta #1045 para "Concluída"</span>
-                <span class="activity-time">há 2h</span>
-              </div>
-              <div class="activity-item">
-                <div class="activity-dot" style="background:var(--purple)"></div>
-                <span class="activity-text">Médico Dra. Ana Lima realizou login no sistema</span>
-                <span class="activity-time">há 3h</span>
-              </div>
-              <div class="activity-item">
-                <div class="activity-dot" style="background:#15803d"></div>
-                <span class="activity-text">Novo médico cadastrado: Dr. Carlos Mendes (CRM 12345-SP)</span>
-                <span class="activity-time">Ontem</span>
-              </div>
-              <div class="activity-item">
-                <div class="activity-dot" style="background:#d97706"></div>
-                <span class="activity-text">Status da consulta #1087 atualizado para "Agendada" pelo médico responsável</span>
-                <span class="activity-time">Ontem</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <!-- CARD: STATUS DAS CONSULTAS -->
         <div class="card">
           <div class="card-header">
@@ -342,20 +255,22 @@
 
 <script src="../JS/navbar.js"></script>
 <script src="../JS/auth.js"></script>
+<script src="../JS/api.js"></script>
 <script>
   // ============================================
   // FUNÇÕES PARA GERENCIAMENTO (Quick Actions)
   // ============================================
-  const usuario =JSON.parse(localStorage.getItem("usuario"));
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
 
   if (!usuario) {
-      window.location.href ="../login.html";
+      window.location.href = "../login.html";
   }
 
-  if (usuario.role !=="Administrador") {
+  if (usuario.role !== "Administrador") {
       alert("Acesso negado!");
-      window.location.href ="../login.html";
+      window.location.href = "../login.html";
   }
+
   function gerenciarMedicos() {
     window.location.href = 'crudmedico.html';
   }
@@ -369,25 +284,94 @@
   }
   
   // ============================================
-  // FUNÇÕES PARA CARREGAMENTO DE DADOS (API FUTURA)
+  // FUNÇÕES PARA CARREGAMENTO DE DADOS (API)
   // ============================================
   
   async function carregarDadosDashboard() {
     try {
-      // Simulação de dados estáticos (substituir pela chamada API real)
-      const dadosExemplo = {
-        totalMedicos: 24,
-        totalPacientes: 387,
-        totalConsultas: 188
-      };
-      
-      document.getElementById('totalMedicos').textContent = dadosExemplo.totalMedicos;
-      document.getElementById('totalPacientes').textContent = dadosExemplo.totalPacientes;
-      document.getElementById('totalConsultas').textContent = dadosExemplo.totalConsultas;
-      
-    } catch (error) {
-      console.error('Erro ao carregar dados do dashboard:', error);
+      const [
+        respMedicos,
+        respPacientes,
+        respConsultas
+      ] = await Promise.all([
+        get("/medicos"),
+        get("/pacientes"),
+        get("/consultas")
+      ]);
+
+      const dadosMedicos = await respMedicos.json();
+      const dadosPacientes = await respPacientes.json();
+      const dadosConsultas = await respConsultas.json();
+
+      if (!respMedicos.ok || !respPacientes.ok || !respConsultas.ok) {
+        HematoAI.showToast("Erro ao carregar informações do Dashboard.", "error");
+        return;
+      }
+
+      const medicos = dadosMedicos.dados || [];
+      const pacientes = dadosPacientes.dados || [];
+      const consultas = dadosConsultas.dados || [];
+
+      atualizarIndicadores(medicos, pacientes, consultas);
+      preencherMedicosRecentes(medicos);
+      preencherPacientesRecentes(pacientes);
+      atualizarStatusConsultas(consultas);
+
+    } catch (erro) {
+      console.error(erro);
+      HematoAI.showToast("Erro ao conectar ao servidor.", "error");
     }
+  }
+
+  function atualizarIndicadores(medicos, pacientes, consultas) {
+    document.getElementById("totalMedicos").textContent = medicos.length;
+    document.getElementById("totalPacientes").textContent = pacientes.length;
+    document.getElementById("totalConsultas").textContent = consultas.length;
+  }
+
+  function preencherMedicosRecentes(medicos) {
+    const lista = document.getElementById("listaMedicosRecentes");
+    lista.innerHTML = "";
+    medicos
+      .slice(-3)
+      .reverse()
+      .forEach(m => {
+        lista.innerHTML += `
+          <div class="recent-list-item">
+            <div class="recent-list-info">
+              <div class="recent-list-name">${m.nome}</div>
+              <div class="recent-list-detail">CRM: ${m.crm}</div>
+            </div>
+          </div>
+        `;
+      });
+  }
+
+  function preencherPacientesRecentes(pacientes) {
+    const lista = document.getElementById("listaPacientesRecentes");
+    lista.innerHTML = "";
+    pacientes
+      .slice(-3)
+      .reverse()
+      .forEach(p => {
+        lista.innerHTML += `
+          <div class="recent-list-item">
+            <div class="recent-list-info">
+              <div class="recent-list-name">${p.nome}</div>
+              <div class="recent-list-detail">CPF: ${p.cpf}</div>
+            </div>
+          </div>
+        `;
+      });
+  }
+
+  function atualizarStatusConsultas(consultas) {
+    document.getElementById("consultasPendentes").textContent =
+      consultas.filter(c => c.statusc === "Pendente").length;
+    document.getElementById("consultasAndamento").textContent =
+      consultas.filter(c => c.statusc === "Em andamento").length;
+    document.getElementById("consultasFinalizadas").textContent =
+      consultas.filter(c => c.statusc === "Finalizado").length;
   }
   
   // Inicialização da Sessão e Sidebar
@@ -413,7 +397,6 @@
   // Carregar dados do dashboard
   carregarDadosDashboard();
   verificarPerfil("Administrador");
-
 </script>
 </body>
 </html>

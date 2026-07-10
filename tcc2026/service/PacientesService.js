@@ -2,12 +2,19 @@ const PacientesDAO = require("../dao/PacientesDAO");
 const Pacientes = require("../model/Pacientes");
 const ErrorResponse = require("../utils/ErrorResponse");
 
+const LoginDAO = require("../dao/LoginDAO");
+const EnderecosDAO = require("../dao/EnderecosDAO");
+
+const md5 = require("md5");
+
 module.exports = class PacientesService {
 
     #dao;
 
     constructor(banco) {
         this.#dao = new PacientesDAO(banco);
+        this.loginDAO = new LoginDAO(banco);
+        this.enderecoDAO = new EnderecosDAO(banco);
     }
 
     create = async (dados) => {
@@ -34,7 +41,7 @@ module.exports = class PacientesService {
             return await this.#dao.findByMedico(user.crm);
         }
 
-        throw new ErrorResponse(403,"Acesso negado");
+        throw new ErrorResponse(403, "Acesso negado");
     }
 
     findByMedico = async (crm) => {
@@ -92,6 +99,84 @@ module.exports = class PacientesService {
         return paciente;
     }
 
+    updateMeuPerfil = async (cpf, dados) => {
+
+        const paciente = await this.#dao.findById(cpf);
+
+        if (!paciente) {
+
+            throw new ErrorResponse(
+                404,
+                "Paciente não encontrado"
+            );
+
+        }
+
+        const login = await this.loginDAO.findById(
+            paciente.id_usuario
+        );
+
+        if (!login) {
+
+            throw new ErrorResponse(
+                404,
+                "Usuário não encontrado"
+            );
+
+        }
+        const senhaHash = md5(dados.senhaAtual);
+
+        if (senhaHash !== login.senha) {
+
+            throw new ErrorResponse(
+                400,
+                "Senha atual incorreta"
+            );
+
+        }
+        
+
+        // Atualização do e-mail
+        let email = login.email;
+
+        if (dados.email && dados.email !== login.email) {
+
+            const existente = await this.loginDAO.findByEmail(
+                dados.email
+            );
+
+            if (
+                existente &&
+                existente.id_usuario !== login.id_usuario
+            ) {
+
+                throw new ErrorResponse(
+                    400,
+                    "E-mail já cadastrado"
+                );
+
+            }
+
+            email = dados.email;
+        }
+
+        let senha = login.senha;
+        if (dados.novaSenha) {
+            senha = md5(dados.novaSenha);
+        }
+
+        await this.loginDAO.updateCredenciais(
+            login.id_usuario,
+            email,
+            senha
+        );
+
+        return {
+            atualizado: true
+        };
+
+    }
+
     update = async (cpf, dados) => {
 
         const existente = await this.#dao.findById(cpf);
@@ -113,11 +198,24 @@ module.exports = class PacientesService {
 
     delete = async (cpf) => {
 
-        const result = await this.#dao.delete(cpf);
+        const paciente = await this.#dao.findById(cpf);
 
-        if (result.affectedRows === 0) {
-            throw new ErrorResponse(404, "Paciente não encontrado");
+        if (!paciente) {
+            throw new ErrorResponse(
+                404,
+                "Paciente não encontrado"
+            );
         }
+
+        await this.#dao.delete(cpf);
+
+        await this.loginDAO.delete(
+            paciente.id_usuario
+        );
+
+        await this.enderecoDAO.delete(
+            paciente.id_endereco
+        );
 
         return true;
     }

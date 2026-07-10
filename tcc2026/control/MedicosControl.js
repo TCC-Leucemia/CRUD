@@ -119,4 +119,5 @@ module.exports = class MedicosControl {
             next(err);
         }
     }
+    
 }

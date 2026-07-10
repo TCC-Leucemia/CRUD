@@ -100,7 +100,73 @@ module.exports = class LoginService {
         return login;
     }
 
-    update = async (id,dados,user) => {
+    alterarCredenciais = async (id_usuario, dados) => {
+
+        const usuario =
+            await this.#dao.findById(id_usuario);
+
+        if (!usuario) {
+
+            throw new ErrorResponse(
+                404,
+                "Usuário não encontrado"
+            );
+        }
+
+        const senhaHash =
+            md5(dados.senhaAtual);
+
+        if (senhaHash !== usuario.senha) {
+
+            throw new ErrorResponse(
+                401,
+                "Senha atual incorreta"
+            );
+        }
+
+        if (dados.novoEmail) {
+
+            const existente =
+                await this.#dao.findByEmail(
+                    dados.novoEmail
+                );
+
+            if (
+                existente &&
+                existente.id_usuario != id_usuario
+            ) {
+
+                throw new ErrorResponse(
+                    400,
+                    "Email já está em uso"
+                );
+            }
+
+            usuario.email = dados.novoEmail;
+        }
+
+        if (
+            dados.novaSenha &&
+            dados.novaSenha === dados.senhaAtual
+        ) {
+            throw new ErrorResponse(
+                400,
+                "A nova senha deve ser diferente da senha atual"
+            );
+        }
+
+        if (dados.novaSenha) {
+            usuario.senha = md5(dados.novaSenha);
+        }
+        console.log("USUÁRIO ANTES DO UPDATE:");
+        console.log(usuario);
+
+        await this.#dao.update(usuario);
+
+        return true;
+    }
+
+    update = async (id, dados, user) => {
 
         const existente =
             await this.#dao.findById(id);
@@ -152,7 +218,11 @@ module.exports = class LoginService {
 
         login.id_usuario = id;
         login.email = dados.email;
-        login.senha = md5(dados.senha);
+        if (dados.senha) {
+            login.senha = md5(dados.senha);
+        } else {
+            login.senha = existente.senha;
+        }
         login.tipo = dados.tipo;
 
         const resultado =
@@ -164,7 +234,7 @@ module.exports = class LoginService {
         };
     }
 
-    delete = async (id,user) => {
+    delete = async (id, user) => {
 
         const login =
             await this.#dao.findById(id);
@@ -276,7 +346,7 @@ module.exports = class LoginService {
         };
     }
 
-    validarAcessoLogin = async (id_usuario,user) => {
+    validarAcessoLogin = async (id_usuario, user) => {
 
         const login =
             await this.#dao.findById(id_usuario);

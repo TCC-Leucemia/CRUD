@@ -1,6 +1,5 @@
 const PacientesService = require("../service/PacientesService");
 
-
 module.exports = class PacientesControl {
 
     #service;
@@ -101,4 +100,27 @@ module.exports = class PacientesControl {
             next(erro);
         }
     }
+    meusDadosUpdate = async (req, res, next) => {
+
+        try {
+
+            await this.#service.updateMeuPerfil(
+                req.user.cpf,
+                req.body
+            );
+
+            res.status(200).send({
+                status: true,
+                msg: "Dados atualizados com sucesso."
+            });
+
+        } catch (erro) {
+
+            next(erro);
+
+        }
+
+    }
+
+    
 }

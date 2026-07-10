@@ -17,7 +17,10 @@ module.exports = class ConsultasService {
     }
 
     create = async (dados, user) => {
-
+        console.log("DADOS RECEBIDOS:");
+        console.log(dados);
+        console.log("CPF:", dados.cpf);
+        console.log("CRM:", dados.crm);
         if (user.role === "Médico") {
             dados.crm = user.crm;
         }
@@ -34,9 +37,10 @@ module.exports = class ConsultasService {
             );
         }
 
-        const paciente = await this.#pacientesDAO.findById(
+        const paciente = await this.#pacientesDAO.findByCPF(
             dados.cpf
         );
+        console.log("PACIENTE:", paciente);
 
         if (!paciente) {
             throw new ErrorResponse(
@@ -170,7 +174,7 @@ module.exports = class ConsultasService {
             if (dados.cpf) {
 
                 const paciente =
-                    await this.#pacientesDAO.findById(
+                    await this.#pacientesDAO.findByCPF(
                         dados.cpf
                     );
 

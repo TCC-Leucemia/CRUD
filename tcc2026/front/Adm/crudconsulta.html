@@ -103,6 +103,281 @@
       color: var(--text-3);
       margin-top: 3px;
     }
+
+    /* Nome abaixo dos campos */
+    .nome-display {
+      margin-top: 4px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .nome-display.encontrado {
+      color: var(--green);
+    }
+    .nome-display.nao-encontrado {
+      color: var(--red);
+    }
+    .nome-display.vazio {
+      color: var(--text-3);
+    }
+
+    input[list] {
+      width: 100%;
+    }
+
+    /* ========== CALENDÁRIO PERSONALIZADO ========== */
+    .date-picker-wrapper {
+      position: relative;
+      width: 100%;
+    }
+
+    .date-picker-wrapper input {
+      padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: 0.875rem;
+      background: var(--bg);
+      color: var(--text-1);
+      font-family: var(--font);
+      outline: none;
+      transition: var(--transition);
+      width: 100%;
+      min-height: 48px;
+      cursor: pointer;
+    }
+
+    .date-picker-wrapper input:focus {
+      border-color: var(--red);
+      background: var(--surface);
+      box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.08);
+    }
+
+    .date-picker-wrapper input:hover {
+      border-color: var(--border-dark);
+    }
+
+    .date-picker-wrapper .date-icon {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.1rem;
+      pointer-events: none;
+      color: var(--text-3);
+      transition: color 0.2s ease;
+    }
+
+    .date-picker-wrapper:focus-within .date-icon {
+      color: var(--red);
+    }
+
+    .calendar-popup {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      z-index: 1000;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+      padding: 16px;
+      width: 320px;
+      max-width: 100%;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .calendar-popup.open {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .calendar-header .month-year {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--text-1);
+      cursor: pointer;
+      padding: 4px 10px;
+      border-radius: var(--radius-md);
+      transition: var(--transition);
+    }
+
+    .calendar-header .month-year:hover {
+      background: var(--bg);
+      color: var(--red);
+    }
+
+    .calendar-header .nav-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 40px;
+      padding: 4px 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      color: var(--text-2);
+      font-family: var(--font);
+    }
+
+    .calendar-header .nav-btn:hover {
+      background: var(--bg);
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    .calendar-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+
+    .calendar-weekdays span {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-3);
+      padding: 4px 0;
+    }
+
+    .calendar-days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+    }
+
+    .calendar-days .day {
+      padding: 8px 0;
+      text-align: center;
+      border-radius: var(--radius-md);
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-1);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .calendar-days .day:hover {
+      background: var(--red-light);
+      color: var(--red);
+    }
+
+    .calendar-days .day.other-month {
+      color: var(--text-3);
+      opacity: 0.5;
+    }
+
+    .calendar-days .day.selected {
+      background: var(--red);
+      color: white;
+      font-weight: 700;
+    }
+
+    .calendar-days .day.selected:hover {
+      background: var(--red-dark);
+    }
+
+    .calendar-days .day.today {
+      border: 2px solid var(--red);
+      font-weight: 700;
+    }
+
+    .time-selector {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .time-selector label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-2);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .time-selector select {
+      padding: 6px 10px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: 0.8rem;
+      background: var(--bg);
+      color: var(--text-1);
+      font-family: var(--font);
+      outline: none;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .time-selector select:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.08);
+    }
+
+    /* Modo escuro */
+    .dark-mode .calendar-popup {
+      background: var(--surface);
+      border-color: var(--border);
+    }
+
+    .dark-mode .calendar-days .day:hover {
+      background: var(--red-light);
+      color: var(--red);
+    }
+
+    .dark-mode .calendar-days .day.selected {
+      background: var(--red);
+      color: white;
+    }
+
+    .dark-mode .calendar-days .day.today {
+      border-color: var(--red);
+    }
+
+    .dark-mode .time-selector select {
+      background: var(--bg);
+      border-color: var(--border);
+      color: var(--text-1);
+    }
+
+    .dark-mode .time-selector select:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+    }
+
+    /* Responsivo */
+    @media (max-width: 540px) {
+      .calendar-popup {
+        width: 280px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      .calendar-popup.open {
+        transform: translateX(-50%);
+      }
+      .calendar-days .day {
+        padding: 6px 0;
+        font-size: 0.75rem;
+      }
+      .time-selector {
+        flex-wrap: wrap;
+      }
+    }
   </style>
 </head>
 <body>
@@ -186,7 +461,6 @@
           </div>
         </div>
       </div>
-
     </div>
   </div>
 </div>
@@ -207,18 +481,56 @@
       <div class="form-grid">
         <div class="form-group">
           <label>CPF do Paciente *</label>
-          <input type="text" id="cCpf" placeholder="000.000.000-00" maxlength="14">
+          <input type="text" id="cCpf" placeholder="Digite o CPF ou nome..." list="pacientesList" autocomplete="off">
+          <datalist id="pacientesList"></datalist>
+          <div id="pacienteNomeDisplay" class="nome-display vazio">Selecione um paciente</div>
           <div class="field-hint">Apenas pacientes cadastrados no sistema.</div>
         </div>
         <div class="form-group">
           <label>CRM do Médico *</label>
-          <input type="text" id="cCrm" placeholder="Ex: 12345" maxlength="11">
+          <input type="text" id="cCrm" placeholder="Digite o CRM ou nome..." list="medicosList" autocomplete="off">
+          <datalist id="medicosList"></datalist>
+          <div id="medicoNomeDisplay" class="nome-display vazio">Selecione um médico</div>
           <div class="field-hint">Apenas médicos cadastrados no sistema.</div>
         </div>
         <div class="form-group">
           <label>Data e Hora *</label>
-          <input type="datetime-local" id="cData">
-          <div class="field-hint">Deve ser uma data futura.</div>
+          <div class="date-picker-wrapper">
+            <input type="text" id="cData" placeholder="Selecione a data e hora" readonly>
+            <span class="date-icon">📅</span>
+            <div class="calendar-popup" id="calendarPopup">
+              <div class="calendar-header">
+                <button type="button" class="nav-btn" id="prevMonth">◀</button>
+                <span class="month-year" id="monthYearDisplay">Janeiro 2026</span>
+                <button type="button" class="nav-btn" id="nextMonth">▶</button>
+              </div>
+              <div class="calendar-weekdays">
+                <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
+              </div>
+              <div class="calendar-days" id="calendarDays"></div>
+              <div class="time-selector">
+                <label for="horaSelect">Hora</label>
+                <select id="horaSelect">
+                  <option value="00">00</option><option value="01">01</option><option value="02">02</option>
+                  <option value="03">03</option><option value="04">04</option><option value="05">05</option>
+                  <option value="06">06</option><option value="07">07</option><option value="08">08</option>
+                  <option value="09">09</option><option value="10">10</option><option value="11">11</option>
+                  <option value="12">12</option><option value="13">13</option><option value="14">14</option>
+                  <option value="15">15</option><option value="16">16</option><option value="17">17</option>
+                  <option value="18">18</option><option value="19">19</option><option value="20">20</option>
+                  <option value="21">21</option><option value="22">22</option><option value="23">23</option>
+                </select>
+                <span style="font-weight:700;color:var(--text-2);">:</span>
+                <select id="minutoSelect">
+                  <option value="00">00</option>
+                  <option value="15">15</option>
+                  <option value="30">30</option>
+                  <option value="45">45</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="field-hint">Clique para abrir o calendário e selecionar data e hora.</div>
         </div>
         <div class="form-group">
           <label>Tipo de Consulta</label>
@@ -263,32 +575,31 @@
   </div>
 </div>
 
+<script src="../js/api.js"></script>
+<script src="../JS/auth.js"></script>
 <script src="../JS/navbar.js"></script>
 <script>
-/* ══════════════════════════════════════════════════════════════
-   HematoAI · CRUD de Consultas — dados em memória (sem API)
-══════════════════════════════════════════════════════════════ */
-
+  // ============================================================
+  //  SESSÃO E SIDEBAR
+  // ============================================================
   if (!localStorage.getItem('hematoai_session')) {
     HematoAI.setSession({ tipo: 'Administrador', nome: 'Admin HematoAI' });
   }
   HematoAI.initSidebar('consultas');
 
-  /* ── Dados de demonstração ── */
-  let proximoId = 4;
-  let consultas = [
-    { id_consulta: 1, cpf: '11111111111', crm: '12345-SP', data_consulta: '2025-06-10T08:00:00', tipo_consulta: 'Hemograma',       statusc: 'Finalizado'   },
-    { id_consulta: 2, cpf: '22222222222', crm: '54321-RJ', data_consulta: '2025-07-01T10:00:00', tipo_consulta: 'Consulta clínica', statusc: 'Pendente'     },
-    { id_consulta: 3, cpf: '33333333333', crm: '99999-MG', data_consulta: '2025-07-15T14:30:00', tipo_consulta: 'Retorno',          statusc: 'Em andamento' },
-  ];
-
-  /* ── Estado ── */
-  let filtradas  = [];
+  // ============================================================
+  //  ESTADO GLOBAL
+  // ============================================================
+  let consultas = [];
+  let pacientes = [];
+  let medicos = [];
   let modoEdicao = false;
-  let idEdicao   = null;
-  let idDetalhe  = null;
+  let idEdicao = null;
+  let idDetalhe = null;
 
-  /* ── Helpers ── */
+  // ============================================================
+  //  HELPERS
+  // ============================================================
   function formatarCPF(cpf) {
     const c = String(cpf).replace(/\D/g, '').padStart(11, '0');
     return c.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
@@ -305,13 +616,9 @@
     return `<span class="status-pill status-${map[s] || 'pendente'}">${s}</span>`;
   }
 
-  /* ── Carregar / renderizar ── */
-  function carregar() {
-    filtradas = [...consultas];
-    aplicarFiltros();
-    atualizarKPIs(consultas);
-  }
-
+  // ============================================================
+  //  RENDERIZAÇÃO DA TABELA
+  // ============================================================
   function renderTabela(data) {
     const tbody = document.getElementById('tbodyConsultas');
     const empty = document.getElementById('emptyState');
@@ -327,8 +634,14 @@
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td style="font-family:var(--font-mono);font-size:0.78rem;color:var(--text-3)">#${c.id_consulta}</td>
-        <td style="font-family:var(--font-mono);font-size:0.8rem">${formatarCPF(c.cpf || '')}</td>
-        <td><span class="badge badge-blue">${c.crm}</span></td>
+        <td>
+          <strong>${c.paciente || '—'}</strong><br>
+          <small style="color:var(--text-3)">${formatarCPF(c.cpf)}</small>
+        </td>
+        <td>
+          <strong>${c.medico || '—'}</strong><br>
+          <small style="color:var(--text-3)">CRM ${c.crm}</small>
+        </td>
         <td style="font-size:0.85rem">${formatarDataHora(c.data_consulta)}</td>
         <td>${c.tipo_consulta || '<span style="color:var(--text-3)">—</span>'}</td>
         <td>${statusPill(c.statusc)}</td>
@@ -344,149 +657,622 @@
     });
   }
 
-  /* ── KPIs ── */
-  function atualizarKPIs(data) {
-    document.getElementById('kpiTotal').textContent      = data.length;
-    document.getElementById('kpiPendente').textContent   = data.filter(c => c.statusc === 'Pendente').length;
-    document.getElementById('kpiAndamento').textContent  = data.filter(c => c.statusc === 'Em andamento').length;
-    document.getElementById('kpiFinalizado').textContent = data.filter(c => c.statusc === 'Finalizado').length;
-  }
-
-  /* ── Filtros ── */
+  // ============================================================
+  //  FILTROS
+  // ============================================================
   function aplicarFiltros() {
     const q      = document.getElementById('searchConsulta').value.toLowerCase();
     const status = document.getElementById('filterStatus').value;
     const tipo   = document.getElementById('filterTipo').value;
 
-    filtradas = consultas.filter(c =>
-      (!q      || (c.cpf || '').toLowerCase().includes(q) || (c.crm || '').toLowerCase().includes(q)) &&
+    const filtradas = consultas.filter(c =>
+      (!q ||
+        (c.cpf || '').toLowerCase().includes(q) ||
+        (c.crm || '').toLowerCase().includes(q) ||
+        (c.paciente || '').toLowerCase().includes(q) ||
+        (c.medico || '').toLowerCase().includes(q)
+      ) &&
       (!status || c.statusc === status) &&
-      (!tipo   || c.tipo_consulta === tipo)
+      (!tipo || c.tipo_consulta === tipo)
     );
     renderTabela(filtradas);
   }
 
-  document.getElementById('searchConsulta').addEventListener('input',  aplicarFiltros);
-  document.getElementById('filterStatus').addEventListener('change',   aplicarFiltros);
-  document.getElementById('filterTipo').addEventListener('change',     aplicarFiltros);
-  document.getElementById('btnRecarregar').addEventListener('click',   carregar);
+  document.getElementById('searchConsulta').addEventListener('input', aplicarFiltros);
+  document.getElementById('filterStatus').addEventListener('change', aplicarFiltros);
+  document.getElementById('filterTipo').addEventListener('change', aplicarFiltros);
+  document.getElementById('btnRecarregar').addEventListener('click', aplicarFiltros);
 
-  /* ── Máscara CPF ── */
-  document.getElementById('cCpf').addEventListener('input', function () {
-    let v = this.value.replace(/\D/g, '').slice(0, 11);
-    v = v.replace(/(\d{3})(\d)/, '$1.$2');
-    v = v.replace(/(\d{3})\.(\d{3})(\d)/, '$1.$2.$3');
-    v = v.replace(/(\d{3})\.(\d{3})\.(\d{3})(\d)/, '$1.$2.$3-$4');
-    this.value = v;
-  });
-
-  /* ── Data mínima ── */
-  function setMinDatetime() {
-    const agora   = new Date();
-    agora.setMinutes(agora.getMinutes() + 10);
-    const offset  = agora.getTimezoneOffset() * 60000;
-    document.getElementById('cData').min = new Date(agora - offset).toISOString().slice(0, 16);
+  // ============================================================
+  //  CARREGAMENTO DE DADOS (API)
+  // ============================================================
+  async function carregarPacientes() {
+    const resp = await get("/pacientes");
+    const dados = await resp.json();
+    if (!resp.ok) {
+      HematoAI.showToast(dados.msg || "Erro ao carregar pacientes.", "error");
+      return;
+    }
+    pacientes = dados.dados || [];
+    preencherDatalistPacientes();
   }
 
-  /* ── Abrir modal novo ── */
+  async function carregarMedicos() {
+    const resp = await get("/medicos");
+    const dados = await resp.json();
+    if (!resp.ok) {
+      HematoAI.showToast(dados.msg || "Erro ao carregar médicos.", "error");
+      return;
+    }
+    medicos = dados.dados || [];
+    preencherDatalistMedicos();
+  }
+
+  async function carregarConsultas() {
+    const resp = await get("/consultas");
+    const dados = await resp.json();
+    if (!resp.ok) {
+      HematoAI.showToast(dados.msg || "Erro ao carregar consultas.", "error");
+      return;
+    }
+    consultas = dados.dados || [];
+    aplicarFiltros();
+  }
+
+  // ============================================================
+  //  PREENCHER DATALISTS
+  // ============================================================
+  function preencherDatalistPacientes() {
+    const datalist = document.getElementById('pacientesList');
+    datalist.innerHTML = '';
+    pacientes.forEach(p => {
+      const option = document.createElement('option');
+      option.value = formatarCPF(p.cpf) + ' - ' + p.nome;
+      option.dataset.cpf = p.cpf;
+      option.dataset.nome = p.nome;
+      datalist.appendChild(option);
+    });
+  }
+
+  function preencherDatalistMedicos() {
+    const datalist = document.getElementById('medicosList');
+    datalist.innerHTML = '';
+    medicos.forEach(m => {
+      const option = document.createElement('option');
+      option.value = m.crm + ' - ' + m.nome;
+      option.dataset.crm = m.crm;
+      option.dataset.nome = m.nome;
+      datalist.appendChild(option);
+    });
+  }
+
+  // ============================================================
+  //  EVENTOS DOS CAMPOS PACIENTE E MÉDICO
+  // ============================================================
+  function configurarCampoPaciente() {
+    const input = document.getElementById('cCpf');
+    const display = document.getElementById('pacienteNomeDisplay');
+
+    function atualizarNome() {
+      const valor = input.value.trim();
+      const cpfNumeros = valor.replace(/\D/g, '');
+      let encontrado = null;
+
+      if (cpfNumeros.length === 11) {
+        encontrado = pacientes.find(p => p.cpf === cpfNumeros);
+      }
+      if (!encontrado) {
+        const opcoes = document.getElementById('pacientesList').options;
+        for (let opt of opcoes) {
+          if (opt.value === valor) {
+            encontrado = {
+              cpf: opt.dataset.cpf,
+              nome: opt.dataset.nome
+            };
+            break;
+          }
+        }
+      }
+
+      if (encontrado) {
+        display.textContent = `Paciente: ${encontrado.nome}`;
+        display.className = 'nome-display encontrado';
+        input.dataset.cpfSelecionado = encontrado.cpf;
+      } else {
+        if (!valor) {
+          display.textContent = 'Selecione um paciente';
+          display.className = 'nome-display vazio';
+          delete input.dataset.cpfSelecionado;
+        } else {
+          display.textContent = 'Paciente não encontrado';
+          display.className = 'nome-display nao-encontrado';
+          delete input.dataset.cpfSelecionado;
+        }
+      }
+    }
+
+    input.addEventListener('input', atualizarNome);
+    input.addEventListener('change', atualizarNome);
+    atualizarNome();
+  }
+
+  function configurarCampoMedico() {
+    const input = document.getElementById('cCrm');
+    const display = document.getElementById('medicoNomeDisplay');
+
+    function atualizarNome() {
+      const valor = input.value.trim();
+      let encontrado = null;
+
+      const crmPuro = valor.replace(/\s/g, '');
+      if (crmPuro) {
+        encontrado = medicos.find(m => m.crm === crmPuro);
+      }
+      if (!encontrado) {
+        const opcoes = document.getElementById('medicosList').options;
+        for (let opt of opcoes) {
+          if (opt.value === valor) {
+            encontrado = {
+              crm: opt.dataset.crm,
+              nome: opt.dataset.nome
+            };
+            break;
+          }
+        }
+      }
+
+      if (encontrado) {
+        display.textContent = `Médico: ${encontrado.nome}`;
+        display.className = 'nome-display encontrado';
+        input.dataset.crmSelecionado = encontrado.crm;
+      } else {
+        if (!valor) {
+          display.textContent = 'Selecione um médico';
+          display.className = 'nome-display vazio';
+          delete input.dataset.crmSelecionado;
+        } else {
+          display.textContent = 'Médico não encontrado';
+          display.className = 'nome-display nao-encontrado';
+          delete input.dataset.crmSelecionado;
+        }
+      }
+    }
+
+    input.addEventListener('input', atualizarNome);
+    input.addEventListener('change', atualizarNome);
+    atualizarNome();
+  }
+
+  // ============================================================
+  //  CALENDÁRIO PERSONALIZADO
+  // ============================================================
+  let selectedDate = null;
+  let currentMonth = new Date().getMonth();
+  let currentYear = new Date().getFullYear();
+  const today = new Date();
+
+  function renderCalendar() {
+    const daysContainer = document.getElementById('calendarDays');
+    const monthYearDisplay = document.getElementById('monthYearDisplay');
+    const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+      'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+
+    monthYearDisplay.textContent = `${meses[currentMonth]} ${currentYear}`;
+
+    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    const daysInPrevMonth = new Date(currentYear, currentMonth, 0).getDate();
+
+    daysContainer.innerHTML = '';
+
+    // Dias do mês anterior
+    for (let i = firstDay - 1; i >= 0; i--) {
+      const day = daysInPrevMonth - i;
+      const div = document.createElement('div');
+      div.className = 'day other-month';
+      div.textContent = day;
+      daysContainer.appendChild(div);
+    }
+
+    // Dias do mês atual
+    for (let d = 1; d <= daysInMonth; d++) {
+      const div = document.createElement('div');
+      div.className = 'day';
+      div.textContent = d;
+
+      if (d === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear()) {
+        div.classList.add('today');
+      }
+
+      if (selectedDate &&
+        d === selectedDate.getDate() &&
+        currentMonth === selectedDate.getMonth() &&
+        currentYear === selectedDate.getFullYear()) {
+        div.classList.add('selected');
+      }
+
+      div.dataset.day = d;
+      div.addEventListener('click', () => selecionarDia(d));
+      daysContainer.appendChild(div);
+    }
+
+    // Dias do próximo mês para preencher o grid
+    const totalDays = firstDay + daysInMonth;
+    const remaining = (7 - (totalDays % 7)) % 7;
+    for (let d = 1; d <= remaining; d++) {
+      const div = document.createElement('div');
+      div.className = 'day other-month';
+      div.textContent = d;
+      daysContainer.appendChild(div);
+    }
+  }
+
+  function selecionarDia(dia) {
+    selectedDate = new Date(currentYear, currentMonth, dia);
+    renderCalendar();
+    atualizarCampoData();
+    // Calendário permanece aberto para ajuste de hora
+  }
+
+  function atualizarCampoData() {
+    const input = document.getElementById('cData');
+    const horaSelect = document.getElementById('horaSelect');
+    const minutoSelect = document.getElementById('minutoSelect');
+
+    if (selectedDate) {
+      const dia = String(selectedDate.getDate()).padStart(2, '0');
+      const mes = String(selectedDate.getMonth() + 1).padStart(2, '0');
+      const ano = selectedDate.getFullYear();
+      const hora = horaSelect.value.padStart(2, '0');
+      const minuto = minutoSelect.value.padStart(2, '0');
+      const dataFormatada = `${dia}/${mes}/${ano} ${hora}:${minuto}`;
+      input.value = dataFormatada;
+      input.dataset.value = `${ano}-${mes}-${dia}T${hora}:${minuto}`;
+    }
+  }
+
+  function abrirCalendario() {
+    const popup = document.getElementById('calendarPopup');
+    // Se já estiver aberto, fecha; senão, abre
+    if (popup.classList.contains('open')) {
+      popup.classList.remove('open');
+      return;
+    }
+    if (selectedDate) {
+      currentMonth = selectedDate.getMonth();
+      currentYear = selectedDate.getFullYear();
+    } else {
+      currentMonth = today.getMonth();
+      currentYear = today.getFullYear();
+    }
+    renderCalendar();
+    popup.classList.add('open');
+  }
+
+  // ============================================================
+  //  SELETOR DE MÊS E ANO (ao clicar no título)
+  // ============================================================
+  function abrirSelecionadorMesAno() {
+    const currentMonthYear = document.getElementById('monthYearDisplay').textContent;
+    const [mesNome, anoStr] = currentMonthYear.split(' ');
+    const ano = parseInt(anoStr);
+    const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+      'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+    const mesIndex = meses.indexOf(mesNome);
+
+    const overlay = document.createElement('div');
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100%';
+    overlay.style.height = '100%';
+    overlay.style.backgroundColor = 'rgba(0,0,0,0.3)';
+    overlay.style.zIndex = '9999';
+    overlay.style.display = 'flex';
+    overlay.style.alignItems = 'center';
+    overlay.style.justifyContent = 'center';
+
+    const container = document.createElement('div');
+    container.style.backgroundColor = 'var(--surface)';
+    container.style.borderRadius = 'var(--radius-xl)';
+    container.style.padding = '24px';
+    container.style.boxShadow = 'var(--shadow-lg)';
+    container.style.maxWidth = '400px';
+    container.style.width = '90%';
+    container.style.color = 'var(--text-1)';
+
+    const title = document.createElement('h3');
+    title.textContent = 'Selecionar Mês/Ano';
+    title.style.marginBottom = '16px';
+    title.style.fontWeight = '700';
+    title.style.color = 'var(--text-1)';
+    container.appendChild(title);
+
+    const mesSelect = document.createElement('select');
+    mesSelect.style.width = '100%';
+    mesSelect.style.padding = '8px 12px';
+    mesSelect.style.marginBottom = '10px';
+    mesSelect.style.border = '1.5px solid var(--border)';
+    mesSelect.style.borderRadius = 'var(--radius-md)';
+    mesSelect.style.fontSize = '0.9rem';
+    mesSelect.style.fontFamily = 'var(--font)';
+    mesSelect.style.background = 'var(--bg)';
+    mesSelect.style.color = 'var(--text-1)';
+    meses.forEach((m, i) => {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = m;
+      if (i === mesIndex) opt.selected = true;
+      mesSelect.appendChild(opt);
+    });
+    container.appendChild(mesSelect);
+
+    const anoInput = document.createElement('input');
+    anoInput.type = 'number';
+    anoInput.value = ano;
+    anoInput.min = 2000;
+    anoInput.max = 2100;
+    anoInput.style.width = '100%';
+    anoInput.style.padding = '8px 12px';
+    anoInput.style.marginBottom = '16px';
+    anoInput.style.border = '1.5px solid var(--border)';
+    anoInput.style.borderRadius = 'var(--radius-md)';
+    anoInput.style.fontSize = '0.9rem';
+    anoInput.style.fontFamily = 'var(--font)';
+    anoInput.style.background = 'var(--bg)';
+    anoInput.style.color = 'var(--text-1)';
+    container.appendChild(anoInput);
+
+    const btnContainer = document.createElement('div');
+    btnContainer.style.display = 'flex';
+    btnContainer.style.gap = '10px';
+    btnContainer.style.justifyContent = 'flex-end';
+
+    const btnCancelar = document.createElement('button');
+    btnCancelar.textContent = 'Cancelar';
+    btnCancelar.className = 'btn btn-ghost';
+    btnCancelar.style.padding = '8px 20px';
+    btnCancelar.addEventListener('click', () => document.body.removeChild(overlay));
+
+    const btnConfirmar = document.createElement('button');
+    btnConfirmar.textContent = 'Confirmar';
+    btnConfirmar.className = 'btn btn-primary';
+    btnConfirmar.style.padding = '8px 20px';
+    btnConfirmar.addEventListener('click', () => {
+      const novoMes = parseInt(mesSelect.value);
+      const novoAno = parseInt(anoInput.value);
+      if (novoAno >= 2000 && novoAno <= 2100) {
+        currentMonth = novoMes;
+        currentYear = novoAno;
+        renderCalendar();
+        // selectedDate permanece inalterado (se houver)
+      } else {
+        alert('Ano inválido. Use entre 2000 e 2100.');
+      }
+      document.body.removeChild(overlay);
+    });
+
+    btnContainer.appendChild(btnCancelar);
+    btnContainer.appendChild(btnConfirmar);
+    container.appendChild(btnContainer);
+
+    overlay.appendChild(container);
+    document.body.appendChild(overlay);
+
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) document.body.removeChild(overlay);
+    });
+  }
+
+  // Eventos do calendário
+  document.getElementById('cData').addEventListener('click', abrirCalendario);
+
+  document.getElementById('prevMonth').addEventListener('click', () => {
+    if (currentMonth === 0) { currentMonth = 11; currentYear--; }
+    else { currentMonth--; }
+    renderCalendar();
+  });
+
+  document.getElementById('nextMonth').addEventListener('click', () => {
+    if (currentMonth === 11) { currentMonth = 0; currentYear++; }
+    else { currentMonth++; }
+    renderCalendar();
+  });
+
+  document.getElementById('monthYearDisplay').addEventListener('click', abrirSelecionadorMesAno);
+
+  // Atualizar data quando hora/minuto mudarem
+  document.getElementById('horaSelect').addEventListener('change', atualizarCampoData);
+  document.getElementById('minutoSelect').addEventListener('change', atualizarCampoData);
+
+  // Fechar calendário ao clicar fora
+  document.addEventListener('click', (e) => {
+    const wrapper = document.querySelector('.date-picker-wrapper');
+    const popup = document.getElementById('calendarPopup');
+    if (wrapper && !wrapper.contains(e.target) && popup.classList.contains('open')) {
+      popup.classList.remove('open');
+    }
+  });
+
+  // ============================================================
+  //  ABRIR MODAL NOVA CONSULTA
+  // ============================================================
   document.getElementById('btnNovaConsulta').addEventListener('click', () => {
     modoEdicao = false;
-    idEdicao   = null;
+    idEdicao = null;
     document.getElementById('modalTitulo').textContent = 'Nova Consulta';
-    document.getElementById('infoBox').style.display   = '';
-    document.getElementById('cCpf').value    = '';
-    document.getElementById('cCrm').value    = '';
-    document.getElementById('cData').value   = '';
-    document.getElementById('cTipo').value   = '';
+    document.getElementById('infoBox').style.display = '';
+
+    document.getElementById('cCpf').value = '';
+    document.getElementById('cCrm').value = '';
+    document.getElementById('cData').value = '';
+    document.getElementById('cTipo').value = '';
     document.getElementById('cStatus').value = 'Pendente';
-    setMinDatetime();
+
+    document.getElementById('pacienteNomeDisplay').textContent = 'Selecione um paciente';
+    document.getElementById('pacienteNomeDisplay').className = 'nome-display vazio';
+    document.getElementById('medicoNomeDisplay').textContent = 'Selecione um médico';
+    document.getElementById('medicoNomeDisplay').className = 'nome-display vazio';
+
+    // Reseta calendário
+    selectedDate = null;
+    const hoje = new Date();
+    currentMonth = hoje.getMonth();
+    currentYear = hoje.getFullYear();
+    renderCalendar();
+    document.getElementById('horaSelect').value = '08';
+    document.getElementById('minutoSelect').value = '00';
+
+    document.getElementById('cCpf').disabled = false;
+    document.getElementById('cCrm').disabled = false;
+
     HematoAI.openModal(document.getElementById('modalConsulta'));
   });
 
-  /* ── Salvar consulta ── */
-  document.getElementById('salvarConsulta').addEventListener('click', () => {
-    const cpf    = document.getElementById('cCpf').value.replace(/\D/g, '');
-    const crm    = document.getElementById('cCrm').value.trim();
-    const data   = document.getElementById('cData').value;
-    const tipo   = document.getElementById('cTipo').value;
+  // ============================================================
+  //  SALVAR CONSULTA
+  // ============================================================
+  document.getElementById('salvarConsulta').addEventListener('click', async () => {
+    const cpfInput = document.getElementById('cCpf');
+    const crmInput = document.getElementById('cCrm');
+    const dataInput = document.getElementById('cData');
+
+    let cpf = cpfInput.dataset.cpfSelecionado || cpfInput.value.replace(/\D/g, '');
+    let crm = crmInput.dataset.crmSelecionado || crmInput.value.trim();
+    let data = dataInput.dataset.value || '';
+
+    const tipo = document.getElementById('cTipo').value;
     const status = document.getElementById('cStatus').value;
 
-    if (!cpf || cpf.length !== 11) { HematoAI.showToast('CPF inválido.', 'error'); return; }
-    if (!crm)                       { HematoAI.showToast('CRM obrigatório.', 'error'); return; }
-    if (!data)                      { HematoAI.showToast('Data da consulta obrigatória.', 'error'); return; }
-    if (!status)                    { HematoAI.showToast('Selecione o status.', 'error'); return; }
-
-    if (modoEdicao) {
-      const idx = consultas.findIndex(x => x.id_consulta === idEdicao);
-      if (idx >= 0) {
-        consultas[idx] = {
-          ...consultas[idx],
-          cpf,
-          crm,
-          data_consulta: new Date(data).toISOString(),
-          statusc:       status,
-          tipo_consulta: tipo || null,
-        };
-      }
-      HematoAI.showToast('Consulta atualizada com sucesso!', 'success');
-    } else {
-      consultas.push({
-        id_consulta:   proximoId++,
-        cpf,
-        crm,
-        data_consulta: new Date(data).toISOString(),
-        statusc:       status,
-        tipo_consulta: tipo || null,
-      });
-      HematoAI.showToast('Consulta criada com sucesso!', 'success');
+    if (!cpf || cpf.length !== 11) {
+      HematoAI.showToast('Selecione um paciente válido.', 'error');
+      return;
+    }
+    if (!crm) {
+      HematoAI.showToast('Selecione um médico válido.', 'error');
+      return;
+    }
+    if (!data) {
+      HematoAI.showToast('Selecione uma data e hora para a consulta.', 'error');
+      return;
+    }
+    if (!status) {
+      HematoAI.showToast('Selecione o status.', 'error');
+      return;
     }
 
-    HematoAI.closeModal(document.getElementById('modalConsulta'));
-    carregar();
+    const body = {
+      cpf,
+      crm,
+      data_consulta: data,
+      tipo_consulta: tipo || null,
+      statusc: status
+    };
+
+    try {
+      let resp;
+      if (modoEdicao) {
+        resp = await put('/consultas/' + idEdicao, body);
+      } else {
+        resp = await post('/consultas', body);
+      }
+      const dados = await resp.json();
+      if (!resp.ok) {
+        HematoAI.showToast(dados.msg || 'Erro ao salvar consulta.', 'error');
+        return;
+      }
+      HematoAI.showToast(
+        modoEdicao ? 'Consulta atualizada com sucesso!' : 'Consulta cadastrada com sucesso!',
+        'success'
+      );
+      HematoAI.closeModal(document.getElementById('modalConsulta'));
+      await carregarConsultas();
+    } catch (erro) {
+      console.error(erro);
+      HematoAI.showToast('Erro ao conectar ao servidor.', 'error');
+    }
   });
 
-  /* ── Editar ── */
+  // ============================================================
+  //  EDITAR CONSULTA
+  // ============================================================
   function abrirEdicao(id) {
     const c = consultas.find(x => x.id_consulta === id);
     if (!c) return;
 
     modoEdicao = true;
-    idEdicao   = id;
+    idEdicao = id;
     document.getElementById('modalTitulo').textContent = `Editar Consulta #${id}`;
-    document.getElementById('infoBox').style.display   = 'none';
+    document.getElementById('infoBox').style.display = 'none';
 
-    document.getElementById('cCpf').value    = formatarCPF(c.cpf || '');
-    document.getElementById('cCrm').value    = c.crm;
-    document.getElementById('cTipo').value   = c.tipo_consulta || '';
+    document.getElementById('cCpf').disabled = true;
+    document.getElementById('cCrm').disabled = true;
+
+    const cpfFormatado = formatarCPF(c.cpf);
+    document.getElementById('cCpf').value = cpfFormatado + ' - ' + (c.paciente || '');
+    document.getElementById('cCpf').dataset.cpfSelecionado = c.cpf;
+    document.getElementById('pacienteNomeDisplay').textContent = `Paciente: ${c.paciente || ''}`;
+    document.getElementById('pacienteNomeDisplay').className = 'nome-display encontrado';
+
+    document.getElementById('cCrm').value = c.crm + ' - ' + (c.medico || '');
+    document.getElementById('cCrm').dataset.crmSelecionado = c.crm;
+    document.getElementById('medicoNomeDisplay').textContent = `Médico: ${c.medico || ''}`;
+    document.getElementById('medicoNomeDisplay').className = 'nome-display encontrado';
+
+    document.getElementById('cTipo').value = c.tipo_consulta || '';
     document.getElementById('cStatus').value = c.statusc;
 
+    // Preenche data no formato dd/mm/aaaa HH:MM
     if (c.data_consulta) {
       const d = new Date(c.data_consulta);
-      const offset = d.getTimezoneOffset() * 60000;
-      document.getElementById('cData').value = new Date(d - offset).toISOString().slice(0, 16);
+      const dia = String(d.getDate()).padStart(2, '0');
+      const mes = String(d.getMonth() + 1).padStart(2, '0');
+      const ano = d.getFullYear();
+      const hora = String(d.getHours()).padStart(2, '0');
+      const minuto = String(d.getMinutes()).padStart(2, '0');
+      const dataFormatada = `${dia}/${mes}/${ano} ${hora}:${minuto}`;
+      document.getElementById('cData').value = dataFormatada;
+      document.getElementById('cData').dataset.value = `${ano}-${mes}-${dia}T${hora}:${minuto}`;
+      selectedDate = new Date(ano, d.getMonth(), d.getDate());
+      currentMonth = d.getMonth();
+      currentYear = d.getFullYear();
+      document.getElementById('horaSelect').value = hora;
+      document.getElementById('minutoSelect').value = minuto;
+    } else {
+      document.getElementById('cData').value = '';
+      document.getElementById('cData').dataset.value = '';
     }
 
-    document.getElementById('cData').removeAttribute('min');
     HematoAI.openModal(document.getElementById('modalConsulta'));
   }
 
-  /* ── Detalhes ── */
-  function abrirDetalhes(id) {
+  // ============================================================
+  //  DETALHES
+  // ============================================================
+  async function abrirDetalhes(id) {
     idDetalhe = id;
-    const c   = consultas.find(x => x.id_consulta === id);
-
-    if (!c) {
-      document.getElementById('detalheBody').innerHTML =
-        '<p style="color:var(--red);padding:20px">Consulta não encontrada.</p>';
-    } else {
+    try {
+      const resp = await get('/consultas/' + id);
+      const dados = await resp.json();
+      if (!resp.ok) {
+        HematoAI.showToast(dados.msg || 'Erro ao carregar consulta.', 'error');
+        return;
+      }
+      const c = dados.dados;
       document.getElementById('detalheBody').innerHTML = `
         <div class="detail-grid">
           <span class="detail-key">ID</span>
           <span class="detail-value" style="font-family:var(--font-mono)">#${c.id_consulta}</span>
-          <span class="detail-key">Paciente (CPF)</span>
-          <span class="detail-value" style="font-family:var(--font-mono)">${formatarCPF(c.cpf || '')}</span>
-          <span class="detail-key">Médico (CRM)</span>
-          <span class="detail-value"><span class="badge badge-blue">${c.crm}</span></span>
+          <span class="detail-key">Paciente</span>
+          <span class="detail-value">
+            <strong>${c.paciente || '—'}</strong><br>
+            <span style="font-family:var(--font-mono);color:var(--text-3);">CPF: ${formatarCPF(c.cpf)}</span>
+          </span>
+          <span class="detail-key">Médico</span>
+          <span class="detail-value">
+            <strong>${c.medico || '—'}</strong><br>
+            <span style="color:var(--text-3);">CRM: ${c.crm}</span>
+          </span>
           <span class="detail-key">Data e Hora</span>
           <span class="detail-value">${formatarDataHora(c.data_consulta)}</span>
           <span class="detail-key">Tipo</span>
@@ -495,46 +1281,73 @@
           <span class="detail-value">${statusPill(c.statusc)}</span>
         </div>
       `;
+      HematoAI.openModal(document.getElementById('modalDetalhes'));
+    } catch (erro) {
+      console.error(erro);
+      HematoAI.showToast('Erro ao conectar ao servidor.', 'error');
     }
-
-    HematoAI.openModal(document.getElementById('modalDetalhes'));
   }
 
   document.getElementById('closeModalDetalhes').addEventListener('click', () =>
-    HematoAI.closeModal(document.getElementById('modalDetalhes')));
+    HematoAI.closeModal(document.getElementById('modalDetalhes'))
+  );
   document.getElementById('fecharDetalhes').addEventListener('click', () =>
-    HematoAI.closeModal(document.getElementById('modalDetalhes')));
+    HematoAI.closeModal(document.getElementById('modalDetalhes'))
+  );
   document.getElementById('editarDetalhe').addEventListener('click', () => {
     HematoAI.closeModal(document.getElementById('modalDetalhes'));
     if (idDetalhe) abrirEdicao(idDetalhe);
   });
 
-  /* ── Excluir ── */
+  // ============================================================
+  //  EXCLUIR CONSULTA
+  // ============================================================
   function confirmarExclusao(id) {
     HematoAI.confirmDialog(
-      `Deseja excluir a consulta <strong>#${id}</strong>?<br>
-       Os exames vinculados a esta consulta também poderão ser afetados.`,
-      () => {
-        consultas = consultas.filter(x => x.id_consulta !== id);
-        HematoAI.showToast('Consulta excluída com sucesso.', 'success');
-        carregar();
+      `Deseja excluir a consulta <strong>#${id}</strong>?<br>Esta ação não pode ser desfeita.`,
+      async () => {
+        try {
+          const resp = await del('/consultas/' + id);
+          const dados = await resp.json();
+          if (!resp.ok) {
+            HematoAI.showToast(dados.msg || 'Erro ao excluir consulta.', 'error');
+            return;
+          }
+          HematoAI.showToast('Consulta excluída com sucesso.', 'success');
+          await carregarConsultas();
+        } catch (erro) {
+          console.error(erro);
+          HematoAI.showToast('Erro ao conectar ao servidor.', 'error');
+        }
       }
     );
   }
 
-  /* ── Fechar modais ── */
-  ['closeModalConsulta','cancelarConsulta'].forEach(id => {
+  // ============================================================
+  //  FECHAR MODAIS
+  // ============================================================
+  ['closeModalConsulta', 'cancelarConsulta'].forEach(id => {
     document.getElementById(id).addEventListener('click', () =>
-      HematoAI.closeModal(document.getElementById('modalConsulta')));
+      HematoAI.closeModal(document.getElementById('modalConsulta'))
+    );
   });
   document.getElementById('modalConsulta').addEventListener('click', e => {
     if (e.target === document.getElementById('modalConsulta'))
       HematoAI.closeModal(document.getElementById('modalConsulta'));
   });
 
-  /* ── Init ── */
-  carregar();
-  verificarPerfil("Administrador","Médico");
+  // ============================================================
+  //  INICIALIZAÇÃO
+  // ============================================================
+  window.addEventListener('DOMContentLoaded', async () => {
+    await carregarPacientes();
+    await carregarMedicos();
+    await carregarConsultas();
+    configurarCampoPaciente();
+    configurarCampoMedico();
+    renderCalendar();
+    verificarPerfil('Administrador', 'Médico');
+  });
 </script>
 </body>
 </html>

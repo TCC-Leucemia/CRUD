@@ -132,6 +132,25 @@ module.exports = class LoginControl {
         }
     }
 
+    alterarCredenciais = async (req, res, next) => {
+
+        try {
+
+            await this.#service.alterarCredenciais(
+                req.user.id_usuario,
+                req.body
+            );
+
+            res.status(200).send({
+                status: true,
+                msg: "Credenciais alteradas com sucesso."
+            });
+
+        } catch (erro) {
+            next(erro);
+        }
+    }
+
     meuLogin = async (req, res, next) => {
 
         try {

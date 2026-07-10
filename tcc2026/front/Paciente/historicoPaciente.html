@@ -450,125 +450,16 @@
   </div>
 </div>
 
+<script src="../JS/auth.js"></script>
+<script src="../JS/api.js"></script>
 <script src="../JS/navbar.js"></script>
 <script>
-/* ═══════════════════════════════════════════════════════
-   DADOS FICTÍCIOS — substituir por chamada à API real
-═══════════════════════════════════════════════════════ */
 
-// Consultas (sem anamnese e sem IA)
-const CONSULTAS = [
-  {
-    id: 1,
-    medico: 'Dr. Carlos Mendes',
-    crm: '12345-SP',
-    especialidade: 'Hematologia',
-    data: '2026-03-05',
-    tipo: 'Hemograma Completo',
-    status: 'Finalizado',
-  },
-  {
-    id: 2,
-    medico: 'Dra. Ana Lima',
-    crm: '54321-RJ',
-    especialidade: 'Oncologia',
-    data: '2026-01-18',
-    tipo: 'Mielograma',
-    status: 'Finalizado',
-  },
-  {
-    id: 3,
-    medico: 'Dr. João Silva',
-    crm: '99999-MG',
-    especialidade: 'Hematologia',
-    data: '2025-11-22',
-    tipo: 'Consulta de Rotina',
-    status: 'Finalizado',
-  },
-  {
-    id: 4,
-    medico: 'Dra. Ana Lima',
-    crm: '54321-RJ',
-    especialidade: 'Oncologia',
-    data: '2026-04-10',
-    tipo: 'Consulta de Acompanhamento',
-    status: 'Pendente',
-  },
-];
+let CONSULTAS = [];
+let EXAMES = [];
 
-// Exames (com diagnóstico do médico – tabela resultados_exame)
-const EXAMES = [
-  {
-    id: 1,
-    tipo: 'Hemograma Completo',
-    data: '2026-03-05',
-    medico: 'Dr. Carlos Mendes',
-    laboratorio: 'Lab HematoAI — Unidade Central',
-    status: 'Finalizado',
-    diagnostico: {
-      resultado_texto: 'Pancitopenia parcial com linfocitose acentuada. Morfologia linfocitária atípica em 35% das células. Indicado encaminhamento para imunofenotipagem.',
-      suspeita_leucemia: 'Moderada',
-      tipo_leucemia: 'LLC',
-      data_resultado: '2026-03-06',
-    },
-  },
-  {
-    id: 2,
-    tipo: 'Mielograma',
-    data: '2026-01-18',
-    medico: 'Dra. Ana Lima',
-    laboratorio: 'Lab HematoAI — Unidade Sul',
-    status: 'Finalizado',
-    diagnostico: {
-      resultado_texto: 'Hipoplasia eritróide e megacariocítica. Predominância de blastos com morfologia característica de LMA. Citogenética pendente.',
-      suspeita_leucemia: 'Alta',
-      tipo_leucemia: 'LMA',
-      data_resultado: '2026-01-20',
-    },
-  },
-  {
-    id: 3,
-    tipo: 'Hemograma de Controle',
-    data: '2025-11-22',
-    medico: 'Dr. João Silva',
-    laboratorio: 'Lab HematoAI — Unidade Central',
-    status: 'Finalizado',
-    diagnostico: {
-      resultado_texto: 'Todos os parâmetros dentro dos valores de referência. Nenhuma alteração morfológica identificada. Próximo exame recomendado em 6 meses.',
-      suspeita_leucemia: 'Sem suspeita',
-      tipo_leucemia: 'Não identificado',
-      data_resultado: '2025-11-23',
-    },
-  },
-  {
-    id: 4,
-    tipo: 'PCR e VHS',
-    data: '2026-03-05',
-    medico: 'Dr. Carlos Mendes',
-    laboratorio: 'Lab HematoAI — Unidade Central',
-    status: 'Finalizado',
-    diagnostico: {
-      resultado_texto: 'Marcadores inflamatórios elevados, compatíveis com processo proliferativo sistêmico identificado no hemograma. Monitoramento recomendado.',
-      suspeita_leucemia: 'Baixa',
-      tipo_leucemia: 'Não identificado',
-      data_resultado: '2026-03-07',
-    },
-  },
-];
-
-/* ═══════════════════════════════════════════════════════
-   ESTADO
-═══════════════════════════════════════════════════════ */
 let viewAtiva  = 'consultas';
 let idSelecionado = null;
-
-// Sessão
-localStorage.setItem('hematoai_session', JSON.stringify({
-  tipo: 'Paciente',
-  nome: 'Ana Paula Lima',
-  email: 'paciente@email.com',
-  cpf: '33333333333'
-}));
 
 // Inicializar sidebar
 if (typeof HematoAI !== 'undefined' && HematoAI.initSidebar) {
@@ -577,9 +468,126 @@ if (typeof HematoAI !== 'undefined' && HematoAI.initSidebar) {
 
 /* ═══════════════════════════════════════════════════════
    CALENDÁRIO
-═══════════════════════════════════════════════════════ */
+══════════════════════════════f═════════════════════════ */
 let mesAtual = new Date().getMonth();
 let anoAtual = new Date().getFullYear();
+
+async function carregarConsultas() {
+
+    try {
+
+        const token = localStorage.getItem("token");
+
+        const response = await fetch(
+            "http://localhost:3000/consultas",
+            {
+                headers: {
+                    Authorization: "Bearer " + token
+                }
+            }
+        );
+
+        const dados = await response.json();
+
+        if (!dados.status) {
+            HematoAI.showToast("Erro ao carregar consultas", "error");
+            return;
+        }
+
+        CONSULTAS = dados.dados.map(c => ({
+
+            id: c.id_consulta,
+
+            medico: c.medico,
+
+            crm: c.crm,
+
+            data: c.data_consulta,
+
+            tipo: c.tipo_consulta,
+
+            status: c.statusc,
+
+            especialidade: c.especialidade || "Hematologia"
+
+        }));
+
+    } catch (e) {
+
+        console.error(e);
+
+        HematoAI.showToast(
+            "Erro ao carregar consultas",
+            "error"
+        );
+    }
+  }
+
+  async function carregarExames() {
+
+    try {
+
+        const token = localStorage.getItem("token");
+        
+        console.log("TOKEN:", token);
+
+        const response = await fetch(
+            "http://localhost:3000/exames",
+            {
+                headers: {
+                    Authorization: "Bearer " + token
+                }
+            }
+        );
+
+        const dados = await response.json();
+
+        if (!dados.status) {
+
+            HematoAI.showToast(
+                "Erro ao carregar exames",
+                "error"
+            );
+
+            return;
+        }
+
+        EXAMES = dados.dados.map(e => ({
+
+            id: e.id_exame,
+
+            tipo: e.tipo_exame,
+
+            data: e.data_exame,
+
+            medico: e.medico,
+
+            status: e.statusc,
+
+            diagnostico: {
+
+                resultado_texto: e.resultado_texto,
+
+                suspeita_leucemia: e.suspeita_leucemia,
+
+                tipo_leucemia: e.tipo_leucemia,
+
+                data_resultado: e.data_resultado
+
+            }
+
+        }));
+
+    } catch (e) {
+
+        console.error(e);
+
+        HematoAI.showToast(
+            "Erro ao carregar exames",
+            "error"
+        );
+    }
+  }
 
 function renderCalendario(mes, ano) {
   const grid = document.getElementById('calGrid');
@@ -609,7 +617,7 @@ function renderCalendario(mes, ano) {
   for (let d = 1; d <= diasNoMes; d++) {
     const dataStr = `${ano}-${String(mes+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const isToday = (d === hoje.getDate() && mes === hoje.getMonth() && ano === hoje.getFullYear());
-    const temConsulta = CONSULTAS.some(c => c.data === dataStr);
+    const temConsulta = CONSULTAS.some(c => c.data.substring(0,10) === dataStr);
     let classes = 'day';
     if (temConsulta) classes += ' has-consulta';
     if (isToday) classes += ' today';
@@ -627,9 +635,8 @@ function renderCalendario(mes, ano) {
   document.querySelectorAll('.day.has-consulta').forEach(el => {
     el.addEventListener('click', function() {
       const data = this.dataset.data;
-      const consulta = CONSULTAS.find(c => c.data === data);
+      const consulta = CONSULTAS.find(c => c.data.substring(0,10) === data);
       if (consulta) {
-        // Muda para a aba consultas e seleciona o item
         setView('consultas');
         idSelecionado = consulta.id;
         renderLista(CONSULTAS, 'consulta');
@@ -720,7 +727,7 @@ function renderLista(dados, tipo) {
           <span class="item-titulo">${item.tipo}</span>
           <span class="item-data">${formatarData(item.data)}</span>
         </div>
-        <div class="item-sub">${item.medico} · ${item.laboratorio}</div>
+        <div class="item-sub">${item.medico}</div>
         <span class="badge badge-${corStatus(item.status)}" style="font-size:.68rem">${item.status}</span>`;
       div.addEventListener('click', () => {
         idSelecionado = item.id;
@@ -798,10 +805,6 @@ function renderDetalheExame(e) {
           <span class="detalhe-valor">${e.medico}</span>
         </div>
         <div class="detalhe-linha">
-          <span class="detalhe-label">Laboratório</span>
-          <span class="detalhe-valor">${e.laboratorio}</span>
-        </div>
-        <div class="detalhe-linha">
           <span class="detalhe-label">Status</span>
           <span class="detalhe-valor">
             <span class="badge badge-${corStatus(e.status)}">${e.status}</span>
@@ -838,14 +841,27 @@ function corStatus(s) {
   return { Finalizado:'green', 'Em andamento':'blue', Pendente:'yellow' }[s] || 'gray';
 }
 function formatarData(d) {
-  if (!d) return '—';
-  return new Date(d + 'T00:00:00').toLocaleDateString('pt-BR');
+    if (!d) return "—";
+
+    const data = new Date(d);
+
+    if (isNaN(data)) return "—";
+
+    return data.toLocaleDateString("pt-BR");
 }
+
 function formatarDataLonga(d) {
-  if (!d) return '—';
-  return new Date(d + 'T00:00:00').toLocaleDateString('pt-BR', {
-    day: '2-digit', month: 'long', year: 'numeric'
-  });
+    if (!d) return "—";
+
+    const data = new Date(d);
+
+    if (isNaN(data)) return "—";
+
+    return data.toLocaleDateString("pt-BR", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric"
+    });
 }
 
 // Botão Exportar PDF (simulação)
@@ -853,10 +869,19 @@ document.getElementById('btnExportarPDF').addEventListener('click', function() {
   HematoAI.showToast('PDF exportado com sucesso!', 'success');
 });
 
-/* ── Inicializa calendário e lista ── */
-renderCalendario(mesAtual, anoAtual);
-setView('consultas');
-verificarPerfil("Paciente");
+(async () => {
+
+    verificarPerfil("Paciente");
+
+    await carregarConsultas();
+
+    await carregarExames();
+
+    renderCalendario(mesAtual, anoAtual);
+
+    setView("consultas");
+
+})();
 </script>
 </body>
 </html>
