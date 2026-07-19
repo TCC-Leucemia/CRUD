@@ -6,6 +6,7 @@
   <title>HematoAI · Gerenciar Resultados</title>
   <link rel="stylesheet" href="../CSS/navbar.css">
   <style>
+    /* ── Filtros ── */
     .filter-row {
       display: flex;
       gap: 10px;
@@ -30,40 +31,28 @@
       box-shadow: 0 0 0 3px rgba(185,28,28,0.08);
     }
 
-    .status-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 0.72rem;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-    .status-pill::before {
-      content: '';
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
+    /* Badges de suspeita */
+    .badge-suspeita {
       display: inline-block;
-      margin-right: 6px;
+      padding: 2px 12px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 700;
     }
-    .status-pendente { background: #fef3c7; color: #d97706; }
-    .status-pendente::before { background: #d97706; }
-    .status-andamento { background: #dbeafe; color: #2563eb; }
-    .status-andamento::before { background: #2563eb; }
-    .status-finalizado { background: #dcfce7; color: #15803d; }
-    .status-finalizado::before { background: #15803d; }
+    .badge-suspeita.sem       { background: #dcfce7; color: #15803d; }
+    .badge-suspeita.baixa     { background: #dbeafe; color: #2563eb; }
+    .badge-suspeita.moderada  { background: #fef3c7; color: #d97706; }
+    .badge-suspeita.alta      { background: #fee2e2; color: #dc2626; }
 
-    .tipo-badge {
+    .badge-tipo {
       display: inline-block;
-      padding: 3px 10px;
+      padding: 2px 12px;
       border-radius: 20px;
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       font-weight: 700;
+      background: var(--purple-light);
+      color: var(--purple);
     }
-    .tipo-hemograma { background: var(--red-light); color: var(--red); }
-    .tipo-mielograma { background: var(--purple-light); color: var(--purple); }
 
     .detail-grid {
       display: grid;
@@ -95,6 +84,174 @@
       line-height: 1.6;
       margin-bottom: 18px;
     }
+
+    /* ── Painel de exame (somente leitura) ── */
+    .exame-info-panel {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px 18px;
+      margin-bottom: 20px;
+    }
+    .exame-info-panel .grid {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 4px 16px;
+      font-size: 0.85rem;
+    }
+    .exame-info-panel .grid .label {
+      color: var(--text-2);
+      font-weight: 600;
+    }
+    .exame-info-panel .grid .valor {
+      color: var(--text-1);
+      font-weight: 500;
+    }
+    .exame-info-panel .grid .valor.destaque {
+      font-weight: 700;
+      color: var(--red);
+    }
+
+    /* ── Seletor de exame (tabela + pesquisa + resumo) ── */
+    .exame-selector {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      background: var(--bg);
+      margin-top: 4px;
+      margin-bottom: 20px;
+    }
+    .exame-selector .search-wrapper {
+      position: relative;
+      margin-bottom: 12px;
+    }
+    .exame-selector .search-wrapper input {
+      width: 100%;
+      padding: 8px 14px 8px 36px;
+      border: 1.5px solid var(--border);
+      border-radius: 40px;
+      font-size: 0.85rem;
+      background: var(--surface);
+      color: var(--text-1);
+      outline: none;
+      transition: var(--transition);
+    }
+    .exame-selector .search-wrapper input:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(185,28,28,0.08);
+    }
+    .exame-selector .search-wrapper .lupa {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.95rem;
+      color: var(--text-3);
+    }
+
+    .exame-tabela-wrapper {
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: var(--surface);
+    }
+    .exame-tabela-wrapper table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+    }
+    .exame-tabela-wrapper thead {
+      background: var(--bg);
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+    .exame-tabela-wrapper th {
+      padding: 8px 12px;
+      text-align: left;
+      font-weight: 700;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      color: var(--text-2);
+      border-bottom: 1px solid var(--border);
+    }
+    .exame-tabela-wrapper td {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-1);
+      vertical-align: middle;
+    }
+    .exame-tabela-wrapper tr:last-child td { border-bottom: none; }
+    .exame-tabela-wrapper tr.selecionado {
+      background: var(--red-light);
+      border-left: 3px solid var(--red);
+    }
+    .exame-tabela-wrapper tr:hover {
+      background: var(--bg);
+      cursor: pointer;
+    }
+    .exame-tabela-wrapper .btn-selecionar {
+      padding: 2px 12px;
+      font-size: 0.7rem;
+      border-radius: 30px;
+    }
+
+    .resumo-exame {
+      margin-top: 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 12px 16px;
+      display: none;
+    }
+    .resumo-exame.ativo {
+      display: block;
+    }
+    .resumo-exame .grid {
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      gap: 4px 16px;
+      font-size: 0.85rem;
+    }
+    .resumo-exame .grid .label {
+      color: var(--text-2);
+      font-weight: 600;
+    }
+    .resumo-exame .grid .valor {
+      color: var(--text-1);
+      font-weight: 500;
+    }
+    .resumo-exame .grid .valor.destaque {
+      font-weight: 700;
+      color: var(--red);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* ── Modo escuro ── */
+    .dark-mode .badge-suspeita.sem       { background: #064e3b; color: #6ee7b7; }
+    .dark-mode .badge-suspeita.baixa     { background: #1e3a8a; color: #93c5fd; }
+    .dark-mode .badge-suspeita.moderada  { background: #78350f; color: #fcd34d; }
+    .dark-mode .badge-suspeita.alta      { background: #7f1d1d; color: #fca5a5; }
+    .dark-mode .badge-tipo               { background: #4c1d95; color: #c4b5fd; }
+    .dark-mode .exame-info-panel,
+    .dark-mode .exame-selector {
+      background: var(--surface);
+      border-color: var(--border);
+    }
+    .dark-mode .exame-tabela-wrapper {
+      background: var(--surface);
+    }
+    .dark-mode .exame-tabela-wrapper thead {
+      background: var(--bg);
+    }
+    .dark-mode .exame-tabela-wrapper tr.selecionado {
+      background: #1e293b;
+      border-left-color: var(--red);
+    }
   </style>
 </head>
 <body>
@@ -108,7 +265,7 @@
     <div class="page-header">
       <div class="page-header-left">
         <h1>Gerenciar Resultados de Exames</h1>
-        <p>Cadastro e acompanhamento de resultados laboratoriais</p>
+        <p>Cadastro e gerenciamento de resultados laboratoriais</p>
       </div>
       <div class="page-header-right">
         <button class="btn btn-primary" id="btnNovoResultado">Novo Resultado</button>
@@ -121,13 +278,14 @@
           <span class="card-title">Lista de Resultados</span>
           <div class="filter-row">
             <div class="search-bar" style="max-width:260px">
-              <input type="text" id="searchResultado" placeholder="Paciente, CPF ou ID do exame...">
+              <input type="text" id="searchResultado" placeholder="Buscar por ID do exame...">
             </div>
-            <select id="filterStatus" class="filter-select">
-              <option value="">Todos os status</option>
-              <option value="Pendente">Pendente</option>
-              <option value="Em andamento">Em andamento</option>
-              <option value="Finalizado">Finalizado</option>
+            <select id="filterSuspeita" class="filter-select">
+              <option value="">Todas as suspeitas</option>
+              <option value="Sem suspeita">Sem suspeita</option>
+              <option value="Baixa">Baixa</option>
+              <option value="Moderada">Moderada</option>
+              <option value="Alta">Alta</option>
             </select>
             <button class="btn btn-ghost btn-sm" id="btnRecarregar">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -144,12 +302,11 @@
             <thead>
               <tr>
                 <th>ID</th>
-                <th>Paciente</th>
-                <th>CPF</th>
-                <th>Data Consulta</th>
                 <th>ID Exame</th>
+                <th>Resultado</th>
+                <th>Suspeita</th>
                 <th>Tipo</th>
-                <th>Status</th>
+                <th>Data Resultado</th>
                 <th>Ações</th>
               </tr>
             </thead>
@@ -165,7 +322,7 @@
   </div>
 </div>
 
-<!-- Modal Formulário -->
+<!-- ── Modal Formulário ── -->
 <div class="modal-overlay" id="modalResultado">
   <div class="modal modal-lg">
     <div class="modal-header">
@@ -173,32 +330,103 @@
       <button class="btn-close-modal" id="closeModalResultado">✕</button>
     </div>
     <div class="modal-body">
-      <div class="info-box">
-        Os resultados são vinculados a um exame existente. Preencha o ID do exame e os dados do resultado.
+      <div class="info-box" id="infoBox">
+        Selecione um exame para vincular o resultado. Apenas exames do médico logado são exibidos.
       </div>
 
+      <!-- ─── Seletor de Exame ─── -->
+      <div id="exameSelector">
+        <div class="form-group" style="margin-bottom:20px;">
+          <label>Exame *</label>
+          <div class="exame-selector">
+            <div class="search-wrapper">
+              <span class="lupa">🔍</span>
+              <input type="text" id="searchExameSelect" placeholder="Pesquisar por paciente, CPF, ID ou tipo...">
+            </div>
+            <div class="exame-tabela-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Paciente</th>
+                    <th>CPF</th>
+                    <th>Tipo</th>
+                    <th style="width:100px;">Ação</th>
+                  </tr>
+                </thead>
+                <tbody id="tbodyExamesSelect"></tbody>
+              </table>
+            </div>
+            <div class="resumo-exame" id="resumoExame">
+              <div style="font-weight:700;font-size:0.8rem;color:var(--text-2);margin-bottom:6px;">Exame selecionado</div>
+              <div class="grid">
+                <span class="label">ID</span>
+                <span class="valor destaque" id="resumoExameId">—</span>
+                <span class="label">Paciente</span>
+                <span class="valor" id="resumoExamePaciente">—</span>
+                <span class="label">CPF</span>
+                <span class="valor" id="resumoExameCpf">—</span>
+                <span class="label">Tipo</span>
+                <span class="valor" id="resumoExameTipo">—</span>
+                <span class="label">Data</span>
+                <span class="valor" id="resumoExameData">—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── Painel de Exame (Edição) ─── -->
+      <div id="examePanel" class="exame-info-panel hidden">
+        <div style="font-weight:700;font-size:0.85rem;color:var(--text-2);margin-bottom:8px;">Exame vinculado (somente leitura)</div>
+        <div class="grid">
+          <span class="label">ID</span>
+          <span class="valor destaque" id="exameIdDisplay">—</span>
+          <span class="label">Paciente</span>
+          <span class="valor" id="examePacienteDisplay">—</span>
+          <span class="label">CPF</span>
+          <span class="valor" id="exameCpfDisplay">—</span>
+          <span class="label">Tipo</span>
+          <span class="valor" id="exameTipoDisplay">—</span>
+          <span class="label">Data do Exame</span>
+          <span class="valor" id="exameDataDisplay">—</span>
+        </div>
+      </div>
+
+      <!-- ─── Campos editáveis ─── -->
       <div class="form-grid">
         <div class="form-group">
-          <label>ID do Exame *</label>
-          <input type="number" id="rIdExame" placeholder="Ex: 1" min="1">
-        </div>
-        <div class="form-group">
-          <label>Status</label>
-          <select id="rStatus">
-            <option value="Pendente">Pendente</option>
-            <option value="Em andamento">Em andamento</option>
-            <option value="Finalizado">Finalizado</option>
-          </select>
+          <label>Data do Resultado *</label>
+          <input type="date" id="rDataResultado">
         </div>
         <div class="form-group col-span-2">
           <label>Resultado *</label>
-          <textarea id="rResultado" rows="6" placeholder="Descreva o resultado do exame..."></textarea>
+          <textarea id="rResultado" rows="5" placeholder="Descreva o resultado do exame..."></textarea>
         </div>
-        <div class="form-group col-span-2">
-          <label>Observações adicionais</label>
-          <textarea id="rObservacoes" rows="3" placeholder="Observações complementares (opcional)"></textarea>
+        <div class="form-group">
+          <label>Suspeita de Leucemia *</label>
+          <select id="rSuspeita">
+            <option value="">Selecione</option>
+            <option value="Sem suspeita">Sem suspeita</option>
+            <option value="Baixa">Baixa</option>
+            <option value="Moderada">Moderada</option>
+            <option value="Alta">Alta</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Tipo de Leucemia</label>
+          <select id="rTipoLeucemia">
+            <option value="">Selecione</option>
+            <option value="LLA">LLA</option>
+            <option value="LMA">LMA</option>
+            <option value="LLC">LLC</option>
+            <option value="LMC">LMC</option>
+            <option value="Não identificado">Não identificado</option>
+          </select>
         </div>
       </div>
+
+      <input type="hidden" id="rIdExame" value="">
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" id="cancelarResultado">Cancelar</button>
@@ -207,7 +435,7 @@
   </div>
 </div>
 
-<!-- Modal Detalhes -->
+<!-- ── Modal Detalhes ── -->
 <div class="modal-overlay" id="modalDetalhes">
   <div class="modal">
     <div class="modal-header">
@@ -224,85 +452,176 @@
 
 <script src="../JS/navbar.js"></script>
 <script>
-  if (!localStorage.getItem('hematoai_session')) {
-    HematoAI.setSession({ tipo: 'Médico', nome: 'Dr. Usuário', crm: '00000-SP' });
-  }
-  HematoAI.initSidebar('exames-crud');
 
-  // ============================================
-  // DADOS DE DEMONSTRAÇÃO
-  // ============================================
-  
-  // Mapeamento de pacientes (CPF -> Nome)
-  const pacientes = {
-    '11111111111': 'Maria Oliveira',
-    '22222222222': 'Pedro Alves',
-    '33333333333': 'Ana Paula Lima',
-    '44444444444': 'Roberto Santos'
-  };
+  HematoAI.initSidebar('resultados');
 
-  // Mapeamento de exames (ID do exame -> { paciente, tipo, data_consulta })
-  const examesInfo = {
-    1: { cpf: '11111111111', tipo: 'Hemograma', data_consulta: '2025-06-10T08:00:00' },
-    2: { cpf: '11111111111', tipo: 'Mielograma', data_consulta: '2025-06-10T08:00:00' },
-    3: { cpf: '22222222222', tipo: 'Hemograma', data_consulta: '2025-07-01T10:00:00' },
-    4: { cpf: '33333333333', tipo: 'Hemograma', data_consulta: '2025-07-15T14:30:00' }
-  };
+  const token = localStorage.getItem("token");
 
-  let proximoId = 4;
-  let resultados = [
-    { id_resultado: 1, id_exame: 1, statusc: 'Finalizado', resultado: 'Hemograma normal. Todos os parâmetros dentro dos limites de referência.', observacoes: '' },
-    { id_resultado: 2, id_exame: 2, statusc: 'Em andamento', resultado: 'Análise em andamento. Aguardando confirmação dos valores.', observacoes: 'Necessita revisão' },
-    { id_resultado: 3, id_exame: 3, statusc: 'Pendente', resultado: 'Aguardando processamento da amostra.', observacoes: '' },
-  ];
-
+  /* ── Estado ── */
+  let resultados = [];
+  let exames = [];
   let filtrados = [];
   let modoEdicao = false;
   let idEdicao = null;
   let idDetalhe = null;
+  let exameSelecionado = null; // objeto completo do exame selecionado
 
-  // ============================================
-  // FUNÇÕES AUXILIARES
-  // ============================================
-  
-  function getPacientePorExame(idExame) {
-    const info = examesInfo[idExame];
-    if (!info) return { nome: '—', cpf: '—', tipo: '—', data_consulta: null };
-    return {
-      nome: pacientes[info.cpf] || '—',
-      cpf: info.cpf || '—',
-      tipo: info.tipo || '—',
-      data_consulta: info.data_consulta || null
-    };
+  /* ── Helpers ── */
+  function formatarData(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    return d.toLocaleDateString('pt-BR');
+  }
+
+  function formatarDataInput(iso) {
+    if (!iso) return '';
+    const d = new Date(iso);
+    return d.toISOString().split('T')[0];
   }
 
   function formatarCPF(cpf) {
-    if (!cpf || cpf === '—') return '—';
+    if (!cpf) return '—';
     const c = String(cpf).replace(/\D/g, '').padStart(11, '0');
     return c.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
   }
 
-  function formatarDataHora(iso) {
-    if (!iso) return '—';
-    const d = new Date(iso);
-    return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  function badgeSuspeita(suspeita) {
+    const map = {
+      'Sem suspeita': 'sem',
+      'Baixa': 'baixa',
+      'Moderada': 'moderada',
+      'Alta': 'alta'
+    };
+    const classe = map[suspeita] || 'sem';
+    return `<span class="badge-suspeita ${classe}">${suspeita || 'Sem suspeita'}</span>`;
   }
 
-  function statusPill(s) {
-    const map = { 'Pendente': 'pendente', 'Em andamento': 'andamento', 'Finalizado': 'finalizado' };
-    return `<span class="status-pill status-${map[s] || 'pendente'}">${s}</span>`;
+  function badgeTipo(tipo) {
+    if (!tipo || tipo === 'Não identificado') return '—';
+    return `<span class="badge-tipo">${tipo}</span>`;
   }
 
-  function tipoBadge(tipo) {
-    if (tipo === 'Hemograma') return `<span class="tipo-badge tipo-hemograma">Hemograma</span>`;
-    if (tipo === 'Mielograma') return `<span class="tipo-badge tipo-mielograma">Mielograma</span>`;
-    return `<span style="color:var(--text-3)">—</span>`;
+  /* ── API ── */
+  async function carregarResultados() {
+    try {
+      const response = await fetch("http://localhost:3000/resultados-exame", {
+        headers: { Authorization: "Bearer " + token }
+      });
+      const dados = await response.json();
+      if (!dados.status) {
+        HematoAI.showToast(dados.msg || "Erro ao carregar resultados.", "error");
+        return;
+      }
+      resultados = dados.dados || [];
+      aplicarFiltros();
+    } catch (erro) {
+      console.error(erro);
+      HematoAI.showToast("Erro ao conectar ao servidor.", "error");
+    }
   }
 
-  // ============================================
-  // RENDERIZAÇÃO
-  // ============================================
-  
+  async function carregarExames() {
+    try {
+      const response = await fetch("http://localhost:3000/exames", {
+        headers: { Authorization: "Bearer " + token }
+      });
+      const dados = await response.json();
+      if (!dados.status) {
+        HematoAI.showToast(dados.msg || "Erro ao carregar exames.", "error");
+        return;
+      }
+      exames = dados.dados || [];
+      renderizarListaExames();
+    } catch (erro) {
+      console.error(erro);
+      HematoAI.showToast("Erro ao conectar ao servidor.", "error");
+    }
+  }
+
+  /* ── Renderizar lista de exames no seletor ── */
+  function renderizarListaExames(filtro = '') {
+    const tbody = document.getElementById('tbodyExamesSelect');
+    tbody.innerHTML = '';
+
+    const filtroLower = filtro.toLowerCase().trim();
+    let lista = exames;
+
+    if (filtroLower) {
+      lista = exames.filter(e => {
+        return (e.paciente || '').toLowerCase().includes(filtroLower) ||
+               (e.cpf || '').includes(filtroLower) ||
+               String(e.id_exame).includes(filtroLower) ||
+               (e.tipo_exame || '').toLowerCase().includes(filtroLower);
+      });
+    }
+
+    if (lista.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="5" style="text-align:center;padding:20px;color:var(--text-3);">
+            Nenhum exame encontrado.
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    lista.forEach(e => {
+      const tr = document.createElement('tr');
+      const isSelecionado = exameSelecionado && exameSelecionado.id_exame === e.id_exame;
+      if (isSelecionado) tr.classList.add('selecionado');
+
+      tr.innerHTML = `
+        <td style="font-family:var(--font-mono);font-size:0.75rem;">#${e.id_exame}</td>
+        <td style="font-weight:600;">${e.paciente || '—'}</td>
+        <td style="font-family:var(--font-mono);font-size:0.75rem;">${formatarCPF(e.cpf)}</td>
+        <td>${e.tipo_exame || '—'}</td>
+        <td>
+          <button class="btn btn-primary btn-sm btn-selecionar" onclick="selecionarExame(${e.id_exame})">
+            Selecionar
+          </button>
+        </td>
+      `;
+
+      tr.addEventListener('click', (ev) => {
+        if (ev.target.tagName !== 'BUTTON') {
+          selecionarExame(e.id_exame);
+        }
+      });
+
+      tbody.appendChild(tr);
+    });
+  }
+
+  /* ── Selecionar exame ── */
+  function selecionarExame(idExame) {
+    const exame = exames.find(e => e.id_exame === idExame);
+    if (!exame) return;
+
+    exameSelecionado = exame;
+    document.getElementById('rIdExame').value = exame.id_exame;
+
+    // Atualiza resumo
+    document.getElementById('resumoExameId').textContent = '#' + exame.id_exame;
+    document.getElementById('resumoExamePaciente').textContent = exame.paciente || '—';
+    document.getElementById('resumoExameCpf').textContent = formatarCPF(exame.cpf);
+    document.getElementById('resumoExameTipo').textContent = exame.tipo_exame || '—';
+    document.getElementById('resumoExameData').textContent = exame.data_exame ? formatarData(exame.data_exame) : '—';
+
+    const resumoDiv = document.getElementById('resumoExame');
+    resumoDiv.classList.add('ativo');
+
+    // Re-renderiza a lista para destacar
+    const search = document.getElementById('searchExameSelect').value;
+    renderizarListaExames(search);
+  }
+
+  /* ── Event listener da pesquisa de exames ── */
+  document.getElementById('searchExameSelect').addEventListener('input', function() {
+    renderizarListaExames(this.value);
+  });
+
+  /* ── Renderizar tabela de resultados ── */
   function renderTabela(data) {
     const tbody = document.getElementById('tbodyResultados');
     const empty = document.getElementById('emptyState');
@@ -315,16 +634,16 @@
     empty.style.display = 'none';
 
     data.forEach(r => {
-      const paciente = getPacientePorExame(r.id_exame);
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td style="font-family:var(--font-mono);font-size:0.78rem;color:var(--text-3)">#${r.id_resultado}</td>
-        <td style="font-weight:600;font-size:0.85rem">${paciente.nome}</td>
-        <td style="font-family:var(--font-mono);font-size:0.8rem">${formatarCPF(paciente.cpf)}</td>
-        <td style="font-size:0.8rem">${formatarDataHora(paciente.data_consulta)}</td>
         <td style="font-family:var(--font-mono);font-size:0.82rem;color:var(--blue)">#${r.id_exame}</td>
-        <td>${tipoBadge(paciente.tipo)}</td>
-        <td>${statusPill(r.statusc)}</td>
+        <td style="font-size:0.85rem;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+          ${r.resultado_texto || '—'}
+        </td>
+        <td>${badgeSuspeita(r.suspeita_leucemia)}</td>
+        <td>${badgeTipo(r.tipo_leucemia)}</td>
+        <td style="font-size:0.85rem;">${formatarData(r.data_resultado)}</td>
         <td>
           <div class="td-actions">
             <button class="btn btn-ghost btn-sm" onclick="abrirDetalhes(${r.id_resultado})">Ver</button>
@@ -337,166 +656,247 @@
     });
   }
 
-  // ============================================
-  // CARREGAR E FILTRAR
-  // ============================================
-  
-  function carregar() {
-    filtrados = [...resultados];
-    aplicarFiltros();
-  }
-
+  /* ── Filtros ── */
   function aplicarFiltros() {
     const q = document.getElementById('searchResultado').value.toLowerCase();
-    const status = document.getElementById('filterStatus').value;
+    const suspeita = document.getElementById('filterSuspeita').value;
 
     filtrados = resultados.filter(r => {
-      const paciente = getPacientePorExame(r.id_exame);
-      const matchPaciente = paciente.nome.toLowerCase().includes(q) || 
-                           paciente.cpf.includes(q) || 
-                           String(r.id_exame).includes(q);
-      return matchPaciente && (!status || r.statusc === status);
+      const matchId = String(r.id_exame).includes(q);
+      const matchSuspeita = !suspeita || r.suspeita_leucemia === suspeita;
+      return matchId && matchSuspeita;
     });
     renderTabela(filtrados);
   }
 
   document.getElementById('searchResultado').addEventListener('input', aplicarFiltros);
-  document.getElementById('filterStatus').addEventListener('change', aplicarFiltros);
-  document.getElementById('btnRecarregar').addEventListener('click', carregar);
+  document.getElementById('filterSuspeita').addEventListener('change', aplicarFiltros);
+  document.getElementById('btnRecarregar').addEventListener('click', carregarResultados);
 
-  // ============================================
-  // CRUD - ABRIR MODAL
-  // ============================================
-  
-  document.getElementById('btnNovoResultado').addEventListener('click', () => {
+  /* ── Abrir modal novo ── */
+  document.getElementById('btnNovoResultado').addEventListener('click', async () => {
     modoEdicao = false;
     idEdicao = null;
+    exameSelecionado = null;
+
     document.getElementById('modalTitulo').textContent = 'Novo Resultado';
+    document.getElementById('infoBox').style.display = '';
+
+    // Exibe seletor, esconde painel de leitura
+    document.getElementById('exameSelector').classList.remove('hidden');
+    document.getElementById('examePanel').classList.add('hidden');
+
+    // Limpa campos
+    document.getElementById('searchExameSelect').value = '';
     document.getElementById('rIdExame').value = '';
-    document.getElementById('rStatus').value = 'Pendente';
+    document.getElementById('rDataResultado').value = '';
     document.getElementById('rResultado').value = '';
-    document.getElementById('rObservacoes').value = '';
+    document.getElementById('rSuspeita').value = '';
+    document.getElementById('rTipoLeucemia').value = '';
+
+    // Limpa resumo
+    document.getElementById('resumoExame').classList.remove('ativo');
+    document.getElementById('resumoExameId').textContent = '—';
+    document.getElementById('resumoExamePaciente').textContent = '—';
+    document.getElementById('resumoExameCpf').textContent = '—';
+    document.getElementById('resumoExameTipo').textContent = '—';
+    document.getElementById('resumoExameData').textContent = '—';
+
+    // Carrega exames e renderiza lista
+    if (exames.length === 0) {
+      await carregarExames();
+    } else {
+      renderizarListaExames();
+    }
+
     HematoAI.openModal(document.getElementById('modalResultado'));
   });
 
-  // ============================================
-  // CRUD - SALVAR
-  // ============================================
-  
-  document.getElementById('salvarResultado').addEventListener('click', () => {
-    const idExame = parseInt(document.getElementById('rIdExame').value);
-    const status = document.getElementById('rStatus').value;
+  /* ── Salvar ── */
+  document.getElementById('salvarResultado').addEventListener('click', async () => {
+    let idExame;
+    if (modoEdicao) {
+      idExame = parseInt(document.getElementById('rIdExame').value);
+    } else {
+      idExame = parseInt(document.getElementById('rIdExame').value);
+    }
+
+    const dataResultado = document.getElementById('rDataResultado').value;
     const resultado = document.getElementById('rResultado').value.trim();
-    const observacoes = document.getElementById('rObservacoes').value.trim();
+    const suspeita = document.getElementById('rSuspeita').value;
+    const tipo = document.getElementById('rTipoLeucemia').value;
 
     if (!idExame || idExame <= 0) {
-      HematoAI.showToast('ID do exame inválido.', 'error');
+      HematoAI.showToast('Selecione um exame válido.', 'error');
+      return;
+    }
+    if (!dataResultado) {
+      HematoAI.showToast('Selecione a data do resultado.', 'error');
       return;
     }
     if (!resultado) {
       HematoAI.showToast('O resultado é obrigatório.', 'error');
       return;
     }
-
-    // Verifica se o exame existe no mapeamento
-    if (!examesInfo[idExame]) {
-      HematoAI.showToast('Exame não encontrado. Verifique o ID.', 'error');
+    if (!suspeita) {
+      HematoAI.showToast('Selecione a suspeita de leucemia.', 'error');
       return;
     }
 
-    if (modoEdicao) {
-      const idx = resultados.findIndex(x => x.id_resultado === idEdicao);
-      if (idx >= 0) {
-        resultados[idx] = {
-          ...resultados[idx],
-          id_exame: idExame,
-          statusc: status,
-          resultado: resultado,
-          observacoes: observacoes
-        };
-      }
-      HematoAI.showToast('Resultado atualizado com sucesso!', 'success');
-    } else {
-      resultados.push({
-        id_resultado: proximoId++,
-        id_exame: idExame,
-        statusc: status,
-        resultado: resultado,
-        observacoes: observacoes,
-        data_criacao: new Date().toISOString()
-      });
-      HematoAI.showToast('Resultado cadastrado com sucesso!', 'success');
-    }
+    const body = {
+      id_exame: idExame,
+      resultado_texto: resultado,
+      suspeita_leucemia: suspeita,
+      tipo_leucemia: tipo || 'Não identificado',
+      data_resultado: dataResultado
+    };
 
-    HematoAI.closeModal(document.getElementById('modalResultado'));
-    carregar();
+    try {
+      let response;
+      if (modoEdicao) {
+        response = await fetch(`http://localhost:3000/resultados-exame/${idEdicao}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + token
+          },
+          body: JSON.stringify(body)
+        });
+      } else {
+        response = await fetch('http://localhost:3000/resultados-exame', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + token
+          },
+          body: JSON.stringify(body)
+        });
+      }
+
+      const dados = await response.json();
+      if (!dados.status) {
+        HematoAI.showToast(dados.msg || 'Erro ao salvar resultado.', 'error');
+        return;
+      }
+
+      HematoAI.showToast(
+        modoEdicao ? 'Resultado atualizado com sucesso!' : 'Resultado cadastrado com sucesso!',
+        'success'
+      );
+      HematoAI.closeModal(document.getElementById('modalResultado'));
+      await carregarResultados();
+
+    } catch (erro) {
+      console.error(erro);
+      HematoAI.showToast('Erro ao conectar ao servidor.', 'error');
+    }
   });
 
-  // ============================================
-  // CRUD - EDITAR
-  // ============================================
-  
+  /* ── Editar ── */
   function abrirEdicao(id) {
     const r = resultados.find(x => x.id_resultado === id);
     if (!r) return;
 
     modoEdicao = true;
     idEdicao = id;
+
+    // Busca o exame relacionado para preencher o painel
+    const exame = exames.find(e => e.id_exame === r.id_exame);
+
     document.getElementById('modalTitulo').textContent = `Editar Resultado #${id}`;
+    document.getElementById('infoBox').style.display = 'none';
+
+    // Esconde seletor, mostra painel de exame
+    document.getElementById('exameSelector').classList.add('hidden');
+    document.getElementById('examePanel').classList.remove('hidden');
+
+    // Preenche painel
+    document.getElementById('exameIdDisplay').textContent = `#${r.id_exame}`;
+    document.getElementById('examePacienteDisplay').textContent = exame?.paciente || '—';
+    document.getElementById('exameCpfDisplay').textContent = exame?.cpf ? formatarCPF(exame.cpf) : '—';
+    document.getElementById('exameTipoDisplay').textContent = exame?.tipo_exame || '—';
+    document.getElementById('exameDataDisplay').textContent = exame?.data_exame ? formatarData(exame.data_exame) : '—';
+
+    // Guarda id_exame no hidden
     document.getElementById('rIdExame').value = r.id_exame;
-    document.getElementById('rStatus').value = r.statusc;
-    document.getElementById('rResultado').value = r.resultado;
-    document.getElementById('rObservacoes').value = r.observacoes || '';
+
+    // Preenche campos editáveis
+    document.getElementById('rDataResultado').value = formatarDataInput(r.data_resultado);
+    document.getElementById('rResultado').value = r.resultado_texto || '';
+    document.getElementById('rSuspeita').value = r.suspeita_leucemia || '';
+    document.getElementById('rTipoLeucemia').value = r.tipo_leucemia || '';
+
     HematoAI.openModal(document.getElementById('modalResultado'));
   }
 
-  // ============================================
-  // CRUD - DETALHES
-  // ============================================
-  
+  /* ── Detalhes ── */
   function abrirDetalhes(id) {
     idDetalhe = id;
     const r = resultados.find(x => x.id_resultado === id);
-
     if (!r) {
       document.getElementById('detalheBody').innerHTML = '<p style="color:var(--red);padding:20px">Resultado não encontrado.</p>';
-    } else {
-      const paciente = getPacientePorExame(r.id_exame);
-      document.getElementById('detalheBody').innerHTML = `
-        <div class="detail-grid">
-          <span class="detail-key">ID</span>
-          <span class="detail-value" style="font-family:var(--font-mono)">#${r.id_resultado}</span>
-          <span class="detail-key">Paciente</span>
-          <span class="detail-value" style="font-weight:600">${paciente.nome}</span>
-          <span class="detail-key">CPF</span>
-          <span class="detail-value" style="font-family:var(--font-mono)">${formatarCPF(paciente.cpf)}</span>
-          <span class="detail-key">Data da Consulta</span>
-          <span class="detail-value">${formatarDataHora(paciente.data_consulta)}</span>
-          <span class="detail-key">ID Exame</span>
-          <span class="detail-value" style="font-family:var(--font-mono);color:var(--blue)">#${r.id_exame}</span>
-          <span class="detail-key">Tipo de Exame</span>
-          <span class="detail-value">${tipoBadge(paciente.tipo)}</span>
-          <span class="detail-key">Status</span>
-          <span class="detail-value">${statusPill(r.statusc)}</span>
-          <span class="detail-key">Resultado</span>
-          <span class="detail-value"><div class="resultado-texto">${r.resultado}</div></span>
-          ${r.observacoes ? `
-            <span class="detail-key">Observações</span>
-            <span class="detail-value"><div class="resultado-texto" style="min-height:auto;background:var(--yellow-light);border-color:#fde68a;">${r.observacoes}</div></span>
-          ` : ''}
-          <span class="detail-key">Data</span>
-          <span class="detail-value">${formatarDataHora(r.data_criacao)}</span>
-        </div>
-      `;
+      HematoAI.openModal(document.getElementById('modalDetalhes'));
+      return;
     }
 
+    const exame = exames.find(e => e.id_exame === r.id_exame);
+
+    let html = '';
+
+    // Dados do Paciente
+    if (exame) {
+      html += `
+        <div class="exame-info-panel" style="margin-bottom:14px;">
+          <div style="font-weight:700;font-size:0.85rem;color:var(--text-2);margin-bottom:8px;">Dados do Paciente</div>
+          <div class="grid">
+            <span class="label">Nome</span>
+            <span class="valor" style="font-weight:600;">${exame.paciente || '—'}</span>
+            <span class="label">CPF</span>
+            <span class="valor">${exame.cpf ? formatarCPF(exame.cpf) : '—'}</span>
+          </div>
+        </div>
+      `;
+
+      // Dados do Exame
+      html += `
+        <div class="exame-info-panel" style="margin-bottom:14px;">
+          <div style="font-weight:700;font-size:0.85rem;color:var(--text-2);margin-bottom:8px;">Dados do Exame</div>
+          <div class="grid">
+            <span class="label">ID do Exame</span>
+            <span class="valor destaque">#${exame.id_exame}</span>
+            <span class="label">Tipo</span>
+            <span class="valor">${exame.tipo_exame || '—'}</span>
+            <span class="label">Data da Consulta</span>
+            <span class="valor">${exame.data_consulta ? formatarData(exame.data_consulta) : '—'}</span>
+          </div>
+        </div>
+      `;
+    } else {
+      html += `<div class="exame-info-panel" style="margin-bottom:14px;">
+        <span style="color:var(--text-3);">Dados do exame não disponíveis.</span>
+      </div>`;
+    }
+
+    // Resultado
+    html += `
+      <div class="detail-grid">
+        <span class="detail-key">ID do Resultado</span>
+        <span class="detail-value" style="font-family:var(--font-mono)">#${r.id_resultado}</span>
+        <span class="detail-key">Resultado</span>
+        <span class="detail-value"><div class="resultado-texto">${r.resultado_texto || '—'}</div></span>
+        <span class="detail-key">Suspeita de Leucemia</span>
+        <span class="detail-value">${badgeSuspeita(r.suspeita_leucemia)}</span>
+        <span class="detail-key">Tipo de Leucemia</span>
+        <span class="detail-value">${badgeTipo(r.tipo_leucemia)}</span>
+        <span class="detail-key">Data do Resultado</span>
+        <span class="detail-value">${formatarData(r.data_resultado)}</span>
+      </div>
+    `;
+
+    document.getElementById('detalheBody').innerHTML = html;
     HematoAI.openModal(document.getElementById('modalDetalhes'));
   }
 
-  // ============================================
-  // FECHAR MODAIS
-  // ============================================
-  
   document.getElementById('closeModalDetalhes').addEventListener('click', () => HematoAI.closeModal(document.getElementById('modalDetalhes')));
   document.getElementById('fecharDetalhes').addEventListener('click', () => HematoAI.closeModal(document.getElementById('modalDetalhes')));
   document.getElementById('editarDetalhe').addEventListener('click', () => {
@@ -504,38 +904,43 @@
     if (idDetalhe) abrirEdicao(idDetalhe);
   });
 
-  // ============================================
-  // CRUD - EXCLUIR
-  // ============================================
-  
+  /* ── Excluir ── */
   function confirmarExclusao(id) {
     HematoAI.confirmDialog(
       `Deseja excluir o resultado <strong>#${id}</strong>?<br>Esta ação não pode ser desfeita.`,
-      () => {
-        resultados = resultados.filter(x => x.id_resultado !== id);
-        HematoAI.showToast('Resultado excluído com sucesso.', 'success');
-        carregar();
+      async () => {
+        try {
+          const response = await fetch(`http://localhost:3000/resultados-exame/${id}`, {
+            method: 'DELETE',
+            headers: { Authorization: 'Bearer ' + token }
+          });
+          const dados = await response.json();
+          if (!dados.status) {
+            HematoAI.showToast(dados.msg || 'Erro ao excluir resultado.', 'error');
+            return;
+          }
+          HematoAI.showToast('Resultado excluído com sucesso.', 'success');
+          await carregarResultados();
+        } catch (erro) {
+          console.error(erro);
+          HematoAI.showToast('Erro ao conectar ao servidor.', 'error');
+        }
       }
     );
   }
 
-  // ============================================
-  // FECHAR MODAIS
-  // ============================================
-  
-  ['closeModalResultado','cancelarResultado'].forEach(id => {
+  /* ── Fechar modal de formulário ── */
+  ['closeModalResultado', 'cancelarResultado'].forEach(id => {
     document.getElementById(id).addEventListener('click', () => HematoAI.closeModal(document.getElementById('modalResultado')));
   });
   document.getElementById('modalResultado').addEventListener('click', e => {
     if (e.target === document.getElementById('modalResultado')) HematoAI.closeModal(document.getElementById('modalResultado'));
   });
 
-  // ============================================
-  // INICIALIZAÇÃO
-  // ============================================
-  
-  carregar();
-  verificarPerfil("Médico");
+  /* ── Init ── */
+  carregarResultados();
+  carregarExames();
+  verificarPerfil('Médico');
 </script>
 </body>
 </html>

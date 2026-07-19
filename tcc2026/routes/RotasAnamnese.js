@@ -34,6 +34,12 @@ module.exports = (app, banco) => {
         middleware.validateId,
         control.show
     );
+    app.get(
+        "/anamnese/consulta/:id_consulta",
+        jwt.validateToken,
+        role.authorize("Médico"),
+        control.findByConsulta
+    );
 
     app.put(
         "/anamnese/:id_anamnese",

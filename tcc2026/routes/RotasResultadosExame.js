@@ -25,6 +25,12 @@ module.exports = (app, banco) => {
         role.authorize("Médico", "Paciente"),
         control.index
     );
+    app.get(
+        "/resultados-exame/exame/:id_exame",
+        jwt.validateToken,
+        role.authorize("Médico", "Paciente"),
+        control.showByExame
+    );
 
     app.get(
         "/resultados-exame/:id_resultado",

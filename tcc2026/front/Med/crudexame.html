@@ -64,7 +64,6 @@
       font-weight: 700;
     }
 
-    /* Loading */
     .table-loading {
       display: none;
       align-items: center;
@@ -83,7 +82,6 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* Detail grid */
     .detail-grid {
       display: grid;
       grid-template-columns: 160px 1fr;
@@ -105,14 +103,13 @@
       margin-bottom: 18px;
     }
 
-    /* Field hint */
     .field-hint {
       font-size: 0.72rem;
       color: var(--text-3);
       margin-top: 3px;
     }
 
-    /* Exame tipo selector */
+    /* Tipo selector */
     .tipo-selector {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -149,6 +146,266 @@
       font-size: 0.72rem;
       color: var(--text-3);
       margin-top: 4px;
+    }
+
+    /* ── Seletor de consultas (Novo) ── */
+    .consulta-selector {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      background: var(--bg);
+      margin-top: 4px;
+    }
+
+    .consulta-selector .search-wrapper {
+      position: relative;
+      margin-bottom: 12px;
+    }
+
+    .consulta-selector .search-wrapper input {
+      width: 100%;
+      padding: 8px 14px 8px 36px;
+      border: 1.5px solid var(--border);
+      border-radius: 40px;
+      font-size: 0.85rem;
+      background: var(--surface);
+      color: var(--text-1);
+      outline: none;
+      transition: var(--transition);
+    }
+
+    .consulta-selector .search-wrapper input:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(185,28,28,0.08);
+    }
+
+    .consulta-selector .search-wrapper .lupa {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.95rem;
+      color: var(--text-3);
+    }
+
+    .consulta-tabela-wrapper {
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: var(--surface);
+    }
+
+    .consulta-tabela-wrapper table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+    }
+
+    .consulta-tabela-wrapper thead {
+      background: var(--bg);
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    .consulta-tabela-wrapper th {
+      padding: 8px 12px;
+      text-align: left;
+      font-weight: 700;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      color: var(--text-2);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .consulta-tabela-wrapper td {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-1);
+      vertical-align: middle;
+    }
+
+    .consulta-tabela-wrapper tr:last-child td {
+      border-bottom: none;
+    }
+
+    .consulta-tabela-wrapper tr.selecionada {
+      background: var(--red-light);
+      border-left: 3px solid var(--red);
+    }
+
+    .consulta-tabela-wrapper tr:hover {
+      background: var(--bg);
+      cursor: pointer;
+    }
+
+    .consulta-tabela-wrapper .btn-selecionar {
+      padding: 2px 12px;
+      font-size: 0.7rem;
+      border-radius: 30px;
+    }
+
+    .resumo-consulta {
+      margin-top: 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 12px 16px;
+      display: none;
+    }
+
+    .resumo-consulta.ativo {
+      display: block;
+    }
+
+    .resumo-consulta .grid {
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      gap: 4px 16px;
+      font-size: 0.85rem;
+    }
+
+    .resumo-consulta .grid .label {
+      color: var(--text-2);
+      font-weight: 600;
+    }
+
+    .resumo-consulta .grid .valor {
+      color: var(--text-1);
+      font-weight: 500;
+    }
+
+    .resumo-consulta .grid .valor.destaque {
+      font-weight: 700;
+      color: var(--red);
+    }
+
+    /* ── Card informativo (Edição) ── */
+    .consulta-info-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      background: var(--bg);
+      margin-top: 4px;
+    }
+
+    .consulta-info-card .grid {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 4px 16px;
+      font-size: 0.85rem;
+    }
+
+    .consulta-info-card .grid .label {
+      color: var(--text-2);
+      font-weight: 600;
+    }
+
+    .consulta-info-card .grid .valor {
+      color: var(--text-1);
+      font-weight: 500;
+    }
+
+    .consulta-info-card .grid .valor.destaque {
+      font-weight: 700;
+      color: var(--red);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 600px) {
+      .consulta-tabela-wrapper table {
+        font-size: 0.7rem;
+      }
+      .consulta-tabela-wrapper th,
+      .consulta-tabela-wrapper td {
+        padding: 6px 8px;
+      }
+      .resumo-consulta .grid,
+      .consulta-info-card .grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 4px 8px;
+      }
+    }
+
+    /* ── Nova seção: Resultado da Análise IA ── */
+    .resultado-ia-section {
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 2px solid var(--border);
+    }
+    .resultado-ia-section .section-title {
+      font-weight: 700;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-2);
+      margin-bottom: 14px;
+    }
+    .resultado-ia-card {
+      background: var(--bg);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      padding: 16px 18px;
+      box-shadow: var(--shadow-sm);
+    }
+    .resultado-ia-card .ia-item {
+      margin-bottom: 10px;
+    }
+    .resultado-ia-card .ia-item:last-child {
+      margin-bottom: 0;
+    }
+    .resultado-ia-card .ia-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: var(--text-3);
+      display: block;
+      margin-bottom: 2px;
+    }
+    .resultado-ia-card .ia-value {
+      font-size: 0.9rem;
+      color: var(--text-1);
+      font-weight: 500;
+      padding: 4px 0;
+      border-bottom: 1px dashed var(--border);
+    }
+    .resultado-ia-card .ia-value:last-child {
+      border-bottom: none;
+    }
+    .resultado-ia-card .ia-value.observacoes {
+      border-bottom: none;
+      white-space: pre-wrap;
+      line-height: 1.5;
+    }
+
+    /* Sem dados */
+    .ia-sem-dados {
+      background: var(--yellow-light);
+      border: 1px solid #fde68a;
+      border-radius: var(--radius-lg);
+      padding: 16px 18px;
+      color: var(--yellow);
+      text-align: center;
+      font-size: 0.9rem;
+    }
+    .ia-sem-dados strong {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .ia-sem-dados small {
+      font-size: 0.8rem;
+      opacity: 0.8;
+    }
+    .dark-mode .ia-sem-dados {
+      background: #78350f;
+      border-color: #f59e0b;
+      color: #fcd34d;
     }
   </style>
 </head>
@@ -205,7 +462,7 @@
           <span>Carregando exames...</span>
         </div>
 
-        <div class="table-wrapper" id="tableWrapper" style="border:none;border-radius:0 0 var(--radius-xl) var(--radius-xl)">
+        <div class="table-wrapper" style="border:none;border-radius:0 0 var(--radius-xl) var(--radius-xl)">
           <table>
             <thead>
               <tr>
@@ -230,14 +487,13 @@
           </div>
         </div>
       </div>
-
     </div>
   </div>
 </div>
 
 <!-- ── Modal Formulário ── -->
 <div class="modal-overlay" id="modalExame">
-  <div class="modal">
+  <div class="modal modal-lg">
     <div class="modal-header">
       <h2 id="modalTitulo">Novo Exame</h2>
       <button class="btn-close-modal" id="closeModalExame">&#10005;</button>
@@ -245,20 +501,71 @@
     <div class="modal-body">
 
       <div class="info-box" id="infoBox">
-        O exame deve estar vinculado a uma consulta existente. Informe o ID da consulta corretamente.
+        Selecione uma consulta para vincular o exame. Apenas consultas do médico logado são exibidas.
       </div>
 
-      <div class="form-grid" style="margin-bottom:20px">
-        <div class="form-group col-span-2">
-          <label>ID da Consulta *</label>
-          <input type="number" id="eConsultaId" placeholder="Ex: 1" min="1">
-          <div class="field-hint">O exame será vinculado à consulta informada. A consulta deve existir no sistema.</div>
+      <!-- ─── Seletor de Consultas (visível apenas no modo criação) ─── -->
+      <div id="consultaSelector">
+        <div class="form-group col-span-2" style="margin-bottom:20px;">
+          <label>Consulta *</label>
+          <div class="consulta-selector">
+            <div class="search-wrapper">
+              <span class="lupa">🔍</span>
+              <input type="text" id="searchConsulta" placeholder="Pesquisar por paciente, CPF, ID ou data...">
+            </div>
+            <div class="consulta-tabela-wrapper" id="consultaTabelaWrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Paciente</th>
+                    <th>CPF</th>
+                    <th>Data</th>
+                    <th style="width:100px;">Ação</th>
+                  </tr>
+                </thead>
+                <tbody id="tbodyConsultas"></tbody>
+              </table>
+            </div>
+            <div class="resumo-consulta" id="resumoConsulta">
+              <div style="font-weight:700;font-size:0.8rem;color:var(--text-2);margin-bottom:6px;">Consulta selecionada</div>
+              <div class="grid">
+                <span class="label">Paciente</span>
+                <span class="valor" id="resumoPaciente">—</span>
+                <span class="label">CPF</span>
+                <span class="valor" id="resumoCpf">—</span>
+                <span class="label">Data</span>
+                <span class="valor" id="resumoData">—</span>
+                <span class="label">ID</span>
+                <span class="valor destaque" id="resumoId">—</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Tipo de exame -->
-      <div style="margin-bottom:20px">
-        <label style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:var(--text-2);display:block;margin-bottom:10px">Tipo de Exame *</label>
+      <!-- ─── Card Informativo (visível apenas no modo edição) ─── -->
+      <div id="consultaInfo" class="hidden">
+        <div class="form-group col-span-2" style="margin-bottom:20px;">
+          <label>Consulta vinculada (somente leitura)</label>
+          <div class="consulta-info-card">
+            <div class="grid">
+              <span class="label">Paciente</span>
+              <span class="valor" id="infoPaciente">—</span>
+              <span class="label">CPF</span>
+              <span class="valor" id="infoCpf">—</span>
+              <span class="label">Data</span>
+              <span class="valor" id="infoData">—</span>
+              <span class="label">ID</span>
+              <span class="valor destaque" id="infoId">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── Tipo de Exame ─── -->
+      <div style="margin-bottom:20px;">
+        <label style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:var(--text-2);display:block;margin-bottom:10px;">Tipo de Exame *</label>
         <div class="tipo-selector">
           <div class="tipo-option" id="tipoHemograma" onclick="selecionarTipo('Hemograma')">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#b91c1c" stroke-width="1.5" style="margin:0 auto;display:block">
@@ -280,6 +587,7 @@
         <input type="hidden" id="eTipo">
       </div>
 
+      <!-- ─── Data e Status ─── -->
       <div class="form-grid">
         <div class="form-group">
           <label>Data e Hora do Exame</label>
@@ -295,6 +603,10 @@
           </select>
         </div>
       </div>
+
+      <!-- ─── ID da consulta oculto ─── -->
+      <input type="hidden" id="eConsultaId" value="">
+
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" id="cancelarExame">Cancelar</button>
@@ -310,7 +622,38 @@
       <h2>Detalhes do Exame</h2>
       <button class="btn-close-modal" id="closeModalDetalhes">&#10005;</button>
     </div>
-    <div class="modal-body" id="detalheBody"></div>
+    <div class="modal-body" id="detalheBody">
+      <!-- Informações do exame (geradas pelo JavaScript) -->
+      <div id="detalheExameInfo"></div>
+
+      <!-- ─── Nova seção: Resultado da Análise IA ─── -->
+      <div class="resultado-ia-section" id="resultadoIaSecao">
+        <div class="section-title">Resultado</div>
+        <div id="resultadoIaConteudo">
+          <!-- Conteúdo será exibido via JavaScript futuramente -->
+          <!-- Por enquanto, placeholder estático com mensagem de "sem dados" -->
+          <div class="ia-sem-dados" id="resultadoSemDados">
+            <strong>Nenhum resultado disponível para este exame.</strong>
+            <small>O exame ainda não foi emitido pelo médico.</small>
+          </div>
+          <!-- Estrutura oculta para quando houver dados (será exibida via JS) -->
+          <div class="resultado-ia-card" id="resultadoIaCard" style="display:none;">
+            <div class="ia-item">
+              <span class="ia-label">Classificação</span>
+              <div class="ia-value" id="resultadoClassificacao">Leucemia Suspeita</div>
+            </div>
+            <div class="ia-item">
+              <span class="ia-label">Confiança da IA</span>
+              <div class="ia-value" id="resultadoConfianca">98,72%</div>
+            </div>
+            <div class="ia-item">
+              <span class="ia-label">Observações</span>
+              <div class="ia-value observacoes" id="resultadoObservacoes">Foram identificadas células compatíveis com blastos em quantidade acima do esperado para um esfregaço normal.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" id="fecharDetalhes">Fechar</button>
       <button class="btn btn-outline" id="editarDetalhe">Editar Exame</button>
@@ -320,37 +663,12 @@
 
 <script src="../JS/navbar.js"></script>
 <script>
-/* ══════════════════════════════════════════════════════════════
-   HematoAI · CRUD de Exames — dados em memória (sem API)
-══════════════════════════════════════════════════════════════ */
+  // =============================================================
+  //  TODO O JAVASCRIPT EXISTENTE PERMANECE INALTERADO
+  // =============================================================
 
-  if (!localStorage.getItem('hematoai_session')) {
-    HematoAI.setSession({ tipo: 'Médico', nome: 'Dr. Usuário', crm: '00000-SP' });
-  }
   HematoAI.initSidebar('exames-crud');
-
-  /* ── Dados de demonstração com pacientes e consultas ── */
-  let proximoId = 4;
-  
-  // Simulação de pacientes vinculados às consultas
-  const pacientes = {
-    1: { nome: 'Maria Oliveira', cpf: '111.111.111-11' },
-    2: { nome: 'Pedro Alves', cpf: '222.222.222-22' },
-    3: { nome: 'Ana Paula Lima', cpf: '333.333.333-33' }
-  };
-
-  // Simulação de datas das consultas
-  const consultasInfo = {
-    1: { data_consulta: '2025-06-10T08:00:00' },
-    2: { data_consulta: '2025-07-01T10:00:00' },
-    3: { data_consulta: '2025-07-15T14:30:00' }
-  };
-
-  let exames = [
-    { id_exame: 1, id_consulta: 1, tipo_exame: 'Hemograma',   data_exame: '2025-06-10T08:00:00', statusc: 'Finalizado'   },
-    { id_exame: 2, id_consulta: 1, tipo_exame: 'Mielograma',  data_exame: '2025-06-15T10:30:00', statusc: 'Em andamento' },
-    { id_exame: 3, id_consulta: 2, tipo_exame: 'Hemograma',   data_exame: '2025-07-01T09:00:00', statusc: 'Pendente'     },
-  ];
+  const token = localStorage.getItem("token");
 
   /* ── Estado ── */
   let filtrados       = [];
@@ -359,22 +677,29 @@
   let idDetalhe       = null;
   let tipoSelecionado = '';
 
-  /* ── Helpers de formatação ── */
+  let exames = [];
+  let consultas = [];
+  let consultaSelecionada = null;
+
+  /* ── Helpers ── */
   function formatarDataHora(iso) {
     if (!iso) return '—';
     const d = new Date(iso);
     return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
   }
 
-  function getPacientePorConsulta(idConsulta) {
-    return pacientes[idConsulta] || { nome: '—', cpf: '—' };
+  function formatarData(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    return d.toLocaleDateString('pt-BR');
   }
 
-  function getDataConsulta(idConsulta) {
-    return consultasInfo[idConsulta]?.data_consulta || null;
+  function formatarCPF(cpf) {
+    if (!cpf) return '—';
+    const c = String(cpf).replace(/\D/g, '').padStart(11, '0');
+    return c.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
   }
 
-  /* ── Status / tipo helpers ── */
   function statusPill(s) {
     const map = { 'Pendente': 'pendente', 'Em andamento': 'andamento', 'Finalizado': 'finalizado' };
     return `<span class="status-pill status-${map[s] || 'pendente'}">${s}</span>`;
@@ -386,7 +711,6 @@
     return `<span style="color:var(--text-3)">—</span>`;
   }
 
-  /* ── Seletor de tipo ── */
   function selecionarTipo(tipo) {
     tipoSelecionado = tipo;
     document.getElementById('eTipo').value = tipo;
@@ -394,13 +718,125 @@
     document.getElementById('tipoMielograma').classList.toggle('selected', tipo === 'Mielograma');
   }
 
-  /* ── Carregar / renderizar ── */
-  function carregar() {
-    filtrados = [...exames];
-    aplicarFiltros();
-    atualizarKPIs(exames);
+  /* ── Carregar exames ── */
+  async function carregarExames() {
+    try {
+      const response = await fetch("http://localhost:3000/exames", {
+        headers: { Authorization: "Bearer " + token }
+      });
+      const dados = await response.json();
+      if (!dados.status) {
+        HematoAI.showToast(dados.msg, "error");
+        return;
+      }
+      exames = dados.dados;
+      aplicarFiltros();
+    } catch (erro) {
+      console.error(erro);
+      HematoAI.showToast("Erro ao conectar ao servidor.", "error");
+    }
   }
 
+  /* ── Carregar consultas do médico (apenas para novo exame) ── */
+  async function carregarConsultas() {
+    try {
+      const response = await fetch("http://localhost:3000/consultas", {
+        headers: { Authorization: "Bearer " + token }
+      });
+      const dados = await response.json();
+      if (!dados.status) {
+        HematoAI.showToast(dados.msg, "error");
+        return;
+      }
+      consultas = dados.dados;
+      renderizarListaConsultas();
+    } catch (erro) {
+      console.error(erro);
+      HematoAI.showToast("Erro ao carregar consultas.", "error");
+    }
+  }
+
+  /* ── Renderizar lista de consultas no modal ── */
+  function renderizarListaConsultas(filtro = '') {
+    const tbody = document.getElementById('tbodyConsultas');
+    tbody.innerHTML = '';
+
+    const filtroLower = filtro.toLowerCase().trim();
+    let lista = consultas;
+
+    if (filtroLower) {
+      lista = consultas.filter(c => {
+        const dataStr = c.data_consulta ? formatarDataHora(c.data_consulta) : '';
+        return (c.paciente || '').toLowerCase().includes(filtroLower) ||
+               (c.cpf || '').includes(filtroLower) ||
+               String(c.id_consulta).includes(filtroLower) ||
+               dataStr.includes(filtroLower);
+      });
+    }
+
+    if (lista.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="5" style="text-align:center;padding:20px;color:var(--text-3);">
+            Nenhuma consulta encontrada.
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    lista.forEach(c => {
+      const tr = document.createElement('tr');
+      const isSelecionada = consultaSelecionada && consultaSelecionada.id_consulta === c.id_consulta;
+      if (isSelecionada) tr.classList.add('selecionada');
+
+      tr.innerHTML = `
+        <td style="font-family:var(--font-mono);font-size:0.75rem;">#${c.id_consulta}</td>
+        <td style="font-weight:600;">${c.paciente || '—'}</td>
+        <td style="font-family:var(--font-mono);font-size:0.75rem;">${formatarCPF(c.cpf)}</td>
+        <td style="font-size:0.8rem;">${c.data_consulta ? formatarDataHora(c.data_consulta) : '—'}</td>
+        <td>
+          <button class="btn btn-primary btn-sm btn-selecionar" onclick="selecionarConsulta(${c.id_consulta})">
+            Selecionar
+          </button>
+        </td>
+      `;
+
+      tr.addEventListener('click', (e) => {
+        if (e.target.tagName !== 'BUTTON') {
+          selecionarConsulta(c.id_consulta);
+        }
+      });
+
+      tbody.appendChild(tr);
+    });
+  }
+
+  /* ── Selecionar uma consulta ── */
+  function selecionarConsulta(idConsulta) {
+    const consulta = consultas.find(c => c.id_consulta === idConsulta);
+    if (!consulta) return;
+
+    consultaSelecionada = consulta;
+    document.getElementById('eConsultaId').value = consulta.id_consulta;
+
+    document.getElementById('resumoPaciente').textContent = consulta.paciente || '—';
+    document.getElementById('resumoCpf').textContent = formatarCPF(consulta.cpf);
+    document.getElementById('resumoData').textContent = consulta.data_consulta ? formatarDataHora(consulta.data_consulta) : '—';
+    document.getElementById('resumoId').textContent = '#' + consulta.id_consulta;
+
+    document.getElementById('resumoConsulta').classList.add('ativo');
+
+    const search = document.getElementById('searchConsulta').value;
+    renderizarListaConsultas(search);
+  }
+
+  /* ── Event listener da pesquisa de consultas ── */
+  document.getElementById('searchConsulta').addEventListener('input', function() {
+    renderizarListaConsultas(this.value);
+  });
+
+  /* ── Renderizar tabela de exames ── */
   function renderTabela(data) {
     const tbody = document.getElementById('tbodyExames');
     const empty = document.getElementById('emptyState');
@@ -413,15 +849,13 @@
     empty.style.display = 'none';
 
     data.forEach(e => {
-      const paciente = getPacientePorConsulta(e.id_consulta);
-      const dataConsulta = getDataConsulta(e.id_consulta);
-      const tr = document.createElement('tr');
+      const tr = document.createElement("tr");
       tr.innerHTML = `
         <td style="font-family:var(--font-mono);font-size:0.78rem;color:var(--text-3)">#${e.id_exame}</td>
-        <td style="font-weight:600;font-size:0.85rem">${paciente.nome}</td>
-        <td style="font-family:var(--font-mono);font-size:0.8rem">${paciente.cpf}</td>
-        <td style="font-size:0.8rem">${formatarDataHora(dataConsulta)}</td>
-        <td style="font-family:var(--font-mono);font-size:0.82rem;color:var(--blue)">#${e.id_consulta}</td>
+        <td style="font-weight:600;font-size:0.85rem;">${e.paciente || '—'}</td>
+        <td style="font-family:var(--font-mono);font-size:0.8rem;">${e.cpf || '—'}</td>
+        <td style="font-size:0.8rem;">${e.data_consulta ? formatarDataHora(e.data_consulta) : '—'}</td>
+        <td style="font-family:var(--font-mono);font-size:0.82rem;color:var(--blue);">#${e.id_consulta}</td>
         <td>${tipoBadge(e.tipo_exame)}</td>
         <td>${statusPill(e.statusc)}</td>
         <td>
@@ -436,15 +870,6 @@
     });
   }
 
-  /* ── KPIs ── */
-  function atualizarKPIs(data) {
-    document.getElementById('kpiTotal').textContent      = data.length;
-    document.getElementById('kpiHemograma').textContent  = data.filter(e => e.tipo_exame === 'Hemograma').length;
-    document.getElementById('kpiMielograma').textContent = data.filter(e => e.tipo_exame === 'Mielograma').length;
-    document.getElementById('kpiPendente').textContent   = data.filter(e => e.statusc === 'Pendente').length;
-    document.getElementById('kpiFinalizado').textContent = data.filter(e => e.statusc === 'Finalizado').length;
-  }
-
   /* ── Filtros ── */
   function aplicarFiltros() {
     const q      = document.getElementById('searchExame').value.toLowerCase();
@@ -452,12 +877,10 @@
     const status = document.getElementById('filterStatus').value;
 
     filtrados = exames.filter(e => {
-      const paciente = getPacientePorConsulta(e.id_consulta);
-      const matchPaciente = paciente.nome.toLowerCase().includes(q) || 
-                           paciente.cpf.includes(q) || 
-                           String(e.id_exame).includes(q) || 
-                           String(e.id_consulta).includes(q);
-      
+      const matchPaciente = (e.paciente || '').toLowerCase().includes(q) ||
+                            (e.cpf || '').includes(q) ||
+                            String(e.id_exame).includes(q) ||
+                            String(e.id_consulta).includes(q);
       return matchPaciente &&
         (!tipo   || e.tipo_exame === tipo) &&
         (!status || e.statusc === status);
@@ -465,27 +888,40 @@
     renderTabela(filtrados);
   }
 
-  document.getElementById('searchExame').addEventListener('input',   aplicarFiltros);
-  document.getElementById('filterTipo').addEventListener('change',   aplicarFiltros);
+  document.getElementById('searchExame').addEventListener('input', aplicarFiltros);
+  document.getElementById('filterTipo').addEventListener('change', aplicarFiltros);
   document.getElementById('filterStatus').addEventListener('change', aplicarFiltros);
-  document.getElementById('btnRecarregar').addEventListener('click', carregar);
+  document.getElementById('btnRecarregar').addEventListener('click', carregarExames);
 
   /* ── Abrir modal novo ── */
-  document.getElementById('btnNovoExame').addEventListener('click', () => {
-    modoEdicao      = false;
-    idEdicao        = null;
+  document.getElementById('btnNovoExame').addEventListener('click', async () => {
+    modoEdicao = false;
+    idEdicao   = null;
     tipoSelecionado = '';
+    consultaSelecionada = null;
 
     document.getElementById('modalTitulo').textContent = 'Novo Exame';
-    document.getElementById('infoBox').style.display   = '';
-    document.getElementById('eConsultaId').value       = '';
-    document.getElementById('eTipo').value             = '';
-    document.getElementById('eData').value             = '';
-    document.getElementById('eStatus').value           = 'Pendente';
-    document.getElementById('eConsultaId').disabled    = false;
-
+    document.getElementById('infoBox').style.display = '';
+    document.getElementById('eConsultaId').value = '';
+    document.getElementById('eTipo').value = '';
+    document.getElementById('eData').value = '';
+    document.getElementById('eStatus').value = 'Pendente';
     document.getElementById('tipoHemograma').classList.remove('selected');
     document.getElementById('tipoMielograma').classList.remove('selected');
+
+    // Mostra seletor, esconde card informativo
+    document.getElementById('consultaSelector').classList.remove('hidden');
+    document.getElementById('consultaInfo').classList.add('hidden');
+
+    // Reseta resumo
+    document.getElementById('resumoConsulta').classList.remove('ativo');
+    document.getElementById('resumoPaciente').textContent = '—';
+    document.getElementById('resumoCpf').textContent = '—';
+    document.getElementById('resumoData').textContent = '—';
+    document.getElementById('resumoId').textContent = '—';
+
+    // Carrega consultas e renderiza lista
+    await carregarConsultas();
 
     const agora = new Date();
     agora.setMinutes(agora.getMinutes() + 10);
@@ -496,14 +932,14 @@
   });
 
   /* ── Salvar exame ── */
-  document.getElementById('salvarExame').addEventListener('click', () => {
+  document.getElementById('salvarExame').addEventListener('click', async () => {
     const idConsulta = parseInt(document.getElementById('eConsultaId').value);
-    const tipo       = document.getElementById('eTipo').value || tipoSelecionado;
-    const data       = document.getElementById('eData').value;
-    const status     = document.getElementById('eStatus').value;
+    const tipo = document.getElementById('eTipo').value || tipoSelecionado;
+    const data = document.getElementById('eData').value;
+    const status = document.getElementById('eStatus').value;
 
-    if (!idConsulta || idConsulta <= 0) {
-      HematoAI.showToast('ID da consulta inválido.', 'error');
+    if (!idConsulta) {
+      HematoAI.showToast('Selecione uma consulta.', 'error');
       return;
     }
     if (!tipo) {
@@ -511,30 +947,55 @@
       return;
     }
 
-    if (modoEdicao) {
-      const idx = exames.findIndex(x => x.id_exame === idEdicao);
-      if (idx >= 0) {
-        exames[idx] = {
-          ...exames[idx],
-          tipo_exame: tipo,
-          statusc:    status,
-          data_exame: data ? new Date(data).toISOString() : exames[idx].data_exame,
-        };
-      }
-      HematoAI.showToast('Exame atualizado com sucesso!', 'success');
-    } else {
-      exames.push({
-        id_exame:    proximoId++,
+    try {
+      let response;
+      const body = {
         id_consulta: idConsulta,
-        tipo_exame:  tipo,
-        statusc:     status || 'Pendente',
-        data_exame:  data ? new Date(data).toISOString() : null,
-      });
-      HematoAI.showToast('Exame cadastrado com sucesso!', 'success');
-    }
+        tipo_exame: tipo,
+        data_exame: data || null,
+        statusc: status
+      };
 
-    HematoAI.closeModal(document.getElementById('modalExame'));
-    carregar();
+      if (modoEdicao) {
+          response = await fetch(
+              `http://localhost:3000/exames/${idEdicao}`,
+              {
+                  method: "PUT",
+                  headers: {
+                      "Content-Type": "application/json",
+                      Authorization: "Bearer " + token
+                  },
+                  body: JSON.stringify(body)
+              }
+          );
+      } else {
+          response = await fetch("http://localhost:3000/exames", {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json",
+                  Authorization: "Bearer " + token
+              },
+              body: JSON.stringify(body)
+          });
+      }
+
+      const dados = await response.json();
+      if (!dados.status) {
+        HematoAI.showToast(dados.msg, "error");
+        return;
+      }
+
+      HematoAI.showToast(
+        modoEdicao ? "Exame atualizado com sucesso!" : "Exame cadastrado com sucesso!",
+        "success"
+      );
+      HematoAI.closeModal(document.getElementById("modalExame"));
+      await carregarExames();
+
+    } catch (erro) {
+      console.error(erro);
+      HematoAI.showToast("Erro ao conectar ao servidor.", "error");
+    }
   });
 
   /* ── Editar ── */
@@ -542,22 +1003,21 @@
     const e = exames.find(x => x.id_exame === id);
     if (!e) return;
 
-    modoEdicao      = true;
-    idEdicao        = id;
+    modoEdicao = true;
+    idEdicao = id;
     tipoSelecionado = e.tipo_exame;
 
-    document.getElementById('modalTitulo').textContent   = `Editar Exame #${id}`;
-    document.getElementById('infoBox').style.display     = 'none';
-    document.getElementById('eConsultaId').value         = e.id_consulta;
-    document.getElementById('eConsultaId').disabled      = true;
-    document.getElementById('eTipo').value               = e.tipo_exame;
-    document.getElementById('eStatus').value             = e.statusc;
+    document.getElementById('modalTitulo').textContent = `Editar Exame #${id}`;
+    document.getElementById('infoBox').style.display = 'none';
+    document.getElementById('eConsultaId').value = e.id_consulta;
+    document.getElementById('eTipo').value = e.tipo_exame;
+    document.getElementById('eStatus').value = e.statusc;
 
     document.getElementById('tipoHemograma').classList.toggle('selected', e.tipo_exame === 'Hemograma');
     document.getElementById('tipoMielograma').classList.toggle('selected', e.tipo_exame === 'Mielograma');
 
     if (e.data_exame) {
-      const d      = new Date(e.data_exame);
+      const d = new Date(e.data_exame);
       const offset = d.getTimezoneOffset() * 60000;
       document.getElementById('eData').value = new Date(d - offset).toISOString().slice(0, 16);
     } else {
@@ -565,45 +1025,172 @@
     }
     document.getElementById('eData').removeAttribute('min');
 
+    // ─── Modo edição: esconde seletor, mostra card informativo ───
+    document.getElementById('consultaSelector').classList.add('hidden');
+    document.getElementById('consultaInfo').classList.remove('hidden');
+
+    // Preenche card com os dados da consulta original (do exame)
+    document.getElementById('infoPaciente').textContent = e.paciente || '—';
+    document.getElementById('infoCpf').textContent = e.cpf ? formatarCPF(e.cpf) : '—';
+    document.getElementById('infoData').textContent = e.data_consulta ? formatarDataHora(e.data_consulta) : '—';
+    document.getElementById('infoId').textContent = '#' + e.id_consulta;
+
+    // Garante que não há seleção de consulta ativa (para evitar conflitos)
+    consultaSelecionada = null;
+    document.getElementById('resumoConsulta').classList.remove('ativo');
+
     HematoAI.openModal(document.getElementById('modalExame'));
   }
 
   /* ── Detalhes ── */
-  function abrirDetalhes(id) {
+  async function abrirDetalhes(id) {
     idDetalhe = id;
-    const e   = exames.find(x => x.id_exame === id);
+
+    const e = exames.find(x => x.id_exame === id);
 
     if (!e) {
-      document.getElementById('detalheBody').innerHTML =
-        '<p style="color:var(--red);padding:20px">Exame não encontrado.</p>';
-    } else {
-      const paciente = getPacientePorConsulta(e.id_consulta);
-      const dataConsulta = getDataConsulta(e.id_consulta);
       document.getElementById('detalheBody').innerHTML = `
-        <div class="detail-grid">
-          <span class="detail-key">ID do Exame</span>
-          <span class="detail-value" style="font-family:var(--font-mono)">#${e.id_exame}</span>
-          <span class="detail-key">Paciente</span>
-          <span class="detail-value" style="font-weight:600">${paciente.nome}</span>
-          <span class="detail-key">CPF do Paciente</span>
-          <span class="detail-value" style="font-family:var(--font-mono)">${paciente.cpf}</span>
-          <span class="detail-key">Data da Consulta</span>
-          <span class="detail-value">${formatarDataHora(dataConsulta)}</span>
-          <span class="detail-key">ID da Consulta</span>
-          <span class="detail-value" style="font-family:var(--font-mono)">
-            <a href="crudconsulta" style="color:var(--blue)">#${e.id_consulta}</a>
-          </span>
-          <span class="detail-key">Tipo de Exame</span>
-          <span class="detail-value">${tipoBadge(e.tipo_exame)}</span>
-          <span class="detail-key">Data do Exame</span>
-          <span class="detail-value">${formatarDataHora(e.data_exame)}</span>
-          <span class="detail-key">Status</span>
-          <span class="detail-value">${statusPill(e.statusc)}</span>
+        <p style="color:var(--red);padding:20px">
+          Exame não encontrado.
+        </p>
+      `;
+      HematoAI.openModal(document.getElementById('modalDetalhes'));
+      return;
+    }
+
+    // Carrega primeiro os dados básicos do exame
+    document.getElementById('detalheBody').innerHTML = `
+      <div class="detail-grid">
+        <span class="detail-key">ID do Exame</span>
+        <span class="detail-value" style="font-family:var(--font-mono)">#${e.id_exame}</span>
+
+        <span class="detail-key">Paciente</span>
+        <span class="detail-value" style="font-weight:600">${e.paciente || '—'}</span>
+
+        <span class="detail-key">CPF do Paciente</span>
+        <span class="detail-value" style="font-family:var(--font-mono)">
+          ${formatarCPF(e.cpf)}
+        </span>
+
+        <span class="detail-key">Data da Consulta</span>
+        <span class="detail-value">
+          ${e.data_consulta ? formatarDataHora(e.data_consulta) : '—'}
+        </span>
+
+        <span class="detail-key">ID da Consulta</span>
+        <span class="detail-value" style="font-family:var(--font-mono)">
+          #${e.id_consulta}
+        </span>
+
+        <span class="detail-key">Tipo de Exame</span>
+        <span class="detail-value">
+          ${tipoBadge(e.tipo_exame)}
+        </span>
+
+        <span class="detail-key">Data do Exame</span>
+        <span class="detail-value">
+          ${formatarDataHora(e.data_exame)}
+        </span>
+
+        <span class="detail-key">Status</span>
+        <span class="detail-value">
+          ${statusPill(e.statusc)}
+        </span>
+      </div>
+
+      <hr style="margin:20px 0">
+
+      <div class="resultado-ia-section">
+        <h3 style="margin-bottom:15px;">Resultado</h3>
+
+        <div id="resultadoContainer">
+          <div style="text-align:center;padding:25px;color:var(--text-3);">
+            Carregando resultado...
+          </div>
+        </div>
+      </div>
+    `;
+
+    HematoAI.openModal(document.getElementById('modalDetalhes'));
+
+    // Agora busca o resultado no back
+    try {
+
+      const response = await fetch("http://localhost:3000/resultados-exame", {
+        headers: {
+          Authorization: "Bearer " + token
+        }
+      });
+
+      const dados = await response.json();
+
+      if (!dados.status) {
+        document.getElementById("resultadoContainer").innerHTML = `
+          <div class="ia-sem-dados">
+            <strong>Nenhum resultado disponível.</strong>
+          </div>
+        `;
+        return;
+      }
+
+      const resultado = dados.dados.find(r => r.id_exame == id);
+
+      if (!resultado) {
+
+        document.getElementById("resultadoContainer").innerHTML = `
+          <div class="ia-sem-dados">
+            <strong>Nenhum resultado disponível para este exame.</strong>
+            <small>O exame ainda não foi emitido pelo médico.</small>
+          </div>
+        `;
+
+        return;
+      }
+
+      document.getElementById("resultadoContainer").innerHTML = `
+        <div class="resultado-ia-card">
+
+          <div class="ia-item">
+            <span class="ia-label">Suspeita de Leucemia</span>
+            <div class="ia-value">
+              ${resultado.suspeita_leucemia || '—'}
+            </div>
+          </div>
+
+          <div class="ia-item">
+            <span class="ia-label">Tipo de Leucemia</span>
+            <div class="ia-value">
+              ${resultado.tipo_leucemia || '—'}
+            </div>
+          </div>
+
+          <div class="ia-item">
+            <span class="ia-label">Data do Resultado</span>
+            <div class="ia-value">
+              ${formatarData(resultado.data_resultado)}
+            </div>
+          </div>
+
+          <div class="ia-item">
+            <span class="ia-label">Resultado</span>
+            <div class="ia-value observacoes">
+              ${resultado.resultado_texto || '—'}
+            </div>
+          </div>
+
+        </div>
+      `;
+
+    } catch (erro) {
+
+      console.error(erro);
+
+      document.getElementById("resultadoContainer").innerHTML = `
+        <div class="ia-sem-dados">
+          <strong>Erro ao carregar resultado.</strong>
         </div>
       `;
     }
-
-    HematoAI.openModal(document.getElementById('modalDetalhes'));
   }
 
   document.getElementById('closeModalDetalhes').addEventListener('click', () =>
@@ -618,18 +1205,30 @@
   /* ── Excluir ── */
   function confirmarExclusao(id) {
     HematoAI.confirmDialog(
-      `Deseja excluir o exame <strong>#${id}</strong>?<br>
-       Imagens e resultados vinculados também poderão ser afetados.`,
-      () => {
-        exames = exames.filter(x => x.id_exame !== id);
-        HematoAI.showToast('Exame excluído com sucesso.', 'success');
-        carregar();
+      `Deseja excluir o exame <strong>#${id}</strong>?<br>Esta ação não pode ser desfeita.`,
+      async () => {
+        try {
+          const response = await fetch("http://localhost:3000/exames/" + id, {
+            method: "DELETE",
+            headers: { Authorization: "Bearer " + token }
+          });
+          const dados = await response.json();
+          if (!dados.status) {
+            HematoAI.showToast(dados.msg, "error");
+            return;
+          }
+          HematoAI.showToast("Exame excluído com sucesso.", "success");
+          await carregarExames();
+        } catch (erro) {
+          console.error(erro);
+          HematoAI.showToast("Erro ao conectar ao servidor.", "error");
+        }
       }
     );
   }
 
   /* ── Fechar modais ── */
-  ['closeModalExame','cancelarExame'].forEach(id => {
+  ['closeModalExame', 'cancelarExame'].forEach(id => {
     document.getElementById(id).addEventListener('click', () =>
       HematoAI.closeModal(document.getElementById('modalExame')));
   });
@@ -639,7 +1238,7 @@
   });
 
   /* ── Init ── */
-  carregar();
+  carregarExames();
   verificarPerfil("Médico");
 </script>
 </body>

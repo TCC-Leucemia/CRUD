@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HematoAI · Calendário de Consultas</title>
+  <link rel="stylesheet" href="../CSS/navbar.css">
+  <style>
+    /* ── Layout da página ── */
+    .calendario-page {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* ── Filtros ── */
+    .filtros-bar {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 12px 18px;
+      box-shadow: var(--shadow-sm);
+    }
+    .filtros-bar label {
+      font-weight: 600;
+      font-size: 0.8rem;
+      color: var(--text-2);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .filtros-bar select,
+    .filtros-bar input {
+      padding: 6px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 40px;
+      font-size: 0.8rem;
+      background: var(--bg);
+      color: var(--text-1);
+      outline: none;
+      transition: var(--transition);
+      font-family: var(--font);
+    }
+    .filtros-bar select:focus,
+    .filtros-bar input:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(185,28,28,0.08);
+    }
+    .filtros-bar .busca-paciente {
+      flex: 1;
+      min-width: 160px;
+    }
+    .filtros-bar .busca-paciente input {
+      width: 100%;
+    }
+
+    /* ── Navegação do calendário ── */
+    .cal-nav {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 10px 16px;
+      box-shadow: var(--shadow-sm);
+    }
+    .cal-nav .nav-btn {
+      background: transparent;
+      border: 1.5px solid var(--border);
+      border-radius: 40px;
+      padding: 6px 14px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-2);
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: var(--font);
+    }
+    .cal-nav .nav-btn:hover {
+      border-color: var(--red);
+      color: var(--red);
+      background: var(--red-light);
+    }
+    .cal-nav .mes-ano {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--text-1);
+      flex: 1;
+      text-align: center;
+      min-width: 140px;
+    }
+    .cal-nav .busca-data {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .cal-nav .busca-data input {
+      padding: 6px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 40px;
+      font-size: 0.8rem;
+      background: var(--bg);
+      color: var(--text-1);
+      outline: none;
+      transition: var(--transition);
+      font-family: var(--font);
+      width: 120px;
+    }
+    .cal-nav .busca-data input:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(185,28,28,0.08);
+    }
+    .cal-nav .busca-data .btn-buscar {
+      padding: 6px 14px;
+      border: none;
+      border-radius: 40px;
+      background: var(--red);
+      color: white;
+      font-weight: 600;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: var(--font);
+    }
+    .cal-nav .busca-data .btn-buscar:hover {
+      background: var(--red-dark);
+      transform: translateY(-1px);
+    }
+
+    /* ── Grid principal: calendário + painel lateral ── */
+    .cal-grid-container {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 24px;
+      margin-top: 4px;
+    }
+
+    /* ── Calendário ── */
+    .calendario-wrapper {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+    .calendario-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+    }
+    .cal-dia-semana {
+      font-weight: 700;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      color: var(--text-3);
+      text-align: center;
+      padding: 6px 0;
+      letter-spacing: 0.5px;
+    }
+    .cal-dia {
+      background: var(--bg);
+      border: 1.5px solid transparent;
+      border-radius: var(--radius-lg);
+      padding: 10px 4px 6px;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+      min-height: 52px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    .cal-dia:hover {
+      background: var(--red-light);
+      border-color: var(--red);
+      transform: scale(1.04);
+      box-shadow: var(--shadow-sm);
+    }
+    .cal-dia .num {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-1);
+      line-height: 1.2;
+    }
+    .cal-dia.outro-mes .num {
+      color: var(--text-3);
+      opacity: 0.5;
+    }
+    /* Indicador de consultas */
+    .cal-dia .indicador {
+      margin-top: 3px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--red);
+      display: none;
+      transition: var(--transition);
+    }
+    .cal-dia .indicador.muitas {
+      width: auto;
+      height: auto;
+      background: transparent;
+      color: var(--red);
+      font-size: 0.6rem;
+      font-weight: 700;
+      padding: 0 4px;
+      border-radius: 10px;
+      background: var(--red-light);
+    }
+    .cal-dia.tem-consulta .indicador {
+      display: block;
+    }
+    .cal-dia.tem-consulta .indicador.muitas {
+      display: block;
+    }
+    /* Hoje */
+    .cal-dia.hoje {
+      border-color: var(--red);
+      background: var(--red-light);
+      box-shadow: 0 0 0 2px rgba(185,28,28,0.15);
+    }
+    .cal-dia.hoje .num {
+      font-weight: 800;
+      color: var(--red);
+    }
+    /* Selecionado */
+    .cal-dia.selecionado {
+      border-color: var(--red);
+      background: var(--red-mid);
+      box-shadow: 0 0 0 3px rgba(185,28,28,0.2);
+    }
+    .cal-dia.selecionado .num {
+      color: var(--red-dark);
+      font-weight: 800;
+    }
+    /* Animações */
+    .cal-dia {
+      transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+    }
+
+    /* ── Painel lateral ── */
+    .painel-lateral {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+      max-height: 600px;
+      display: flex;
+      flex-direction: column;
+    }
+    .painel-lateral .painel-titulo {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--text-1);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .painel-lateral .painel-titulo span {
+      font-weight: 400;
+      font-size: 0.8rem;
+      color: var(--text-3);
+    }
+    .painel-lateral .consultas-lista {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .painel-lateral .consultas-lista::-webkit-scrollbar {
+      width: 4px;
+    }
+    .painel-lateral .consultas-lista::-webkit-scrollbar-thumb {
+      background: var(--border-dark);
+      border-radius: 2px;
+    }
+    .consulta-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 12px 14px;
+      transition: var(--transition);
+      animation: fadeIn 0.25s ease;
+    }
+    .consulta-card:hover {
+      box-shadow: var(--shadow-sm);
+      border-color: var(--border-dark);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .consulta-card .topo {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .consulta-card .topo .horario {
+      font-weight: 700;
+      font-size: 0.8rem;
+      color: var(--red);
+      white-space: nowrap;
+    }
+    .consulta-card .topo .badge-status {
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+    .badge-pendente   { background: #fef3c7; color: #d97706; }
+    .badge-andamento  { background: #dbeafe; color: #2563eb; }
+    .badge-finalizado { background: #dcfce7; color: #15803d; }
+    .dark-mode .badge-pendente   { background: #78350f; color: #fcd34d; }
+    .dark-mode .badge-andamento  { background: #1e3a8a; color: #93c5fd; }
+    .dark-mode .badge-finalizado { background: #064e3b; color: #6ee7b7; }
+
+    .consulta-card .info {
+      margin-top: 6px;
+    }
+    .consulta-card .info .nome {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--text-1);
+    }
+    .consulta-card .info .cpf {
+      font-size: 0.7rem;
+      color: var(--text-3);
+      font-family: var(--font-mono);
+    }
+    .consulta-card .info .tipo {
+      font-size: 0.75rem;
+      color: var(--text-2);
+      margin-top: 2px;
+    }
+    .consulta-card .btn-abrir {
+      margin-top: 10px;
+      width: 100%;
+      padding: 5px 0;
+      border: 1.5px solid var(--red);
+      border-radius: 40px;
+      background: transparent;
+      color: var(--red);
+      font-weight: 600;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: var(--font);
+    }
+    .consulta-card .btn-abrir:hover {
+      background: var(--red);
+      color: white;
+      box-shadow: 0 2px 8px rgba(185,28,28,0.25);
+    }
+
+    .sem-consultas {
+      color: var(--text-3);
+      text-align: center;
+      padding: 30px 10px;
+      font-size: 0.9rem;
+    }
+    .sem-consultas .icone {
+      font-size: 2.5rem;
+      display: block;
+      margin-bottom: 8px;
+      opacity: 0.6;
+    }
+
+    /* ── Legenda ── */
+    .legenda {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+      padding: 12px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      justify-content: center;
+    }
+    .legenda-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      color: var(--text-2);
+    }
+    .legenda-item .bolinha {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .legenda-item .bolinha.verde { background: #15803d; }
+    .legenda-item .bolinha.azul  { background: #2563eb; }
+    .legenda-item .bolinha.amarela { background: #d97706; }
+
+    /* ── Responsividade ── */
+    @media (max-width: 1024px) {
+      .cal-grid-container {
+        grid-template-columns: 1fr;
+      }
+      .painel-lateral {
+        max-height: 400px;
+      }
+    }
+    @media (max-width: 600px) {
+      .filtros-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .cal-nav {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .cal-nav .mes-ano {
+        order: -1;
+      }
+      .cal-nav .busca-data {
+        flex-wrap: wrap;
+      }
+      .cal-nav .busca-data input {
+        flex: 1;
+        min-width: 100px;
+      }
+      .calendario-grid {
+        gap: 4px;
+      }
+      .cal-dia {
+        min-height: 40px;
+        padding: 6px 2px;
+      }
+      .cal-dia .num {
+        font-size: 0.75rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<button class="sidebar-toggle" id="sidebarToggle">☰</button>
+
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <div class="main-content">
+    <div class="page-header">
+      <div class="page-header-left">
+        <h1>Calendário de Consultas</h1>
+        <p id="headerDate">Visualize sua agenda médica.</p>
+      </div>
+      <div class="page-header-right">
+        <span class="badge badge-green">Médico</span>
+      </div>
+    </div>
+
+    <div class="page-body">
+      <div class="calendario-page">
+
+        <!-- ─── FILTROS ─── -->
+        <div class="filtros-bar">
+          <label>
+            Status
+            <select id="filtroStatus">
+              <option value="">Todos</option>
+              <option value="Pendente">Pendente</option>
+              <option value="Em andamento">Em andamento</option>
+              <option value="Finalizado">Finalizado</option>
+            </select>
+          </label>
+          <label class="busca-paciente">
+            Paciente
+            <input type="text" id="buscaPaciente" placeholder="Nome ou CPF...">
+          </label>
+        </div>
+
+        <!-- ─── NAVEGAÇÃO ─── -->
+        <div class="cal-nav">
+          <button class="nav-btn" id="btnMesAnterior">◀ Mês anterior</button>
+          <span class="mes-ano" id="mesAnoDisplay">Janeiro 2026</span>
+          <button class="nav-btn" id="btnMesProximo">Próximo mês ▶</button>
+          <button class="nav-btn" id="btnHoje">Hoje</button>
+          <div class="busca-data">
+            <input type="text" id="inputBuscaData" placeholder="dd/mm/aaaa">
+            <button class="btn-buscar" id="btnBuscarData">Buscar</button>
+          </div>
+        </div>
+
+        <!-- ─── GRID PRINCIPAL ─── -->
+        <div class="cal-grid-container">
+          <!-- Calendário -->
+          <div class="calendario-wrapper">
+            <div class="calendario-grid" id="calendarioGrid">
+              <!-- dias da semana (gerados via JS) -->
+            </div>
+          </div>
+
+          <!-- Painel lateral -->
+          <div class="painel-lateral">
+            <div class="painel-titulo">
+              📋 Consultas do dia
+              <span id="diaSelecionadoLabel">—</span>
+            </div>
+            <div class="consultas-lista" id="consultasLista">
+              <!-- preenchido via JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- ─── LEGENDA ─── -->
+        <div class="legenda">
+          <span class="legenda-item"><span class="bolinha amarela"></span> Pendente</span>
+          <span class="legenda-item"><span class="bolinha azul"></span> Em andamento</span>
+          <span class="legenda-item"><span class="bolinha verde"></span> Finalizado</span>
+          <span class="legenda-item">● Dia com consulta</span>
+          <span class="legenda-item"><strong style="color:var(--red);">◉</strong> Hoje</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../JS/navbar.js"></script>
+<script src="../JS/auth.js"></script>
+<script>
+  let consultas = [];
+  let mesAtual = new Date().getMonth();
+  let anoAtual = new Date().getFullYear();
+  let diaSelecionado = null;   // objeto Date do dia selecionado
+  let filtroStatus = '';
+  let buscaPaciente = '';
+
+  // =============================================================
+  //  AUXILIARES
+  // =============================================================
+  function formatarCPF(cpf) {
+    if (!cpf) return '—';
+    const c = String(cpf).replace(/\D/g, '').padStart(11, '0');
+    return c.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+  }
+
+  function formatarHora(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    return d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function formatarData(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    return d.toLocaleDateString('pt-BR');
+  }
+
+  function dataParaString(d) {
+    if (!d) return '';
+    const ano = d.getFullYear();
+    const mes = String(d.getMonth() + 1).padStart(2, '0');
+    const dia = String(d.getDate()).padStart(2, '0');
+    return `${ano}-${mes}-${dia}`;
+  }
+
+  function diaComparar(d1, d2) {
+    return d1.getDate() === d2.getDate() &&
+           d1.getMonth() === d2.getMonth() &&
+           d1.getFullYear() === d2.getFullYear();
+  }
+
+  function ultimoDiaMes(ano, mes) {
+    return new Date(ano, mes + 1, 0).getDate();
+  }
+
+  function primeiroDiaSemana(ano, mes) {
+    return new Date(ano, mes, 1).getDay(); // 0=domingo
+  }
+
+  function obterConsultasFiltradas() {
+    let lista = [...consultas];
+    if (filtroStatus) {
+      lista = lista.filter(c => c.statusc === filtroStatus);
+    }
+    if (buscaPaciente.trim()) {
+      const termo = buscaPaciente.trim().toLowerCase();
+      lista = lista.filter(c =>
+        (c.paciente || "").toLowerCase().includes(termo)
+      );
+    }
+    return lista;
+  }
+
+  function consultasDoDia(data) {
+    const dataStr = dataParaString(data);
+    const filtradas = obterConsultasFiltradas();
+    return filtradas.filter(c => {
+      const d = new Date(c.data_consulta);
+      return dataParaString(d) === dataStr;
+    }).sort((a, b) => new Date(a.data_consulta) - new Date(b.data_consulta));
+  }
+
+  function consultasDoMes(ano, mes) {
+    const filtradas = obterConsultasFiltradas();
+    return filtradas.filter(c => {
+      const d = new Date(c.data_consulta);
+      return d.getMonth() === mes && d.getFullYear() === ano;
+    });
+  }
+
+  // =============================================================
+  //  FUNÇÕES PRINCIPAIS
+  // =============================================================
+  async function carregarConsultas() {
+
+    try {
+
+        const session = JSON.parse(
+            localStorage.getItem("hematoai_session")
+        );
+        console.log(session);
+        console.log(session.token);
+        const response = await fetch(
+            "http://localhost:3000/consultas",
+            {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${session.token}`,
+                    "Content-Type": "application/json"
+                }
+            }
+        );
+
+        const json = await response.json();
+
+        if (!response.ok || !json.status) {
+            throw new Error(json.msg || "Erro ao carregar consultas.");
+        }
+
+        consultas = json.dados;
+
+    } catch (error) {
+
+        console.error(error);
+
+        HematoAI.showToast(
+            error.message,
+            "error"
+        );
+
+    }
+
+}
+
+  function renderizarCalendario() {
+    const grid = document.getElementById('calendarioGrid');
+    const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+                   'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+    document.getElementById('mesAnoDisplay').textContent = `${meses[mesAtual]} ${anoAtual}`;
+
+    // Dias da semana
+    const diasSemana = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+    let html = '';
+    diasSemana.forEach(d => {
+      html += `<div class="cal-dia-semana">${d}</div>`;
+    });
+
+    const primeiroDia = primeiroDiaSemana(anoAtual, mesAtual);
+    const diasNoMes = ultimoDiaMes(anoAtual, mesAtual);
+    const diasMesAnterior = ultimoDiaMes(anoAtual, mesAtual - 1);
+
+    // Dias do mês anterior
+    const diasAnt = primeiroDia;
+    for (let i = diasAnt - 1; i >= 0; i--) {
+      const dia = diasMesAnterior - i;
+      html += `<div class="cal-dia outro-mes" data-dia="${dia}" data-mes="${mesAtual-1}" data-ano="${anoAtual}">
+        <span class="num">${dia}</span>
+        <span class="indicador"></span>
+      </div>`;
+    }
+
+    // Dias do mês atual
+    const hoje = new Date();
+    const consultasMes = consultasDoMes(anoAtual, mesAtual);
+    const consultasPorDia = {};
+    consultasMes.forEach(c => {
+      const d = new Date(c.data_consulta);
+      const key = d.getDate();
+      if (!consultasPorDia[key]) consultasPorDia[key] = [];
+      consultasPorDia[key].push(c);
+    });
+
+    for (let d = 1; d <= diasNoMes; d++) {
+      const isHoje = (d === hoje.getDate() && mesAtual === hoje.getMonth() && anoAtual === hoje.getFullYear());
+      const temConsulta = consultasPorDia[d] && consultasPorDia[d].length > 0;
+      const qtd = temConsulta ? consultasPorDia[d].length : 0;
+      const isSelecionado = diaSelecionado && diaSelecionado.getDate() === d && diaSelecionado.getMonth() === mesAtual && diaSelecionado.getFullYear() === anoAtual;
+
+      let classes = 'cal-dia';
+      if (isHoje) classes += ' hoje';
+      if (isSelecionado) classes += ' selecionado';
+      if (temConsulta) classes += ' tem-consulta';
+
+      let indicador = '';
+      if (qtd > 0) {
+        if (qtd <= 3) {
+          indicador = `<span class="indicador"></span>`;
+        } else {
+          indicador = `<span class="indicador muitas">+${qtd}</span>`;
+        }
+      }
+
+      html += `<div class="${classes}" data-dia="${d}" data-mes="${mesAtual}" data-ano="${anoAtual}">
+        <span class="num">${d}</span>
+        ${indicador}
+      </div>`;
+    }
+
+    // Dias do mês seguinte para preencher o grid
+    const totalDias = diasAnt + diasNoMes;
+    const restante = (7 - (totalDias % 7)) % 7;
+    for (let d = 1; d <= restante; d++) {
+      html += `<div class="cal-dia outro-mes" data-dia="${d}" data-mes="${mesAtual+1}" data-ano="${anoAtual}">
+        <span class="num">${d}</span>
+        <span class="indicador"></span>
+      </div>`;
+    }
+
+    grid.innerHTML = html;
+
+    // Adicionar event listeners nos dias
+    document.querySelectorAll('.cal-dia').forEach(el => {
+      el.addEventListener('click', function(e) {
+        const dia = parseInt(this.dataset.dia);
+        const mes = parseInt(this.dataset.mes);
+        const ano = parseInt(this.dataset.ano);
+        const dataSelecionada = new Date(ano, mes, dia);
+        // Se for dia de outro mês, navegar para aquele mês
+        if (mes !== mesAtual || ano !== anoAtual) {
+          mesAtual = mes;
+          anoAtual = ano;
+          renderizarCalendario();
+          // Re-selecionar o dia após renderizar
+          setTimeout(() => {
+            const novoEl = document.querySelector(`.cal-dia[data-dia="${dia}"][data-mes="${mes}"][data-ano="${ano}"]`);
+            if (novoEl) novoEl.click();
+          }, 10);
+          return;
+        }
+        selecionarDia(dataSelecionada);
+      });
+    });
+
+    // Se não houver dia selecionado, selecionar hoje (se estiver no mês)
+    if (!diaSelecionado || diaSelecionado.getMonth() !== mesAtual || diaSelecionado.getFullYear() !== anoAtual) {
+      const hojeData = new Date();
+      if (hojeData.getMonth() === mesAtual && hojeData.getFullYear() === anoAtual) {
+        selecionarDia(hojeData);
+      } else {
+        // Selecionar o primeiro dia do mês com consulta, ou o dia 1
+        const diasComConsulta = Object.keys(consultasPorDia).map(Number).sort((a,b)=>a-b);
+        if (diasComConsulta.length > 0) {
+          selecionarDia(new Date(anoAtual, mesAtual, diasComConsulta[0]));
+        } else {
+          selecionarDia(new Date(anoAtual, mesAtual, 1));
+        }
+      }
+    }
+  }
+
+  function selecionarDia(data) {
+    diaSelecionado = data;
+    // Remover seleção anterior
+    document.querySelectorAll('.cal-dia.selecionado').forEach(el => el.classList.remove('selecionado'));
+    // Destacar novo dia
+    const dia = data.getDate();
+    const mes = data.getMonth();
+    const ano = data.getFullYear();
+    const el = document.querySelector(`.cal-dia[data-dia="${dia}"][data-mes="${mes}"][data-ano="${ano}"]`);
+    if (el) el.classList.add('selecionado');
+    // Atualizar label do painel lateral
+    document.getElementById('diaSelecionadoLabel').textContent = formatarData(data.toISOString());
+    // Preencher consultas do dia
+    preencherConsultasDia(data);
+  }
+
+  function preencherConsultasDia(data) {
+    const lista = document.getElementById('consultasLista');
+    const consultasDia = consultasDoDia(data);
+
+    if (consultasDia.length === 0) {
+      lista.innerHTML = `
+        <div class="sem-consultas">
+          <span class="icone">📅</span>
+          Nenhuma consulta para este dia.
+        </div>
+      `;
+      return;
+    }
+
+    let html = '';
+    consultasDia.forEach(c => {
+      const badgeClass = c.statusc === 'Pendente' ? 'badge-pendente' :
+                         c.statusc === 'Em andamento' ? 'badge-andamento' : 'badge-finalizado';
+      html += `
+        <div class="consulta-card">
+          <div class="topo">
+            <span class="horario">${formatarHora(c.data_consulta)}</span>
+            <span class="badge-status ${badgeClass}">${c.statusc}</span>
+          </div>
+          <div class="info">
+            <div class="nome">${c.paciente}</div>
+            <div class="cpf">CPF: ${formatarCPF(c.cpf)}</div>
+            <div class="tipo">${c.tipo_consulta || 'Consulta'}</div>
+          </div>
+          <button class="btn-abrir" onclick="abrirConsulta(${c.id_consulta})">Abrir Consulta</button>
+        </div>
+      `;
+    });
+    lista.innerHTML = html;
+  }
+
+  function abrirConsulta(id){
+    window.location.href =
+        `crudconsulta_med.html?id=${id}`;
+}
+
+  function buscarData() {
+    const input = document.getElementById('inputBuscaData').value.trim();
+    if (!input) return;
+    // Formato dd/mm/aaaa
+    const partes = input.split('/');
+    if (partes.length !== 3) {
+      HematoAI.showToast('Formato inválido. Use dd/mm/aaaa.', 'error');
+      return;
+    }
+    const dia = parseInt(partes[0]);
+    const mes = parseInt(partes[1]) - 1;
+    const ano = parseInt(partes[2]);
+    if (isNaN(dia) || isNaN(mes) || isNaN(ano) || dia < 1 || dia > 31 || mes < 0 || mes > 11 || ano < 1900) {
+      HematoAI.showToast('Data inválida.', 'error');
+      return;
+    }
+    const data = new Date(ano, mes, dia);
+    if (data.getMonth() !== mes || data.getDate() !== dia) {
+      HematoAI.showToast('Data inválida.', 'error');
+      return;
+    }
+    // Navegar para o mês
+    mesAtual = mes;
+    anoAtual = ano;
+    renderizarCalendario();
+    // Selecionar o dia
+    setTimeout(() => {
+      selecionarDia(data);
+    }, 50);
+    // Limpar campo
+    document.getElementById('inputBuscaData').value = '';
+  }
+
+  function irParaHoje() {
+    const hoje = new Date();
+    mesAtual = hoje.getMonth();
+    anoAtual = hoje.getFullYear();
+    renderizarCalendario();
+    setTimeout(() => {
+      selecionarDia(hoje);
+    }, 50);
+  }
+
+  function aplicarFiltros() {
+    const statusSelect = document.getElementById('filtroStatus');
+    filtroStatus = statusSelect.value;
+    const buscaInput = document.getElementById('buscaPaciente');
+    buscaPaciente = buscaInput.value;
+    renderizarCalendario();
+  }
+
+  // =============================================================
+  //  EVENT LISTENERS
+  // =============================================================
+  document.getElementById('btnMesAnterior').addEventListener('click', function() {
+    mesAtual--;
+    if (mesAtual < 0) { mesAtual = 11; anoAtual--; }
+    renderizarCalendario();
+  });
+
+  document.getElementById('btnMesProximo').addEventListener('click', function() {
+    mesAtual++;
+    if (mesAtual > 11) { mesAtual = 0; anoAtual++; }
+    renderizarCalendario();
+  });
+
+  document.getElementById('btnHoje').addEventListener('click', irParaHoje);
+  document.getElementById('btnBuscarData').addEventListener('click', buscarData);
+  document.getElementById('inputBuscaData').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') buscarData();
+  });
+
+  document.getElementById('filtroStatus').addEventListener('change', aplicarFiltros);
+  document.getElementById('buscaPaciente').addEventListener('input', aplicarFiltros);
+
+  // =============================================================
+  //  INICIALIZAÇÃO
+  // =============================================================
+  if (!localStorage.getItem('hematoai_session')) {
+    HematoAI.setSession({ tipo: 'Médico', nome: 'Dr. Usuário', crm: '00000-SP' });
+  }
+  HematoAI.initSidebar('consultas');
+
+  (async () => {
+        await carregarConsultas();
+        renderizarCalendario();
+    })();
+
+  // Atualizar data no header
+  const hoje = new Date();
+  const headerDate = document.getElementById('headerDate');
+  if (headerDate) {
+    headerDate.textContent = hoje.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  }
+
+  verificarPerfil('Médico');
+</script>
+</body>
+</html>

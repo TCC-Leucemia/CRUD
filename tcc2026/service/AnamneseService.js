@@ -267,4 +267,32 @@ module.exports = class AnamneseService {
 
         return true;
     }
+
+    
+    findByConsulta = async (id_consulta, user) => {
+
+        const consulta =
+            await this.#consultasDAO.findById(id_consulta);
+
+        if (!consulta) {
+
+            throw new ErrorResponse(
+                404,
+                "Consulta não encontrada"
+            );
+
+        }
+
+        if (consulta.crm !== user.crm) {
+
+            throw new ErrorResponse(
+                403,
+                "Acesso negado"
+            );
+
+        }
+
+        return await this.#dao.findByConsulta(id_consulta);
+
+    }
 }

@@ -45,11 +45,10 @@
   }
   const NAV_CONFIG = {
     Médico: [
-      { icon: '🏥', label: 'Dashboard', href: 'medico.html', id: 'anamnese' },
+      { icon: '🏥', label: 'Dashboard', href: 'medico.html', id: 'dashboard' },
       { icon: '📋', label: 'Consultas', href: 'crudconsulta_med.html', id: 'consultas' },
       { icon: '🔬', label: 'Exames', href: 'crudexame.html', id: 'exames-crud' },
       { icon: '📊', label: 'Resultados', href: 'crudresultado.html', id: 'resultados' },
-      { icon: '📝', label: 'Anamnese', href: 'crudanamnese.html', id: 'anamnese' },
       { icon: '🤖', label: 'Análises IA', href: 'crudanaliseia.html', id: 'analises-ia' },
     ],
     Administrador: [
@@ -128,6 +127,8 @@
 
   function initSidebar(activePage) {
     const session = getSession();
+
+    console.log("Sessão carregada:", session);
     const role = session.tipo || 'Administrador';
     const name = session.nome || 'Administrador';
     const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);

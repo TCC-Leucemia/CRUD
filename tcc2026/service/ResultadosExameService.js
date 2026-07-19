@@ -224,4 +224,35 @@ module.exports = class ResultadosExameService {
 
         return true;
     }
+    findByExame = async (idExame, user) => {
+
+        const resultado =
+            await this.#dao.findByExame(idExame);
+
+        if (!resultado) {
+            return null;
+        }
+
+        if (
+            user.role === "Paciente" &&
+            resultado.cpf !== user.cpf
+        ) {
+            throw new ErrorResponse(
+                403,
+                "Acesso negado"
+            );
+        }
+
+        if (
+            user.role === "Médico" &&
+            resultado.crm !== user.crm
+        ) {
+            throw new ErrorResponse(
+                403,
+                "Acesso negado"
+            );
+        }
+
+        return resultado;
+    }
 }

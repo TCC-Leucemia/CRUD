@@ -124,15 +124,42 @@ module.exports = class ConsultasDAO {
         const sql = `
             SELECT
                 c.*,
+
                 p.nome AS paciente,
+                p.data_nasc,
+                p.sexo,
+
                 m.nome AS medico,
-                m.especialidade
+                m.especialidade,
+
+                a.id_anamnese,
+                a.sintomas,
+                a.comorbidades,
+
+                e.id_exame,
+
+                re.id_resultado
+
             FROM consultas c
+
             INNER JOIN pacientes p
                 ON p.cpf = c.cpf
+
             INNER JOIN medicos m
                 ON m.crm = c.crm
+
+            LEFT JOIN anamnese a
+                ON a.id_consulta = c.id_consulta
+
+            LEFT JOIN exames e
+                ON e.id_consulta = c.id_consulta
+
+            LEFT JOIN resultados_exame re
+                ON re.id_exame = e.id_exame
+
             WHERE c.crm = ?
+
+            ORDER BY c.data_consulta DESC;
         `;
 
         return new Promise((resolve, reject) => {

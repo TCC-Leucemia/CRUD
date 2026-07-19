@@ -12,32 +12,11 @@
       gap: 20px;
     }
 
-    .quick-action-grid {
+    .med-grid-full {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
-      margin-bottom: 28px;
+      grid-template-columns: 1fr;
+      gap: 20px;
     }
-
-    .quick-card {
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-xl);
-      padding: 22px 18px;
-      text-align: center;
-      cursor: pointer;
-      transition: var(--transition);
-      text-decoration: none;
-      display: block;
-    }
-    .quick-card:hover {
-      box-shadow: var(--shadow-md);
-      transform: translateY(-3px);
-      border-color: var(--red);
-    }
-    .quick-card-icon  { font-size: 2rem; margin-bottom: 8px; }
-    .quick-card-label { font-size: 0.875rem; font-weight: 700; color: var(--text-1); }
-    .quick-card-sub   { font-size: 0.72rem; color: var(--text-3); margin-top: 3px; }
 
     .stats-indicators {
       display: grid;
@@ -84,13 +63,81 @@
     .activity-text { flex: 1; font-size: 0.85rem; color: var(--text-1); }
     .activity-time { font-size: 0.72rem; color: var(--text-3); white-space: nowrap; }
 
+    .alerta-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .alerta-item:last-child {
+      border-bottom: none;
+    }
+    .alerta-item .icone {
+      font-size: 1.1rem;
+      width: 24px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .alerta-item .texto {
+      font-size: 0.85rem;
+      color: var(--text-1);
+      flex: 1;
+    }
+    .alerta-item .badge-alerta {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: 20px;
+    }
+    .badge-alerta.vermelho { background: #fee2e2; color: #dc2626; }
+    .badge-alerta.amarelo  { background: #fef3c7; color: #d97706; }
+    .badge-alerta.azul     { background: #dbeafe; color: #2563eb; }
+    .badge-alerta.verde    { background: #dcfce7; color: #15803d; }
+    .badge-alerta.cinza    { background: #f1f5f9; color: #475569; }
+
+    .dark-mode .badge-alerta.vermelho { background: #7f1d1d; color: #fca5a5; }
+    .dark-mode .badge-alerta.amarelo  { background: #78350f; color: #fcd34d; }
+    .dark-mode .badge-alerta.azul     { background: #1e3a8a; color: #93c5fd; }
+    .dark-mode .badge-alerta.verde    { background: #064e3b; color: #6ee7b7; }
+    .dark-mode .badge-alerta.cinza    { background: #334155; color: #cbd5e1; }
+
+    .agenda-vazia {
+      color: var(--text-3);
+      font-size: 0.85rem;
+      padding: 12px 0;
+      text-align: center;
+      font-style: italic;
+    }
+
+    .resultado-suspeita {
+      font-weight: 600;
+      font-size: 0.78rem;
+      padding: 2px 10px;
+      border-radius: 20px;
+    }
+    .suspeita-alta   { background: #fee2e2; color: #dc2626; }
+    .suspeita-moderada { background: #fef3c7; color: #d97706; }
+    .suspeita-baixa  { background: #dbeafe; color: #2563eb; }
+    .suspeita-sem    { background: #dcfce7; color: #15803d; }
+
+    .dark-mode .suspeita-alta   { background: #7f1d1d; color: #fca5a5; }
+    .dark-mode .suspeita-moderada { background: #78350f; color: #fcd34d; }
+    .dark-mode .suspeita-baixa  { background: #1e3a8a; color: #93c5fd; }
+    .dark-mode .suspeita-sem    { background: #064e3b; color: #6ee7b7; }
+
+    .sem-alerta {
+      color: var(--text-3);
+      text-align: center;
+      padding: 20px 0;
+      font-size: 0.9rem;
+    }
+
     @media (max-width: 1024px) {
       .med-grid { grid-template-columns: 1fr; }
-      .quick-action-grid { grid-template-columns: repeat(2, 1fr); }
       .stats-indicators { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 600px) {
-      .quick-action-grid { grid-template-columns: 1fr; }
       .stats-indicators { grid-template-columns: 1fr; }
     }
   </style>
@@ -114,7 +161,8 @@
     </div>
 
     <div class="page-body">
-      <!-- INDICADORES ESTATÍSTICOS -->
+
+      <!-- ─── INDICADORES ─── -->
       <div class="stats-indicators">
         <div class="stat-indicator-card">
           <div class="stat-indicator-number" id="totalConsultas">0</div>
@@ -129,37 +177,14 @@
           <div class="stat-indicator-label">Pacientes</div>
         </div>
         <div class="stat-indicator-card">
-          <div class="stat-indicator-number" id="totalAnalises">0</div>
-          <div class="stat-indicator-label">Análises IA</div>
+          <div class="stat-indicator-number" id="totalResultados">0</div>
+          <div class="stat-indicator-label">Resultados</div>
         </div>
       </div>
 
-      <!-- QUICK ACTIONS -->
-      <div class="quick-action-grid">
-        <div class="quick-card" onclick="verConsultas()">
-          <div class="quick-card-icon">📋</div>
-          <div class="quick-card-label">Consultas</div>
-          <div class="quick-card-sub">Visualizar e atualizar status</div>
-        </div>
-        <div class="quick-card" onclick="verExames()">
-          <div class="quick-card-icon">🔬</div>
-          <div class="quick-card-label">Exames</div>
-          <div class="quick-card-sub">Gerenciar exames</div>
-        </div>
-        <div class="quick-card" onclick="verResultados()">
-          <div class="quick-card-icon">📊</div>
-          <div class="quick-card-label">Resultados</div>
-          <div class="quick-card-sub">Laudos e diagnósticos</div>
-        </div>
-        <div class="quick-card" onclick="verAnamnese()">
-          <div class="quick-card-icon">📝</div>
-          <div class="quick-card-label">Anamnese</div>
-          <div class="quick-card-sub">Histórico dos pacientes</div>
-        </div>
-      </div>
-
+      <!-- ─── LINHA 2: Consultas Recentes | Agenda de Hoje ─── -->
       <div class="med-grid">
-        <!-- CARD: CONSULTAS RECENTES -->
+        <!-- Consultas Recentes -->
         <div class="card">
           <div class="card-header">
             <span class="card-title">Consultas Recentes</span>
@@ -186,7 +211,37 @@
           </div>
         </div>
 
-        <!-- CARD: EXAMES RECENTES -->
+        <!-- Agenda de Hoje -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Agenda de Hoje</span>
+            <a href="calendario.html" class="btn btn-outline btn-sm">Ver agenda completa →</a>
+          </div>
+          <div class="card-body">
+            <div id="agendaHoje">
+              <div class="activity-item">
+                <div class="activity-dot" style="background:var(--blue)"></div>
+                <span class="activity-text">08:30 - Carlos Souza</span>
+                <span class="activity-time">Pendente</span>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot" style="background:var(--blue)"></div>
+                <span class="activity-text">10:00 - Mariana Silva</span>
+                <span class="activity-time">Pendente</span>
+              </div>
+              <div class="activity-item">
+                <div class="activity-dot" style="background:#15803d"></div>
+                <span class="activity-text">14:30 - João Pereira</span>
+                <span class="activity-time">Finalizada</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── LINHA 3: Exames Recentes | Últimos Resultados ─── -->
+      <div class="med-grid" style="margin-top:20px;">
+        <!-- Exames Recentes -->
         <div class="card">
           <div class="card-header">
             <span class="card-title">Exames Recentes</span>
@@ -196,72 +251,88 @@
             <div id="listaExamesRecentes">
               <div class="activity-item">
                 <div class="activity-dot" style="background:#15803d"></div>
-                <span class="activity-text">Hemograma - #E001</span>
+                <span class="activity-text">Hemograma - Maria Oliveira</span>
                 <span class="activity-time">Finalizado</span>
               </div>
               <div class="activity-item">
                 <div class="activity-dot" style="background:var(--blue)"></div>
-                <span class="activity-text">Mielograma - #E002</span>
+                <span class="activity-text">Mielograma - Pedro Alves</span>
                 <span class="activity-time">Em andamento</span>
               </div>
               <div class="activity-item">
                 <div class="activity-dot" style="background:var(--yellow)"></div>
-                <span class="activity-text">Hemograma - #E003</span>
+                <span class="activity-text">Hemograma - Ana Lima</span>
                 <span class="activity-time">Pendente</span>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- CARD: ANÁLISES IA -->
+        <!-- Últimos Resultados -->
         <div class="card">
           <div class="card-header">
-            <span class="card-title">Análises IA</span>
-            <a href="crudanaliseia.html" class="btn btn-outline btn-sm">Ver todas →</a>
+            <span class="card-title">Últimos Resultados</span>
+            <a href="crudresultado.html" class="btn btn-outline btn-sm">Ver todos →</a>
           </div>
           <div class="card-body">
-            <div id="listaAnalisesIA">
+            <div id="listaUltimosResultados">
               <div class="activity-item">
                 <div class="activity-dot" style="background:var(--red)"></div>
-                <span class="activity-text">Alta suspeita - LMA</span>
-                <span class="activity-time">Confiança: 94%</span>
+                <span class="activity-text">Maria Oliveira - Hemograma</span>
+                <span class="activity-time"><span class="resultado-suspeita suspeita-alta">Alta</span></span>
               </div>
               <div class="activity-item">
                 <div class="activity-dot" style="background:#d97706"></div>
-                <span class="activity-text">Moderada - LLC</span>
-                <span class="activity-time">Confiança: 78%</span>
+                <span class="activity-text">Pedro Alves - Mielograma</span>
+                <span class="activity-time"><span class="resultado-suspeita suspeita-moderada">Moderada</span></span>
               </div>
               <div class="activity-item">
                 <div class="activity-dot" style="background:#15803d"></div>
-                <span class="activity-text">Baixa suspeita</span>
-                <span class="activity-time">Confiança: 45%</span>
+                <span class="activity-text">Ana Lima - Hemograma</span>
+                <span class="activity-time"><span class="resultado-suspeita suspeita-sem">Sem suspeita</span></span>
               </div>
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- CARD: ATIVIDADES RECENTES -->
+      <!-- ─── LINHA 4: Painel de Alertas ─── -->
+      <div class="med-grid-full" style="margin-top:20px;">
         <div class="card">
           <div class="card-header">
-            <span class="card-title">Atividades Recentes</span>
-            <a href="historico.html" class="btn btn-outline btn-sm">Ver histórico →</a>
+            <span class="card-title">Painel de Alertas</span>
           </div>
           <div class="card-body">
-            <div id="listaAtividades">
-              <div class="activity-item">
-                <div class="activity-dot" style="background:var(--blue)"></div>
-                <span class="activity-text">Novo exame cadastrado - Hemograma</span>
-                <span class="activity-time">há 1h</span>
+            <div id="painelAlertas">
+              <div class="alerta-item">
+                <span class="icone">📋</span>
+                <span class="texto">Consultas pendentes</span>
+                <span class="badge-alerta amarelo">3</span>
               </div>
-              <div class="activity-item">
-                <div class="activity-dot" style="background:var(--red)"></div>
-                <span class="activity-text">Status da consulta #1045 atualizado</span>
-                <span class="activity-time">há 2h</span>
+              <div class="alerta-item">
+                <span class="icone">🧪</span>
+                <span class="texto">Exames pendentes</span>
+                <span class="badge-alerta amarelo">5</span>
               </div>
-              <div class="activity-item">
-                <div class="activity-dot" style="background:#15803d"></div>
-                <span class="activity-text">Nova análise IA gerada</span>
-                <span class="activity-time">há 3h</span>
+              <div class="alerta-item">
+                <span class="icone">🔬</span>
+                <span class="texto">Exames em andamento</span>
+                <span class="badge-alerta azul">2</span>
+              </div>
+              <div class="alerta-item">
+                <span class="icone">📄</span>
+                <span class="texto">Resultados emitidos</span>
+                <span class="badge-alerta verde">12</span>
+              </div>
+              <div class="alerta-item">
+                <span class="icone">🔴</span>
+                <span class="texto">Resultados com Alta suspeita</span>
+                <span class="badge-alerta vermelho">4</span>
+              </div>
+              <div class="alerta-item">
+                <span class="icone">📅</span>
+                <span class="texto">Consultas agendadas para hoje</span>
+                <span class="badge-alerta azul">3</span>
               </div>
             </div>
           </div>
@@ -275,77 +346,459 @@
 <script src="../JS/navbar.js"></script>
 <script src="../JS/auth.js"></script>
 <script>
-  const usuario =JSON.parse(localStorage.getItem("usuario"));
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
+  const token = localStorage.getItem("token");
 
-  if (!usuario ||usuario.role !== "Médico") {
-      window.location.href ="../login.html";
+  let consultas = [];
+  let exames = [];
+  let resultados = [];
+
+  if (!usuario || usuario.role !== "Médico") {
+      window.location.href = "../login.html";
   }
-  localStorage.setItem('hematoai_session', JSON.stringify({
-    tipo: 'Médico',
-    nome: 'Dr. Usuário',
-    crm: '00000-SP',
-    email: 'medico@hospital.com'
-  }));
-  function verConsultas() {
-    window.location.href = 'crudconsulta_med.html';
-  }
-  
-  function verExames() {
-    window.location.href = 'crudexame.html';
-  }
-  
-  function verResultados() {
-    window.location.href = 'crudresultado.html';
-  }
-  
-  function verAnamnese() {
-    window.location.href = 'crudanamnese.html';
-  }
-  
+
   // ============================================
   // CARREGAMENTO DE DADOS (API FUTURA)
   // ============================================
+
   
-  async function carregarDadosDashboard() {
-    try {
-      // Simulação de dados estáticos
-      const dadosExemplo = {
-        totalConsultas: 28,
-        totalExames: 15,
-        totalPacientes: 42,
-        totalAnalises: 8
-      };
-      
-      document.getElementById('totalConsultas').textContent = dadosExemplo.totalConsultas;
-      document.getElementById('totalExames').textContent = dadosExemplo.totalExames;
-      document.getElementById('totalPacientes').textContent = dadosExemplo.totalPacientes;
-      document.getElementById('totalAnalises').textContent = dadosExemplo.totalAnalises;
-      
-    } catch (error) {
-      console.error('Erro ao carregar dados do dashboard:', error);
+  async function carregarConsultas() {
+    
+    const response = await fetch("http://localhost:3000/consultas", {
+        headers: {
+            Authorization: "Bearer " + token
+        }
+    });
+
+    const dados = await response.json();
+
+    if(dados.status){
+        consultas = dados.dados;
     }
-  }
-  
+    console.log(consultas);
+}
+async function carregarExames() {
+
+    const response = await fetch("http://localhost:3000/exames", {
+        headers:{
+            Authorization:"Bearer " + token
+        }
+    });
+
+    const dados = await response.json();
+
+    if(dados.status){
+        exames = dados.dados;
+    }
+    console.log(exames);
+
+}
+async function carregarResultados(){
+
+    const response = await fetch("http://localhost:3000/resultados-exame",{
+        headers:{
+            Authorization:"Bearer " + token
+        }
+    });
+
+    const dados = await response.json();
+
+    if(dados.status){
+        resultados = dados.dados;
+    }
+
+}
+function preencherIndicadores(){
+
+    document.getElementById("totalConsultas").textContent =
+        consultas.length;
+
+    document.getElementById("totalExames").textContent =
+        exames.length;
+
+    document.getElementById("totalResultados").textContent =
+        resultados.length;
+
+    const pacientes = new Set(
+        consultas.map(c=>c.cpf)
+    );
+
+    document.getElementById("totalPacientes").textContent =
+        pacientes.size;
+
+}
+
+function preencherConsultasRecentes() {
+
+    const container =
+        document.getElementById("listaConsultasRecentes");
+
+    const lista =
+        [...consultas]
+        .sort((a,b)=>
+            new Date(b.data_consulta) -
+            new Date(a.data_consulta)
+        )
+        .slice(0,5);
+
+    if(lista.length===0){
+
+        container.innerHTML =
+            `<div class="agenda-vazia">
+                Nenhuma consulta encontrada.
+            </div>`;
+
+        return;
+    }
+
+    container.innerHTML = lista.map(c=>`
+
+        <div class="activity-item">
+
+            <div class="activity-dot"
+                 style="background:${corStatusConsulta(c.statusc)}">
+            </div>
+
+            <span class="activity-text">
+                Consulta #${c.id_consulta} - ${c.paciente}
+            </span>
+
+            <span class="activity-time">
+                ${c.statusc}
+            </span>
+
+        </div>
+
+    `).join("");
+
+}
+function preencherAgendaHoje(){
+
+    const container =
+        document.getElementById("agendaHoje");
+
+    const hoje =
+        new Date().toISOString().split("T")[0];
+
+    const agenda =
+        consultas
+        .filter(c=>c.data_consulta.startsWith(hoje))
+        .sort((a,b)=>
+            new Date(a.data_consulta)-
+            new Date(b.data_consulta)
+        );
+
+    if(agenda.length===0){
+
+        container.innerHTML =
+            `<div class="agenda-vazia">
+                Nenhuma consulta para hoje.
+            </div>`;
+
+        return;
+    }
+
+    container.innerHTML = agenda.map(c=>`
+
+        <div class="activity-item">
+
+            <div class="activity-dot"
+                 style="background:${corStatusConsulta(c.statusc)}">
+            </div>
+
+            <span class="activity-text">
+                ${formatarHora(c.data_consulta)} - ${c.paciente}
+            </span>
+
+            <span class="activity-time">
+                ${c.statusc}
+            </span>
+
+        </div>
+
+    `).join("");
+
+}
+function preencherExamesRecentes(){
+
+    const container =
+        document.getElementById("listaExamesRecentes");
+
+    const lista =
+        [...exames]
+        .sort((a,b)=>
+            new Date(b.data_exame)-
+            new Date(a.data_exame)
+        )
+        .slice(0,5);
+
+    if(lista.length===0){
+
+        container.innerHTML =
+            `<div class="agenda-vazia">
+                Nenhum exame encontrado.
+            </div>`;
+
+        return;
+    }
+
+    container.innerHTML = lista.map(e=>`
+
+        <div class="activity-item">
+
+            <div class="activity-dot"
+                 style="background:${corStatusExame(e.statusc)}">
+            </div>
+
+            <span class="activity-text">
+                ${e.tipo_exame} - ${e.paciente}
+            </span>
+
+            <span class="activity-time">
+                ${e.statusc}
+            </span>
+
+        </div>
+
+    `).join("");
+
+}
+function preencherResultadosRecentes(){
+
+    const container =
+        document.getElementById("listaUltimosResultados");
+
+    const lista =
+        [...resultados]
+        .sort((a,b)=>
+            new Date(b.data_resultado)-
+            new Date(a.data_resultado)
+        )
+        .slice(0,5);
+
+    if(lista.length===0){
+
+        container.innerHTML =
+            `<div class="agenda-vazia">
+                Nenhum resultado encontrado.
+            </div>`;
+
+        return;
+    }
+
+    container.innerHTML = lista.map(r=>`
+
+        <div class="activity-item">
+
+            <div class="activity-dot"
+                 style="background:${corSuspeita(r.suspeita_leucemia)}">
+            </div>
+
+            <span class="activity-text">
+                Exame #${r.id_exame}
+            </span>
+
+            <span class="activity-time">
+
+                <span class="
+                    resultado-suspeita
+                    ${classeSuspeita(r.suspeita_leucemia)}
+                ">
+                    ${r.suspeita_leucemia}
+                </span>
+
+            </span>
+
+        </div>
+
+    `).join("");
+
+}
+function preencherAlertas(){
+
+    const container =
+        document.getElementById("painelAlertas");
+
+    const consultasPendentes =
+        consultas.filter(c=>c.statusc==="Pendente").length;
+
+    const examesPendentes =
+        exames.filter(e=>e.statusc==="Pendente").length;
+
+    const examesAndamento =
+        exames.filter(e=>e.statusc==="Em andamento").length;
+
+    const resultadosEmitidos =
+        resultados.length;
+
+    const altaSuspeita =
+        resultados.filter(r=>
+            r.suspeita_leucemia==="Alta"
+        ).length;
+
+    const hoje =
+        new Date().toISOString().split("T")[0];
+
+    const agendaHoje =
+        consultas.filter(c=>
+            c.data_consulta.startsWith(hoje)
+        ).length;
+
+    container.innerHTML = `
+
+        ${criarAlerta("📋","Consultas pendentes",consultasPendentes,"amarelo")}
+
+        ${criarAlerta("🧪","Exames pendentes",examesPendentes,"amarelo")}
+
+        ${criarAlerta("🔬","Exames em andamento",examesAndamento,"azul")}
+
+        ${criarAlerta("📄","Resultados emitidos",resultadosEmitidos,"verde")}
+
+        ${criarAlerta("🔴","Alta suspeita",altaSuspeita,"vermelho")}
+
+        ${criarAlerta("📅","Consultas hoje",agendaHoje,"azul")}
+
+    `;
+
+}
+function criarAlerta(icone,texto,valor,classe){
+
+    return `
+        <div class="alerta-item">
+
+            <span class="icone">${icone}</span>
+
+            <span class="texto">
+                ${texto}
+            </span>
+
+            <span class="badge-alerta ${classe}">
+                ${valor}
+            </span>
+
+        </div>
+    `;
+
+}
+function formatarHora(data){
+
+    return new Date(data).toLocaleTimeString(
+        "pt-BR",
+        {
+            hour:"2-digit",
+            minute:"2-digit"
+        }
+    );
+
+}
+function corStatusConsulta(status){
+
+    switch(status){
+
+        case "Finalizado":
+            return "#15803d";
+
+        case "Em andamento":
+            return "#2563eb";
+
+        case "Pendente":
+            return "#d97706";
+
+        default:
+            return "#94a3b8";
+    }
+}
+function corStatusExame(status){
+
+    switch(status){
+
+        case "Finalizado":
+            return "#15803d";
+
+        case "Em andamento":
+            return "#2563eb";
+
+        case "Pendente":
+            return "#d97706";
+
+        default:
+            return "#94a3b8";
+    }
+
+}
+function corSuspeita(suspeita){
+
+    switch(suspeita){
+
+        case "Alta":
+            return "#dc2626";
+
+        case "Moderada":
+            return "#d97706";
+
+        case "Baixa":
+            return "#2563eb";
+
+        default:
+            return "#15803d";
+    }
+
+}
+function classeSuspeita(suspeita){
+
+    switch(suspeita){
+
+        case "Alta":
+            return "suspeita-alta";
+
+        case "Moderada":
+            return "suspeita-moderada";
+
+        case "Baixa":
+            return "suspeita-baixa";
+
+        default:
+            return "suspeita-sem";
+    }
+
+}
+async function carregarDadosDashboard(){
+
+    await Promise.all([
+        carregarConsultas(),
+        carregarExames(),
+        carregarResultados()
+    ]);
+
+    preencherIndicadores();
+    preencherConsultasRecentes();
+    preencherAgendaHoje();
+    preencherExamesRecentes();
+    preencherResultadosRecentes();
+    preencherAlertas();
+
+}
+
   // Inicialização da Sessão e Sidebar
   if (!localStorage.getItem('hematoai_session')) {
     if (typeof HematoAI !== 'undefined' && HematoAI.setSession) {
         HematoAI.setSession({ tipo: 'Médico', nome: 'Dr. Usuário', crm: '00000-SP' });
     }
   }
-  
+
   if (typeof HematoAI !== 'undefined' && HematoAI.initSidebar) {
       HematoAI.initSidebar('anamnese');
   } else {
       console.warn("HematoAI não definido. Verifique o arquivo JS/navbar.js");
   }
-  
+
   // Atualizar data no header
   const dataAtual = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   const headerElement = document.getElementById('headerDate');
   if (headerElement) {
       headerElement.textContent = dataAtual;
   }
-  
+
   // Carregar dados do dashboard
   carregarDadosDashboard();
   verificarPerfil("Médico");

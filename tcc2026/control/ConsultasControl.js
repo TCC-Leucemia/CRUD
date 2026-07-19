@@ -32,7 +32,9 @@ module.exports = class ConsultasControl {
     }
 
     index = async (req, res, next) => {
-        console.log(req.user);
+        console.log("ROLE:", req.user.role);
+        console.log("CRM:", req.user.crm);
+        console.log("CPF:", req.user.cpf);
         try {
 
             const service = new ConsultasService(this.#banco);

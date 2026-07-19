@@ -384,8 +384,6 @@
 
                     const dados = await resposta.json();
 
-                    console.log("Resposta API:", dados);
-
                     if (!resposta.ok || !dados.status) {
 
                         alert(dados.msg || "Login inválido");
@@ -404,15 +402,20 @@
                         JSON.stringify(dados.usuario)
                     );
 
-                    // Mantém compatibilidade com navbar.js
                     localStorage.setItem(
                         "hematoai_session",
                         JSON.stringify({
+                            token: dados.token,
                             tipo: dados.usuario.role,
+                            nome: dados.usuario.nome,
                             email: dados.usuario.email,
                             id_usuario: dados.usuario.id_usuario
                         })
                     );
+
+                    console.log(
+    JSON.parse(localStorage.getItem("hematoai_session"))
+);
 
                     // Redirecionamento
                     switch (dados.usuario.role) {

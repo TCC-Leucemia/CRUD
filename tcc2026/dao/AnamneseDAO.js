@@ -122,6 +122,33 @@ module.exports = class AnamneseDAO {
         });
     }
 
+    findByConsulta(id_consulta) {
+
+        const sql = `
+            SELECT *
+            FROM anamnese
+            WHERE id_consulta = ?
+            LIMIT 1
+        `;
+
+        return new Promise((resolve, reject) => {
+
+            this.#banco.query(
+                sql,
+                [id_consulta],
+                (err, result) => {
+
+                    if (err) return reject(err);
+
+                    resolve(result[0] || null);
+
+                }
+            );
+
+        });
+
+    }
+
     update = async (anamnese) => {
 
         const sql = `

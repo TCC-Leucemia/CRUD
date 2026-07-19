@@ -44,24 +44,32 @@ module.exports = class ExamesDAO {
 
         const sql = `
             SELECT
-                e.id_exame,
-                e.id_consulta,
-                e.tipo_exame,
-                e.data_exame,
-                e.statusc,
+            e.id_exame,
+            e.id_consulta,
+            e.tipo_exame,
+            e.data_exame,
+            e.statusc,
 
-                m.nome AS medico,
-                m.especialidade,
+            c.data_consulta,
 
-                r.resultado_texto,
-                r.suspeita_leucemia,
-                r.tipo_leucemia,
-                r.data_resultado
+            m.nome AS medico,
+            m.especialidade,
+
+            p.nome AS paciente,
+            p.cpf,
+
+            r.resultado_texto,
+            r.suspeita_leucemia,
+            r.tipo_leucemia,
+            r.data_resultado
 
             FROM exames e
 
             INNER JOIN consultas c
                 ON c.id_consulta = e.id_consulta
+
+            INNER JOIN pacientes p
+                ON p.cpf = c.cpf
 
             INNER JOIN medicos m
                 ON m.crm = c.crm
@@ -97,24 +105,32 @@ module.exports = class ExamesDAO {
 
         const sql = `
             SELECT
-                e.id_exame,
-                e.id_consulta,
-                e.tipo_exame,
-                e.data_exame,
-                e.statusc,
+            e.id_exame,
+            e.id_consulta,
+            e.tipo_exame,
+            e.data_exame,
+            e.statusc,
 
-                m.nome AS medico,
-                m.especialidade,
+            c.data_consulta,
 
-                r.resultado_texto,
-                r.suspeita_leucemia,
-                r.tipo_leucemia,
-                r.data_resultado
+            m.nome AS medico,
+            m.especialidade,
+
+            p.nome AS paciente,
+            p.cpf,
+
+            r.resultado_texto,
+            r.suspeita_leucemia,
+            r.tipo_leucemia,
+            r.data_resultado
 
             FROM exames e
 
             INNER JOIN consultas c
                 ON c.id_consulta = e.id_consulta
+
+            INNER JOIN pacientes p
+                ON p.cpf = c.cpf
 
             INNER JOIN medicos m
                 ON m.crm = c.crm

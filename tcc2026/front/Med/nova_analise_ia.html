@@ -345,12 +345,7 @@
 <script src="../JS/navbar.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-  // ============================================
-  // SESSÃO & SIDEBAR
-  // ============================================
-  if (!localStorage.getItem('hematoai_session')) {
-    HematoAI.setSession({ tipo: 'Médico', nome: 'Dr. Usuário', crm: '00000-SP' });
-  }
+  
   HematoAI.initSidebar('analises-ia');
 
   // ============================================

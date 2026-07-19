@@ -155,6 +155,38 @@ module.exports = class ResultadosExameDAO {
         });
     }
 
+    findByExame(idExame) {
+
+        const sql = `
+            SELECT
+                re.*,
+                c.cpf,
+                c.crm
+            FROM resultados_exame re
+            INNER JOIN exames e
+                ON e.id_exame = re.id_exame
+            INNER JOIN consultas c
+                ON c.id_consulta = e.id_consulta
+            WHERE re.id_exame = ?
+        `;
+
+        return new Promise((resolve, reject) => {
+
+            this.#banco.query(
+                sql,
+                [idExame],
+                (erro, result) => {
+
+                    if (erro) reject(erro);
+                    else resolve(result[0] || null);
+
+                }
+            );
+
+        });
+
+    }
+
     findOwnerByExameId(idExame) {
 
         const sql = `

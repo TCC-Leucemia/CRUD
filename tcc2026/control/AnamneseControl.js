@@ -8,6 +8,7 @@ module.exports = class AnamneseControl {
         this.#banco = banco;
         console.log("AnamneseControl.constructor");
     }
+    
 
     store = async (req, res, next) => {
 
@@ -128,5 +129,29 @@ module.exports = class AnamneseControl {
         } catch (erro) {
             next(erro);
         }
+    }
+    findByConsulta = async (req, res, next) => {
+
+        try {
+
+            const service = new AnamneseService(this.#banco);
+
+            const resultado =
+                await service.findByConsulta(
+                    req.params.id_consulta,
+                    req.user
+                );
+
+            res.status(200).send({
+                status: true,
+                dados: resultado
+            });
+
+        } catch (erro) {
+
+            next(erro);
+
+        }
+
     }
 }

@@ -130,4 +130,24 @@ module.exports = class ResultadosExameControl {
             next(erro);
         }
     }
+    showByExame = async (req, res, next) => {
+
+        try {
+
+            const resultado =
+                await this.#service.findByExame(
+                    req.params.id_exame,
+                    req.user
+                );
+
+            return res.send({
+                status: true,
+                dados: resultado
+            });
+
+        } catch (erro) {
+            next(erro);
+        }
+
+    }
 }

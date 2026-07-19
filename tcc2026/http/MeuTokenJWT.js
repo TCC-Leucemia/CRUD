@@ -16,6 +16,8 @@ module.exports = class MeuTokenJWT {
 
         this.#key = process.env.JWT_SECRET;
 
+        console.log("JWT_SECRET:", this.#key);
+
         this.#alg = "HS256";
 
         this.#type = "JWT";

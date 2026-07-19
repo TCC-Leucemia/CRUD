@@ -60,6 +60,172 @@
       line-height: 1.6;
       margin-bottom: 18px;
     }
+
+    /* ── Seletor de consulta (estilo crudexame) ── */
+    .consulta-selector {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      background: var(--bg);
+      margin-top: 4px;
+      margin-bottom: 20px;
+    }
+    .consulta-selector .search-wrapper {
+      position: relative;
+      margin-bottom: 12px;
+    }
+    .consulta-selector .search-wrapper input {
+      width: 100%;
+      padding: 8px 14px 8px 36px;
+      border: 1.5px solid var(--border);
+      border-radius: 40px;
+      font-size: 0.85rem;
+      background: var(--surface);
+      color: var(--text-1);
+      outline: none;
+      transition: var(--transition);
+    }
+    .consulta-selector .search-wrapper input:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(185,28,28,0.08);
+    }
+    .consulta-selector .search-wrapper .lupa {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.95rem;
+      color: var(--text-3);
+    }
+
+    .consulta-tabela-wrapper {
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: var(--surface);
+    }
+    .consulta-tabela-wrapper table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+    }
+    .consulta-tabela-wrapper thead {
+      background: var(--bg);
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+    .consulta-tabela-wrapper th {
+      padding: 8px 12px;
+      text-align: left;
+      font-weight: 700;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      color: var(--text-2);
+      border-bottom: 1px solid var(--border);
+    }
+    .consulta-tabela-wrapper td {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-1);
+      vertical-align: middle;
+    }
+    .consulta-tabela-wrapper tr:last-child td { border-bottom: none; }
+    .consulta-tabela-wrapper tr.selecionada {
+      background: var(--red-light);
+      border-left: 3px solid var(--red);
+    }
+    .consulta-tabela-wrapper tr:hover {
+      background: var(--bg);
+      cursor: pointer;
+    }
+    .consulta-tabela-wrapper .btn-selecionar {
+      padding: 2px 12px;
+      font-size: 0.7rem;
+      border-radius: 30px;
+    }
+
+    .resumo-consulta {
+      margin-top: 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 12px 16px;
+      display: none;
+    }
+    .resumo-consulta.ativo {
+      display: block;
+    }
+    .resumo-consulta .grid {
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      gap: 4px 16px;
+      font-size: 0.85rem;
+    }
+    .resumo-consulta .grid .label {
+      color: var(--text-2);
+      font-weight: 600;
+    }
+    .resumo-consulta .grid .valor {
+      color: var(--text-1);
+      font-weight: 500;
+    }
+    .resumo-consulta .grid .valor.destaque {
+      font-weight: 700;
+      color: var(--red);
+    }
+
+    /* ── Card de consulta (edição) ── */
+    .consulta-info-panel {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px 18px;
+      margin-bottom: 20px;
+    }
+    .consulta-info-panel .grid {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 4px 16px;
+      font-size: 0.85rem;
+    }
+    .consulta-info-panel .grid .label {
+      color: var(--text-2);
+      font-weight: 600;
+    }
+    .consulta-info-panel .grid .valor {
+      color: var(--text-1);
+      font-weight: 500;
+    }
+    .consulta-info-panel .grid .valor.destaque {
+      font-weight: 700;
+      color: var(--red);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* ── Modo escuro ── */
+    .dark-mode .consulta-selector {
+      background: var(--surface);
+      border-color: var(--border);
+    }
+    .dark-mode .consulta-tabela-wrapper {
+      background: var(--surface);
+    }
+    .dark-mode .consulta-tabela-wrapper thead {
+      background: var(--bg);
+    }
+    .dark-mode .consulta-tabela-wrapper tr.selecionada {
+      background: #1e293b;
+      border-left-color: var(--red);
+    }
+    .dark-mode .consulta-info-panel {
+      background: var(--surface);
+      border-color: var(--border);
+    }
   </style>
 </head>
 <body>
@@ -76,14 +242,15 @@
         <p>Histórico clínico e sintomas dos pacientes</p>
       </div>
       <div class="page-header-right">
-        <span class="badge badge-blue">Visualização e edição</span>
+        <button class="btn btn-primary" id="btnNovaAnamnese">Nova Anamnese</button>
+        <span class="badge badge-blue" style="margin-left:8px;">Visualização e edição</span>
       </div>
     </div>
 
     <div class="page-body">
       <div class="info-box">
         ⚠️ Você pode visualizar, editar e excluir as anamneses dos seus pacientes.
-        Para cadastrar uma nova anamnese, utilize a funcionalidade <strong>"Nova Análise IA"</strong>.
+        Para cadastrar uma nova anamnese, clique em <strong>"Nova Anamnese"</strong>.
       </div>
 
       <div class="card">
@@ -128,32 +295,79 @@
   </div>
 </div>
 
-<!-- Modal Formulário (Apenas Edição) -->
+<!-- ── Modal Formulário ── -->
 <div class="modal-overlay" id="modalAnamnese">
   <div class="modal modal-lg">
     <div class="modal-header">
-      <h2 id="modalTitulo">Editar Anamnese</h2>
+      <h2 id="modalTitulo">Nova Anamnese</h2>
       <button class="btn-close-modal" id="closeModalAnamnese">✕</button>
     </div>
     <div class="modal-body">
-      <div class="info-box" style="background:var(--blue-light);border-color:#bfdbfe;color:var(--blue);">
-        ✏️ Você está editando a anamnese do paciente. Altere os campos conforme necessário.
+      <div class="info-box" id="modalInfoBox" style="background:var(--blue-light);border-color:#bfdbfe;color:var(--blue);">
+        Selecione uma consulta que ainda não possui anamnese.
       </div>
 
+      <!-- ─── Seletor de Consulta (Novo) ─── -->
+      <div id="consultaSelector">
+        <div class="form-group" style="margin-bottom:20px;">
+          <label>Consulta *</label>
+          <div class="consulta-selector">
+            <div class="search-wrapper">
+              <span class="lupa">🔍</span>
+              <input type="text" id="searchConsultaSelect" placeholder="Pesquisar por paciente, CPF, ID ou tipo...">
+            </div>
+            <div class="consulta-tabela-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Paciente</th>
+                    <th>CPF</th>
+                    <th>Data</th>
+                    <th style="width:100px;">Ação</th>
+                  </tr>
+                </thead>
+                <tbody id="tbodyConsultasSelect"></tbody>
+              </table>
+            </div>
+            <div class="resumo-consulta" id="resumoConsulta">
+              <div style="font-weight:700;font-size:0.8rem;color:var(--text-2);margin-bottom:6px;">Consulta selecionada</div>
+              <div class="grid">
+                <span class="label">ID</span>
+                <span class="valor destaque" id="resumoConsultaId">—</span>
+                <span class="label">Paciente</span>
+                <span class="valor" id="resumoConsultaPaciente">—</span>
+                <span class="label">CPF</span>
+                <span class="valor" id="resumoConsultaCpf">—</span>
+                <span class="label">Data</span>
+                <span class="valor" id="resumoConsultaData">—</span>
+                <span class="label">Tipo</span>
+                <span class="valor" id="resumoConsultaTipo">—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── Painel de Consulta (Edição) ─── -->
+      <div id="consultaPanel" class="consulta-info-panel hidden">
+        <div style="font-weight:700;font-size:0.85rem;color:var(--text-2);margin-bottom:8px;">Consulta vinculada (somente leitura)</div>
+        <div class="grid">
+          <span class="label">ID</span>
+          <span class="valor destaque" id="consultaIdDisplay">—</span>
+          <span class="label">Paciente</span>
+          <span class="valor" id="consultaPacienteDisplay">—</span>
+          <span class="label">CPF</span>
+          <span class="valor" id="consultaCpfDisplay">—</span>
+          <span class="label">Data</span>
+          <span class="valor" id="consultaDataDisplay">—</span>
+          <span class="label">Tipo</span>
+          <span class="valor" id="consultaTipoDisplay">—</span>
+        </div>
+      </div>
+
+      <!-- ─── Campos editáveis ─── -->
       <div class="form-grid">
-        <div class="form-group">
-          <label>Paciente</label>
-          <input type="text" id="aPacienteNome" disabled style="background:var(--bg);opacity:0.7;font-weight:600;">
-        </div>
-        <div class="form-group">
-          <label>CPF</label>
-          <input type="text" id="aCpf" disabled style="background:var(--bg);opacity:0.7;">
-        </div>
-        <div class="form-group">
-          <label>ID da Consulta</label>
-          <input type="number" id="aIdConsulta" disabled style="background:var(--bg);opacity:0.7;">
-        </div>
-        <div class="form-group"><!-- spacer --></div>
         <div class="form-group col-span-2">
           <label>Sintomas *</label>
           <textarea id="aSintomas" rows="4" placeholder="Descreva os sintomas apresentados pelo paciente..."></textarea>
@@ -163,15 +377,17 @@
           <textarea id="aComorbidades" rows="3" placeholder="Doenças prévias, condições crônicas, histórico familiar..."></textarea>
         </div>
       </div>
+
+      <input type="hidden" id="aIdConsulta" value="">
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" id="cancelarAnamnese">Cancelar</button>
-      <button class="btn btn-primary" id="salvarAnamnese">Salvar Alterações</button>
+      <button class="btn btn-primary" id="salvarAnamnese">Salvar Anamnese</button>
     </div>
   </div>
 </div>
 
-<!-- Modal Detalhes -->
+<!-- ── Modal Detalhes ── -->
 <div class="modal-overlay" id="modalDetalhes">
   <div class="modal">
     <div class="modal-header">
@@ -188,23 +404,28 @@
 
 <script src="../JS/navbar.js"></script>
 <script>
-  if (!localStorage.getItem('hematoai_session')) {
-    HematoAI.setSession({ tipo: 'Médico', nome: 'Dr. Usuário', crm: '00000-SP' });
-  }
+  
   HematoAI.initSidebar('anamnese');
 
   // ============================================
-  // DADOS DE DEMONSTRAÇÃO
+  // DADOS DE DEMONSTRAÇÃO (mockados)
   // ============================================
   
-  // Mapeamento de pacientes
+  // Pacientes (apenas para referência)
   const pacientes = {
     '11111111111': 'Maria Oliveira',
     '22222222222': 'Pedro Alves',
     '33333333333': 'Ana Paula Lima'
   };
 
-  // Datas das consultas
+  // Consultas disponíveis (as que não possuem anamnese)
+  let consultasDisponiveis = [
+    { id_consulta: 4, cpf: '11111111111', paciente: 'Maria Oliveira', data_consulta: '2026-07-20T09:00:00', tipo_consulta: 'Hemograma' },
+    { id_consulta: 5, cpf: '22222222222', paciente: 'Pedro Alves', data_consulta: '2026-07-22T14:30:00', tipo_consulta: 'Consulta clínica' },
+    { id_consulta: 6, cpf: '33333333333', paciente: 'Ana Paula Lima', data_consulta: '2026-07-25T11:00:00', tipo_consulta: 'Retorno' },
+  ];
+
+  // Consultas já com anamnese (para exibir dados no detalhe)
   const consultasInfo = {
     1: { data_consulta: '2025-06-10T08:00:00' },
     2: { data_consulta: '2025-07-01T10:00:00' },
@@ -222,6 +443,7 @@
   let modoEdicao = false;
   let idEdicao = null;
   let idDetalhe = null;
+  let consultaSelecionada = null; // objeto da consulta selecionada no seletor
 
   // ============================================
   // FUNÇÕES AUXILIARES
@@ -247,8 +469,13 @@
     return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
   }
 
+  function atualizarListaDisponivel() {
+    const idsComAnamnese = anamneses.map(a => a.id_consulta);
+    consultasDisponiveis = consultasDisponiveis.filter(c => !idsComAnamnese.includes(c.id_consulta));
+  }
+
   // ============================================
-  // RENDERIZAÇÃO
+  // RENDERIZAÇÃO DA TABELA DE ANAMNESES
   // ============================================
   
   function renderTabela(data) {
@@ -287,10 +514,94 @@
   }
 
   // ============================================
+  // RENDERIZAÇÃO DA LISTA DE CONSULTAS (seletor)
+  // ============================================
+  
+  function renderizarListaConsultas(filtro = '') {
+    const tbody = document.getElementById('tbodyConsultasSelect');
+    tbody.innerHTML = '';
+
+    const filtroLower = filtro.toLowerCase().trim();
+    let lista = consultasDisponiveis;
+
+    if (filtroLower) {
+      lista = consultasDisponiveis.filter(c => {
+        return (c.paciente || '').toLowerCase().includes(filtroLower) ||
+               (c.cpf || '').includes(filtroLower) ||
+               String(c.id_consulta).includes(filtroLower) ||
+               (c.tipo_consulta || '').toLowerCase().includes(filtroLower);
+      });
+    }
+
+    if (lista.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="5" style="text-align:center;padding:20px;color:var(--text-3);">
+            Nenhuma consulta disponível para anamnese.
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    lista.forEach(c => {
+      const tr = document.createElement('tr');
+      const isSelecionada = consultaSelecionada && consultaSelecionada.id_consulta === c.id_consulta;
+      if (isSelecionada) tr.classList.add('selecionada');
+
+      tr.innerHTML = `
+        <td style="font-family:var(--font-mono);font-size:0.75rem;">#${c.id_consulta}</td>
+        <td style="font-weight:600;">${c.paciente || '—'}</td>
+        <td style="font-family:var(--font-mono);font-size:0.75rem;">${formatarCPF(c.cpf)}</td>
+        <td style="font-size:0.8rem;">${c.data_consulta ? formatarDataHora(c.data_consulta) : '—'}</td>
+        <td>
+          <button class="btn btn-primary btn-sm btn-selecionar" onclick="selecionarConsulta(${c.id_consulta})">
+            Selecionar
+          </button>
+        </td>
+      `;
+
+      tr.addEventListener('click', (ev) => {
+        if (ev.target.tagName !== 'BUTTON') {
+          selecionarConsulta(c.id_consulta);
+        }
+      });
+
+      tbody.appendChild(tr);
+    });
+  }
+
+  function selecionarConsulta(idConsulta) {
+    const consulta = consultasDisponiveis.find(c => c.id_consulta === idConsulta);
+    if (!consulta) return;
+
+    consultaSelecionada = consulta;
+    document.getElementById('aIdConsulta').value = consulta.id_consulta;
+
+    // Atualiza resumo
+    document.getElementById('resumoConsultaId').textContent = '#' + consulta.id_consulta;
+    document.getElementById('resumoConsultaPaciente').textContent = consulta.paciente || '—';
+    document.getElementById('resumoConsultaCpf').textContent = formatarCPF(consulta.cpf);
+    document.getElementById('resumoConsultaData').textContent = consulta.data_consulta ? formatarDataHora(consulta.data_consulta) : '—';
+    document.getElementById('resumoConsultaTipo').textContent = consulta.tipo_consulta || '—';
+
+    document.getElementById('resumoConsulta').classList.add('ativo');
+
+    // Re-renderiza para destacar
+    const search = document.getElementById('searchConsultaSelect').value;
+    renderizarListaConsultas(search);
+  }
+
+  document.getElementById('searchConsultaSelect').addEventListener('input', function() {
+    renderizarListaConsultas(this.value);
+  });
+
+  // ============================================
   // CARREGAR E FILTRAR
   // ============================================
   
   function carregar() {
+    atualizarListaDisponivel();
     filtrados = [...anamneses];
     aplicarFiltros();
   }
@@ -309,28 +620,47 @@
   document.getElementById('btnRecarregar').addEventListener('click', carregar);
 
   // ============================================
-  // EDITAR
+  // NOVA ANAMNESE
   // ============================================
   
-  function abrirEdicao(id) {
-    const a = anamneses.find(x => x.id_anamnese === id);
-    if (!a) return;
+  document.getElementById('btnNovaAnamnese').addEventListener('click', () => {
+    modoEdicao = false;
+    idEdicao = null;
+    consultaSelecionada = null;
 
-    modoEdicao = true;
-    idEdicao = id;
-    const nomePaciente = getNomePaciente(a.cpf);
-    
-    document.getElementById('modalTitulo').textContent = `Editar Anamnese - ${nomePaciente}`;
-    document.getElementById('aPacienteNome').value = nomePaciente;
-    document.getElementById('aCpf').value = formatarCPF(a.cpf);
-    document.getElementById('aIdConsulta').value = a.id_consulta;
-    document.getElementById('aSintomas').value = a.sintomas;
-    document.getElementById('aComorbidades').value = a.comorbidades || '';
+    document.getElementById('modalTitulo').textContent = 'Nova Anamnese';
+    document.getElementById('modalInfoBox').textContent = 'Selecione uma consulta que ainda não possui anamnese.';
+    document.getElementById('modalInfoBox').style.background = 'var(--blue-light)';
+    document.getElementById('modalInfoBox').style.borderColor = '#bfdbfe';
+    document.getElementById('modalInfoBox').style.color = 'var(--blue)';
+
+    // Mostrar seletor, esconder painel de leitura
+    document.getElementById('consultaSelector').classList.remove('hidden');
+    document.getElementById('consultaPanel').classList.add('hidden');
+
+    // Limpar campos
+    document.getElementById('searchConsultaSelect').value = '';
+    document.getElementById('aIdConsulta').value = '';
+    document.getElementById('aSintomas').value = '';
+    document.getElementById('aComorbidades').value = '';
+
+    // Limpar resumo
+    document.getElementById('resumoConsulta').classList.remove('ativo');
+    document.getElementById('resumoConsultaId').textContent = '—';
+    document.getElementById('resumoConsultaPaciente').textContent = '—';
+    document.getElementById('resumoConsultaCpf').textContent = '—';
+    document.getElementById('resumoConsultaData').textContent = '—';
+    document.getElementById('resumoConsultaTipo').textContent = '—';
+
+    // Atualizar lista de consultas disponíveis e renderizar
+    atualizarListaDisponivel();
+    renderizarListaConsultas();
+
     HematoAI.openModal(document.getElementById('modalAnamnese'));
-  }
+  });
 
   // ============================================
-  // SALVAR EDIÇÃO
+  // SALVAR (CRIAÇÃO OU EDIÇÃO)
   // ============================================
   
   document.getElementById('salvarAnamnese').addEventListener('click', () => {
@@ -342,18 +672,80 @@
       return;
     }
 
-    const idx = anamneses.findIndex(x => x.id_anamnese === idEdicao);
-    if (idx >= 0) {
-      anamneses[idx] = {
-        ...anamneses[idx],
+    if (modoEdicao) {
+      // Edição
+      const idx = anamneses.findIndex(x => x.id_anamnese === idEdicao);
+      if (idx >= 0) {
+        anamneses[idx] = {
+          ...anamneses[idx],
+          sintomas: sintomas,
+          comorbidades: comorbidades
+        };
+        HematoAI.showToast('Anamnese atualizada com sucesso!', 'success');
+      }
+    } else {
+      // Criação
+      const idConsulta = parseInt(document.getElementById('aIdConsulta').value);
+      if (!idConsulta || !consultaSelecionada) {
+        HematoAI.showToast('Selecione uma consulta válida.', 'error');
+        return;
+      }
+
+      anamneses.push({
+        id_anamnese: proximoId++,
+        cpf: consultaSelecionada.cpf,
+        id_consulta: idConsulta,
         sintomas: sintomas,
-        comorbidades: comorbidades
-      };
-      HematoAI.showToast('Anamnese atualizada com sucesso!', 'success');
-      HematoAI.closeModal(document.getElementById('modalAnamnese'));
-      carregar();
+        comorbidades: comorbidades || ''
+      });
+
+      // Remover a consulta da lista de disponíveis
+      consultasDisponiveis = consultasDisponiveis.filter(c => c.id_consulta !== idConsulta);
+
+      HematoAI.showToast('Anamnese cadastrada com sucesso!', 'success');
     }
+
+    HematoAI.closeModal(document.getElementById('modalAnamnese'));
+    carregar(); // recarrega a lista
   });
+
+  // ============================================
+  // EDITAR
+  // ============================================
+  
+  function abrirEdicao(id) {
+    const a = anamneses.find(x => x.id_anamnese === id);
+    if (!a) return;
+
+    modoEdicao = true;
+    idEdicao = id;
+
+    document.getElementById('modalTitulo').textContent = `Editar Anamnese - ${getNomePaciente(a.cpf)}`;
+    document.getElementById('modalInfoBox').textContent = '✏️ Você está editando a anamnese. Altere apenas sintomas e comorbidades.';
+    document.getElementById('modalInfoBox').style.background = 'var(--blue-light)';
+    document.getElementById('modalInfoBox').style.borderColor = '#bfdbfe';
+    document.getElementById('modalInfoBox').style.color = 'var(--blue)';
+
+    // Esconde seletor, mostra painel de leitura
+    document.getElementById('consultaSelector').classList.add('hidden');
+    document.getElementById('consultaPanel').classList.remove('hidden');
+
+    // Preenche painel com dados da consulta vinculada
+    const consulta = consultasDisponiveis.find(c => c.id_consulta === a.id_consulta) || 
+                     { paciente: getNomePaciente(a.cpf), cpf: a.cpf, data_consulta: getDataConsulta(a.id_consulta), tipo_consulta: '—' };
+    document.getElementById('consultaIdDisplay').textContent = '#' + a.id_consulta;
+    document.getElementById('consultaPacienteDisplay').textContent = consulta.paciente || '—';
+    document.getElementById('consultaCpfDisplay').textContent = formatarCPF(consulta.cpf);
+    document.getElementById('consultaDataDisplay').textContent = consulta.data_consulta ? formatarDataHora(consulta.data_consulta) : '—';
+    document.getElementById('consultaTipoDisplay').textContent = consulta.tipo_consulta || '—';
+
+    document.getElementById('aIdConsulta').value = a.id_consulta;
+
+    document.getElementById('aSintomas').value = a.sintomas || '';
+    document.getElementById('aComorbidades').value = a.comorbidades || '';
+
+    HematoAI.openModal(document.getElementById('modalAnamnese'));
+  }
 
   // ============================================
   // DETALHES
@@ -399,7 +791,23 @@
     HematoAI.confirmDialog(
       `Deseja excluir a anamnese <strong>#${id}</strong>?<br>Esta ação não pode ser desfeita.`,
       () => {
+        const removida = anamneses.find(a => a.id_anamnese === id);
         anamneses = anamneses.filter(x => x.id_anamnese !== id);
+
+        // Devolver a consulta à lista de disponíveis (se não estiver já)
+        if (removida) {
+          const jaExiste = consultasDisponiveis.some(c => c.id_consulta === removida.id_consulta);
+          if (!jaExiste) {
+            consultasDisponiveis.push({
+              id_consulta: removida.id_consulta,
+              cpf: removida.cpf,
+              paciente: getNomePaciente(removida.cpf),
+              data_consulta: getDataConsulta(removida.id_consulta) || new Date().toISOString(),
+              tipo_consulta: 'Consulta'
+            });
+          }
+        }
+
         HematoAI.showToast('Anamnese excluída com sucesso.', 'success');
         carregar();
       }
@@ -429,7 +837,7 @@
   // ============================================
   
   carregar();
-  verificarPerfil("Médico");
+  verificarPerfil('Médico');
 </script>
 </body>
 </html>
