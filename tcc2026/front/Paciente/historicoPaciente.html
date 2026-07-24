@@ -488,6 +488,7 @@ async function carregarConsultas() {
         );
 
         const dados = await response.json();
+        console.log("Resposta da API:", dados);
 
         if (!dados.status) {
             HematoAI.showToast("Erro ao carregar consultas", "error");

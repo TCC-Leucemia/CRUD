@@ -17,29 +17,63 @@
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 16px;
-      margin-bottom: 28px;
+      margin-bottom: 32px;
     }
 
     .stat-indicator-card {
       background: var(--surface);
       border: 1.5px solid var(--border);
       border-radius: var(--radius-xl);
-      padding: 18px;
+      padding: 20px 12px;
       text-align: center;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-indicator-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--red);
+      opacity: 0.6;
+      transition: opacity 0.3s ease;
+    }
+
+    .stat-indicator-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--red);
+    }
+
+    .stat-indicator-card:hover::before {
+      opacity: 1;
     }
 
     .stat-indicator-number {
       font-size: 2rem;
       font-weight: 800;
       color: var(--red);
-      line-height: 1;
-      margin-bottom: 6px;
+      line-height: 1.2;
+      margin-bottom: 4px;
+      letter-spacing: -0.5px;
     }
 
     .stat-indicator-label {
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: var(--text-2);
-      font-weight: 500;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+    }
+
+    .stat-indicator-icon {
+      font-size: 1.6rem;
+      display: block;
+      margin-bottom: 6px;
+      opacity: 0.8;
     }
 
     /* ── Grid principal (2x2) ──────────────────────────── */
@@ -49,13 +83,19 @@
       gap: 20px;
     }
 
-    /* ── Estilos dos novos cards ───────────────────────── */
+    .pac-grid .card {
+      transition: all 0.3s ease;
+    }
 
-    /* Próxima Consulta / Último Exame (detalhes) */
+    .pac-grid .card:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    /* ── Estilos dos cards ──────────────────────────────── */
     .info-linha {
       display: flex;
       justify-content: space-between;
-      padding: 6px 0;
+      padding: 7px 0;
       font-size: 0.85rem;
       border-bottom: 1px solid var(--border);
     }
@@ -64,16 +104,17 @@
     }
     .info-linha .label {
       color: var(--text-2);
+      font-weight: 500;
     }
     .info-linha .valor {
       color: var(--text-1);
-      font-weight: 500;
+      font-weight: 600;
       text-align: right;
     }
 
     .consulta-status {
-      margin-top: 8px;
-      padding-top: 8px;
+      margin-top: 10px;
+      padding-top: 10px;
       border-top: 1px solid var(--border);
       display: flex;
       justify-content: flex-end;
@@ -82,38 +123,82 @@
     .placeholder-text {
       color: var(--text-3);
       font-size: 0.9rem;
-      padding: 12px 0;
+      padding: 16px 0;
       text-align: center;
       font-weight: 500;
     }
 
-    /* Alertas */
+    /* ── Badges de status ── */
+    .status-badge {
+      display: inline-block;
+      padding: 3px 14px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+    .status-finalizado {
+      background: #dcfce7;
+      color: #15803d;
+    }
+    .status-andamento {
+      background: #dbeafe;
+      color: #2563eb;
+    }
+    .status-pendente {
+      background: #fef3c7;
+      color: #d97706;
+    }
+
+    .dark-mode .status-finalizado {
+      background: #064e3b;
+      color: #6ee7b7;
+    }
+    .dark-mode .status-andamento {
+      background: #1e3a8a;
+      color: #93c5fd;
+    }
+    .dark-mode .status-pendente {
+      background: #78350f;
+      color: #fcd34d;
+    }
+
+    /* ── Alertas ── */
     .alerta-item {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
       padding: 10px 0;
       border-bottom: 1px solid var(--border);
+      transition: background 0.2s ease;
+      border-radius: var(--radius-md);
+      padding: 10px 12px;
+      margin: 0 -12px;
     }
     .alerta-item:last-child {
       border-bottom: none;
     }
+    .alerta-item:hover {
+      background: var(--bg);
+    }
     .alerta-item .icone {
-      font-size: 1.1rem;
-      width: 24px;
+      font-size: 1.2rem;
+      width: 28px;
       text-align: center;
+      flex-shrink: 0;
     }
     .alerta-item .texto {
       font-size: 0.85rem;
       color: var(--text-1);
       flex: 1;
+      font-weight: 500;
     }
 
-    /* Resumo Clínico */
+    /* ── Resumo Clínico ── */
     .resumo-linha {
       display: flex;
       justify-content: space-between;
-      padding: 8px 0;
+      padding: 9px 0;
       border-bottom: 1px solid var(--border);
       font-size: 0.85rem;
     }
@@ -122,13 +207,28 @@
     }
     .resumo-linha .label {
       color: var(--text-2);
+      font-weight: 500;
     }
     .resumo-linha .valor {
       color: var(--text-1);
-      font-weight: 600;
+      font-weight: 700;
     }
 
-    /* ── Modo escuro (compatibilidade com o existente) ── */
+    /* ── Botão "Ver histórico" ── */
+    .btn-ver-historico {
+      width: 100%;
+      justify-content: center;
+      margin-top: 4px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      transition: all 0.3s ease;
+    }
+    .btn-ver-historico:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* ── Modo escuro ── */
     .dark-mode .info-linha {
       border-bottom-color: var(--border);
     }
@@ -149,6 +249,7 @@
     }
     @media (max-width: 600px) {
       .stats-indicators { grid-template-columns: 1fr; }
+      .stat-indicator-number { font-size: 1.6rem; }
     }
   </style>
 </head>
@@ -176,20 +277,24 @@
         <!-- ─── INDICADORES ────────────────────────────────── -->
         <div class="stats-indicators">
           <div class="stat-indicator-card">
+            <span class="stat-indicator-icon">📋</span>
             <div class="stat-indicator-number" id="totalConsultas">0</div>
-            <div class="stat-indicator-label">📋 Consultas</div>
+            <div class="stat-indicator-label">Consultas</div>
           </div>
           <div class="stat-indicator-card">
+            <span class="stat-indicator-icon">🧪</span>
             <div class="stat-indicator-number" id="totalExames">0</div>
-            <div class="stat-indicator-label">🧪 Exames</div>
+            <div class="stat-indicator-label">Exames</div>
           </div>
           <div class="stat-indicator-card">
+            <span class="stat-indicator-icon">📄</span>
             <div class="stat-indicator-number" id="totalResultados">0</div>
-            <div class="stat-indicator-label">📄 Resultados</div>
+            <div class="stat-indicator-label">Resultados</div>
           </div>
           <div class="stat-indicator-card">
+            <span class="stat-indicator-icon">📅</span>
             <div class="stat-indicator-number" id="proximasConsultas">0</div>
-            <div class="stat-indicator-label">📅 Próximas consultas</div>
+            <div class="stat-indicator-label">Próximas consultas</div>
           </div>
         </div>
 
@@ -207,7 +312,7 @@
                 <div class="placeholder-text">Nenhuma consulta agendada.</div>
               </div>
               <div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border);">
-                <a href="historicoPaciente.html" class="btn btn-outline btn-sm" style="width:100%; justify-content:center;">
+                <a href="historicoPaciente.html" class="btn btn-outline btn-sm btn-ver-historico">
                   Ver histórico →
                 </a>
               </div>
@@ -278,13 +383,7 @@
     window.location.href = "../login.html";
   }
 
-  // Forçar sessão para garantir consistência (será substituído pela API futuramente)
-  localStorage.setItem('hematoai_session', JSON.stringify({
-    tipo: 'Paciente',
-    nome: 'Ana Paula Lima',
-    email: 'paciente@email.com',
-    cpf: '33333333333'
-  }));
+  
 
   if (typeof HematoAI !== 'undefined' && HematoAI.initSidebar) {
     HematoAI.initSidebar('paciente');

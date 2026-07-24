@@ -144,7 +144,7 @@
           <span class="card-title">Lista de Análises</span>
           <div class="filter-row">
             <div class="search-bar" style="max-width:280px">
-              <input type="text" id="searchAnalise" placeholder="Paciente, CPF ou ID do exame...">
+              <input type="text" id="searchAnalise" placeholder="Paciente, CPF ou tipo do exame...">
             </div>
             <select id="filterSuspeita" class="filter-select">
               <option value="">Todas as suspeitas</option>
@@ -177,8 +177,8 @@
                 <th>Paciente</th>
                 <th>CPF</th>
                 <th>Data Consulta</th>
-                <th>ID Exame</th>
-                <th>Tipo</th>
+                <th>Tipo Leucemia</th>
+                <th>Tipo Exame</th>
                 <th>Suspeita</th>
                 <th>Status</th>
                 <th>Ações</th>
@@ -216,49 +216,47 @@
   
   HematoAI.initSidebar('analises-ia');
 
-  // ============================================
-  // DADOS DE DEMONSTRAÇÃO
-  // ============================================
-  
-  // Mapeamento de pacientes
-  const pacientes = {
-    '11111111111': 'Maria Oliveira',
-    '22222222222': 'Pedro Alves',
-    '33333333333': 'Ana Paula Lima'
-  };
-
-  // Mapeamento de exames (ID do exame -> { paciente, tipo, data_consulta })
-  const examesInfo = {
-    1: { cpf: '11111111111', tipo: 'Hemograma', data_consulta: '2025-06-10T08:00:00' },
-    2: { cpf: '11111111111', tipo: 'Mielograma', data_consulta: '2025-06-10T08:00:00' },
-    3: { cpf: '22222222222', tipo: 'Hemograma', data_consulta: '2025-07-01T10:00:00' },
-    4: { cpf: '33333333333', tipo: 'Hemograma', data_consulta: '2025-07-15T14:30:00' }
-  };
-
-  let analises = [
-    { id_analise: 1, id_exame: 1, resultado_ia: 'Presença de células blásticas atípicas. Sugerente de LMA.\nRecomenda-se confirmação com exames complementares.', suspeita_ia: 'Alta', tipo_leucemia_ia: 'LMA', confianca: 94.5, statusc: 'Finalizado', data_analise: '2025-06-10' },
-    { id_analise: 2, id_exame: 2, resultado_ia: 'Alterações discretas nos parâmetros hematológicos.\nRecomenda-se novo exame em 30 dias para acompanhamento.', suspeita_ia: 'Baixa', tipo_leucemia_ia: 'Não identificado', confianca: 62.3, statusc: 'Em andamento', data_analise: '2025-06-15' },
-    { id_analise: 3, id_exame: 3, resultado_ia: 'Aguardando processamento da amostra para análise completa.', suspeita_ia: 'Sem suspeita', tipo_leucemia_ia: 'Não identificado', confianca: 0, statusc: 'Pendente', data_analise: null },
-  ];
-
-  let filtrados = [];
   let idDetalhe = null;
+  let analises = [];
+  let filtrados = [];
 
-  // ============================================
-  // FUNÇÕES AUXILIARES
-  // ============================================
-  
-  function getPacientePorExame(idExame) {
-    const info = examesInfo[idExame];
-    if (!info) return { nome: '—', cpf: '—', tipo: '—', data_consulta: null };
-    return {
-      nome: pacientes[info.cpf] || '—',
-      cpf: info.cpf || '—',
-      tipo: info.tipo || '—',
-      data_consulta: info.data_consulta || null
-    };
+  async function carregar() {
+
+    try {
+
+        const session = JSON.parse(
+            localStorage.getItem("hematoai_session")
+        );
+
+        const response = await fetch(
+            "http://localhost:3000/analise-ia",
+            {
+                headers: {
+                    Authorization: `Bearer ${session.token}`
+                }
+            }
+        );
+
+        const json = await response.json();
+
+        if (!response.ok || !json.status) {
+            throw new Error(json.msg);
+        }
+
+        analises = json.dados;
+        console.log(json.dados);
+
+        aplicarFiltros();
+
+    }
+    catch (erro) {
+
+        HematoAI.showToast(
+            erro.message,
+            "error"
+        );
+    }
   }
-
   function formatarCPF(cpf) {
     if (!cpf || cpf === '—') return '—';
     const c = String(cpf).replace(/\D/g, '').padStart(11, '0');
@@ -309,15 +307,18 @@
     empty.style.display = 'none';
 
     data.forEach(a => {
-      const paciente = getPacientePorExame(a.id_exame);
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td style="font-family:var(--font-mono);font-size:0.78rem;color:var(--text-3)">#${a.id_analise}</td>
-        <td style="font-weight:600;font-size:0.85rem">${paciente.nome}</td>
-        <td style="font-family:var(--font-mono);font-size:0.8rem">${formatarCPF(paciente.cpf)}</td>
-        <td style="font-size:0.8rem">${formatarDataHora(paciente.data_consulta)}</td>
-        <td style="font-family:var(--font-mono);font-size:0.82rem;color:var(--blue)">#${a.id_exame}</td>
-        <td>${tipoBadge(paciente.tipo)}</td>
+        <td style="font-weight:600;font-size:0.85rem">${a.nome}</td>
+        <td style="font-family:var(--font-mono);font-size:0.8rem">${formatarCPF(a.cpf)}</td>
+        <td style="font-size:0.8rem">${formatarDataHora(a.data_consulta)}</td>
+        <td>
+        <span class="badge badge-purple">
+            ${a.tipo_leucemia_ia || "Não identificado"}
+        </span>
+        </td>
+        <td>${tipoBadge(a.tipo_exame)}</td>
         <td>${suspeitaBadge(a.suspeita_ia)}</td>
         <td>${statusPill(a.statusc)}</td>
         <td>
@@ -331,31 +332,78 @@
     });
   }
 
-  // ============================================
-  // CARREGAR E FILTRAR
-  // ============================================
-  
-  function carregar() {
-    filtrados = [...analises];
-    aplicarFiltros();
-  }
-
   function aplicarFiltros() {
     const q = document.getElementById('searchAnalise').value.toLowerCase();
     const suspeita = document.getElementById('filterSuspeita').value;
     const status = document.getElementById('filterStatus').value;
 
     filtrados = analises.filter(a => {
-      const paciente = getPacientePorExame(a.id_exame);
-      const matchPaciente = paciente.nome.toLowerCase().includes(q) || 
-                           paciente.cpf.includes(q) || 
-                           String(a.id_exame).includes(q);
-      return matchPaciente &&
-        (!suspeita || a.suspeita_ia === suspeita) &&
-        (!status || a.statusc === status);
+
+    const matchPaciente =
+        a.nome.toLowerCase().includes(q) ||
+        a.cpf.includes(q) ||
+        String(a.id_exame).includes(q);
+
+          return matchPaciente &&
+              (!suspeita || a.suspeita_ia === suspeita) &&
+              (!status || a.statusc === status);
+
     });
     renderTabela(filtrados);
   }
+
+  async function excluirAnalise(id) {
+
+    try {
+
+        const session = JSON.parse(
+            localStorage.getItem("hematoai_session")
+        );
+
+        const response = await fetch(
+            `http://localhost:3000/analise-ia/${id}`,
+            {
+                method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${session.token}`
+                }
+            }
+        );
+
+        const json = await response.json();
+
+        if (!response.ok || !json.status) {
+            throw new Error(json.msg);
+        }
+
+        HematoAI.showToast(
+            json.msg,
+            "success"
+        );
+
+        carregar();
+
+    }
+    catch (erro) {
+
+        HematoAI.showToast(
+            erro.message,
+            "error"
+        );
+    }
+
+  }
+  function confirmarExclusao(id){
+
+    HematoAI.confirmDialog(
+
+        `Deseja excluir a análise IA <strong>#${id}</strong>?`,
+
+        () => excluirAnalise(id)
+
+    );
+
+}
 
   document.getElementById('searchAnalise').addEventListener('input', aplicarFiltros);
   document.getElementById('filterSuspeita').addEventListener('change', aplicarFiltros);
@@ -381,21 +429,21 @@
     if (!a) {
       document.getElementById('detalheBody').innerHTML = '<p style="color:var(--red);padding:20px">Análise não encontrada.</p>';
     } else {
-      const paciente = getPacientePorExame(a.id_exame);
+      const paciente = a;
       document.getElementById('detalheBody').innerHTML = `
         <div class="detail-grid">
           <span class="detail-key">ID</span>
           <span class="detail-value" style="font-family:var(--font-mono)">#${a.id_analise}</span>
           <span class="detail-key">Paciente</span>
-          <span class="detail-value" style="font-weight:600">${paciente.nome}</span>
+          <span class="detail-value" style="font-weight:600">${a.nome}</span>
           <span class="detail-key">CPF</span>
-          <span class="detail-value" style="font-family:var(--font-mono)">${formatarCPF(paciente.cpf)}</span>
+          <span class="detail-value" style="font-family:var(--font-mono)">${formatarCPF(a.cpf)}</span>
           <span class="detail-key">Data da Consulta</span>
-          <span class="detail-value">${formatarDataHora(paciente.data_consulta)}</span>
+          <span class="detail-value">${formatarDataHora(a.data_consulta)}</span>
           <span class="detail-key">ID Exame</span>
           <span class="detail-value" style="font-family:var(--font-mono);color:var(--blue)">#${a.id_exame}</span>
           <span class="detail-key">Tipo de Exame</span>
-          <span class="detail-value">${tipoBadge(paciente.tipo)}</span>
+          <span class="detail-value">${tipoBadge(a.tipo_exame)}</span>
           <span class="detail-key">Suspeita</span>
           <span class="detail-value">${suspeitaBadge(a.suspeita_ia)}</span>
           <span class="detail-key">Tipo Leucemia</span>
@@ -426,16 +474,16 @@
       return;
     }
 
-    const paciente = getPacientePorExame(a.id_exame);
+    const paciente = a;
     const conteudoPDF = `
 HEMATOAI - RELATÓRIO DE ANÁLISE IA
 =============================================
 ID da Análise: #${a.id_analise}
-Paciente: ${paciente.nome}
-CPF: ${formatarCPF(paciente.cpf)}
-Data da Consulta: ${formatarDataHora(paciente.data_consulta)}
+Paciente: ${a.nome}
+CPF: ${formatarCPF(a.cpf)}
+Data da Consulta: ${formatarDataHora(a.data_consulta)}
 ID do Exame: #${a.id_exame}
-Tipo de Exame: ${paciente.tipo}
+Tipo de Exame: ${a.tipo_exame}
 Data da Análise: ${formatarData(a.data_analise)}
 Status: ${a.statusc}
 
@@ -472,22 +520,6 @@ Consulte um especialista para validação do diagnóstico.
   
   document.getElementById('closeModalDetalhes').addEventListener('click', () => HematoAI.closeModal(document.getElementById('modalDetalhes')));
   document.getElementById('fecharDetalhes').addEventListener('click', () => HematoAI.closeModal(document.getElementById('modalDetalhes')));
-
-  // ============================================
-  // EXCLUIR
-  // ============================================
-  
-  function confirmarExclusao(id) {
-    HematoAI.confirmDialog(
-      `Deseja excluir a análise IA <strong>#${id}</strong>?<br>Esta ação não pode ser desfeita.`,
-      () => {
-        analises = analises.filter(x => x.id_analise !== id);
-        HematoAI.showToast('Análise excluída com sucesso.', 'success');
-        carregar();
-      }
-    );
-  }
-
   // ============================================
   // INICIALIZAÇÃO
   // ============================================

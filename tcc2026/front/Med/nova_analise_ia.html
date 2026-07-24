@@ -64,6 +64,12 @@
       box-shadow: 0 0 0 3px rgba(185,28,28,0.08);
     }
 
+    .input-group input:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      background: var(--bg);
+    }
+
     .input-group textarea {
       resize: vertical;
       min-height: 90px;
@@ -249,6 +255,32 @@
     @keyframes spin { to { transform: rotate(360deg); } }
     .hidden { display: none !important; }
 
+    /* Estilo para o select com dados do paciente */
+    .select-info {
+      font-size: 0.72rem;
+      color: var(--text-3);
+      margin-top: 4px;
+    }
+
+    .campo-automatico {
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      font-size: 0.875rem;
+      color: var(--text-1);
+      opacity: 0.7;
+      cursor: not-allowed;
+      min-height: 42px;
+      display: flex;
+      align-items: center;
+    }
+
+    .campo-automatico.vazio {
+      color: var(--text-3);
+      font-style: italic;
+    }
+
     @media (max-width: 700px) {
       .input-group.full-width { grid-column: span 1; }
     }
@@ -278,37 +310,50 @@
         <div class="form-section-title">Anamnese e imagens do paciente</div>
         <form id="formAnamnese">
           <div class="form-grid">
-            <div class="input-group">
-              <label for="nome">Nome completo</label>
-              <input type="text" id="nome" placeholder="Ex: Maria da Silva" required>
-            </div>
-            <div class="input-group">
-              <label for="idade">Idade (anos)</label>
-              <input type="number" id="idade" placeholder="Ex: 56" required>
-            </div>
-            <div class="input-group">
-              <label for="sexo">Sexo</label>
-              <select id="sexo" required>
-                <option value="">Selecione</option>
-                <option value="Feminino">Feminino</option>
-                <option value="Masculino">Masculino</option>
-                <option value="Prefiro não informar">Prefiro não informar</option>
-              </select>
-            </div>
-            <div class="input-group">
-              <label for="idExame">ID do Exame</label>
-              <input type="number" id="idExame" placeholder="Ex: 1" required>
-            </div>
+            <!-- Select do Exame -->
             <div class="input-group full-width">
-              <label for="sintomas">Sintomas apresentados</label>
+              <label for="idExame">Selecione o Exame *</label>
+              <select id="idExame" required>
+                <option value="">Carregando exames...</option>
+              </select>
+              <div class="select-info">Selecione um exame para preencher os dados do paciente automaticamente.</div>
+            </div>
+
+            <!-- Dados do paciente (preenchidos automaticamente) -->
+            <div class="input-group">
+              <label>Nome do Paciente</label>
+              <div class="campo-automatico vazio" id="displayNome">Aguardando seleção do exame...</div>
+              <input type="hidden" id="nome" value="">
+            </div>
+
+            <div class="input-group">
+              <label>Idade</label>
+              <div class="campo-automatico vazio" id="displayIdade">Aguardando seleção do exame...</div>
+              <input type="hidden" id="idade" value="">
+            </div>
+
+            <div class="input-group">
+              <label>Sexo</label>
+              <div class="campo-automatico vazio" id="displaySexo">Aguardando seleção do exame...</div>
+              <input type="hidden" id="sexo" value="">
+            </div>
+
+            <div class="input-group"><!-- spacer --></div>
+
+            <!-- Sintomas e Histórico -->
+            <div class="input-group full-width">
+              <label for="sintomas">Sintomas apresentados *</label>
               <textarea id="sintomas" placeholder="Ex: fadiga, febre, perda de peso, equimoses..." required></textarea>
             </div>
+
             <div class="input-group full-width">
-              <label for="historico">Histórico clínico relevante</label>
+              <label for="historico">Histórico clínico relevante *</label>
               <textarea id="historico" placeholder="Ex: Doenças prévias, tratamentos anteriores, histórico familiar..." required></textarea>
             </div>
+
+            <!-- Upload de imagem -->
             <div class="input-group full-width">
-              <label>Lâmina digital</label>
+              <label>Lâmina digital *</label>
               <div class="upload-area" id="uploadArea">
                 <div class="upload-text">📁 Clique ou arraste a imagem</div>
                 <div class="upload-hint">Suporta JPG, PNG, JPEG. Máximo 10MB.</div>
@@ -363,7 +408,147 @@ document.addEventListener('DOMContentLoaded', function () {
   const fileSize      = document.getElementById('fileSize');
   const removeFileBtn = document.getElementById('removeFile');
 
+  const selectExame   = document.getElementById('idExame');
+  const displayNome   = document.getElementById('displayNome');
+  const displayIdade  = document.getElementById('displayIdade');
+  const displaySexo   = document.getElementById('displaySexo');
+  const inputNome     = document.getElementById('nome');
+  const inputIdade    = document.getElementById('idade');
+  const inputSexo     = document.getElementById('sexo');
+
   let pdfUrlAtual = null;
+  let examesData = []; // Armazena os dados completos dos exames
+
+  // ============================================
+  // FUNÇÕES AUXILIARES
+  // ============================================
+  function formatarData(iso) {
+    if (!iso) return 'Data não informada';
+    const d = new Date(iso);
+    return d.toLocaleDateString('pt-BR');
+  }
+
+  function calcularIdade(dataNascimento) {
+    if (!dataNascimento) return null;
+    const hoje = new Date();
+    const nascimento = new Date(dataNascimento);
+    let idade = hoje.getFullYear() - nascimento.getFullYear();
+    const mes = hoje.getMonth() - nascimento.getMonth();
+    if (mes < 0 || (mes === 0 && hoje.getDate() < nascimento.getDate())) {
+      idade--;
+    }
+    return idade;
+  }
+
+  function preencherDadosPaciente(exame) {
+    if (!exame) {
+      // Limpa os campos
+      displayNome.textContent = 'Aguardando seleção do exame...';
+      displayNome.className = 'campo-automatico vazio';
+      displayIdade.textContent = 'Aguardando seleção do exame...';
+      displayIdade.className = 'campo-automatico vazio';
+      displaySexo.textContent = 'Aguardando seleção do exame...';
+      displaySexo.className = 'campo-automatico vazio';
+      inputNome.value = '';
+      inputIdade.value = '';
+      inputSexo.value = '';
+      return;
+    }
+
+    // Preenche nome
+    displayNome.textContent = exame.paciente || 'Não informado';
+    displayNome.className = 'campo-automatico';
+    inputNome.value = exame.paciente || '';
+
+    // Preenche idade
+    const idade = exame.data_nascimento ? calcularIdade(exame.data_nascimento) : null;
+    if (idade !== null) {
+      displayIdade.textContent = `${idade} anos`;
+      inputIdade.value = idade;
+    } else {
+      displayIdade.textContent = 'Não informado';
+      inputIdade.value = '';
+    }
+    displayIdade.className = 'campo-automatico';
+
+    // Preenche sexo
+    const sexoMap = {
+      'Masculino': 'Masculino',
+      'Feminino': 'Feminino',
+      'M': 'Masculino',
+      'F': 'Feminino'
+    };
+    const sexoFormatado = sexoMap[exame.sexo] || exame.sexo || 'Não informado';
+    displaySexo.textContent = sexoFormatado;
+    displaySexo.className = 'campo-automatico';
+    inputSexo.value = sexoFormatado;
+  }
+
+  // ============================================
+  // CARREGAR EXAMES
+  // ============================================
+  async function carregarExames() {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch("http://localhost:3000/exames", {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      const json = await response.json();
+
+      if (!json.status) {
+        HematoAI.showToast(json.msg || 'Erro ao carregar exames.', 'error');
+        return;
+      }
+
+      examesData = json.dados || [];
+
+      // Popula o select
+      selectExame.innerHTML = '<option value="">Selecione um exame</option>';
+      
+      examesData.forEach(exame => {
+        const option = document.createElement('option');
+        option.value = exame.id_exame;
+        const dataExame = exame.data_exame ? formatarData(exame.data_exame) : 'Data não informada';
+        option.textContent = `${exame.paciente || 'Paciente'} • ${exame.tipo_exame || 'Exame'} • ${dataExame}`;
+        // Armazena os dados completos no option para acesso rápido
+        option.dataset.exame = JSON.stringify(exame);
+        selectExame.appendChild(option);
+      });
+
+    } catch (error) {
+      console.error('Erro ao carregar exames:', error);
+      HematoAI.showToast('Erro ao carregar exames.', 'error');
+    }
+  }
+
+  // ============================================
+  // EVENTO DE SELEÇÃO DO EXAME
+  // ============================================
+  selectExame.addEventListener('change', function() {
+    const selectedOption = this.options[this.selectedIndex];
+    
+    if (!selectedOption || !selectedOption.value) {
+      preencherDadosPaciente(null);
+      return;
+    }
+
+    try {
+      const exameData = JSON.parse(selectedOption.dataset.exame);
+      preencherDadosPaciente(exameData);
+    } catch (error) {
+      console.error('Erro ao processar dados do exame:', error);
+      // Fallback: tenta buscar pelo ID
+      const exame = examesData.find(e => e.id_exame === parseInt(this.value));
+      if (exame) {
+        preencherDadosPaciente(exame);
+      } else {
+        preencherDadosPaciente(null);
+      }
+    }
+  });
 
   // ============================================
   // UPLOAD
@@ -451,21 +636,24 @@ document.addEventListener('DOMContentLoaded', function () {
       formData.append('nome',     nome);
       formData.append('idExame',  idExame);
 
-      console.log('📤 Enviando para o servidor...');
+      const token = localStorage.getItem("token");
 
-      // Simulação de resposta (substituir pela chamada real)
-      // const response = await fetch('http://localhost:3000/analisar', {
-      //   method: 'POST',
-      //   body: formData
-      // });
-      // const data = await response.json();
+      const response = await fetch(
+          "http://localhost:3000/anamnese",
+          {
+              method: "POST",
+              headers: {
+                  "Authorization": `Bearer ${token}`
+              },
+              body: formData
+          }
+      );
 
-      // SIMULAÇÃO DE RESPOSTA (REMOVER QUANDO INTEGRAR)
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      const data = {
-        laudo: `RELATÓRIO DE ANÁLISE HEMATOLÓGICA\n\nPaciente: ${nome}\nIdade: ${idade} anos\nSexo: ${sexo}\n\nSINTOMAS: ${sintomas}\n\nHISTÓRICO: ${historico}\n\nANÁLISE:\n- Hemoglobina: 9.8 g/dL (baixo)\n- Leucócitos: 25,000 µL (elevado)\n- Plaquetas: 45,000 µL (baixo)\n- Presença de células blásticas atípicas: 15%\n\nSUSPEITA: ALTA - Leucemia Mieloide Aguda (LMA)\nCONFIANÇA: 94.5%\n\nRECOMENDAÇÃO:\n- Realizar mielograma para confirmação\n- Avaliar necessidade de internação\n- Iniciar suporte transfusional imediato\n\nEste laudo foi gerado automaticamente pelo sistema HematoAI.`,
-        pdfUrl: null
-      };
+      const data = await response.json();
+
+      if (!response.ok) {
+          throw new Error(data.msg || 'Erro ao gerar laudo');
+      }
 
       if (data.laudo) {
         laudoEl.textContent = data.laudo;
@@ -516,13 +704,11 @@ document.addEventListener('DOMContentLoaded', function () {
   btnPDF.addEventListener('click', baixarPDF);
 
   // ============================================
-  // TESTAR CONEXÃO (OPCIONAL)
+  // INICIALIZAÇÃO
   // ============================================
-  // fetch('http://localhost:3000/', { method: 'HEAD' })
-  //   .then(() => console.log('✅ Servidor conectado'))
-  //   .catch(() => console.warn('⚠️ Servidor não está respondendo'));
+  carregarExames();
+  verificarPerfil("Médico");
 });
-verificarPerfil("Médico");
 </script>
 </body>
 </html>

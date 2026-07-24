@@ -760,12 +760,7 @@
     window.location.href = "../login.html";
   }
 
-  localStorage.setItem('hematoai_session', JSON.stringify({
-    tipo: 'Paciente',
-    nome: 'Ana Paula Lima',
-    email: 'paciente@email.com',
-    cpf: '33333333333'
-  }));
+  
 
   if (typeof HematoAI !== 'undefined' && HematoAI.initSidebar) {
     HematoAI.initSidebar('resultados');

@@ -127,7 +127,6 @@
 
   function initSidebar(activePage) {
     const session = getSession();
-
     console.log("Sessão carregada:", session);
     const role = session.tipo || 'Administrador';
     const name = session.nome || 'Administrador';

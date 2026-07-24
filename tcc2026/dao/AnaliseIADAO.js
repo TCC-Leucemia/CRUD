@@ -77,13 +77,30 @@ module.exports = class AnaliseIADAO {
     findByCrm(crm) {
 
         const sql = `
-            SELECT ai.*
+            SELECT
+                ai.*,
+
+                e.tipo_exame,
+
+                c.data_consulta,
+
+                p.nome,
+                p.cpf
+
             FROM analise_ia ai
+
             INNER JOIN exames e
-                ON e.id_exame = ai.id_exame
+                ON ai.id_exame = e.id_exame
+
             INNER JOIN consultas c
-                ON c.id_consulta = e.id_consulta
+                ON e.id_consulta = c.id_consulta
+
+            INNER JOIN pacientes p
+                ON p.cpf = c.cpf
+
             WHERE c.crm = ?
+
+            ORDER BY ai.id_analise DESC;
         `;
 
         return new Promise((resolve, reject) => {

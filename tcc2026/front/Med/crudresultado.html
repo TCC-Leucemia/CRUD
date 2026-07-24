@@ -351,6 +351,7 @@
                     <th>Paciente</th>
                     <th>CPF</th>
                     <th>Tipo</th>
+                    <th>Data Exame</th>
                     <th style="width:100px;">Ação</th>
                   </tr>
                 </thead>
@@ -558,7 +559,7 @@
     if (lista.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="5" style="text-align:center;padding:20px;color:var(--text-3);">
+          <td colspan="6" style="text-align:center;padding:20px;color:var(--text-3);">
             Nenhum exame encontrado.
           </td>
         </tr>
@@ -576,6 +577,9 @@
         <td style="font-weight:600;">${e.paciente || '—'}</td>
         <td style="font-family:var(--font-mono);font-size:0.75rem;">${formatarCPF(e.cpf)}</td>
         <td>${e.tipo_exame || '—'}</td>
+        <td style="font-size:0.8rem;">
+          ${e.data_exame ? formatarData(e.data_exame) : '—'}
+        </td>
         <td>
           <button class="btn btn-primary btn-sm btn-selecionar" onclick="selecionarExame(${e.id_exame})">
             Selecionar

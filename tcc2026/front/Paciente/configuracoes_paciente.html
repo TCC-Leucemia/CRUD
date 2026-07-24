@@ -603,12 +603,7 @@
 
   // ---- 4. Validar e salvar credenciais ----
   // (mantendo a lógica do código original, ajustada para a nova estrutura)
-  let usuarioLogado = {
-    nome: 'Ana Paula Lima',
-    email: 'paciente@email.com',
-    senha: 'paciente123',
-    cpf: '33333333333'
-  };
+  
 
   function validarCredenciais() {
     const senhaAtual = document.getElementById('senhaAtual')?.value || '';
@@ -752,19 +747,6 @@
   document.getElementById('btnCancelarAlteracao').addEventListener('click', cancelarAlteracao);
   document.getElementById('btnSairSistema').addEventListener('click', sairSistema);
 
-  // ---- 6. Inicialização ----
-  if (!localStorage.getItem('hematoai_session')) {
-    HematoAI.setSession({ tipo: 'Paciente', nome: 'Ana Paula Lima', email: 'paciente@email.com', cpf: '33333333333' });
-  } else {
-    const session = JSON.parse(localStorage.getItem('hematoai_session'));
-    if (session.email) usuarioLogado.email = session.email;
-    if (session.nome) usuarioLogado.nome = session.nome;
-    if (session.cpf) usuarioLogado.cpf = session.cpf;
-    // Atualiza pacienteDados com os dados da sessão
-    pacienteDados.nome = session.nome || pacienteDados.nome;
-    pacienteDados.email = session.email || pacienteDados.email;
-    pacienteDados.cpf = session.cpf || pacienteDados.cpf;
-  }
 
   (async () => {
     HematoAI.initSidebar("config");
