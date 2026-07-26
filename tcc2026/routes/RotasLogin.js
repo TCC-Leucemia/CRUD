@@ -20,6 +20,18 @@ module.exports = (app, banco) => {
         middleware.validateBody,
         control.store
     );
+    app.post(
+        "/auth/esqueci-senha",
+        control.buscarCpf
+    );
+    app.post(
+        "/auth/validar-codigo",
+        control.validarCodigo
+    );
+    app.post(
+        "/auth/alterar-senha-recuperacao",
+        control.alterarSenhaRecuperacao
+    );
     app.get(
         "/login/meu-login",
         jwt.validateToken,

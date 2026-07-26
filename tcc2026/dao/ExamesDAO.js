@@ -124,6 +124,8 @@ module.exports = class ExamesDAO {
 
                 p.nome AS paciente,
                 p.cpf,
+                p.data_nasc,
+                p.sexo,
 
                 r.resultado_texto,
                 r.suspeita_leucemia,

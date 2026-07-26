@@ -281,8 +281,152 @@
       font-style: italic;
     }
 
+    /* ── Seletor de exames (Novo) ── */
+    .exame-selector {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      background: var(--bg);
+      margin-top: 4px;
+    }
+
+    .exame-selector .search-wrapper {
+      position: relative;
+      margin-bottom: 12px;
+    }
+
+    .exame-selector .search-wrapper input {
+      width: 100%;
+      padding: 8px 14px 8px 36px;
+      border: 1.5px solid var(--border);
+      border-radius: 40px;
+      font-size: 0.85rem;
+      background: var(--surface);
+      color: var(--text-1);
+      outline: none;
+      transition: var(--transition);
+    }
+
+    .exame-selector .search-wrapper input:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(185,28,28,0.08);
+    }
+
+    .exame-selector .search-wrapper .lupa {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.95rem;
+      color: var(--text-3);
+    }
+
+    .exame-tabela-wrapper {
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: var(--surface);
+    }
+
+    .exame-tabela-wrapper table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+    }
+
+    .exame-tabela-wrapper thead {
+      background: var(--bg);
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    .exame-tabela-wrapper th {
+      padding: 8px 12px;
+      text-align: left;
+      font-weight: 700;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      color: var(--text-2);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .exame-tabela-wrapper td {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-1);
+      vertical-align: middle;
+    }
+
+    .exame-tabela-wrapper tr:last-child td {
+      border-bottom: none;
+    }
+
+    .exame-tabela-wrapper tr.selecionada {
+      background: var(--red-light);
+      border-left: 3px solid var(--red);
+    }
+
+    .exame-tabela-wrapper tr:hover {
+      background: var(--bg);
+      cursor: pointer;
+    }
+
+    .exame-tabela-wrapper .btn-selecionar {
+      padding: 2px 12px;
+      font-size: 0.7rem;
+      border-radius: 30px;
+    }
+
+    .resumo-exame {
+      margin-top: 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 12px 16px;
+      display: none;
+    }
+
+    .resumo-exame.ativo {
+      display: block;
+    }
+
+    .resumo-exame .grid {
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      gap: 4px 16px;
+      font-size: 0.85rem;
+    }
+
+    .resumo-exame .grid .label {
+      color: var(--text-2);
+      font-weight: 600;
+    }
+
+    .resumo-exame .grid .valor {
+      color: var(--text-1);
+      font-weight: 500;
+    }
+
+    .resumo-exame .grid .valor.destaque {
+      font-weight: 700;
+      color: var(--red);
+    }
+
     @media (max-width: 700px) {
       .input-group.full-width { grid-column: span 1; }
+      .exame-tabela-wrapper table {
+        font-size: 0.7rem;
+      }
+      .exame-tabela-wrapper th,
+      .exame-tabela-wrapper td {
+        padding: 6px 8px;
+      }
+      .resumo-exame .grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 4px 8px;
+      }
     }
   </style>
 </head>
@@ -310,13 +454,44 @@
         <div class="form-section-title">Anamnese e imagens do paciente</div>
         <form id="formAnamnese">
           <div class="form-grid">
-            <!-- Select do Exame -->
+            <!-- Seletor de Exame (Novo) -->
             <div class="input-group full-width">
-              <label for="idExame">Selecione o Exame *</label>
-              <select id="idExame" required>
-                <option value="">Carregando exames...</option>
-              </select>
-              <div class="select-info">Selecione um exame para preencher os dados do paciente automaticamente.</div>
+              <label>Selecione o Exame *</label>
+              <div class="exame-selector">
+                <div class="search-wrapper">
+                  <span class="lupa">🔍</span>
+                  <input type="text" id="searchExame" placeholder="Pesquisar por paciente, CPF, ID ou data...">
+                </div>
+                <div class="exame-tabela-wrapper" id="exameTabelaWrapper">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Paciente</th>
+                        <th>CPF</th>
+                        <th>Data Exame</th>
+                        <th>Tipo</th>
+                        <th style="width:80px;">Ação</th>
+                      </tr>
+                    </thead>
+                    <tbody id="tbodyExames"></tbody>
+                  </table>
+                </div>
+                <div class="resumo-exame" id="resumoExame">
+                  <div style="font-weight:700;font-size:0.8rem;color:var(--text-2);margin-bottom:6px;">Exame selecionado</div>
+                  <div class="grid">
+                    <span class="label">Paciente</span>
+                    <span class="valor" id="resumoPaciente">—</span>
+                    <span class="label">CPF</span>
+                    <span class="valor" id="resumoCpf">—</span>
+                    <span class="label">Data Exame</span>
+                    <span class="valor" id="resumoData">—</span>
+                    <span class="label">ID</span>
+                    <span class="valor destaque" id="resumoId">—</span>
+                  </div>
+                </div>
+              </div>
+              <input type="hidden" id="idExame" value="">
             </div>
 
             <!-- Dados do paciente (preenchidos automaticamente) -->
@@ -408,7 +583,16 @@ document.addEventListener('DOMContentLoaded', function () {
   const fileSize      = document.getElementById('fileSize');
   const removeFileBtn = document.getElementById('removeFile');
 
-  const selectExame   = document.getElementById('idExame');
+  // Novos elementos do seletor
+  const searchExameInput = document.getElementById('searchExame');
+  const tbodyExames = document.getElementById('tbodyExames');
+  const resumoExame = document.getElementById('resumoExame');
+  const resumoPaciente = document.getElementById('resumoPaciente');
+  const resumoCpf = document.getElementById('resumoCpf');
+  const resumoData = document.getElementById('resumoData');
+  const resumoId = document.getElementById('resumoId');
+  const inputIdExame = document.getElementById('idExame');
+
   const displayNome   = document.getElementById('displayNome');
   const displayIdade  = document.getElementById('displayIdade');
   const displaySexo   = document.getElementById('displaySexo');
@@ -418,6 +602,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   let pdfUrlAtual = null;
   let examesData = []; // Armazena os dados completos dos exames
+  let exameSelecionado = null;
 
   // ============================================
   // FUNÇÕES AUXILIARES
@@ -426,6 +611,18 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!iso) return 'Data não informada';
     const d = new Date(iso);
     return d.toLocaleDateString('pt-BR');
+  }
+
+  function formatarDataHora(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function formatarCPF(cpf) {
+    if (!cpf) return '—';
+    const c = String(cpf).replace(/\D/g, '').padStart(11, '0');
+    return c.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
   }
 
   function calcularIdade(dataNascimento) {
@@ -440,9 +637,19 @@ document.addEventListener('DOMContentLoaded', function () {
     return idade;
   }
 
+  function tipoBadge(tipo) {
+    if (tipo === 'Hemograma')  return `<span class="tipo-badge tipo-hemograma">Hemograma</span>`;
+    if (tipo === 'Mielograma') return `<span class="tipo-badge tipo-mielograma">Mielograma</span>`;
+    return `<span style="color:var(--text-3)">—</span>`;
+  }
+
+  function statusPill(s) {
+    const map = { 'Pendente': 'pendente', 'Em andamento': 'andamento', 'Finalizado': 'finalizado' };
+    return `<span class="status-pill status-${map[s] || 'pendente'}">${s}</span>`;
+  }
+
   function preencherDadosPaciente(exame) {
     if (!exame) {
-      // Limpa os campos
       displayNome.textContent = 'Aguardando seleção do exame...';
       displayNome.className = 'campo-automatico vazio';
       displayIdade.textContent = 'Aguardando seleção do exame...';
@@ -455,13 +662,11 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
 
-    // Preenche nome
     displayNome.textContent = exame.paciente || 'Não informado';
     displayNome.className = 'campo-automatico';
     inputNome.value = exame.paciente || '';
 
-    // Preenche idade
-    const idade = exame.data_nascimento ? calcularIdade(exame.data_nascimento) : null;
+    const idade = exame.data_nasc ? calcularIdade(exame.data_nasc) : null;
     if (idade !== null) {
       displayIdade.textContent = `${idade} anos`;
       inputIdade.value = idade;
@@ -471,7 +676,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     displayIdade.className = 'campo-automatico';
 
-    // Preenche sexo
     const sexoMap = {
       'Masculino': 'Masculino',
       'Feminino': 'Feminino',
@@ -482,6 +686,88 @@ document.addEventListener('DOMContentLoaded', function () {
     displaySexo.textContent = sexoFormatado;
     displaySexo.className = 'campo-automatico';
     inputSexo.value = sexoFormatado;
+  }
+
+  // ============================================
+  // FUNÇÃO PARA SELECIONAR EXAME
+  // ============================================
+  function selecionarExame(idExame) {
+    const exame = examesData.find(e => e.id_exame === idExame);
+    if (!exame) return;
+
+    exameSelecionado = exame;
+    inputIdExame.value = exame.id_exame;
+
+    resumoPaciente.textContent = exame.paciente || '—';
+    resumoCpf.textContent = formatarCPF(exame.cpf);
+    resumoData.textContent = exame.data_exame ? formatarDataHora(exame.data_exame) : '—';
+    resumoId.textContent = '#' + exame.id_exame;
+
+    resumoExame.classList.add('ativo');
+
+    // Preenche os dados do paciente
+    preencherDadosPaciente(exame);
+
+    // Re-renderiza a lista para destacar o selecionado
+    renderizarListaExames(searchExameInput.value);
+  }
+
+  // ============================================
+  // RENDERIZAR LISTA DE EXAMES
+  // ============================================
+  function renderizarListaExames(filtro = '') {
+    tbodyExames.innerHTML = '';
+
+    const filtroLower = filtro.toLowerCase().trim();
+    let lista = examesData;
+
+    if (filtroLower) {
+      lista = examesData.filter(e => {
+        const dataStr = e.data_exame ? formatarDataHora(e.data_exame) : '';
+        return (e.paciente || '').toLowerCase().includes(filtroLower) ||
+               (e.cpf || '').includes(filtroLower) ||
+               String(e.id_exame).includes(filtroLower) ||
+               dataStr.includes(filtroLower);
+      });
+    }
+
+    if (lista.length === 0) {
+      tbodyExames.innerHTML = `
+        <tr>
+          <td colspan="6" style="text-align:center;padding:20px;color:var(--text-3);">
+            Nenhum exame encontrado.
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    lista.forEach(e => {
+      const tr = document.createElement('tr');
+      const isSelecionado = exameSelecionado && exameSelecionado.id_exame === e.id_exame;
+      if (isSelecionado) tr.classList.add('selecionada');
+
+      tr.innerHTML = `
+        <td style="font-family:var(--font-mono);font-size:0.75rem;">#${e.id_exame}</td>
+        <td style="font-weight:600;">${e.paciente || '—'}</td>
+        <td style="font-family:var(--font-mono);font-size:0.75rem;">${formatarCPF(e.cpf)}</td>
+        <td style="font-size:0.8rem;">${e.data_exame ? formatarDataHora(e.data_exame) : '—'}</td>
+        <td>${tipoBadge(e.tipo_exame)}</td>
+        <td>
+          <button class="btn btn-primary btn-sm btn-selecionar" onclick="selecionarExame(${e.id_exame})">
+            Selecionar
+          </button>
+        </td>
+      `;
+
+      tr.addEventListener('click', (event) => {
+        if (event.target.tagName !== 'BUTTON') {
+          selecionarExame(e.id_exame);
+        }
+      });
+
+      tbodyExames.appendChild(tr);
+    });
   }
 
   // ============================================
@@ -504,19 +790,7 @@ document.addEventListener('DOMContentLoaded', function () {
       }
 
       examesData = json.dados || [];
-
-      // Popula o select
-      selectExame.innerHTML = '<option value="">Selecione um exame</option>';
-      
-      examesData.forEach(exame => {
-        const option = document.createElement('option');
-        option.value = exame.id_exame;
-        const dataExame = exame.data_exame ? formatarData(exame.data_exame) : 'Data não informada';
-        option.textContent = `${exame.paciente || 'Paciente'} • ${exame.tipo_exame || 'Exame'} • ${dataExame}`;
-        // Armazena os dados completos no option para acesso rápido
-        option.dataset.exame = JSON.stringify(exame);
-        selectExame.appendChild(option);
-      });
+      renderizarListaExames();
 
     } catch (error) {
       console.error('Erro ao carregar exames:', error);
@@ -525,29 +799,10 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // ============================================
-  // EVENTO DE SELEÇÃO DO EXAME
+  // EVENTO DE PESQUISA
   // ============================================
-  selectExame.addEventListener('change', function() {
-    const selectedOption = this.options[this.selectedIndex];
-    
-    if (!selectedOption || !selectedOption.value) {
-      preencherDadosPaciente(null);
-      return;
-    }
-
-    try {
-      const exameData = JSON.parse(selectedOption.dataset.exame);
-      preencherDadosPaciente(exameData);
-    } catch (error) {
-      console.error('Erro ao processar dados do exame:', error);
-      // Fallback: tenta buscar pelo ID
-      const exame = examesData.find(e => e.id_exame === parseInt(this.value));
-      if (exame) {
-        preencherDadosPaciente(exame);
-      } else {
-        preencherDadosPaciente(null);
-      }
-    }
+  searchExameInput.addEventListener('input', function() {
+    renderizarListaExames(this.value);
   });
 
   // ============================================
@@ -696,6 +951,11 @@ document.addEventListener('DOMContentLoaded', function () {
       HematoAI.showToast('Nenhum laudo disponível para download.', 'error');
     }
   }
+
+  // ============================================
+  // EXPOR FUNÇÕES PARA O GLOBAL
+  // ============================================
+  window.selecionarExame = selecionarExame;
 
   // ============================================
   // EVENT LISTENERS

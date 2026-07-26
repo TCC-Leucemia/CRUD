@@ -209,7 +209,7 @@ module.exports = class LoginDAO {
             );
         });
     }
-    
+
 
     update = async (login, connection = this.#banco) => {
         const sql = `
@@ -274,5 +274,42 @@ module.exports = class LoginDAO {
                 }
             );
         });
+    }
+    buscarEmailPorCpf(cpf) {
+
+        const sql = `
+            SELECT
+                l.id_usuario,
+                l.email,
+                l.tipo
+            FROM login l
+            LEFT JOIN pacientes p
+                ON p.id_usuario = l.id_usuario
+            LEFT JOIN medicos m
+                ON m.id_usuario = l.id_usuario
+            WHERE
+                p.cpf = ?
+                OR m.cpf = ?
+            LIMIT 1`;
+
+        return new Promise((resolve, reject) => {
+
+            this.#banco.query(
+                sql,
+                [cpf, cpf],
+                (erro, result) => {
+
+                    if (erro) {
+                        reject(erro);
+                    }
+                    else {
+                        resolve(result[0] || null);
+                    }
+
+                }
+            );
+
+        });
+
     }
 }
