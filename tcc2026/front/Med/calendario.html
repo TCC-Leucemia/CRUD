@@ -535,6 +535,7 @@
   </div>
 </div>
 
+<script src="https://unpkg.com/lucide@latest"></script>
 <script src="../JS/navbar.js"></script>
 <script src="../JS/auth.js"></script>
 <script>
@@ -590,15 +591,32 @@
 
   function obterConsultasFiltradas() {
     let lista = [...consultas];
+
     if (filtroStatus) {
-      lista = lista.filter(c => c.statusc === filtroStatus);
+        lista = lista.filter(c => c.statusc === filtroStatus);
     }
+
     if (buscaPaciente.trim()) {
-      const termo = buscaPaciente.trim().toLowerCase();
-      lista = lista.filter(c =>
-        (c.paciente || "").toLowerCase().includes(termo)
-      );
+
+        const termo = buscaPaciente.trim().toLowerCase();
+        const termoCpf = termo.replace(/\D/g, "");
+
+        lista = lista.filter(c => {
+
+            const matchPaciente =
+                (c.paciente || "")
+                    .toLowerCase()
+                    .includes(termo);
+
+            const matchCpf =
+                termoCpf.length > 0 &&
+                (c.cpf || "")
+                    .includes(termoCpf);
+
+            return matchPaciente || matchCpf;
+        });
     }
+
     return lista;
   }
 
@@ -649,6 +667,8 @@
         }
 
         consultas = json.dados;
+        console.log("Consultas:", consultas);
+        console.log("Primeira consulta:", consultas[0]);
 
     } catch (error) {
 
@@ -910,6 +930,22 @@
 
   document.getElementById('filtroStatus').addEventListener('change', aplicarFiltros);
   document.getElementById('buscaPaciente').addEventListener('input', aplicarFiltros);
+  document.getElementById('inputBuscaData').addEventListener('input', function () {
+
+      let valor = this.value.replace(/\D/g, '');
+
+      if (valor.length > 8) {
+          valor = valor.substring(0, 8);
+      }
+
+      if (valor.length > 4) {
+          valor = valor.replace(/(\d{2})(\d{2})(\d{0,4})/, '$1/$2/$3');
+      } else if (valor.length > 2) {
+          valor = valor.replace(/(\d{2})(\d{0,2})/, '$1/$2');
+      }
+
+      this.value = valor;
+  });
 
   // =============================================================
   //  INICIALIZAÇÃO

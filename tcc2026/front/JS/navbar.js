@@ -45,35 +45,37 @@
   }
   const NAV_CONFIG = {
     Médico: [
-      { icon: '🏥', label: 'Dashboard', href: 'medico.html', id: 'dashboard' },
-      { icon: '📋', label: 'Consultas', href: 'crudconsulta_med.html', id: 'consultas' },
-      { icon: '🔬', label: 'Exames', href: 'crudexame.html', id: 'exames-crud' },
-      { icon: '📊', label: 'Resultados', href: 'crudresultado.html', id: 'resultados' },
-      { icon: '🤖', label: 'Análises IA', href: 'crudanaliseia.html', id: 'analises-ia' },
+      { icon: 'layout-dashboard', label: 'Dashboard', href: 'medico.html', id: 'dashboard' },
+      { icon: 'calendar-days', label: 'Consultas', href: 'crudconsulta_med.html', id: 'consultas' },
+      { icon: 'microscope', label: 'Exames', href: 'crudexame.html', id: 'exames-crud' },
+      { icon: 'file-text', label: 'Resultados', href: 'crudresultado.html', id: 'resultados' },
+      { icon: 'bot', label: 'Análises IA', href: 'crudanaliseia.html', id: 'analises-ia' },
     ],
+
     Administrador: [
-      { icon: '🏥', label: 'Dashboard', href: 'administrador.html', id: 'dashboard' },
-      { icon: '🧑‍⚕️', label: 'Médicos', href: 'crudmedico.html', id: 'medicos' },
-      { icon: '👥', label: 'Pacientes', href: 'crudpaciente.html', id: 'pacientes' },
-      { icon: '📋', label: 'Consultas', href: 'crudconsulta.html', id: 'consultas' },
+      { icon: 'layout-dashboard', label: 'Dashboard', href: 'administrador.html', id: 'dashboard' },
+      { icon: 'stethoscope', label: 'Médicos', href: 'crudmedico.html', id: 'medicos' },
+      { icon: 'users', label: 'Pacientes', href: 'crudpaciente.html', id: 'pacientes' },
+      { icon: 'calendar-days', label: 'Consultas', href: 'crudconsulta.html', id: 'consultas' },
     ],
+
     Paciente: [
-      { icon: '🏠', label: 'Meu Painel', href: 'paciente.html', id: 'paciente' },
-      { icon: '📋', label: 'Meu Histórico', href: 'historicoPaciente.html', id: 'historico' },
-      {icon: '🧬', label: "Resultados", href: "resultadosExame.html"},
+      { icon: 'house', label: 'Meu Painel', href: 'paciente.html', id: 'paciente' },
+      { icon: 'history', label: 'Meu Histórico', href: 'historicoPaciente.html', id: 'historico' },
+      { icon: 'file-heart', label: 'Resultados', href: 'resultadosExame.html', id: 'resultados' },
     ],
   };
 
   const BOTTOM_NAV = {
     Administrador: [
       {
-        icon: '⚙️',
+        icon: 'settings',
         label: 'Configurações',
         href: 'configuracoes.html',
         id: 'config'
       },
       {
-        icon: '🚪',
+        icon: 'log-out',
         label: 'Sair',
         href: '#',
         id: 'sair',
@@ -83,13 +85,13 @@
 
     Médico: [
       {
-        icon: '⚙️',
+        icon: 'settings',
         label: 'Configurações',
         href: 'configuracoes_med.html',
         id: 'config'
       },
       {
-        icon: '🚪',
+        icon: 'log-out',
         label: 'Sair',
         href: '#',
         id: 'sair',
@@ -99,13 +101,13 @@
 
     Paciente: [
       {
-        icon: '⚙️',
+        icon: 'settings',
         label: 'Configurações',
         href: 'configuracoes_paciente.html',
         id: 'config'
       },
       {
-        icon: '🚪',
+        icon: 'log-out',
         label: 'Sair',
         href: '#',
         id: 'sair',
@@ -158,7 +160,12 @@
       const a = document.createElement('a');
       a.href = item.href;
       a.className = 'nav-item' + (activePage === item.id ? ' active' : '');
-      a.innerHTML = `<span class="nav-icon">${item.icon}</span>${item.label}`;
+      a.innerHTML = `
+          <span class="nav-icon">
+              <i data-lucide="${item.icon}"></i>
+          </span>
+          ${item.label}
+      `;
       mainNav.appendChild(a);
     });
 
@@ -170,9 +177,15 @@
       a.href = item.href;
       a.className = 'nav-item' + (item.cls ? ` ${item.cls}` : '') + (activePage === item.id ? ' active' : '');
       a.id = `nav-${item.id}`;
-      a.innerHTML = `<span class="nav-icon">${item.icon}</span>${item.label}`;
+      a.innerHTML = `
+          <span class="nav-icon">
+              <i data-lucide="${item.icon}"></i>
+          </span>
+          ${item.label}
+      `;
       bottomNav.appendChild(a);
     });
+    lucide.createIcons();
 
     const sairBtn = document.getElementById('nav-sair');
     if (sairBtn) {
