@@ -278,7 +278,7 @@
           <span class="card-title">Lista de Resultados</span>
           <div class="filter-row">
             <div class="search-bar" style="max-width:260px">
-              <input type="text" id="searchResultado" placeholder="Buscar por ID do exame...">
+              <input type="text" id="searchResultado" placeholder="Buscar por nome ou CPF do paciente...">
             </div>
             <select id="filterSuspeita" class="filter-select">
               <option value="">Todas as suspeitas</option>
@@ -302,7 +302,8 @@
             <thead>
               <tr>
                 <th>ID</th>
-                <th>ID Exame</th>
+                <th>Paciente</th>
+                <th>CPF</th>
                 <th>Resultado</th>
                 <th>Suspeita</th>
                 <th>Tipo</th>
@@ -351,6 +352,7 @@
                     <th>Paciente</th>
                     <th>CPF</th>
                     <th>Tipo</th>
+                    <th>Data Exame</th>
                     <th style="width:100px;">Ação</th>
                   </tr>
                 </thead>
@@ -450,6 +452,7 @@
   </div>
 </div>
 
+<script src="https://unpkg.com/lucide@latest"></script>
 <script src="../JS/navbar.js"></script>
 <script>
 
@@ -513,6 +516,7 @@
         return;
       }
       resultados = dados.dados || [];
+      console.log(resultados);
       aplicarFiltros();
     } catch (erro) {
       console.error(erro);
@@ -558,7 +562,7 @@
     if (lista.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="5" style="text-align:center;padding:20px;color:var(--text-3);">
+          <td colspan="6" style="text-align:center;padding:20px;color:var(--text-3);">
             Nenhum exame encontrado.
           </td>
         </tr>
@@ -572,10 +576,20 @@
       if (isSelecionado) tr.classList.add('selecionado');
 
       tr.innerHTML = `
-        <td style="font-family:var(--font-mono);font-size:0.75rem;">#${e.id_exame}</td>
-        <td style="font-weight:600;">${e.paciente || '—'}</td>
-        <td style="font-family:var(--font-mono);font-size:0.75rem;">${formatarCPF(e.cpf)}</td>
+        <tr>
+        <td style="font-family:var(--font-mono);font-size:0.75rem;">
+            #${e.id_exame}
+        </td>
+        <td style="font-weight:600;">
+            ${e.paciente || '—'}
+        </td>
+        <td style="font-family:var(--font-mono);font-size:0.75rem;">
+            ${formatarCPF(e.cpf)}
+        </td>
         <td>${e.tipo_exame || '—'}</td>
+        <td style="font-size:0.8rem;">
+          ${e.data_exame ? formatarData(e.data_exame) : '—'}
+        </td>
         <td>
           <button class="btn btn-primary btn-sm btn-selecionar" onclick="selecionarExame(${e.id_exame})">
             Selecionar
@@ -637,7 +651,10 @@
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td style="font-family:var(--font-mono);font-size:0.78rem;color:var(--text-3)">#${r.id_resultado}</td>
-        <td style="font-family:var(--font-mono);font-size:0.82rem;color:var(--blue)">#${r.id_exame}</td>
+        <td style="color:var(--text-1);font-weight:600;">
+            ${r.paciente || '—'}
+        </td>
+        <td>${formatarCPF(r.cpf)}</td>
         <td style="font-size:0.85rem;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
           ${r.resultado_texto || '—'}
         </td>
@@ -658,14 +675,39 @@
 
   /* ── Filtros ── */
   function aplicarFiltros() {
-    const q = document.getElementById('searchResultado').value.toLowerCase();
+    const q = document.getElementById('searchResultado').value
+        .toLowerCase()
+        .trim();
+
     const suspeita = document.getElementById('filterSuspeita').value;
 
     filtrados = resultados.filter(r => {
-      const matchId = String(r.id_exame).includes(q);
-      const matchSuspeita = !suspeita || r.suspeita_leucemia === suspeita;
-      return matchId && matchSuspeita;
+
+        console.log("Pesquisando:", q, "| Paciente:", r.paciente);
+
+        const matchPaciente =
+            (r.paciente || "")
+                .toLowerCase()
+                .includes(q);
+
+        const cpfBusca = q.replace(/\D/g, "");
+
+        const matchCpf =
+            cpfBusca !== "" &&
+            (r.cpf || "").includes(cpfBusca);
+
+        const matchSuspeita =
+            !suspeita || r.suspeita_leucemia === suspeita;
+
+        console.log({
+            paciente: matchPaciente,
+            cpf: matchCpf,
+            suspeita: matchSuspeita
+        });
+
+        return (matchPaciente || matchCpf) && matchSuspeita;
     });
+
     renderTabela(filtrados);
   }
 

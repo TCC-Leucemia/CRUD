@@ -1,14 +1,19 @@
 const LoginDAO = require("../dao/LoginDAO");
+const EmailService = require("./EmailService");
 const Login = require("../model/Login");
 const md5 = require("md5");
 const ErrorResponse = require("../utils/ErrorResponse");
 
+const codigosRecuperacao = {};
+
 module.exports = class LoginService {
 
     #dao;
+    #email;
 
     constructor(banco) {
         this.#dao = new LoginDAO(banco);
+        this.#email = new EmailService();
     }
 
     create = async (dados) => {
@@ -345,6 +350,45 @@ module.exports = class LoginService {
             nome: user.nome
         };
     }
+    async buscarEmailPorCpf(cpf) {
+
+        const usuario =
+            await this.#dao.buscarEmailPorCpf(cpf);
+
+        if (!usuario) {
+
+            throw new ErrorResponse(
+                404,
+                "CPF não encontrado."
+            );
+
+        }
+
+        const codigo =
+            this.gerarCodigo();
+
+        codigosRecuperacao[cpf] = {
+            email: usuario.email,
+            codigo,
+            expira: Date.now() + 10 * 60 * 1000
+        };
+
+        await this.#email.enviarCodigo(
+
+            usuario.email,
+
+            codigo
+
+        );
+
+        return true;
+
+    }
+    gerarCodigo() {
+        return Math.floor(
+            100000 + Math.random() * 900000
+        ).toString();
+    }
 
     validarAcessoLogin = async (id_usuario, user) => {
 
@@ -371,5 +415,67 @@ module.exports = class LoginService {
         }
 
         return login;
+    }
+    validarCodigo(dados) {
+
+        const registro = codigosRecuperacao[dados.cpf];
+
+        if (!registro) {
+
+            throw new ErrorResponse(
+                400,
+                "Nenhum código solicitado."
+            );
+
+        }
+
+        if (Date.now() > registro.expira) {
+
+            delete codigosRecuperacao[dados.cpf];
+
+            throw new ErrorResponse(
+                400,
+                "Código expirado."
+            );
+
+        }
+
+        if (registro.codigo !== dados.codigo) {
+
+            throw new ErrorResponse(
+                400,
+                "Código inválido."
+            );
+
+        }
+
+        return true;
+
+    }
+    alterarSenhaRecuperacao = async (cpf, novaSenha) => {
+
+        const usuario =
+            await this.#dao.buscarEmailPorCpf(cpf);
+
+        if (!usuario) {
+
+            throw new ErrorResponse(
+                404,
+                "Usuário não encontrado."
+            );
+
+        }
+
+        const login =
+            await this.#dao.findById(usuario.id_usuario);
+
+        login.senha = md5(novaSenha);
+
+        await this.#dao.update(login);
+
+        delete codigosRecuperacao[cpf];
+
+        return true;
+
     }
 }

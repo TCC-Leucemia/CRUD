@@ -81,12 +81,17 @@ module.exports = class ResultadosExameDAO {
     findByCrm(crm) {
 
         const sql = `
-            SELECT re.*
+            SELECT
+                re.*,
+                p.nome AS paciente,
+                p.cpf
             FROM resultados_exame re
             INNER JOIN exames e
                 ON e.id_exame = re.id_exame
             INNER JOIN consultas c
                 ON c.id_consulta = e.id_consulta
+            INNER JOIN pacientes p
+                ON p.cpf = c.cpf
             WHERE c.crm = ?
         `;
 
@@ -101,6 +106,7 @@ module.exports = class ResultadosExameDAO {
                     else resolve(result);
                 }
             );
+
         });
     }
     

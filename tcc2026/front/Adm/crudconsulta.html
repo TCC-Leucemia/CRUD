@@ -104,26 +104,6 @@
       margin-top: 3px;
     }
 
-    /* Nome abaixo dos campos */
-    .nome-display {
-      margin-top: 4px;
-      font-size: 0.85rem;
-      font-weight: 600;
-    }
-    .nome-display.encontrado {
-      color: var(--green);
-    }
-    .nome-display.nao-encontrado {
-      color: var(--red);
-    }
-    .nome-display.vazio {
-      color: var(--text-3);
-    }
-
-    input[list] {
-      width: 100%;
-    }
-
     /* ========== CALENDÁRIO PERSONALIZADO ========== */
     .date-picker-wrapper {
       position: relative;
@@ -329,6 +309,176 @@
       box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.08);
     }
 
+    /* ── Seletores de Paciente e Médico (estilo tabela) ── */
+    .selecionar-wrapper {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      background: var(--bg);
+      margin-top: 4px;
+      margin-bottom: 4px;
+    }
+
+    .selecionar-wrapper .search-wrapper {
+      position: relative;
+      margin-bottom: 12px;
+    }
+
+    .selecionar-wrapper .search-wrapper input {
+      width: 100%;
+      padding: 8px 14px 8px 36px;
+      border: 1.5px solid var(--border);
+      border-radius: 40px;
+      font-size: 0.85rem;
+      background: var(--surface);
+      color: var(--text-1);
+      outline: none;
+      transition: var(--transition);
+    }
+
+    .selecionar-wrapper .search-wrapper input:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(185,28,28,0.08);
+    }
+
+    .selecionar-wrapper .search-wrapper .lupa {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.95rem;
+      color: var(--text-3);
+    }
+
+    .selecionar-tabela-wrapper {
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: var(--surface);
+    }
+
+    .selecionar-tabela-wrapper table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+    }
+
+    .selecionar-tabela-wrapper thead {
+      background: var(--bg);
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    .selecionar-tabela-wrapper th {
+      padding: 8px 12px;
+      text-align: left;
+      font-weight: 700;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      color: var(--text-2);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .selecionar-tabela-wrapper td {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-1);
+      vertical-align: middle;
+    }
+
+    .selecionar-tabela-wrapper tr:last-child td {
+      border-bottom: none;
+    }
+
+    .selecionar-tabela-wrapper tr.selecionado {
+      background: var(--red-light);
+      border-left: 3px solid var(--red);
+    }
+
+    .selecionar-tabela-wrapper tr:hover {
+      background: var(--bg);
+      cursor: pointer;
+    }
+
+    .selecionar-tabela-wrapper .btn-selecionar {
+      padding: 2px 12px;
+      font-size: 0.7rem;
+      border-radius: 30px;
+    }
+
+    .resumo-selecao {
+      margin-top: 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 12px 16px;
+      display: none;
+    }
+
+    .resumo-selecao.ativo {
+      display: block;
+    }
+
+    .resumo-selecao .grid {
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      gap: 4px 16px;
+      font-size: 0.85rem;
+    }
+
+    .resumo-selecao .grid .label {
+      color: var(--text-2);
+      font-weight: 600;
+    }
+
+    .resumo-selecao .grid .valor {
+      color: var(--text-1);
+      font-weight: 500;
+    }
+
+    .resumo-selecao .grid .valor.destaque {
+      font-weight: 700;
+      color: var(--red);
+    }
+
+    /* ── Painel informativo (Edição) ── */
+    .info-panel {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      background: var(--bg);
+      margin-top: 4px;
+      margin-bottom: 4px;
+    }
+
+    .info-panel .grid {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 4px 16px;
+      font-size: 0.85rem;
+    }
+
+    .info-panel .grid .label {
+      color: var(--text-2);
+      font-weight: 600;
+    }
+
+    .info-panel .grid .valor {
+      color: var(--text-1);
+      font-weight: 500;
+    }
+
+    .info-panel .grid .valor.destaque {
+      font-weight: 700;
+      color: var(--red);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
     /* Modo escuro */
     .dark-mode .calendar-popup {
       background: var(--surface);
@@ -360,6 +510,29 @@
       box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
     }
 
+    .dark-mode .selecionar-wrapper {
+      background: var(--surface);
+      border-color: var(--border);
+    }
+
+    .dark-mode .selecionar-tabela-wrapper {
+      background: var(--surface);
+    }
+
+    .dark-mode .selecionar-tabela-wrapper thead {
+      background: var(--bg);
+    }
+
+    .dark-mode .selecionar-tabela-wrapper tr.selecionado {
+      background: #1e293b;
+      border-left-color: var(--red);
+    }
+
+    .dark-mode .info-panel {
+      background: var(--surface);
+      border-color: var(--border);
+    }
+
     /* Responsivo */
     @media (max-width: 540px) {
       .calendar-popup {
@@ -376,6 +549,13 @@
       }
       .time-selector {
         flex-wrap: wrap;
+      }
+      .selecionar-tabela-wrapper table {
+        font-size: 0.7rem;
+      }
+      .selecionar-tabela-wrapper th,
+      .selecionar-tabela-wrapper td {
+        padding: 6px 8px;
       }
     }
   </style>
@@ -467,7 +647,7 @@
 
 <!-- ── Modal Formulário ── -->
 <div class="modal-overlay" id="modalConsulta">
-  <div class="modal">
+  <div class="modal modal-lg">
     <div class="modal-header">
       <h2 id="modalTitulo">Nova Consulta</h2>
       <button class="btn-close-modal" id="closeModalConsulta">&#10005;</button>
@@ -475,24 +655,103 @@
     <div class="modal-body">
 
       <div class="info-box" id="infoBox">
-        A data da consulta deve ser uma data futura. Preencha os dados de paciente e médico corretamente.
+        A data da consulta deve ser uma data futura. Selecione o paciente e o médico.
       </div>
 
       <div class="form-grid">
+        <!-- ─── Seletor de Paciente ─── -->
         <div class="form-group">
-          <label>CPF do Paciente *</label>
-          <input type="text" id="cCpf" placeholder="Digite o CPF ou nome..." list="pacientesList" autocomplete="off">
-          <datalist id="pacientesList"></datalist>
-          <div id="pacienteNomeDisplay" class="nome-display vazio">Selecione um paciente</div>
-          <div class="field-hint">Apenas pacientes cadastrados no sistema.</div>
+          <label>Paciente *</label>
+          <div id="pacienteSelector">
+            <div class="selecionar-wrapper">
+              <div class="search-wrapper">
+                <span class="lupa">🔍</span>
+                <input type="text" id="searchPacienteSelect" placeholder="Pesquisar por nome ou CPF...">
+              </div>
+              <div class="selecionar-tabela-wrapper">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Nome</th>
+                      <th>CPF</th>
+                      <th style="width:100px;">Ação</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tbodyPacientesSelect"></tbody>
+                </table>
+              </div>
+              <div class="resumo-selecao" id="resumoPaciente">
+                <div style="font-weight:700;font-size:0.8rem;color:var(--text-2);margin-bottom:6px;">Paciente selecionado</div>
+                <div class="grid">
+                  <span class="label">Nome</span>
+                  <span class="valor" id="resumoPacienteNome">—</span>
+                  <span class="label">CPF</span>
+                  <span class="valor" id="resumoPacienteCpf">—</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="info-panel hidden" id="pacienteInfoPanel">
+            <div style="font-weight:700;font-size:0.85rem;color:var(--text-2);margin-bottom:6px;">Paciente (somente leitura)</div>
+            <div class="grid">
+              <span class="label">Nome</span>
+              <span class="valor" id="infoPacienteNome">—</span>
+              <span class="label">CPF</span>
+              <span class="valor" id="infoPacienteCpf">—</span>
+            </div>
+          </div>
+          <input type="hidden" id="cCpf" value="">
         </div>
+
+        <!-- ─── Seletor de Médico ─── -->
         <div class="form-group">
-          <label>CRM do Médico *</label>
-          <input type="text" id="cCrm" placeholder="Digite o CRM ou nome..." list="medicosList" autocomplete="off">
-          <datalist id="medicosList"></datalist>
-          <div id="medicoNomeDisplay" class="nome-display vazio">Selecione um médico</div>
-          <div class="field-hint">Apenas médicos cadastrados no sistema.</div>
+          <label>Médico *</label>
+          <div id="medicoSelector">
+            <div class="selecionar-wrapper">
+              <div class="search-wrapper">
+                <span class="lupa">🔍</span>
+                <input type="text" id="searchMedicoSelect" placeholder="Pesquisar por nome ou CRM...">
+              </div>
+              <div class="selecionar-tabela-wrapper">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Nome</th>
+                      <th>CRM</th>
+                      <th style="width:100px;">Ação</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tbodyMedicosSelect"></tbody>
+                </table>
+              </div>
+              <div class="resumo-selecao" id="resumoMedico">
+                <div style="font-weight:700;font-size:0.8rem;color:var(--text-2);margin-bottom:6px;">Médico selecionado</div>
+                <div class="grid">
+                  <span class="label">Nome</span>
+                  <span class="valor" id="resumoMedicoNome">—</span>
+                  <span class="label">CRM</span>
+                  <span class="valor" id="resumoMedicoCrm">—</span>
+                  <span class="label">Especialidade</span>
+                  <span class="valor" id="resumoMedicoEsp">—</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="info-panel hidden" id="medicoInfoPanel">
+            <div style="font-weight:700;font-size:0.85rem;color:var(--text-2);margin-bottom:6px;">Médico (somente leitura)</div>
+            <div class="grid">
+              <span class="label">Nome</span>
+              <span class="valor" id="infoMedicoNome">—</span>
+              <span class="label">CRM</span>
+              <span class="valor" id="infoMedicoCrm">—</span>
+              <span class="label">Especialidade</span>
+              <span class="valor" id="infoMedicoEsp">—</span>
+            </div>
+          </div>
+          <input type="hidden" id="cCrm" value="">
         </div>
+
+        <!-- ─── Data e Hora ─── -->
         <div class="form-group">
           <label>Data e Hora *</label>
           <div class="date-picker-wrapper">
@@ -532,6 +791,7 @@
           </div>
           <div class="field-hint">Clique para abrir o calendário e selecionar data e hora.</div>
         </div>
+
         <div class="form-group">
           <label>Tipo de Consulta</label>
           <select id="cTipo">
@@ -542,6 +802,7 @@
             <option value="Retorno">Retorno</option>
           </select>
         </div>
+
         <div class="form-group col-span-2">
           <label>Status *</label>
           <select id="cStatus">
@@ -575,6 +836,7 @@
   </div>
 </div>
 
+<script src="https://unpkg.com/lucide@latest"></script>
 <script src="../js/api.js"></script>
 <script src="../JS/auth.js"></script>
 <script src="../JS/navbar.js"></script>
@@ -596,6 +858,10 @@
   let modoEdicao = false;
   let idEdicao = null;
   let idDetalhe = null;
+
+  // Estado para seletores
+  let pacienteSelecionado = null;
+  let medicoSelecionado = null;
 
   // ============================================================
   //  HELPERS
@@ -694,7 +960,7 @@
       return;
     }
     pacientes = dados.dados || [];
-    preencherDatalistPacientes();
+    renderizarListaPacientes();
   }
 
   async function carregarMedicos() {
@@ -705,7 +971,7 @@
       return;
     }
     medicos = dados.dados || [];
-    preencherDatalistMedicos();
+    renderizarListaMedicos();
   }
 
   async function carregarConsultas() {
@@ -720,128 +986,152 @@
   }
 
   // ============================================================
-  //  PREENCHER DATALISTS
+  //  RENDERIZAR LISTA DE PACIENTES (seletor)
   // ============================================================
-  function preencherDatalistPacientes() {
-    const datalist = document.getElementById('pacientesList');
-    datalist.innerHTML = '';
-    pacientes.forEach(p => {
-      const option = document.createElement('option');
-      option.value = formatarCPF(p.cpf) + ' - ' + p.nome;
-      option.dataset.cpf = p.cpf;
-      option.dataset.nome = p.nome;
-      datalist.appendChild(option);
+  function renderizarListaPacientes(filtro = '') {
+    const tbody = document.getElementById('tbodyPacientesSelect');
+    tbody.innerHTML = '';
+
+    const filtroLower = filtro.toLowerCase().trim();
+    let lista = pacientes;
+
+    if (filtroLower) {
+      lista = pacientes.filter(p =>
+        p.nome.toLowerCase().includes(filtroLower) ||
+        p.cpf.includes(filtroLower)
+      );
+    }
+
+    if (lista.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="3" style="text-align:center;padding:20px;color:var(--text-3);">
+            Nenhum paciente encontrado.
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    lista.forEach(p => {
+      const tr = document.createElement('tr');
+      const isSelecionado = pacienteSelecionado && pacienteSelecionado.cpf === p.cpf;
+      if (isSelecionado) tr.classList.add('selecionado');
+
+      tr.innerHTML = `
+        <td style="font-weight:600;">${p.nome}</td>
+        <td style="font-family:var(--font-mono);font-size:0.75rem;">${formatarCPF(p.cpf)}</td>
+        <td>
+          <button class="btn btn-primary btn-sm btn-selecionar" onclick="selecionarPaciente('${p.cpf}')">
+            Selecionar
+          </button>
+        </td>
+      `;
+
+      tr.addEventListener('click', (e) => {
+        if (e.target.tagName !== 'BUTTON') {
+          selecionarPaciente(p.cpf);
+        }
+      });
+
+      tbody.appendChild(tr);
     });
   }
 
-  function preencherDatalistMedicos() {
-    const datalist = document.getElementById('medicosList');
-    datalist.innerHTML = '';
-    medicos.forEach(m => {
-      const option = document.createElement('option');
-      option.value = m.crm + ' - ' + m.nome;
-      option.dataset.crm = m.crm;
-      option.dataset.nome = m.nome;
-      datalist.appendChild(option);
+  function selecionarPaciente(cpf) {
+    const paciente = pacientes.find(p => p.cpf === cpf);
+    if (!paciente) return;
+
+    pacienteSelecionado = paciente;
+    document.getElementById('cCpf').value = paciente.cpf;
+
+    // Atualiza resumo
+    document.getElementById('resumoPacienteNome').textContent = paciente.nome;
+    document.getElementById('resumoPacienteCpf').textContent = formatarCPF(paciente.cpf);
+    document.getElementById('resumoPaciente').classList.add('ativo');
+
+    const search = document.getElementById('searchPacienteSelect').value;
+    renderizarListaPacientes(search);
+  }
+
+  // ============================================================
+  //  RENDERIZAR LISTA DE MÉDICOS (seletor)
+  // ============================================================
+  function renderizarListaMedicos(filtro = '') {
+    const tbody = document.getElementById('tbodyMedicosSelect');
+    tbody.innerHTML = '';
+
+    const filtroLower = filtro.toLowerCase().trim();
+    let lista = medicos;
+
+    if (filtroLower) {
+      lista = medicos.filter(m =>
+        m.nome.toLowerCase().includes(filtroLower) ||
+        m.crm.toLowerCase().includes(filtroLower)
+      );
+    }
+
+    if (lista.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="3" style="text-align:center;padding:20px;color:var(--text-3);">
+            Nenhum médico encontrado.
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    lista.forEach(m => {
+      const tr = document.createElement('tr');
+      const isSelecionado = medicoSelecionado && medicoSelecionado.crm === m.crm;
+      if (isSelecionado) tr.classList.add('selecionado');
+
+      tr.innerHTML = `
+        <td style="font-weight:600;">${m.nome}</td>
+        <td style="font-family:var(--font-mono);font-size:0.75rem;">${m.crm}</td>
+        <td>
+          <button class="btn btn-primary btn-sm btn-selecionar" onclick="selecionarMedico('${m.crm}')">
+            Selecionar
+          </button>
+        </td>
+      `;
+
+      tr.addEventListener('click', (e) => {
+        if (e.target.tagName !== 'BUTTON') {
+          selecionarMedico(m.crm);
+        }
+      });
+
+      tbody.appendChild(tr);
     });
   }
 
-  // ============================================================
-  //  EVENTOS DOS CAMPOS PACIENTE E MÉDICO
-  // ============================================================
-  function configurarCampoPaciente() {
-    const input = document.getElementById('cCpf');
-    const display = document.getElementById('pacienteNomeDisplay');
+  function selecionarMedico(crm) {
+    const medico = medicos.find(m => m.crm === crm);
+    if (!medico) return;
 
-    function atualizarNome() {
-      const valor = input.value.trim();
-      const cpfNumeros = valor.replace(/\D/g, '');
-      let encontrado = null;
+    medicoSelecionado = medico;
+    document.getElementById('cCrm').value = medico.crm;
 
-      if (cpfNumeros.length === 11) {
-        encontrado = pacientes.find(p => p.cpf === cpfNumeros);
-      }
-      if (!encontrado) {
-        const opcoes = document.getElementById('pacientesList').options;
-        for (let opt of opcoes) {
-          if (opt.value === valor) {
-            encontrado = {
-              cpf: opt.dataset.cpf,
-              nome: opt.dataset.nome
-            };
-            break;
-          }
-        }
-      }
+    // Atualiza resumo
+    document.getElementById('resumoMedicoNome').textContent = medico.nome;
+    document.getElementById('resumoMedicoCrm').textContent = medico.crm;
+    document.getElementById('resumoMedicoEsp').textContent = medico.especialidade || '—';
+    document.getElementById('resumoMedico').classList.add('ativo');
 
-      if (encontrado) {
-        display.textContent = `Paciente: ${encontrado.nome}`;
-        display.className = 'nome-display encontrado';
-        input.dataset.cpfSelecionado = encontrado.cpf;
-      } else {
-        if (!valor) {
-          display.textContent = 'Selecione um paciente';
-          display.className = 'nome-display vazio';
-          delete input.dataset.cpfSelecionado;
-        } else {
-          display.textContent = 'Paciente não encontrado';
-          display.className = 'nome-display nao-encontrado';
-          delete input.dataset.cpfSelecionado;
-        }
-      }
-    }
-
-    input.addEventListener('input', atualizarNome);
-    input.addEventListener('change', atualizarNome);
-    atualizarNome();
+    const search = document.getElementById('searchMedicoSelect').value;
+    renderizarListaMedicos(search);
   }
 
-  function configurarCampoMedico() {
-    const input = document.getElementById('cCrm');
-    const display = document.getElementById('medicoNomeDisplay');
+  // Event listeners dos campos de pesquisa
+  document.getElementById('searchPacienteSelect').addEventListener('input', function() {
+    renderizarListaPacientes(this.value);
+  });
 
-    function atualizarNome() {
-      const valor = input.value.trim();
-      let encontrado = null;
-
-      const crmPuro = valor.replace(/\s/g, '');
-      if (crmPuro) {
-        encontrado = medicos.find(m => m.crm === crmPuro);
-      }
-      if (!encontrado) {
-        const opcoes = document.getElementById('medicosList').options;
-        for (let opt of opcoes) {
-          if (opt.value === valor) {
-            encontrado = {
-              crm: opt.dataset.crm,
-              nome: opt.dataset.nome
-            };
-            break;
-          }
-        }
-      }
-
-      if (encontrado) {
-        display.textContent = `Médico: ${encontrado.nome}`;
-        display.className = 'nome-display encontrado';
-        input.dataset.crmSelecionado = encontrado.crm;
-      } else {
-        if (!valor) {
-          display.textContent = 'Selecione um médico';
-          display.className = 'nome-display vazio';
-          delete input.dataset.crmSelecionado;
-        } else {
-          display.textContent = 'Médico não encontrado';
-          display.className = 'nome-display nao-encontrado';
-          delete input.dataset.crmSelecionado;
-        }
-      }
-    }
-
-    input.addEventListener('input', atualizarNome);
-    input.addEventListener('change', atualizarNome);
-    atualizarNome();
-  }
+  document.getElementById('searchMedicoSelect').addEventListener('input', function() {
+    renderizarListaMedicos(this.value);
+  });
 
   // ============================================================
   //  CALENDÁRIO PERSONALIZADO
@@ -911,7 +1201,6 @@
     selectedDate = new Date(currentYear, currentMonth, dia);
     renderCalendar();
     atualizarCampoData();
-    // Calendário permanece aberto para ajuste de hora
   }
 
   function atualizarCampoData() {
@@ -933,7 +1222,6 @@
 
   function abrirCalendario() {
     const popup = document.getElementById('calendarPopup');
-    // Se já estiver aberto, fecha; senão, abre
     if (popup.classList.contains('open')) {
       popup.classList.remove('open');
       return;
@@ -950,7 +1238,7 @@
   }
 
   // ============================================================
-  //  SELETOR DE MÊS E ANO (ao clicar no título)
+  //  SELETOR DE MÊS E ANO
   // ============================================================
   function abrirSelecionadorMesAno() {
     const currentMonthYear = document.getElementById('monthYearDisplay').textContent;
@@ -1045,7 +1333,6 @@
         currentMonth = novoMes;
         currentYear = novoAno;
         renderCalendar();
-        // selectedDate permanece inalterado (se houver)
       } else {
         alert('Ano inválido. Use entre 2000 e 2100.');
       }
@@ -1081,11 +1368,9 @@
 
   document.getElementById('monthYearDisplay').addEventListener('click', abrirSelecionadorMesAno);
 
-  // Atualizar data quando hora/minuto mudarem
   document.getElementById('horaSelect').addEventListener('change', atualizarCampoData);
   document.getElementById('minutoSelect').addEventListener('change', atualizarCampoData);
 
-  // Fechar calendário ao clicar fora
   document.addEventListener('click', (e) => {
     const wrapper = document.querySelector('.date-picker-wrapper');
     const popup = document.getElementById('calendarPopup');
@@ -1100,19 +1385,33 @@
   document.getElementById('btnNovaConsulta').addEventListener('click', () => {
     modoEdicao = false;
     idEdicao = null;
+    pacienteSelecionado = null;
+    medicoSelecionado = null;
+
     document.getElementById('modalTitulo').textContent = 'Nova Consulta';
     document.getElementById('infoBox').style.display = '';
 
+    // Limpa campos
     document.getElementById('cCpf').value = '';
     document.getElementById('cCrm').value = '';
     document.getElementById('cData').value = '';
     document.getElementById('cTipo').value = '';
     document.getElementById('cStatus').value = 'Pendente';
 
-    document.getElementById('pacienteNomeDisplay').textContent = 'Selecione um paciente';
-    document.getElementById('pacienteNomeDisplay').className = 'nome-display vazio';
-    document.getElementById('medicoNomeDisplay').textContent = 'Selecione um médico';
-    document.getElementById('medicoNomeDisplay').className = 'nome-display vazio';
+    // Reseta seletores
+    document.getElementById('pacienteSelector').classList.remove('hidden');
+    document.getElementById('pacienteInfoPanel').classList.add('hidden');
+    document.getElementById('medicoSelector').classList.remove('hidden');
+    document.getElementById('medicoInfoPanel').classList.add('hidden');
+
+    document.getElementById('resumoPaciente').classList.remove('ativo');
+    document.getElementById('resumoMedico').classList.remove('ativo');
+
+    document.getElementById('searchPacienteSelect').value = '';
+    document.getElementById('searchMedicoSelect').value = '';
+
+    renderizarListaPacientes();
+    renderizarListaMedicos();
 
     // Reseta calendário
     selectedDate = null;
@@ -1123,9 +1422,6 @@
     document.getElementById('horaSelect').value = '08';
     document.getElementById('minutoSelect').value = '00';
 
-    document.getElementById('cCpf').disabled = false;
-    document.getElementById('cCrm').disabled = false;
-
     HematoAI.openModal(document.getElementById('modalConsulta'));
   });
 
@@ -1133,12 +1429,10 @@
   //  SALVAR CONSULTA
   // ============================================================
   document.getElementById('salvarConsulta').addEventListener('click', async () => {
-    const cpfInput = document.getElementById('cCpf');
-    const crmInput = document.getElementById('cCrm');
+    let cpf = document.getElementById('cCpf').value;
+    let crm = document.getElementById('cCrm').value;
     const dataInput = document.getElementById('cData');
 
-    let cpf = cpfInput.dataset.cpfSelecionado || cpfInput.value.replace(/\D/g, '');
-    let crm = crmInput.dataset.crmSelecionado || crmInput.value.trim();
     let data = dataInput.dataset.value || '';
 
     const tipo = document.getElementById('cTipo').value;
@@ -1202,27 +1496,36 @@
 
     modoEdicao = true;
     idEdicao = id;
+
+    // Pré-selecionar paciente e médico
+    const paciente = pacientes.find(p => p.cpf === c.cpf);
+    const medico = medicos.find(m => m.crm === c.crm);
+
+    pacienteSelecionado = paciente || null;
+    medicoSelecionado = medico || null;
+
     document.getElementById('modalTitulo').textContent = `Editar Consulta #${id}`;
     document.getElementById('infoBox').style.display = 'none';
 
-    document.getElementById('cCpf').disabled = true;
-    document.getElementById('cCrm').disabled = true;
+    // Esconde seletores, mostra painéis informativos
+    document.getElementById('pacienteSelector').classList.add('hidden');
+    document.getElementById('pacienteInfoPanel').classList.remove('hidden');
+    document.getElementById('medicoSelector').classList.add('hidden');
+    document.getElementById('medicoInfoPanel').classList.remove('hidden');
 
-    const cpfFormatado = formatarCPF(c.cpf);
-    document.getElementById('cCpf').value = cpfFormatado + ' - ' + (c.paciente || '');
-    document.getElementById('cCpf').dataset.cpfSelecionado = c.cpf;
-    document.getElementById('pacienteNomeDisplay').textContent = `Paciente: ${c.paciente || ''}`;
-    document.getElementById('pacienteNomeDisplay').className = 'nome-display encontrado';
+    // Preenche painéis
+    document.getElementById('infoPacienteNome').textContent = paciente?.nome || c.paciente || '—';
+    document.getElementById('infoPacienteCpf').textContent = formatarCPF(c.cpf || '');
+    document.getElementById('cCpf').value = c.cpf || '';
 
-    document.getElementById('cCrm').value = c.crm + ' - ' + (c.medico || '');
-    document.getElementById('cCrm').dataset.crmSelecionado = c.crm;
-    document.getElementById('medicoNomeDisplay').textContent = `Médico: ${c.medico || ''}`;
-    document.getElementById('medicoNomeDisplay').className = 'nome-display encontrado';
+    document.getElementById('infoMedicoNome').textContent = medico?.nome || c.medico || '—';
+    document.getElementById('infoMedicoCrm').textContent = c.crm || '—';
+    document.getElementById('infoMedicoEsp').textContent = medico?.especialidade || '—';
+    document.getElementById('cCrm').value = c.crm || '';
 
     document.getElementById('cTipo').value = c.tipo_consulta || '';
     document.getElementById('cStatus').value = c.statusc;
 
-    // Preenche data no formato dd/mm/aaaa HH:MM
     if (c.data_consulta) {
       const d = new Date(c.data_consulta);
       const dia = String(d.getDate()).padStart(2, '0');
@@ -1343,8 +1646,6 @@
     await carregarPacientes();
     await carregarMedicos();
     await carregarConsultas();
-    configurarCampoPaciente();
-    configurarCampoMedico();
     renderCalendar();
     verificarPerfil('Administrador', 'Médico');
   });

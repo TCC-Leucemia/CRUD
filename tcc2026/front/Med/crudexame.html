@@ -470,7 +470,7 @@
                 <th>Paciente</th>
                 <th>CPF</th>
                 <th>Data Consulta</th>
-                <th>ID Consulta</th>
+                <th>Data do Exame</th>
                 <th>Tipo</th>
                 <th>Status</th>
                 <th>Ações</th>
@@ -661,6 +661,7 @@
   </div>
 </div>
 
+<script src="https://unpkg.com/lucide@latest"></script>
 <script src="../JS/navbar.js"></script>
 <script>
   // =============================================================
@@ -730,6 +731,7 @@
         return;
       }
       exames = dados.dados;
+      console.log(dados.dados);
       aplicarFiltros();
     } catch (erro) {
       console.error(erro);
@@ -855,7 +857,9 @@
         <td style="font-weight:600;font-size:0.85rem;">${e.paciente || '—'}</td>
         <td style="font-family:var(--font-mono);font-size:0.8rem;">${e.cpf || '—'}</td>
         <td style="font-size:0.8rem;">${e.data_consulta ? formatarDataHora(e.data_consulta) : '—'}</td>
-        <td style="font-family:var(--font-mono);font-size:0.82rem;color:var(--blue);">#${e.id_consulta}</td>
+        <td style="font-size:0.8rem;">
+            ${formatarDataHora(e.data_exame)}
+        </td>
         <td>${tipoBadge(e.tipo_exame)}</td>
         <td>${statusPill(e.statusc)}</td>
         <td>

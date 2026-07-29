@@ -150,6 +150,27 @@ module.exports = class LoginControl {
             next(erro);
         }
     }
+    buscarCpf = async (req, res, next) => {
+
+        try {
+
+            const usuario =
+                await this.#service.buscarEmailPorCpf(
+                    req.body.cpf
+                );
+
+            res.status(200).send({
+                status: true,
+                dados: usuario
+            });
+
+        } catch (erro) {
+
+            next(erro);
+
+        }
+
+    }
 
     meuLogin = async (req, res, next) => {
 
@@ -167,6 +188,45 @@ module.exports = class LoginControl {
 
         } catch (erro) {
             next(erro);
+        }
+    }
+    validarCodigo = async (req, res, next) => {
+
+        try {
+
+            await this.#service.validarCodigo(req.body);
+
+            res.status(200).send({
+                status: true,
+                msg: "Código válido."
+            });
+
+        } catch (erro) {
+
+            next(erro);
+
+        }
+    }
+    alterarSenhaRecuperacao = async (req, res, next) => {
+
+        try {
+
+            const { cpf, novaSenha } = req.body;
+
+            await this.#service.alterarSenhaRecuperacao(
+                cpf,
+                novaSenha
+            );
+
+            res.status(200).send({
+                status: true,
+                msg: "Senha alterada com sucesso."
+            });
+
+        } catch (err) {
+
+            next(err);
+
         }
     }
 }

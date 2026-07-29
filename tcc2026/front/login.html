@@ -219,7 +219,7 @@
             cursor: pointer;
             transition: background 0.2s, transform 0.1s;
             margin-top: 12px;
-            margin-bottom: 24px;
+            margin-bottom: 16px;
             font-family: inherit;
             box-shadow: var(--shadow-sm);
         }
@@ -227,6 +227,27 @@
         .btn-entrar:hover {
             background-color: var(--medical-red-dark);
             transform: translateY(-1px);
+        }
+
+        /* Link Esqueceu a senha */
+        .esqueceu-senha-link {
+            text-align: center;
+            margin: -4px 0 24px 0;
+        }
+
+        .esqueceu-senha-link a {
+            color: var(--medical-red);
+            text-decoration: none;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-block;
+            font-weight: 500;
+        }
+
+        .esqueceu-senha-link a:hover {
+            text-decoration: underline;
+            color: var(--medical-red-dark);
         }
 
         .cadastro-link {
@@ -331,6 +352,11 @@
                 </div>
                 <button type="submit" class="btn-entrar">Entrar</button>
             </form>
+
+            <!-- Link Esqueceu sua senha -->
+            <div class="esqueceu-senha-link">
+                <a href="Senha/esqueci_senha.html">Esqueceu sua senha?</a>
+            </div>
 
             <div style="margin-top: 20px; font-size: 0.75rem; text-align: center; color: var(--gray-700);">
                 Área restrita para médicos e pacientes autorizados

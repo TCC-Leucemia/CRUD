@@ -44,24 +44,24 @@ module.exports = class ExamesDAO {
 
         const sql = `
             SELECT
-            e.id_exame,
-            e.id_consulta,
-            e.tipo_exame,
-            e.data_exame,
-            e.statusc,
+                e.id_exame,
+                e.id_consulta,
+                e.tipo_exame,
+                e.data_exame,
+                e.statusc,
 
-            c.data_consulta,
+                c.data_consulta,
 
-            m.nome AS medico,
-            m.especialidade,
+                m.nome AS medico,
+                m.especialidade,
 
-            p.nome AS paciente,
-            p.cpf,
+                p.nome AS paciente,
+                p.cpf,
 
-            r.resultado_texto,
-            r.suspeita_leucemia,
-            r.tipo_leucemia,
-            r.data_resultado
+                r.resultado_texto,
+                r.suspeita_leucemia,
+                r.tipo_leucemia,
+                r.data_resultado
 
             FROM exames e
 
@@ -75,11 +75,17 @@ module.exports = class ExamesDAO {
                 ON m.crm = c.crm
 
             LEFT JOIN resultados_exame r
-                ON r.id_exame = e.id_exame
+            ON r.id_resultado = (
+                SELECT r2.id_resultado
+                FROM resultados_exame r2
+                WHERE r2.id_exame = e.id_exame
+                ORDER BY r2.data_resultado DESC, r2.id_resultado DESC
+                LIMIT 1
+            )
 
             WHERE c.cpf = ?
 
-            ORDER BY e.data_exame DESC
+            ORDER BY e.data_exame DESC;
         `;
 
         return new Promise((resolve, reject) => {
@@ -100,29 +106,31 @@ module.exports = class ExamesDAO {
 
     }
 
-    
+
     findByCrm(crm) {
 
         const sql = `
             SELECT
-            e.id_exame,
-            e.id_consulta,
-            e.tipo_exame,
-            e.data_exame,
-            e.statusc,
+                e.id_exame,
+                e.id_consulta,
+                e.tipo_exame,
+                e.data_exame,
+                e.statusc,
 
-            c.data_consulta,
+                c.data_consulta,
 
-            m.nome AS medico,
-            m.especialidade,
+                m.nome AS medico,
+                m.especialidade,
 
-            p.nome AS paciente,
-            p.cpf,
+                p.nome AS paciente,
+                p.cpf,
+                p.data_nasc,
+                p.sexo,
 
-            r.resultado_texto,
-            r.suspeita_leucemia,
-            r.tipo_leucemia,
-            r.data_resultado
+                r.resultado_texto,
+                r.suspeita_leucemia,
+                r.tipo_leucemia,
+                r.data_resultado
 
             FROM exames e
 
@@ -136,11 +144,17 @@ module.exports = class ExamesDAO {
                 ON m.crm = c.crm
 
             LEFT JOIN resultados_exame r
-                ON r.id_exame = e.id_exame
+            ON r.id_resultado = (
+                SELECT r2.id_resultado
+                FROM resultados_exame r2
+                WHERE r2.id_exame = e.id_exame
+                ORDER BY r2.data_resultado DESC, r2.id_resultado DESC
+                LIMIT 1
+            )
 
             WHERE c.crm = ?
 
-            ORDER BY e.data_exame DESC
+            ORDER BY e.data_exame DESC;
         `;
 
         return new Promise((resolve, reject) => {
