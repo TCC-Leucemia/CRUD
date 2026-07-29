@@ -252,6 +252,11 @@
     @media (max-width: 700px) {
       .input-group.full-width { grid-column: span 1; }
     }
+    .nav-icon svg{
+      width:20px;
+      height:20px;
+      stroke:currentColor;
+    }
   </style>
 </head>
 <body>
@@ -341,11 +346,16 @@
     </div>
   </div>
 </div>
-
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <script src="../JS/navbar.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-  
+  // ============================================
+  // SESSÃO & SIDEBAR
+  // ============================================
+  if (!localStorage.getItem('hematoai_session')) {
+    HematoAI.setSession({ tipo: 'Médico', nome: 'Dr. Usuário', crm: '00000-SP' });
+  }
   HematoAI.initSidebar('analises-ia');
 
   // ============================================
@@ -461,11 +471,15 @@ document.addEventListener('DOMContentLoaded', function () {
       // const data = await response.json();
 
       // SIMULAÇÃO DE RESPOSTA (REMOVER QUANDO INTEGRAR)
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      const data = {
-        laudo: `RELATÓRIO DE ANÁLISE HEMATOLÓGICA\n\nPaciente: ${nome}\nIdade: ${idade} anos\nSexo: ${sexo}\n\nSINTOMAS: ${sintomas}\n\nHISTÓRICO: ${historico}\n\nANÁLISE:\n- Hemoglobina: 9.8 g/dL (baixo)\n- Leucócitos: 25,000 µL (elevado)\n- Plaquetas: 45,000 µL (baixo)\n- Presença de células blásticas atípicas: 15%\n\nSUSPEITA: ALTA - Leucemia Mieloide Aguda (LMA)\nCONFIANÇA: 94.5%\n\nRECOMENDAÇÃO:\n- Realizar mielograma para confirmação\n- Avaliar necessidade de internação\n- Iniciar suporte transfusional imediato\n\nEste laudo foi gerado automaticamente pelo sistema HematoAI.`,
-        pdfUrl: null
-      };
+      const response = await fetch('http://localhost:3000/analisar', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erro no servidor (${response.status})`);
+      }
+      const data = await response.json();
 
       if (data.laudo) {
         laudoEl.textContent = data.laudo;
@@ -522,7 +536,6 @@ document.addEventListener('DOMContentLoaded', function () {
   //   .then(() => console.log('✅ Servidor conectado'))
   //   .catch(() => console.warn('⚠️ Servidor não está respondendo'));
 });
-verificarPerfil("Médico");
 </script>
 </body>
 </html>

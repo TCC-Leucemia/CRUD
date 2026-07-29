@@ -3,6 +3,7 @@ console.log(process.env.JWT_SECRET);
 
 const express = require('express');
 const mysql = require('mysql');
+const path = require('path');
 
 const cors = require('cors');
 
@@ -23,9 +24,13 @@ app.use(cors());
 
 app.use(express.json());
 
-app.use(express.static('js'));
+app.use(express.static(path.join(__dirname, 'front'), {
+    extensions: ['html']
+}));
 
-//app.use('/', express.static(__dirname + '/view'));
+app.get('/', (request, response) => {
+    response.sendFile(path.join(__dirname, 'front', 'telaInicial.html'));
+});
 
 
 const porta = 3000;
