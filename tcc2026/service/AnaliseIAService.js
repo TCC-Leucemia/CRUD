@@ -3,13 +3,21 @@ const ExamesDAO = require("../dao/ExamesDAO");
 const AnaliseIA = require("../model/AnaliseIA");
 const ErrorResponse = require("../utils/ErrorResponse");
 
+const fs = require("fs");
+const path = require("path");
+const { spawn } = require("child_process");
+
+const ImagensExameDAO = require("../dao/ImagensExameDAO");
+const ImagensExame = require("../model/ImagensExame");
+
 module.exports = class AnaliseIAService {
 
     #dao;
     #examesDAO;
+    #imagensDAO;
 
     constructor(banco) {
-
+        this.#imagensDAO = new ImagensExameDAO(banco);
         this.#dao = new AnaliseIADAO(banco);
         this.#examesDAO = new ExamesDAO(banco);
     }

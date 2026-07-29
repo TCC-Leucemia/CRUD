@@ -4,6 +4,31 @@ const AnaliseIAMiddleware = require("../middleware/AnaliseIAMiddleware");
 const JwtMiddleware = require("../middleware/JwtMiddleware");
 const RoleMiddleware = require("../middleware/RoleMiddleware");
 
+const multer = require("multer");
+const path = require("path");
+
+const storage = multer.diskStorage({
+
+    destination: (req, file, cb) => {
+        cb(null, "uploads/exames");
+    },
+
+    filename: (req, file, cb) => {
+
+        const nome =
+            Date.now() +
+            path.extname(file.originalname);
+
+        cb(null, nome);
+
+    }
+
+});
+
+const upload = multer({
+    storage
+});
+
 module.exports = (app, banco) => {
 
     const control = new AnaliseIAControl(banco);
@@ -11,6 +36,14 @@ module.exports = (app, banco) => {
 
     const jwt = new JwtMiddleware();
     const role = new RoleMiddleware();
+    
+    app.post(
+        "/analise-ia/gerar",
+        jwt.validateToken,
+        role.authorize("Médico"),
+        upload.single("imagem"),
+        control.gerarLaudo
+    );
 
     app.get(
         "/analise-ia",

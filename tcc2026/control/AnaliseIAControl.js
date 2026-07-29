@@ -119,4 +119,20 @@ module.exports = class AnaliseIAControl {
             next(erro);
         }
     }
+    gerarLaudo = async (req, res, next) => {
+        try {
+            const resultado = await this.#service.gerarLaudo(
+                req,
+                req.user
+            );
+            return res.status(200).send({
+                status: true,
+                laudo: resultado.laudo,
+                pdf: resultado.pdf,
+                id_analise: resultado.id_analise
+            });
+        } catch (erro) {
+            next(erro);
+        }
+    }
 }
