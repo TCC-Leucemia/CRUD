@@ -428,6 +428,11 @@
         gap: 4px 8px;
       }
     }
+    .nav-icon svg{
+      width:20px;
+      height:20px;
+      stroke:currentColor;
+    }
   </style>
 </head>
 <body>
@@ -561,12 +566,17 @@
     </div>
   </div>
 </div>
-
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="../JS/navbar.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-  
+  // ============================================
+  // SESSÃO & SIDEBAR
+  // ============================================
+  if (!localStorage.getItem('hematoai_session')) {
+    HematoAI.setSession({ tipo: 'Médico', nome: 'Dr. Usuário', crm: '00000-SP' });
+  }
   HematoAI.initSidebar('analises-ia');
 
   // ============================================
@@ -905,11 +915,10 @@ document.addEventListener('DOMContentLoaded', function () {
           }
       );
 
-      const data = await response.json();
-
       if (!response.ok) {
-          throw new Error(data.msg || 'Erro ao gerar laudo');
+        throw new Error(`Erro no servidor (${response.status})`);
       }
+      const data = await response.json();
 
       if (data.laudo) {
         laudoEl.textContent = data.laudo;
