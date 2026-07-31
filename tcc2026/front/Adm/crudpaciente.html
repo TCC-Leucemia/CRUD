@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <script src="../JS/theme-init.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HematoAI · Gerenciar Pacientes</title>
   <link rel="stylesheet" href="../CSS/navbar.css">
@@ -203,7 +204,7 @@
         <p>Cadastro, edição e exclusão de pacientes do sistema</p>
       </div>
       <div class="page-header-right">
-        <button class="btn btn-primary" id="btnNovoPaciente">+ Novo Paciente</button>
+        <button class="btn btn-primary" id="btnNovoPaciente"><span class="btn-plus">+</span>Novo Paciente</button>
       </div>
     </div>
 
@@ -220,6 +221,12 @@
               <option value="">Todos os sexos</option>
               <option value="Masculino">Masculino</option>
               <option value="Feminino">Feminino</option>
+            </select>
+            <select id="sortPaciente" class="filter-select" aria-label="Ordenar por">
+              <option value="id_asc">Ordenar por: ID crescente</option>
+              <option value="id_desc">ID decrescente</option>
+              <option value="nome_asc">Nome A-Z</option>
+              <option value="nome_desc">Nome Z-A</option>
             </select>
           </div>
         </div>
@@ -524,7 +531,7 @@
 
         pacientes = dados.dados;
 
-        renderTable(pacientes);
+        applyFilter();
 
     } catch (erro) {
 
@@ -1211,13 +1218,23 @@
   }
 
   function applyFilter() {
-    const q = document.getElementById('searchPaciente').value.toLowerCase();
+    const q = document.getElementById('searchPaciente').value.toLowerCase().trim();
     const sexo = document.getElementById('filterSexo').value;
+    const ordem = document.getElementById('sortPaciente').value;
     
     const filtrados = pacientes.filter(p =>
-      (!q || p.nome.toLowerCase().includes(q) || p.cpf.includes(q) || p.email.toLowerCase().includes(q)) &&
+      (!q || (p.nome || '').toLowerCase().includes(q) ||
+             (p.cpf || '').toLowerCase().includes(q) ||
+             (p.email || '').toLowerCase().includes(q)) &&
       (!sexo || p.sexo === sexo)
     );
+    const comparar = (a, b) => String(a ?? '').localeCompare(String(b ?? ''), 'pt-BR', { sensitivity: 'base', numeric: true });
+    filtrados.sort((a, b) => {
+      if (ordem === 'id_desc') return comparar(b.id_usuario ?? b.cpf, a.id_usuario ?? a.cpf);
+      if (ordem === 'nome_asc') return comparar(a.nome, b.nome);
+      if (ordem === 'nome_desc') return comparar(b.nome, a.nome);
+      return comparar(a.id_usuario ?? a.cpf, b.id_usuario ?? b.cpf);
+    });
     renderTable(filtrados);
   }
 
@@ -1295,6 +1312,7 @@
   // Event listeners
   document.getElementById('searchPaciente').addEventListener('input', applyFilter);
   document.getElementById('filterSexo').addEventListener('change', applyFilter);
+  document.getElementById('sortPaciente').addEventListener('change', applyFilter);
   
   const modalEl = document.getElementById('modalPaciente');
   document.getElementById('closeModalPaciente').addEventListener('click', () => HematoAI.closeModal(modalEl));

@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <script src="../JS/theme-init.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HematoAI · Nova Análise IA</title>
   <link rel="stylesheet" href="../CSS/navbar.css">
@@ -428,11 +429,6 @@
         gap: 4px 8px;
       }
     }
-    .nav-icon svg{
-      width:20px;
-      height:20px;
-      stroke:currentColor;
-    }
   </style>
 </head>
 <body>
@@ -569,6 +565,7 @@
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="../JS/navbar.js"></script>
+<script src="../JS/auth.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
   // ============================================
@@ -905,7 +902,7 @@ document.addEventListener('DOMContentLoaded', function () {
       const token = localStorage.getItem("token");
 
       const response = await fetch(
-          "http://localhost:3000/anamnese",
+          "http://localhost:3000/analise-ia/gerar",
           {
               method: "POST",
               headers: {
@@ -915,10 +912,10 @@ document.addEventListener('DOMContentLoaded', function () {
           }
       );
 
+      const data = await response.json().catch(() => ({}));
       if (!response.ok) {
-        throw new Error(`Erro no servidor (${response.status})`);
+        throw new Error(data.msg || `Erro no servidor (${response.status})`);
       }
-      const data = await response.json();
 
       if (data.laudo) {
         laudoEl.textContent = data.laudo;
@@ -934,7 +931,7 @@ document.addEventListener('DOMContentLoaded', function () {
       console.error('❌ Erro:', error);
       laudoEl.textContent = `ERRO NA ANÁLISE\n\n${error.message}`;
       resultadosDiv.classList.remove('hidden');
-      HematoAI.showToast('Erro ao gerar análise.', 'error');
+      HematoAI.showToast(error.message, 'error');
     } finally {
       btnGerar.innerHTML = textoOriginal;
       btnGerar.disabled  = false;
@@ -945,6 +942,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // BAIXAR PDF
   // ============================================
   function baixarPDF() {
+    if (pdfUrlAtual) { const a = document.createElement('a'); a.href = pdfUrlAtual; a.download = `laudo_ia_${Date.now()}.pdf`; a.click(); return; }
     const laudo = laudoEl.textContent;
     if (laudo && laudo !== '---') {
       const blob = new Blob([laudo], { type: 'application/pdf' });

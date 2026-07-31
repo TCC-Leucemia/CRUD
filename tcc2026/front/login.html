@@ -331,17 +331,6 @@
             </div>
 
             <form id="formLogin" action="#" method="post">
-                <!-- Campo tipo -->
-                <div class="input-group">
-                    <label for="tipoUsuario">Tipo de usuário</label>
-                    <select id="tipoUsuario" name="tipo" required>
-                        <option value="">Selecione...</option>
-                        <option value="Administrador">Administrador</option>
-                        <option value="Médico">Médico</option>
-                        <option value="Paciente">Paciente</option>
-                    </select>
-                </div>
-
                 <div class="input-group">
                     <label for="email">E-mail institucional ou cadastrado</label>
                     <input type="email" id="email" name="email" placeholder="exemplo@hematoai.com" required>
@@ -382,97 +371,92 @@
 
         // Formulário de login
         const formLogin = document.getElementById('formLogin');
-        if (formLogin) {
-            formLogin.addEventListener('submit', async (e) => {
+        const PENDENCIA_PERFIL = "hematoai_perfil_pendente";
 
-                e.preventDefault();
+        function concluirLogin(dados) {
+            sessionStorage.removeItem(PENDENCIA_PERFIL);
+            localStorage.setItem("token", dados.token);
+            localStorage.setItem("usuario", JSON.stringify(dados.usuario));
+            localStorage.setItem(
+                "hematoai_session",
+                JSON.stringify({
+                    token: dados.token,
+                    tipo: dados.usuario.role,
+                    nome: dados.usuario.nome,
+                    email: dados.usuario.email,
+                    id_usuario: dados.usuario.id_usuario
+                })
+            );
 
-                const tipo = document.getElementById('tipoUsuario').value;
-                const email = document.getElementById('email').value.trim();
-                const senha = document.getElementById('senha').value.trim();
+            switch (dados.usuario.role) {
+                case "Administrador":
+                    window.location.href = "Adm/administrador.html";
+                    break;
+                case "Médico":
+                    window.location.href = "Med/medico.html";
+                    break;
+                case "Paciente":
+                    window.location.href = "Paciente/paciente.html";
+                    break;
+                default:
+                    alert("Perfil inválido");
+            }
+        }
 
-                try {
+        async function autenticar() {
+            const email = document.getElementById('email').value.trim();
+            const senha = document.getElementById('senha').value.trim();
+            const payload = { email, senha };
 
-                    const resposta = await fetch(
-                        "http://localhost:3000/auth",
-                        {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
-                            body: JSON.stringify({
-                                email: email,
-                                senha: senha,
-                                tipo: tipo
-                            })
-                        }
-                    );
+            try {
+                sessionStorage.removeItem(PENDENCIA_PERFIL);
+                const resposta = await fetch(
+                    "http://localhost:3000/auth",
+                    {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(payload)
+                    }
+                );
+                const dados = await resposta.json();
 
-                    const dados = await resposta.json();
+                if (!resposta.ok || !dados.status) {
+                    alert(dados.msg || "Login inválido");
+                    return;
+                }
 
-                    if (!resposta.ok || !dados.status) {
+                if (dados.requerPerfil) {
+                    const perfis = Array.isArray(dados.perfis)
+                        ? [...new Set(dados.perfis.filter(
+                            (perfil) => perfil === "Paciente" || perfil === "Médico"
+                        ))]
+                        : [];
 
-                        alert(dados.msg || "Login inválido");
+                    if (typeof dados.tokenPerfil !== "string" || !dados.tokenPerfil || perfis.length < 2) {
+                        alert("Não foi possível iniciar a seleção de perfil. Tente entrar novamente.");
                         return;
                     }
 
-                    // Salva token JWT
-                    localStorage.setItem(
-                        "token",
-                        dados.token
+                    sessionStorage.setItem(
+                        PENDENCIA_PERFIL,
+                        JSON.stringify({ tokenPerfil: dados.tokenPerfil, perfis })
                     );
-
-                    // Salva usuário
-                    localStorage.setItem(
-                        "usuario",
-                        JSON.stringify(dados.usuario)
-                    );
-
-                    localStorage.setItem(
-                        "hematoai_session",
-                        JSON.stringify({
-                            token: dados.token,
-                            tipo: dados.usuario.role,
-                            nome: dados.usuario.nome,
-                            email: dados.usuario.email,
-                            id_usuario: dados.usuario.id_usuario
-                        })
-                    );
-
-                    console.log(
-    JSON.parse(localStorage.getItem("hematoai_session"))
-);
-
-                    // Redirecionamento
-                    switch (dados.usuario.role) {
-
-                        case "Administrador":
-                            window.location.href =
-                                "Adm/administrador.html";
-                            break;
-
-                        case "Médico":
-                            window.location.href =
-                                "Med/medico.html";
-                            break;
-
-                        case "Paciente":
-                            window.location.href =
-                                "Paciente/paciente.html";
-                            break;
-
-                        default:
-                            alert("Perfil inválido");
-                    }
-
-                } catch (erro) {
-
-                    console.error("Erro:", erro);
-
-                    alert(
-                        "Não foi possível conectar ao servidor."
-                    );
+                    document.getElementById("senha").value = "";
+                    window.location.replace("selecionar_perfil.html");
+                    return;
                 }
+
+                concluirLogin(dados);
+            } catch (erro) {
+                console.error("Erro:", erro);
+                alert("Não foi possível conectar ao servidor.");
+            }
+        }
+
+        if (formLogin) {
+            formLogin.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await autenticar();
             });
         }
     })();

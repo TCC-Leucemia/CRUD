@@ -1,0 +1,11 @@
+node_modules/
+
+# Segredos: nunca versionar (contém OPENAI_API_KEY, JWT_SECRET e credenciais de e-mail)
+.env
+tcc2026/.env
+
+tcc2026/uploads/
+tcc2026/laudos_gerados/
+tcc2026/backend/laudos_gerados/
+tcc2026/__pycache__/
+tcc2026/backend/__pycache__/

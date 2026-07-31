@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <script src="../JS/theme-init.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HematoAI · Consultas (Médico)</title>
   <link rel="stylesheet" href="../CSS/navbar.css">
@@ -201,6 +202,14 @@
               <option value="Pendente">Pendente</option>
               <option value="Em andamento">Em andamento</option>
               <option value="Finalizado">Finalizado</option>
+            </select>
+            <select id="sortConsulta" class="filter-select" aria-label="Ordenar por">
+              <option value="data_desc">Ordenar por: Data mais recente</option>
+              <option value="data_asc">Data mais antiga</option>
+              <option value="id_asc">ID crescente</option>
+              <option value="id_desc">ID decrescente</option>
+              <option value="nome_asc">Paciente A-Z</option>
+              <option value="nome_desc">Paciente Z-A</option>
             </select>
           </div>
         </div>
@@ -407,18 +416,29 @@
   }
 
   function aplicarFiltros() {
-    const q = document.getElementById('searchConsulta').value.toLowerCase();
+    const q = document.getElementById('searchConsulta').value.toLowerCase().trim();
     const status = document.getElementById('filterStatus').value;
+    const ordem = document.getElementById('sortConsulta').value;
     const filtradas = consultas.filter(c => {
       const nomePaciente = (c.paciente || "").toLowerCase();
-      return (nomePaciente.includes(q) || c.cpf.includes(q)) &&
+      return (nomePaciente.includes(q) || (c.cpf || '').includes(q)) &&
              (!status || c.statusc === status);
+    });
+    const comparar = (a, b) => String(a ?? '').localeCompare(String(b ?? ''), 'pt-BR', { sensitivity: 'base', numeric: true });
+    filtradas.sort((a, b) => {
+      if (ordem === 'data_asc') return (Date.parse(a.data_consulta) || 0) - (Date.parse(b.data_consulta) || 0);
+      if (ordem === 'id_asc') return Number(a.id_consulta) - Number(b.id_consulta);
+      if (ordem === 'id_desc') return Number(b.id_consulta) - Number(a.id_consulta);
+      if (ordem === 'nome_asc') return comparar(a.paciente, b.paciente);
+      if (ordem === 'nome_desc') return comparar(b.paciente, a.paciente);
+      return (Date.parse(b.data_consulta) || 0) - (Date.parse(a.data_consulta) || 0);
     });
     renderTabela(filtradas);
   }
 
   document.getElementById('searchConsulta').addEventListener('input', aplicarFiltros);
   document.getElementById('filterStatus').addEventListener('change', aplicarFiltros);
+  document.getElementById('sortConsulta').addEventListener('change', aplicarFiltros);
 
   // ============================================
   // AÇÕES

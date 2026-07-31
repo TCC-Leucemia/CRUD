@@ -2,10 +2,22 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <script src="../JS/theme-init.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HematoAI · Análises IA</title>
   <link rel="stylesheet" href="../CSS/navbar.css">
   <style>
+    .main-content,
+    .page-body,
+    .page-body .card {
+      min-width: 0;
+    }
+
+    .table-wrapper {
+      width: 100%;
+      max-width: 100%;
+    }
+
     .filter-row {
       display: flex;
       gap: 10px;
@@ -134,7 +146,7 @@
         <p>Resultados da inteligência artificial para diagnóstico</p>
       </div>
       <div class="page-header-right">
-        <button class="btn btn-success" id="btnNovaAnalise">+ Nova Análise IA</button>
+        <button class="btn btn-success" id="btnNovaAnalise"><span class="btn-plus">+</span>Nova Análise IA</button>
       </div>
     </div>
 

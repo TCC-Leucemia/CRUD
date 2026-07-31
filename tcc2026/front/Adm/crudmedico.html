@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <script src="../JS/theme-init.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HematoAI · Gerenciar Médicos</title>
   <link rel="stylesheet" href="../CSS/navbar.css">
@@ -170,6 +171,22 @@
       cursor: not-allowed;
     }
 
+    /* Botão "Novo Médico" ancorado à esquerda: mesma distância da borda
+       esquerda em qualquer largura de tela, já que a lista é bem larga. */
+    .page-header {
+      justify-content: flex-start;
+    }
+
+    .page-header-left {
+      min-width: 340px;
+    }
+
+    @media (max-width: 900px) {
+      .page-header-left {
+        min-width: 0;
+      }
+    }
+
     /* Loading state for CEP */
     .cep-loading {
       position: relative;
@@ -198,7 +215,7 @@
         <p>Cadastro, edição e exclusão de médicos do sistema</p>
       </div>
       <div class="page-header-right">
-        <button class="btn btn-primary" id="btnNovoMedico">+ Novo Médico</button>
+        <button class="btn btn-primary" id="btnNovoMedico"><span class="btn-plus">+</span>Novo Médico</button>
       </div>
     </div>
 
@@ -209,7 +226,7 @@
           <span class="card-title">Lista de Médicos</span>
           <div class="filter-row">
             <div class="search-bar" style="max-width:280px">
-              <input type="text" id="searchMedico" placeholder="Buscar por nome, CRM, especialidade...">
+              <input type="text" id="searchMedico" placeholder="Buscar por nome, CRM ou CPF...">
             </div>
             <select id="filterEsp" class="filter-select">
               <option value="">Todas especialidades</option>
@@ -218,6 +235,12 @@
               <option>Clínico Geral</option>
               <option>Pediatria</option>
               <option>Medicina Interna</option>
+            </select>
+            <select id="sortMedico" class="filter-select" aria-label="Ordenar por">
+              <option value="id_asc">Ordenar por: ID crescente</option>
+              <option value="id_desc">ID decrescente</option>
+              <option value="nome_asc">Nome A-Z</option>
+              <option value="nome_desc">Nome Z-A</option>
             </select>
           </div>
         </div>
@@ -968,7 +991,7 @@
 
         medicos = dados.dados;
 
-        renderTable(medicos);
+        applyFilter();
 
     } catch (erro) {
 
@@ -1014,12 +1037,25 @@
   }
 
   function applyFilter() {
-    const q   = document.getElementById('searchMedico').value.toLowerCase();
+    const q   = document.getElementById('searchMedico').value.toLowerCase().trim();
+    const qNumerica = q.replace(/\D/g, '');
     const esp = document.getElementById('filterEsp').value;
-    renderTable(medicos.filter(m =>
-      (!q   || m.nome.toLowerCase().includes(q) || m.crm.toLowerCase().includes(q) || m.especialidade.toLowerCase().includes(q)) &&
+    const ordem = document.getElementById('sortMedico').value;
+    const filtrados = medicos.filter(m =>
+      (!q || (m.nome || '').toLowerCase().includes(q) ||
+             (m.crm || '').toLowerCase().includes(q) ||
+             (m.cpf || '').toLowerCase().includes(q) ||
+             (qNumerica && String(m.cpf || '').replace(/\D/g, '').includes(qNumerica))) &&
       (!esp || m.especialidade === esp)
-    ));
+    );
+    const comparar = (a, b) => String(a ?? '').localeCompare(String(b ?? ''), 'pt-BR', { sensitivity: 'base', numeric: true });
+    filtrados.sort((a, b) => {
+      if (ordem === 'id_desc') return comparar(b.id_usuario ?? b.crm, a.id_usuario ?? a.crm);
+      if (ordem === 'nome_asc') return comparar(a.nome, b.nome);
+      if (ordem === 'nome_desc') return comparar(b.nome, a.nome);
+      return comparar(a.id_usuario ?? a.crm, b.id_usuario ?? b.crm);
+    });
+    renderTable(filtrados);
   }
 
   window.editarMedico = function(crm) {
@@ -1101,6 +1137,7 @@
   // Event listeners
   document.getElementById('searchMedico').addEventListener('input', applyFilter);
   document.getElementById('filterEsp').addEventListener('change', applyFilter);
+  document.getElementById('sortMedico').addEventListener('change', applyFilter);
   
   const modalEl = document.getElementById('modalMedico');
   document.getElementById('closeModalMedico').addEventListener('click', () => HematoAI.closeModal(modalEl));

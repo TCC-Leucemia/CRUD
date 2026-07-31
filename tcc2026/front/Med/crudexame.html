@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <script src="../JS/theme-init.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HematoAI · Gerenciar Exames</title>
   <link rel="stylesheet" href="../CSS/navbar.css">
@@ -423,7 +424,7 @@
         <p>Cadastro e acompanhamento de exames laboratoriais</p>
       </div>
       <div class="page-header-right">
-        <button class="btn btn-primary" id="btnNovoExame">Novo Exame</button>
+        <button class="btn btn-primary" id="btnNovoExame"><span class="btn-plus">+</span>Novo Exame</button>
       </div>
     </div>
 
@@ -446,6 +447,14 @@
               <option value="Pendente">Pendente</option>
               <option value="Em andamento">Em andamento</option>
               <option value="Finalizado">Finalizado</option>
+            </select>
+            <select id="sortExame" class="filter-select" aria-label="Ordenar por">
+              <option value="data_desc">Ordenar por: Data mais recente</option>
+              <option value="data_asc">Data mais antiga</option>
+              <option value="id_asc">ID crescente</option>
+              <option value="id_desc">ID decrescente</option>
+              <option value="nome_asc">Paciente A-Z</option>
+              <option value="nome_desc">Paciente Z-A</option>
             </select>
             <button class="btn btn-ghost btn-sm" id="btnRecarregar">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -876,9 +885,10 @@
 
   /* ── Filtros ── */
   function aplicarFiltros() {
-    const q      = document.getElementById('searchExame').value.toLowerCase();
+    const q      = document.getElementById('searchExame').value.toLowerCase().trim();
     const tipo   = document.getElementById('filterTipo').value;
     const status = document.getElementById('filterStatus').value;
+    const ordem  = document.getElementById('sortExame').value;
 
     filtrados = exames.filter(e => {
       const matchPaciente = (e.paciente || '').toLowerCase().includes(q) ||
@@ -889,12 +899,22 @@
         (!tipo   || e.tipo_exame === tipo) &&
         (!status || e.statusc === status);
     });
+    const comparar = (a, b) => String(a ?? '').localeCompare(String(b ?? ''), 'pt-BR', { sensitivity: 'base', numeric: true });
+    filtrados.sort((a, b) => {
+      if (ordem === 'data_asc') return (Date.parse(a.data_exame) || 0) - (Date.parse(b.data_exame) || 0);
+      if (ordem === 'id_asc') return Number(a.id_exame) - Number(b.id_exame);
+      if (ordem === 'id_desc') return Number(b.id_exame) - Number(a.id_exame);
+      if (ordem === 'nome_asc') return comparar(a.paciente, b.paciente);
+      if (ordem === 'nome_desc') return comparar(b.paciente, a.paciente);
+      return (Date.parse(b.data_exame) || 0) - (Date.parse(a.data_exame) || 0);
+    });
     renderTabela(filtrados);
   }
 
   document.getElementById('searchExame').addEventListener('input', aplicarFiltros);
   document.getElementById('filterTipo').addEventListener('change', aplicarFiltros);
   document.getElementById('filterStatus').addEventListener('change', aplicarFiltros);
+  document.getElementById('sortExame').addEventListener('change', aplicarFiltros);
   document.getElementById('btnRecarregar').addEventListener('click', carregarExames);
 
   /* ── Abrir modal novo ── */

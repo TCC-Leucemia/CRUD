@@ -125,6 +125,8 @@
   }
   function clearSession() {
     localStorage.removeItem('hematoai_session');
+    localStorage.removeItem('token');
+    localStorage.removeItem('usuario');
   }
 
   function initSidebar(activePage) {

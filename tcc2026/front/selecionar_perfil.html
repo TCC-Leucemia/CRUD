@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>HematoAI · Escolha seu perfil</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --medical-red: #b91c1c;
+            --medical-red-dark: #991b1b;
+            --medical-red-light: #fee2e2;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-700: #374151;
+            --gray-900: #111827;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 8px 20px rgba(17, 24, 39, 0.09);
+            --shadow-lg: 0 18px 36px rgba(17, 24, 39, 0.12);
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+            color: var(--gray-900);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            line-height: 1.5;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 32px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .logo-link {
+            display: inline-flex;
+            align-items: baseline;
+            gap: 6px;
+            padding: 4px 8px 4px 4px;
+            border-radius: 12px;
+            color: inherit;
+            text-decoration: none;
+            transition: opacity 0.2s, background-color 0.2s;
+        }
+
+        .logo-link:hover {
+            opacity: 0.85;
+            background: var(--gray-50);
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background: var(--medical-red);
+            color: #fff;
+            font: 700 18px monospace;
+        }
+
+        .logo-text {
+            position: relative;
+            top: 4px;
+            color: var(--gray-900);
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .logo-text span {
+            color: var(--medical-red);
+        }
+
+        .tagline {
+            margin-left: 6px;
+            padding-left: 10px;
+            border-left: 1px solid var(--gray-300);
+            color: var(--gray-700);
+            font-size: 0.8rem;
+        }
+
+        .main {
+            flex: 1;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 30px 20px 36px;
+        }
+
+        .selection-panel {
+            width: min(100%, 720px);
+            padding: 30px 34px 24px;
+            border: 1px solid var(--gray-100);
+            border-radius: 26px;
+            background: #fff;
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+        }
+
+        .selection-panel h1 {
+            margin-bottom: 6px;
+            font-size: 1.6rem;
+            line-height: 1.25;
+        }
+
+        .selection-panel > p {
+            margin-bottom: 22px;
+            color: var(--gray-700);
+            font-size: 0.95rem;
+        }
+
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .profile-card {
+            min-height: 168px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            padding: 22px 18px;
+            border: 2px solid var(--gray-200);
+            border-radius: 22px;
+            background: var(--gray-50);
+            color: var(--gray-900);
+            cursor: pointer;
+            font: inherit;
+            transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s, transform 0.2s;
+        }
+
+        .profile-card:hover {
+            border-color: var(--medical-red);
+            background: #fff;
+            box-shadow: var(--shadow-md);
+            transform: translateY(-4px);
+        }
+
+        .profile-card:focus-visible,
+        .back-link:focus-visible {
+            outline: 3px solid rgba(185, 28, 28, 0.25);
+            outline-offset: 3px;
+        }
+
+        .profile-card:disabled {
+            cursor: wait;
+            opacity: 0.65;
+            transform: none;
+        }
+
+        .profile-icon {
+            width: 68px;
+            height: 68px;
+            display: grid;
+            place-items: center;
+            border-radius: 20px;
+            background: var(--medical-red-light);
+            color: var(--medical-red);
+        }
+
+        .profile-icon svg {
+            width: 40px;
+            height: 40px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .profile-label {
+            color: var(--medical-red-dark);
+            font-size: 1.15rem;
+            font-weight: 750;
+        }
+
+        .status {
+            min-height: 0;
+            margin-top: 10px;
+            color: var(--gray-700);
+            font-size: 0.9rem;
+        }
+
+        .status:empty {
+            margin-top: 0;
+        }
+
+        .status.error {
+            color: var(--medical-red-dark);
+            font-weight: 600;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 14px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            color: var(--medical-red);
+            font-size: 0.9rem;
+            font-weight: 650;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            background: var(--medical-red-light);
+            color: var(--medical-red-dark);
+        }
+
+        .footer {
+            padding: 24px 0 20px;
+            border-top: 1px solid var(--gray-200);
+            color: var(--gray-700);
+            font-size: 0.75rem;
+            text-align: center;
+        }
+
+        .bg-accent {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+            width: 280px;
+            height: 280px;
+            background: radial-gradient(circle, rgba(185, 28, 28, 0.035) 0%, rgba(255, 255, 255, 0) 70%);
+            pointer-events: none;
+        }
+
+        @media (max-width: 620px) {
+            .container {
+                padding: 0 20px;
+            }
+
+            .tagline {
+                display: none;
+            }
+
+            .main {
+                align-items: flex-start;
+                padding: 24px 0 28px;
+            }
+
+            .selection-panel {
+                padding: 26px 22px 20px;
+                border-radius: 22px;
+            }
+
+            .selection-panel h1 {
+                font-size: 1.4rem;
+            }
+
+            .profile-grid {
+                grid-template-columns: 1fr;
+                gap: 14px;
+            }
+
+            .profile-card {
+                min-height: 138px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="bg-accent"></div>
+<div class="container">
+    <header class="header">
+        <a href="telaInicial" class="logo-link" aria-label="Página inicial HematoAI">
+            <span class="logo-icon">H</span>
+            <span class="logo-text">Hemato<span>AI</span></span>
+            <span class="tagline">Inteligência em Hematologia</span>
+        </a>
+    </header>
+</div>
+
+<main class="main">
+    <section class="selection-panel" aria-labelledby="selectionTitle">
+        <h1 id="selectionTitle">Como você deseja entrar?</h1>
+        <p>Suas credenciais possuem mais de um perfil. Selecione a área que deseja acessar.</p>
+
+        <div class="profile-grid" id="profileGrid">
+            <button type="button" class="profile-card" data-perfil="Paciente" aria-label="Entrar como paciente">
+                <span class="profile-icon" aria-hidden="true">
+                    <svg viewBox="0 0 48 48">
+                        <circle cx="24" cy="16" r="8"></circle>
+                        <path d="M9 40c1.7-8.1 7.2-12 15-12s13.3 3.9 15 12"></path>
+                        <path d="M35 11v8M31 15h8"></path>
+                    </svg>
+                </span>
+                <span class="profile-label">Paciente</span>
+            </button>
+
+            <button type="button" class="profile-card" data-perfil="Médico" aria-label="Entrar como médico">
+                <span class="profile-icon" aria-hidden="true">
+                    <svg viewBox="0 0 48 48">
+                        <path d="M13 7v11a11 11 0 0 0 22 0V7"></path>
+                        <path d="M9 7h8M31 7h8"></path>
+                        <path d="M24 29v4a8 8 0 0 0 8 8h2"></path>
+                        <circle cx="38" cy="39" r="4"></circle>
+                    </svg>
+                </span>
+                <span class="profile-label">Médico</span>
+            </button>
+        </div>
+
+        <p id="statusMessage" class="status" role="status" aria-live="polite"></p>
+        <a href="login.html" class="back-link" id="backLink">← Voltar para o login</a>
+    </section>
+</main>
+
+<div class="container">
+    <footer class="footer">
+        <p>HematoAI · Sistema de apoio ao diagnóstico hematológico · Segurança e confidencialidade</p>
+    </footer>
+</div>
+
+<script>
+    (function () {
+        const PENDENCIA_PERFIL = "hematoai_perfil_pendente";
+        const profileGrid = document.getElementById("profileGrid");
+        const profileButtons = [...profileGrid.querySelectorAll("[data-perfil]")];
+        const statusMessage = document.getElementById("statusMessage");
+        const backLink = document.getElementById("backLink");
+        let pendencia;
+        let carregando = false;
+
+        function lerPendencia() {
+            try {
+                const valor = JSON.parse(sessionStorage.getItem(PENDENCIA_PERFIL));
+                const perfis = Array.isArray(valor?.perfis)
+                    ? [...new Set(valor.perfis.filter(
+                        (perfil) => perfil === "Paciente" || perfil === "Médico"
+                    ))]
+                    : [];
+
+                if (typeof valor?.tokenPerfil !== "string" || !valor.tokenPerfil || perfis.length < 2) {
+                    return null;
+                }
+
+                return { tokenPerfil: valor.tokenPerfil, perfis };
+            } catch {
+                return null;
+            }
+        }
+
+        function concluirLogin(dados, tipoSelecionado) {
+            if (
+                typeof dados?.token !== "string" ||
+                !dados.token ||
+                !dados.usuario ||
+                dados.usuario.role !== tipoSelecionado
+            ) {
+                throw new Error("O servidor devolveu uma sessão inválida.");
+            }
+
+            localStorage.setItem("token", dados.token);
+            localStorage.setItem("usuario", JSON.stringify(dados.usuario));
+            localStorage.setItem(
+                "hematoai_session",
+                JSON.stringify({
+                    token: dados.token,
+                    tipo: dados.usuario.role,
+                    nome: dados.usuario.nome,
+                    email: dados.usuario.email,
+                    id_usuario: dados.usuario.id_usuario
+                })
+            );
+            sessionStorage.removeItem(PENDENCIA_PERFIL);
+
+            if (dados.usuario.role === "Paciente") {
+                window.location.replace("Paciente/paciente.html");
+                return;
+            }
+
+            if (dados.usuario.role === "Médico") {
+                window.location.replace("Med/medico.html");
+                return;
+            }
+
+            throw new Error("O servidor devolveu um perfil inválido.");
+        }
+
+        function definirCarregamento(ativo, tipo = "") {
+            carregando = ativo;
+            profileGrid.setAttribute("aria-busy", String(ativo));
+            profileButtons.forEach((botao) => {
+                botao.disabled = ativo;
+            });
+            statusMessage.classList.remove("error");
+            statusMessage.setAttribute("role", "status");
+            statusMessage.textContent = ativo ? `Entrando como ${tipo.toLowerCase()}...` : "";
+        }
+
+        function mostrarErro(mensagem) {
+            statusMessage.classList.add("error");
+            statusMessage.setAttribute("role", "alert");
+            statusMessage.textContent = mensagem;
+        }
+
+        function invalidarPendencia() {
+            sessionStorage.removeItem(PENDENCIA_PERFIL);
+            pendencia = null;
+            definirCarregamento(false);
+            profileButtons.forEach((botao) => {
+                botao.disabled = true;
+            });
+            mostrarErro("Sua seleção expirou. Volte ao login e entre novamente.");
+            backLink.focus();
+        }
+
+        async function selecionarPerfil(tipo) {
+            if (carregando || !pendencia || !pendencia.perfis.includes(tipo)) {
+                return;
+            }
+
+            definirCarregamento(true, tipo);
+
+            try {
+                const resposta = await fetch("http://localhost:3000/auth/perfil", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        tokenPerfil: pendencia.tokenPerfil,
+                        tipo
+                    })
+                });
+                const dados = await resposta.json().catch(() => ({}));
+
+                if (!resposta.ok || !dados.status) {
+                    if (resposta.status === 401 || resposta.status === 403) {
+                        invalidarPendencia();
+                        return;
+                    }
+
+                    throw new Error(dados.msg || "Não foi possível acessar o perfil selecionado.");
+                }
+
+                concluirLogin(dados, tipo);
+            } catch (erro) {
+                console.error("Erro ao selecionar perfil:", erro);
+                definirCarregamento(false);
+                mostrarErro(erro.message || "Não foi possível conectar ao servidor.");
+            }
+        }
+
+        pendencia = lerPendencia();
+        if (!pendencia) {
+            sessionStorage.removeItem(PENDENCIA_PERFIL);
+            window.location.replace("login.html");
+            return;
+        }
+
+        profileButtons.forEach((botao) => {
+            botao.hidden = !pendencia.perfis.includes(botao.dataset.perfil);
+            botao.addEventListener("click", () => selecionarPerfil(botao.dataset.perfil));
+        });
+
+        backLink.addEventListener("click", () => {
+            sessionStorage.removeItem(PENDENCIA_PERFIL);
+        });
+    })();
+</script>
+</body>
+</html>

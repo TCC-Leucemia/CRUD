@@ -14,6 +14,7 @@ function logout() {
 
     localStorage.removeItem("token");
     localStorage.removeItem("usuario");
+    localStorage.removeItem("hematoai_session");
 
     window.location.href = "../login.html";
 }
