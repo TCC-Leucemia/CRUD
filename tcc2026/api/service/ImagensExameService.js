@@ -3,6 +3,13 @@ const ExamesDAO = require("../dao/ExamesDAO");
 const ImagensExame = require("../model/ImagensExame");
 const ErrorResponse = require("../utils/ErrorResponse");
 
+const fs = require("fs");
+const path = require("path");
+
+// caminho_arquivo é gravado relativo à raiz do projeto (ex.: "uploads/exames/x.jpg").
+const raizProjeto = path.resolve(__dirname, "..", "..");
+const pastaUploads = path.join(raizProjeto, "uploads");
+
 module.exports = class ImagensExameService {
 
     #dao;
@@ -76,6 +83,77 @@ module.exports = class ImagensExameService {
 
     findByCrm = async (crm) => {
         return await this.#dao.findByCrm(crm);
+    }
+
+    findByExame = async (idExame, usuario) => {
+
+        const owner =
+            await this.#dao.findOwnerByExameId(idExame);
+
+        if (!owner) {
+
+            throw new ErrorResponse(
+                404,
+                "Exame não encontrado ou não vinculado a uma consulta"
+            );
+        }
+
+        if (
+            usuario.role === "Paciente" &&
+            owner.cpf !== usuario.cpf
+        ) {
+
+            throw new ErrorResponse(
+                403,
+                "Acesso negado"
+            );
+        }
+
+        if (
+            usuario.role === "Médico" &&
+            owner.crm !== usuario.crm
+        ) {
+
+            throw new ErrorResponse(
+                403,
+                "Acesso negado"
+            );
+        }
+
+        return await this.#dao.findByExameId(idExame);
+    }
+
+    obterArquivo = async (idImagem, usuario) => {
+
+        await this.validarAcessoImagem(idImagem, usuario);
+
+        const imagem = await this.findById(idImagem);
+
+        const caminho = path.resolve(
+            raizProjeto,
+            String(imagem.caminho_arquivo || "")
+        );
+
+        // Sem esta checagem um caminho gravado errado no banco poderia expor
+        // qualquer arquivo do servidor.
+        if (
+            caminho !== pastaUploads &&
+            !caminho.startsWith(pastaUploads + path.sep)
+        ) {
+            throw new ErrorResponse(
+                400,
+                "Caminho da imagem inválido"
+            );
+        }
+
+        if (!fs.existsSync(caminho)) {
+            throw new ErrorResponse(
+                404,
+                "Arquivo da imagem não encontrado no servidor"
+            );
+        }
+
+        return caminho;
     }
 
     validarAcessoImagem = async (idImagem,usuario) => {

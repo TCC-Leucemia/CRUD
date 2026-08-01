@@ -77,6 +77,29 @@ module.exports = class ImagensExameDAO {
         });
     }
 
+    findByExameId = async (idExame) => {
+
+        const sql = `
+            SELECT * FROM imagens_exame
+            WHERE id_exame = ?
+            ORDER BY data_upload DESC, id_imagem DESC
+        `;
+
+        return new Promise((resolve, reject) => {
+
+            this.#banco.query(sql, [idExame], (erro, resultado) => {
+
+                if (erro) {
+                    reject(erro);
+                } else {
+                    resolve(resultado);
+                }
+
+            });
+
+        });
+    }
+
     findByCpf = async (cpf) => {
 
         const sql = `

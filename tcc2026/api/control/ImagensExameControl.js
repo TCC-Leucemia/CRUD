@@ -66,6 +66,47 @@ module.exports = class ImagensExameControl {
         }
     }
 
+    indexByExame = async (req, res, next) => {
+
+        try {
+
+            const service = new ImagensExameService(this.#banco);
+
+            const resultado = await service.findByExame(
+                req.params.id_exame,
+                req.user
+            );
+
+            res.status(200).send({
+                status: true,
+                dados: resultado
+            });
+
+        } catch (erro) {
+            next(erro);
+        }
+    }
+
+    arquivo = async (req, res, next) => {
+
+        try {
+
+            const service = new ImagensExameService(this.#banco);
+
+            const caminho = await service.obterArquivo(
+                req.params.id_imagem,
+                req.user
+            );
+
+            res.sendFile(caminho, (erro) => {
+                if (erro) next(erro);
+            });
+
+        } catch (erro) {
+            next(erro);
+        }
+    }
+
     show = async (req, res, next) => {
 
         try {

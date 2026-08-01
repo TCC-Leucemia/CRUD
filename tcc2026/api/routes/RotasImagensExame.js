@@ -29,6 +29,30 @@ module.exports = (app, banco) => {
         control.index
     );
 
+    // Precisa vir antes de "/imagens-exame/:id_imagem", senão "exame" seria
+    // interpretado como id da imagem.
+    app.get(
+        "/imagens-exame/exame/:id_exame",
+        jwt.validateToken,
+        role.authorize(
+            "Médico",
+            "Paciente"
+        ),
+        middleware.validateExameId,
+        control.indexByExame
+    );
+
+    app.get(
+        "/imagens-exame/:id_imagem/arquivo",
+        jwt.validateToken,
+        role.authorize(
+            "Médico",
+            "Paciente"
+        ),
+        middleware.validateId,
+        control.arquivo
+    );
+
     app.get(
         "/imagens-exame/:id_imagem",
         jwt.validateToken,

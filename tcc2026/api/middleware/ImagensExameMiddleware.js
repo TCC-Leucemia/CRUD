@@ -261,6 +261,27 @@ module.exports = class ImagensExameMiddleware {
         next();
     }
 
+    validateExameId = (req, res, next) => {
+
+        const { id_exame } = req.params;
+
+        if (!id_exame || isNaN(id_exame)) {
+            throw new ErrorResponse(
+                400,
+                "ID do exame inválido"
+            );
+        }
+
+        if (Number(id_exame) <= 0) {
+            throw new ErrorResponse(
+                400,
+                "ID do exame inválido"
+            );
+        }
+
+        next();
+    }
+
     validateId = (req, res, next) => {
 
         const { id_imagem } = req.params;
