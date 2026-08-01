@@ -153,6 +153,8 @@ module.exports = class AnaliseIADAO {
         const sql = `
             SELECT
                 e.id_exame,
+                c.id_consulta,
+                c.cpf,
                 c.crm
             FROM exames e
             INNER JOIN consultas c

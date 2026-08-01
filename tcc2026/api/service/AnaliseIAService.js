@@ -1,6 +1,8 @@
 const AnaliseIADAO = require("../dao/AnaliseIADAO");
 const ExamesDAO = require("../dao/ExamesDAO");
+const AnamneseDAO = require("../dao/AnamneseDAO");
 const AnaliseIA = require("../model/AnaliseIA");
+const Anamnese = require("../model/Anamnese");
 const ErrorResponse = require("../utils/ErrorResponse");
 
 const fs = require("fs");
@@ -140,12 +142,14 @@ module.exports = class AnaliseIAService {
     #dao;
     #examesDAO;
     #imagensDAO;
+    #anamneseDAO;
 
     constructor(banco) {
         this.#banco = banco;
         this.#imagensDAO = new ImagensExameDAO(banco);
         this.#dao = new AnaliseIADAO(banco);
         this.#examesDAO = new ExamesDAO(banco);
+        this.#anamneseDAO = new AnamneseDAO(banco);
     }
 
     create = async (dados, user) => {
@@ -327,19 +331,46 @@ module.exports = class AnaliseIAService {
             if (owner.crm !== user.crm) throw new ErrorResponse(403, "Acesso negado.");
 
             const script = path.join(__dirname, "..", "..", "backend", "analise_celular.py");
+
+            if (!fs.existsSync(script)) {
+                throw new ErrorResponse(500, `Script de análise não encontrado em ${script}. Confira se a pasta backend foi movida.`);
+            }
+
             let stdout;
             try {
                 ({ stdout } = await executar(
                     "python",
                     [script, arquivo.path, idade, sexo, sintomas, historia],
-                    { cwd: path.dirname(script) }
+                    { cwd: path.dirname(script), maxBuffer: 10 * 1024 * 1024 }
                 ));
             } catch (erro) {
+                // Sem este log a causa real do 502 fica invisível no servidor.
+                console.error("FALHA AO EXECUTAR O PYTHON:", {
+                    codigo: erro.code,
+                    mensagem: erro.message,
+                    stderr: String(erro.stderr || "").slice(0, 2000)
+                });
+
                 const detalhe = `${erro.stderr || ""} ${erro.message || ""}`;
+
+                if (erro.code === "ENOENT") {
+                    throw new ErrorResponse(500, "O interpretador 'python' não foi encontrado pelo servidor. Verifique se o Python está no PATH e reinicie o Node.");
+                }
                 if (/OPENAI_API_KEY|credentials|api key/i.test(detalhe)) {
                     throw new ErrorResponse(503, "Integração com a OpenAI não configurada. Defina OPENAI_API_KEY no arquivo .env de tcc2026.");
                 }
-                throw new ErrorResponse(502, "O processo Python não conseguiu concluir a análise. Verifique a configuração da IA e tente novamente.");
+                if (/ModuleNotFoundError|ImportError/i.test(detalhe)) {
+                    const modulo = detalhe.match(/No module named ['"]([^'"]+)['"]/i);
+                    throw new ErrorResponse(502, `Falta uma biblioteca Python${modulo ? `: ${modulo[1]}` : ""}. Instale-a e tente novamente.`);
+                }
+
+                const ultimaLinha = String(erro.stderr || "")
+                    .trim()
+                    .split(/\r?\n/)
+                    .filter(Boolean)
+                    .pop();
+
+                throw new ErrorResponse(502, `O processo Python não concluiu a análise${ultimaLinha ? `: ${ultimaLinha.slice(0, 200)}` : "."}`);
             }
 
             const [pdf, ...partes] = String(stdout || "").trim().split("|||");
@@ -387,16 +418,26 @@ module.exports = class AnaliseIAService {
                 descricao: "Imagem enviada para análise por IA",
                 data_upload: data
             });
+            const anamnese = new Anamnese();
 
             const insercoes = await executarEmTransacao(this.#banco, async (conexao) => {
                 const ownerAtual = await this.#dao.findOwnerByExameId(id_exame, conexao, true);
                 if (!ownerAtual) throw new ErrorResponse(404, "O vínculo do exame não está mais disponível.");
                 if (ownerAtual.crm !== user.crm) throw new ErrorResponse(403, "O vínculo do exame foi alterado.");
+                Object.assign(anamnese, {
+                    cpf: ownerAtual.cpf,
+                    crm: ownerAtual.crm,
+                    id_consulta: ownerAtual.id_consulta,
+                    sintomas,
+                    comorbidades: historia
+                });
                 const insercaoAnalise = await this.#dao.create(analise, conexao);
                 const insercaoImagem = await this.#imagensDAO.create(imagem, conexao);
+                const insercaoAnamnese = await this.#anamneseDAO.create(anamnese, conexao);
                 return {
                     id_analise: insercaoAnalise.insertId,
-                    id_imagem: insercaoImagem.insertId
+                    id_imagem: insercaoImagem.insertId,
+                    id_anamnese: insercaoAnamnese.insertId
                 };
             });
 

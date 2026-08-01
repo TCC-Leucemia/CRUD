@@ -6,7 +6,7 @@ module.exports = class AnamneseDAO {
         this.#banco = banco;
     }
 
-    create = async (anamnese) => {
+    create = async (anamnese, conexao = this.#banco) => {
 
         const sql = `
             INSERT INTO anamnese
@@ -24,7 +24,7 @@ module.exports = class AnamneseDAO {
 
         return new Promise((resolve, reject) => {
 
-            this.#banco.query(sql, valores, (erro, resultado) => {
+            conexao.query(sql, valores, (erro, resultado) => {
 
                 if (erro) {
                     reject(erro);

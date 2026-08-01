@@ -287,6 +287,10 @@ input, select, textarea { font-family: var(--font); }
 /* ── Main Content ────────────────────────────────────────────── */
 .main-content {
   flex: 1;
+  /* Sem min-width:0 um flex item não encolhe abaixo do próprio conteúdo:
+     uma tabela larga esticaria a página inteira e criaria rolagem horizontal,
+     levando o cabeçalho (e o botão de ação) para fora da área visível. */
+  min-width: 0;
   margin-left: var(--sidebar-width);
   min-height: 100vh;
   display: flex;

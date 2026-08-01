@@ -70,6 +70,18 @@ app.use((error, request, response, next) => {
         });
     }
 
+    // Banco fora do ar: sem isso qualquer tela mostra apenas "Erro interno do
+    // servidor", escondendo que o problema é só o MySQL não estar iniciado.
+    const errosDeBanco = ["ECONNREFUSED", "PROTOCOL_CONNECTION_LOST", "ETIMEDOUT", "ER_ACCESS_DENIED_ERROR", "ER_BAD_DB_ERROR"];
+
+    if (errosDeBanco.includes(error.code)) {
+        return response.status(503).send({
+            status: false,
+            msg: "Banco de dados indisponível. Inicie o MySQL no painel do XAMPP e tente novamente.",
+            detalhes: { code: error.code }
+        });
+    }
+
     return response.status(500).send({
         status: false,
         msg: "Erro interno do servidor",

@@ -218,7 +218,7 @@
     <div class="modal-body" id="detalheBody"></div>
     <div class="modal-footer">
       <button class="btn btn-ghost" id="fecharDetalhes">Fechar</button>
-      <button class="btn btn-primary" id="btnBaixarPDFDetalhe">📄 Baixar PDF</button>
+      <button class="btn btn-primary" id="btnBaixarPDFDetalhe">📄 Baixar relatório</button>
     </div>
   </div>
 </div>
@@ -514,17 +514,19 @@ Este relatório é gerado automaticamente pelo sistema HematoAI.
 Consulte um especialista para validação do diagnóstico.
 `;
 
-    const blob = new Blob([conteudoPDF], { type: 'application/pdf' });
+    // O conteúdo aqui é texto puro, não um PDF. Salvá-lo como .pdf gera um
+    // arquivo que nenhum leitor consegue abrir, por isso baixamos como .txt.
+    const blob = new Blob([conteudoPDF], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const aLink = document.createElement('a');
     aLink.href = url;
-    aLink.download = `analise_ia_${a.id_analise}.pdf`;
+    aLink.download = `analise_ia_${a.id_analise}.txt`;
     document.body.appendChild(aLink);
     aLink.click();
     document.body.removeChild(aLink);
     URL.revokeObjectURL(url);
-    
-    HematoAI.showToast('PDF baixado com sucesso!', 'success');
+
+    HematoAI.showToast('Relatório baixado com sucesso!', 'success');
   });
 
   // ============================================

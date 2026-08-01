@@ -942,22 +942,20 @@ document.addEventListener('DOMContentLoaded', function () {
   // BAIXAR PDF
   // ============================================
   function baixarPDF() {
-    if (pdfUrlAtual) { const a = document.createElement('a'); a.href = pdfUrlAtual; a.download = `laudo_ia_${Date.now()}.pdf`; a.click(); return; }
-    const laudo = laudoEl.textContent;
-    if (laudo && laudo !== '---') {
-      const blob = new Blob([laudo], { type: 'application/pdf' });
-      const url  = URL.createObjectURL(blob);
-      const a    = document.createElement('a');
-      a.href     = url;
-      a.download = `laudo_ia_${Date.now()}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      HematoAI.showToast('Laudo baixado como PDF!', 'success');
-    } else {
-      HematoAI.showToast('Nenhum laudo disponível para download.', 'error');
+    // Só baixa o PDF real gerado pelo backend. O texto do laudo não é um PDF
+    // válido: salvá-lo com extensão .pdf produz um arquivo que não abre.
+    if (!pdfUrlAtual) {
+      HematoAI.showToast('Nenhum PDF disponível. Gere o laudo novamente.', 'error');
+      return;
     }
+
+    const a = document.createElement('a');
+    a.href     = pdfUrlAtual;
+    a.download = `laudo_ia_${Date.now()}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    HematoAI.showToast('Laudo baixado como PDF!', 'success');
   }
 
   // ============================================

@@ -131,6 +131,7 @@ module.exports = class AnaliseIAControl {
                 pdfUrl: resultado.pdf,
                 id_analise: resultado.id_analise,
                 id_imagem: resultado.id_imagem,
+                id_anamnese: resultado.id_anamnese,
                 caminho_imagem: resultado.caminho_imagem
             });
         } catch (erro) {
