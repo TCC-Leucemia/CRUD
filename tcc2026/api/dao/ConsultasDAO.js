@@ -124,21 +124,14 @@ module.exports = class ConsultasDAO {
         const sql = `
             SELECT
                 c.*,
-
                 p.nome AS paciente,
                 p.data_nasc,
                 p.sexo,
-
                 m.nome AS medico,
                 m.especialidade,
-
                 a.id_anamnese,
                 a.sintomas,
-                a.comorbidades,
-
-                e.id_exame,
-
-                re.id_resultado
+                a.comorbidades
 
             FROM consultas c
 
@@ -150,12 +143,6 @@ module.exports = class ConsultasDAO {
 
             LEFT JOIN anamnese a
                 ON a.id_consulta = c.id_consulta
-
-            LEFT JOIN exames e
-                ON e.id_consulta = c.id_consulta
-
-            LEFT JOIN resultados_exame re
-                ON re.id_exame = e.id_exame
 
             WHERE c.crm = ?
 

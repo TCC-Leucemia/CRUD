@@ -46,7 +46,7 @@ module.exports = (app, banco) => {
         jwt.validateToken,
         role.authorize("Médico"),
         middleware.validateId,
-        middleware.validateBody,
+        middleware.validateUpdate,
         control.update
     );
 

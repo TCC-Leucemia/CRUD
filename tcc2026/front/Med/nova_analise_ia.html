@@ -567,7 +567,11 @@
 <script src="../JS/navbar.js"></script>
 <script src="../JS/auth.js"></script>
 <script>
+
 document.addEventListener('DOMContentLoaded', function () {
+  window.addEventListener("beforeunload", () => {
+    console.log("A PÁGINA ESTÁ SENDO RECARREGADA");
+  });
   // ============================================
   // SESSÃO & SIDEBAR
   // ============================================
@@ -582,6 +586,13 @@ document.addEventListener('DOMContentLoaded', function () {
   const btnGerar      = document.getElementById('btnGerarLaudo');
   const resultadosDiv = document.getElementById('resultadosArea');
   const laudoEl       = document.getElementById('laudoCompleto');
+
+  const form = document.getElementById("formAnamnese");
+
+  form.addEventListener("submit", function (e) {
+      console.log("FORM SUBMIT");
+      e.preventDefault();
+  });
   const btnPDF        = document.getElementById('btnBaixarPDF');
   const uploadArea    = document.getElementById('uploadArea');
   const imagensInput  = document.getElementById('imagensInput');
@@ -866,6 +877,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // GERAR LAUDO
   // ============================================
   async function gerarLaudo() {
+    console.log("INICIOU gerarLaudo");
     const nome      = document.getElementById('nome').value.trim();
     const idade     = document.getElementById('idade').value.trim();
     const sexo      = document.getElementById('sexo').value;
@@ -900,19 +912,27 @@ document.addEventListener('DOMContentLoaded', function () {
       formData.append('idExame',  idExame);
 
       const token = localStorage.getItem("token");
+      console.log("ANTES DO FETCH");
+      console.log("1");
 
-      const response = await fetch(
+      const responsePromise = fetch(
           "http://localhost:3000/analise-ia/gerar",
           {
               method: "POST",
               headers: {
-                  "Authorization": `Bearer ${token}`
+                  Authorization: `Bearer ${token}`
               },
               body: formData
           }
       );
 
+      console.log("2");
+      const response = await responsePromise;
+
+      console.log("3");
       const data = await response.json().catch(() => ({}));
+      
+      console.log(data);
       if (!response.ok) {
         throw new Error(data.msg || `Erro no servidor (${response.status})`);
       }

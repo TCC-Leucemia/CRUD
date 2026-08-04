@@ -164,8 +164,6 @@ module.exports = class AnamneseService {
             );
         }
 
-        dados.crm = user.crm;
-
         if (dados.cpf) {
 
             const paciente =
@@ -180,19 +178,6 @@ module.exports = class AnamneseService {
                     "Paciente não encontrado"
                 );
             }
-        }
-
-        const medico =
-            await this.#medicosDAO.findByCRM(
-                dados.crm
-            );
-
-        if (!medico) {
-
-            throw new ErrorResponse(
-                404,
-                "Médico não encontrado"
-            );
         }
 
         if (dados.id_consulta) {
@@ -221,7 +206,13 @@ module.exports = class AnamneseService {
 
         const anamnese = new Anamnese();
 
-        Object.assign(anamnese, dados);
+        Object.assign(
+            anamnese,
+            existente,
+            dados
+        );
+
+        anamnese.crm = user.crm;
 
         anamnese.id_anamnese = id;
 

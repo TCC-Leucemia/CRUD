@@ -601,17 +601,63 @@
   // BOTÃO SALVAR (APENAS MOCK)
   // ============================================
 
-  document.getElementById('salvarEditarAnamnese').addEventListener('click', function() {
-    const sintomas = document.getElementById('editSintomas').value.trim();
-    const comorbidades = document.getElementById('editComorbidades').value.trim();
-    console.log('Salvar anamnese:', { sintomas, comorbidades });
-    HematoAI.showToast('Salvamento não implementado (mock).', 'info');
-    HematoAI.closeModal(document.getElementById('modalEditarAnamnese'));
-  });
+  document.getElementById('salvarEditarAnamnese').addEventListener('click', async function () {
 
-  // ============================================
-  // FECHAR MODAIS
-  // ============================================
+    if (!anamneseAtual) {
+        HematoAI.showToast("Nenhuma anamnese carregada.", "error");
+        return;
+    }
+
+    const sintomas = document.getElementById("editSintomas").value.trim();
+    const comorbidades = document.getElementById("editComorbidades").value.trim();
+
+    try {
+
+        const token = localStorage.getItem("token");
+
+        const response = await fetch(
+            `http://localhost:3000/anamnese/${anamneseAtual.id_anamnese}`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: "Bearer " + token
+                },
+                body: JSON.stringify({
+                    cpf: anamneseAtual.cpf,
+                    id_consulta: anamneseAtual.id_consulta,
+                    sintomas,
+                    comorbidades
+                })
+            }
+        );
+
+        const dados = await response.json();
+
+        if (!dados.status) {
+            HematoAI.showToast(dados.msg, "error");
+            return;
+        }
+
+        HematoAI.showToast("Anamnese atualizada com sucesso!", "success");
+
+        HematoAI.closeModal(
+            document.getElementById("modalEditarAnamnese")
+        );
+
+        await carregarAnamnese(idDetalhe);
+
+    } catch (erro) {
+
+        console.error(erro);
+
+        HematoAI.showToast(
+            "Erro ao atualizar anamnese.",
+            "error"
+        );
+
+    }
+  });
 
   document.getElementById('closeModalStatus').addEventListener('click', () => HematoAI.closeModal(document.getElementById('modalStatus')));
   document.getElementById('cancelarStatus').addEventListener('click', () => HematoAI.closeModal(document.getElementById('modalStatus')));
