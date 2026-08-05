@@ -569,20 +569,14 @@
 <script>
 
 document.addEventListener('DOMContentLoaded', function () {
-  window.addEventListener("beforeunload", () => {
-    console.log("A PÁGINA ESTÁ SENDO RECARREGADA");
+  window.addEventListener("beforeunload", (e) => {
+    console.trace("A PÁGINA ESTÁ SENDO RECARREGADA");
   });
-  // ============================================
-  // SESSÃO & SIDEBAR
-  // ============================================
   if (!localStorage.getItem('hematoai_session')) {
     HematoAI.setSession({ tipo: 'Médico', nome: 'Dr. Usuário', crm: '00000-SP' });
   }
   HematoAI.initSidebar('analises-ia');
 
-  // ============================================
-  // ELEMENTOS
-  // ============================================
   const btnGerar      = document.getElementById('btnGerarLaudo');
   const resultadosDiv = document.getElementById('resultadosArea');
   const laudoEl       = document.getElementById('laudoCompleto');
@@ -878,6 +872,9 @@ document.addEventListener('DOMContentLoaded', function () {
   // ============================================
   async function gerarLaudo() {
     console.log("INICIOU gerarLaudo");
+    window.onbeforeunload = function () {
+        console.trace("RELOAD");
+    };
     const nome      = document.getElementById('nome').value.trim();
     const idade     = document.getElementById('idade').value.trim();
     const sexo      = document.getElementById('sexo').value;
@@ -914,7 +911,7 @@ document.addEventListener('DOMContentLoaded', function () {
       const token = localStorage.getItem("token");
       console.log("ANTES DO FETCH");
       console.log("1");
-
+      console.log("FETCH VAI COMEÇAR");
       const responsePromise = fetch(
           "http://localhost:3000/analise-ia/gerar",
           {
@@ -933,6 +930,9 @@ document.addEventListener('DOMContentLoaded', function () {
       const data = await response.json().catch(() => ({}));
       
       console.log(data);
+      console.log("laudoEl", laudoEl);
+      console.log("resultadosDiv", resultadosDiv);
+      console.log("btnGerar", btnGerar);
       if (!response.ok) {
         throw new Error(data.msg || `Erro no servidor (${response.status})`);
       }
