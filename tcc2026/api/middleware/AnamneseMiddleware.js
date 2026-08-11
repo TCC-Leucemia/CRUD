@@ -50,21 +50,19 @@ module.exports = class AnamneseMiddleware {
 
         let {
             cpf,
-            crm,
             id_consulta,
             sintomas,
             comorbidades
         } = req.body;
 
-        if (!cpf || !crm || !id_consulta) {
+        if (!cpf || !id_consulta) {
             throw new ErrorResponse(
                 400,
-                "CPF, CRM e ID da consulta são obrigatórios"
+                "CPF e ID da consulta são obrigatórios"
             );
         }
 
-        cpf = cpf.trim();
-        crm = crm.trim();
+        cpf = String(cpf).trim();
 
         if (isNaN(id_consulta)) {
             throw new ErrorResponse(
@@ -84,22 +82,6 @@ module.exports = class AnamneseMiddleware {
             throw new ErrorResponse(
                 400,
                 "CPF inválido"
-            );
-        }
-
-        const crmRegex = /^[A-Za-z0-9]+$/;
-
-        if (!crmRegex.test(crm)) {
-            throw new ErrorResponse(
-                400,
-                "CRM inválido"
-            );
-        }
-
-        if (crm.length < 4 || crm.length > 15) {
-            throw new ErrorResponse(
-                400,
-                "CRM inválido"
             );
         }
 

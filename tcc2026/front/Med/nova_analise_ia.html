@@ -437,7 +437,7 @@
 
 <div class="app-layout">
   <aside class="sidebar" id="sidebar"></aside>
-
+ 
   <div class="main-content">
     <div class="page-header">
       <div class="page-header-left">
@@ -493,14 +493,33 @@
                 </div>
               </div>
               <input type="hidden" id="idExame" value="">
-            </div>
+              </div>
+              <div id="avisoSemAnamnese" class="aviso-anamnese" style="display: none;">
+                <div>
+                  <strong>Anamnese não cadastrada</strong>
+                  <p>
+                    Esta consulta ainda não possui uma anamnese cadastrada.
+                    Cadastre a anamnese antes de realizar a análise pela IA.
+                  </p>
+                </div>
 
-            <!-- Dados do paciente (preenchidos automaticamente) -->
-            <div class="input-group">
-              <label>Nome do Paciente</label>
-              <div class="campo-automatico vazio" id="displayNome">Aguardando seleção do exame...</div>
-              <input type="hidden" id="nome" value="">
-            </div>
+              <button
+              type="button"
+              id="btnCadastrarAnamnese"
+              class="btn btn-primary">
+              Cadastrar anamnese </button>
+
+              </div>
+
+              <!-- Dados do paciente (preenchidos automaticamente) -->
+
+              <div class="input-group">
+                <label>Nome do Paciente</label>
+                <div class="campo-automatico vazio" id="displayNome">
+                  Aguardando seleção do exame...
+                </div>
+                <input type="hidden" id="nome" value="">
+              </div>
 
             <div class="input-group">
               <label>Idade</label>
@@ -581,6 +600,12 @@ document.addEventListener('DOMContentLoaded', function () {
   const resultadosDiv = document.getElementById('resultadosArea');
   const laudoEl       = document.getElementById('laudoCompleto');
 
+  btnGerar.disabled = true;
+
+  const avisoSemAnamnese = document.getElementById('avisoSemAnamnese');
+  const btnCadastrarAnamnese = document.getElementById('btnCadastrarAnamnese');
+  let anamneseDisponivel = false;
+
   const form = document.getElementById("formAnamnese");
 
   form.addEventListener("submit", function (e) {
@@ -620,6 +645,20 @@ document.addEventListener('DOMContentLoaded', function () {
   // ============================================
   // FUNÇÕES AUXILIARES
   // ============================================
+
+  btnCadastrarAnamnese.addEventListener('click', function () {
+
+    if (!exameSelecionado || !exameSelecionado.id_consulta) {
+      HematoAI.showToast(
+        'Selecione um exame primeiro.',
+        'error'
+      );
+      return;
+    }
+
+    window.location.href =
+      `./crudconsulta_med.html?id_consulta=${exameSelecionado.id_consulta}`;
+  });
   function formatarData(iso) {
     if (!iso) return 'Data não informada';
     const d = new Date(iso);
@@ -700,28 +739,138 @@ document.addEventListener('DOMContentLoaded', function () {
     displaySexo.className = 'campo-automatico';
     inputSexo.value = sexoFormatado;
   }
+  async function carregarAnamneseDoExame(exame) {
+    const inputSintomas = document.getElementById('sintomas');
+    const inputHistorico = document.getElementById('historico');
 
-  // ============================================
-  // FUNÇÃO PARA SELECIONAR EXAME
-  // ============================================
-  function selecionarExame(idExame) {
-    const exame = examesData.find(e => e.id_exame === idExame);
+    // Limpa os campos
+    inputSintomas.value = '';
+    inputHistorico.value = '';
+
+    // Esconde o aviso inicialmente
+    avisoSemAnamnese.style.display = 'none';
+
+    if (!exame || !exame.id_consulta) {
+        console.warn('Exame não possui id_consulta:', exame);
+        return false;
+    }
+
+    try {
+        const token = localStorage.getItem("token");
+
+        console.log(
+            "Buscando anamnese da consulta:",
+            exame.id_consulta
+        );
+
+        const response = await fetch(
+            `http://localhost:3000/anamnese/consulta/${exame.id_consulta}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        );
+
+        const json = await response.json();
+
+        console.log("Resposta da anamnese:", json);
+
+        if (!response.ok || !json.status) {
+            throw new Error(
+                json.msg || 'Erro ao consultar a anamnese.'
+            );
+        }
+
+        const anamnese = json.dados;
+
+        // ==========================================
+        // NÃO EXISTE ANAMNESE
+        // ==========================================
+
+        if (!anamnese) {
+            console.warn(
+                `Consulta ${exame.id_consulta} não possui anamnese.`
+            );
+
+            avisoSemAnamnese.style.display = 'flex';
+
+            anamneseDisponivel = false;
+            btnGerar.disabled = true;
+
+            return false;
+        }
+
+        // ==========================================
+        // EXISTE ANAMNESE
+        // ==========================================
+
+        inputSintomas.value = anamnese.sintomas || '';
+        inputHistorico.value = anamnese.comorbidades || '';
+
+        avisoSemAnamnese.style.display = 'none';
+
+        anamneseDisponivel = true;
+        btnGerar.disabled = false;
+
+        console.log("Anamnese preenchida:", anamnese);
+
+        return true;
+
+    } catch (error) {
+
+        console.error(
+            "Erro ao carregar anamnese:",
+            error
+        );
+
+        avisoSemAnamnese.style.display = 'flex';
+
+        anamneseDisponivel = false;
+        btnGerar.disabled = true;
+
+        HematoAI.showToast(
+            'Erro ao verificar a anamnese da consulta.',
+            'error'
+        );
+
+        return false;
+    }
+  }
+
+  async function selecionarExame(idExame) {
+    const exame = examesData.find(
+        e => e.id_exame === idExame
+    );
+
     if (!exame) return;
+    anamneseDisponivel = false;
+    btnGerar.disabled = true;
+    avisoSemAnamnese.style.display = 'none';
+
+    console.log("EXAME SELECIONADO:", exame);
 
     exameSelecionado = exame;
+
     inputIdExame.value = exame.id_exame;
 
     resumoPaciente.textContent = exame.paciente || '—';
     resumoCpf.textContent = formatarCPF(exame.cpf);
-    resumoData.textContent = exame.data_exame ? formatarDataHora(exame.data_exame) : '—';
+
+    resumoData.textContent = exame.data_exame
+        ? formatarDataHora(exame.data_exame)
+        : '—';
+
     resumoId.textContent = '#' + exame.id_exame;
 
     resumoExame.classList.add('ativo');
 
-    // Preenche os dados do paciente
     preencherDadosPaciente(exame);
 
-    // Re-renderiza a lista para destacar o selecionado
+    // Verifica se existe anamnese
+    anamneseDisponivel =
+        await carregarAnamneseDoExame(exame);
+
     renderizarListaExames(searchExameInput.value);
   }
 
@@ -803,6 +952,7 @@ document.addEventListener('DOMContentLoaded', function () {
       }
 
       examesData = json.dados || [];
+      console.log("EXAMES RECEBIDOS DA API:", examesData);
       renderizarListaExames();
 
     } catch (error) {
@@ -871,6 +1021,13 @@ document.addEventListener('DOMContentLoaded', function () {
   // GERAR LAUDO
   // ============================================
   async function gerarLaudo() {
+    if (!anamneseDisponivel) {
+        HematoAI.showToast(
+            'É necessário cadastrar a anamnese antes de realizar a análise pela IA.',
+            'error'
+        );
+        return;
+    }
     console.log("INICIOU gerarLaudo");
     window.onbeforeunload = function () {
         console.trace("RELOAD");

@@ -145,6 +145,50 @@
       word-wrap: break-word;
     }
 
+    /* ── Botões de ação na tabela ── */
+    .td-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .td-actions .btn {
+      font-size: 0.7rem;
+      padding: 4px 10px;
+      border-radius: 30px;
+    }
+
+    .btn-anamnese {
+      background: #10b981;
+      color: white;
+      border: none;
+    }
+
+    .btn-anamnese:hover {
+      background: #059669;
+    }
+
+    /* ── Botão de anamnese no modal de detalhes ── */
+    .btn-anamnese-destaque {
+      background: #10b981;
+      color: white;
+      border: none;
+      padding: 8px 20px;
+      font-weight: 700;
+      border-radius: 40px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: var(--transition);
+    }
+
+    .btn-anamnese-destaque:hover {
+      background: #059669;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(16,185,129,0.3);
+    }
+
     /* ── Modo escuro ── */
     .dark-mode .alert-warning {
       background: #78350f;
@@ -164,6 +208,18 @@
     .modal-editar-anamnese .form-group textarea {
       min-height: 100px;
     }
+
+    /* ── Melhorias no rodapé do modal de detalhes ── */
+    .modal-footer .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+      width: 100%;
+    }
+    .modal-footer .btn-group .btn {
+      flex: 0 1 auto;
+    }
   </style>
 </head>
 <body>
@@ -180,14 +236,17 @@
         <p>Visualização e atualização de status das consultas</p>
       </div>
       <div class="page-header-right">
-        <span class="badge badge-blue">Apenas leitura e status</span>
+        <span class="badge badge-blue">
+          Consultas e anamneses
+        </span>
       </div>
     </div>
 
     <div class="page-body">
       <div class="info-box">
-        ⚠️ Você pode visualizar todas as suas consultas e alterar apenas o <strong>status</strong>.
-        As demais informações são somente leitura.
+        ℹ️ Você pode visualizar suas consultas, atualizar o
+        <strong>status</strong> e cadastrar ou editar a
+        <strong>anamnese</strong> de cada consulta.
       </div>
 
       <div class="card">
@@ -225,6 +284,7 @@
                 <th>Tipo</th>
                 <th>Status</th>
                 <th>Ações</th>
+                <th style="width:120px;">Anamnese</th> <!-- Nova coluna -->
               </tr>
             </thead>
             <tbody id="tbodyConsultas"></tbody>
@@ -287,7 +347,13 @@
 
       <!-- Seção: Anamnese -->
       <div class="detalhe-secao" id="anamneseSecao">
-        <div class="detalhe-secao-header">Anamnese</div>
+        <div class="detalhe-secao-header">
+          Anamnese
+          <!-- Botão de edição de anamnese em destaque no cabeçalho -->
+          <button class="btn-anamnese-destaque" id="editarAnamneseBtnTopo" style="float:right;margin-top:-4px;">
+            Editar Anamnese
+          </button>
+        </div>
         <div class="detalhe-secao-body">
           <!-- Alerta quando não houver anamnese -->
           <div class="alert-warning" id="alertAnamneseNaoCadastrada">
@@ -307,9 +373,12 @@
 
     </div>
     <div class="modal-footer">
-      <button class="btn btn-ghost" id="fecharDetalhes">Fechar</button>
-      <button class="btn btn-outline" id="editarStatusDetalhe">Alterar Status</button>
-      <button class="btn btn-primary" id="editarAnamneseBtn">Editar Anamnese</button>
+      <div class="btn-group">
+        <button class="btn btn-ghost" id="fecharDetalhes">Fechar</button>
+        <button class="btn btn-outline" id="editarStatusDetalhe">Alterar Status</button>
+        <!-- Botão de anamnese também mantido no rodapé (redundante, mas funcional) -->
+        <button class="btn btn-primary" id="editarAnamneseBtn">Editar Anamnese</button>
+      </div>
     </div>
   </div>
 </div>
@@ -368,20 +437,159 @@
     const map = { 'Pendente': 'pendente', 'Em andamento': 'andamento', 'Finalizado': 'finalizado' };
     return `<span class="status-pill status-${map[s] || 'pendente'}">${s}</span>`;
   }
+  function obterAnamneseConsulta(idConsulta) {
+
+    return anamneses.find(
+      a => Number(a.id_consulta) === Number(idConsulta)
+    ) || null;
+
+  }
 
   async function carregarConsultas() {
+
     const token = localStorage.getItem("token");
-    const response = await fetch("http://localhost:3000/consultas", {
-      headers: { Authorization: "Bearer " + token }
-    });
-    const dados = await response.json();
-    if (!dados.status) {
-      HematoAI.showToast("Erro ao carregar consultas", "error");
-      return;
+
+    try {
+
+      const [responseConsultas, responseAnamneses] = await Promise.all([
+
+        fetch("http://localhost:3000/consultas", {
+          headers: {
+            Authorization: "Bearer " + token
+          }
+        }),
+
+        fetch("http://localhost:3000/anamnese", {
+          headers: {
+            Authorization: "Bearer " + token
+          }
+        })
+
+      ]);
+
+      const dadosConsultas = await responseConsultas.json();
+      const dadosAnamneses = await responseAnamneses.json();
+
+      // ============================================
+      // CONSULTAS
+      // ============================================
+
+      if (!dadosConsultas.status) {
+
+        HematoAI.showToast(
+          dadosConsultas.msg || "Erro ao carregar consultas.",
+          "error"
+        );
+
+        return;
+
+      }
+
+      consultas = dadosConsultas.dados || [];
+
+      console.log("CONSULTAS CARREGADAS:", consultas);
+
+
+      // ============================================
+      // ANAMNESES
+      // ============================================
+
+      if (dadosAnamneses.status) {
+
+        anamneses = dadosAnamneses.dados || [];
+
+      } else {
+
+        anamneses = [];
+
+      }
+
+      console.log("ANAMNESES CARREGADAS:", anamneses);
+
+
+      // ============================================
+      // APLICA OS FILTROS E MONTA A TABELA
+      // ============================================
+
+      aplicarFiltros();
+
+
+      // ============================================
+      // VERIFICA SE VEIO DE OUTRA PÁGINA
+      // COM ?id_consulta=...
+      // ============================================
+
+      const params = new URLSearchParams(
+        window.location.search
+      );
+
+      const idConsultaURL = params.get("id_consulta");
+
+
+      if (idConsultaURL) {
+
+        const idConsulta = Number(idConsultaURL);
+
+        console.log(
+          "ID DA CONSULTA RECEBIDO PELA URL:",
+          idConsulta
+        );
+
+
+        // Procura a consulta carregada pela API
+
+        const consulta = consultas.find(
+          c => Number(c.id_consulta) === idConsulta
+        );
+
+
+        if (consulta) {
+
+          console.log(
+            "CONSULTA ENCONTRADA:",
+            consulta
+          );
+
+          // Guarda como consulta atualmente selecionada
+
+          idDetalhe = idConsulta;
+
+          // Abre diretamente a tela/modal da anamnese
+
+          abrirAnamnese(idConsulta);
+
+        } else {
+
+          console.warn(
+            "Consulta não encontrada para o ID:",
+            idConsulta
+          );
+
+          HematoAI.showToast(
+            "A consulta selecionada não foi encontrada.",
+            "error"
+          );
+
+        }
+
+      }
+
+    } catch (erro) {
+
+      console.error(
+        "Erro ao carregar consultas:",
+        erro
+      );
+
+      HematoAI.showToast(
+        "Erro ao carregar dados das consultas.",
+        "error"
+      );
+
     }
-    consultas = dados.dados;
-    aplicarFiltros();
   }
+
+
 
   function renderTabela(data) {
     const tbody = document.getElementById('tbodyConsultas');
@@ -406,13 +614,45 @@
         <td>${statusPill(c.statusc)}</td>
         <td>
           <div class="td-actions">
-            <button class="btn btn-ghost btn-sm" onclick="abrirDetalhes(${c.id_consulta})">Ver</button>
-            <button class="btn btn-outline btn-sm" onclick="abrirEditarStatus(${c.id_consulta})">Alterar Status</button>
+
+            <button
+              class="btn btn-ghost btn-sm"
+              onclick="abrirDetalhes(${c.id_consulta})">
+              Ver
+            </button>
+
+            <button
+              class="btn btn-outline btn-sm"
+              onclick="abrirEditarStatus(${c.id_consulta})">
+              Alterar Status
+            </button>
+
+            ${
+              obterAnamneseConsulta(c.id_consulta)
+                ? `
+                  <button
+                    class="btn btn-primary btn-sm"
+                    onclick="abrirAnamnese(${c.id_consulta})">
+                    <i data-lucide="file-pen-line"></i>
+                    Editar Anamnese
+                  </button>
+                `
+                : `
+                  <button
+                    class="btn btn-primary btn-sm"
+                    onclick="abrirAnamnese(${c.id_consulta})">
+                    <i data-lucide="clipboard-pen"></i>
+                    Cadastrar Anamnese
+                  </button>
+                `
+            }
+
           </div>
         </td>
       `;
       tbody.appendChild(tr);
     });
+    lucide.createIcons();
   }
 
   function aplicarFiltros() {
@@ -443,6 +683,70 @@
   // ============================================
   // AÇÕES
   // ============================================
+  function abrirAnamnese(idConsulta) {
+
+    const consulta = consultas.find(
+      c => Number(c.id_consulta) === Number(idConsulta)
+    );
+    console.log("CONSULTA SELECIONADA:", consulta);
+    console.log("ID CONSULTA:", consulta?.id_consulta);
+    console.log("CPF CONSULTA:", consulta?.cpf);
+
+    if (!consulta) {
+
+      HematoAI.showToast(
+        "Consulta não encontrada.",
+        "error"
+      );
+
+      return;
+    }
+
+    const anamnese = obterAnamneseConsulta(idConsulta);
+
+    idDetalhe = idConsulta;
+    consultaAnamneseId = idConsulta;
+    anamneseAtual = anamnese;
+
+    /*
+    * Se já existe anamnese,
+    * abre preenchida para edição.
+    */
+    if (anamnese) {
+
+      document.getElementById("editSintomas").value =
+        anamnese.sintomas || "";
+
+      document.getElementById("editComorbidades").value =
+        anamnese.comorbidades || "";
+
+      document.getElementById(
+        "modalEditarAnamneseTitulo"
+      ).textContent = "Editar Anamnese";
+
+    }
+
+    /*
+    * Se não existe,
+    * abre o formulário vazio.
+    */
+    else {
+
+      document.getElementById("editSintomas").value = "";
+
+      document.getElementById("editComorbidades").value = "";
+
+      document.getElementById(
+        "modalEditarAnamneseTitulo"
+      ).textContent = "Cadastrar Anamnese";
+
+    }
+
+    HematoAI.openModal(
+      document.getElementById("modalEditarAnamnese")
+    );
+
+  }
 
   async function abrirDetalhes(id) {
     idDetalhe = id;
@@ -508,7 +812,7 @@
         document.getElementById("anamneseComorbidades").textContent =
           "Nenhuma informação cadastrada.";
         alertDiv.style.display = "flex";
-        btn.innerHTML = "🧠 Solicitar Análise da IA";
+        btn.innerHTML = "📝 Cadastrar Anamnese";
         btn.style.display = "inline-flex";
       }
 
@@ -566,22 +870,18 @@
   // BOTÃO EDITAR ANAMNESE / SOLICITAR IA
   // ============================================
 
-  document.getElementById('editarAnamneseBtn').addEventListener('click', function() {
-    if (anamneseAtual) {
-      // Abrir modal de edição com dados preenchidos
-      document.getElementById('editSintomas').value = anamneseAtual.sintomas || '';
-      document.getElementById('editComorbidades').value = anamneseAtual.comorbidades || '';
-      document.getElementById('modalEditarAnamneseTitulo').textContent = 'Editar Anamnese';
-      HematoAI.openModal(document.getElementById('modalEditarAnamnese'));
-    } else {
-      // Redirecionar para a página de análise IA
-      window.location.href = 'nova_analise_ia.html';
-    }
-  });
+  document.getElementById('editarAnamneseBtn')
+  .addEventListener('click', function() {
+    if (!idDetalhe) {
+      HematoAI.showToast(
+        "Consulta não identificada.",
+        "error"
+      );
 
-  // ============================================
-  // MODAL EDITAR ANAMNESE - CANCELAR E FECHAR
-  // ============================================
+      return;
+    }
+    abrirAnamnese(idDetalhe);
+  });
 
   document.getElementById('cancelEditarAnamnese').addEventListener('click', function() {
     HematoAI.closeModal(document.getElementById('modalEditarAnamnese'));
@@ -601,60 +901,174 @@
   // BOTÃO SALVAR (APENAS MOCK)
   // ============================================
 
-  document.getElementById('salvarEditarAnamnese').addEventListener('click', async function () {
+  document.getElementById('salvarEditarAnamnese')
+  .addEventListener('click', async function () {
 
-    if (!anamneseAtual) {
-        HematoAI.showToast("Nenhuma anamnese carregada.", "error");
-        return;
+    const sintomas =
+      document.getElementById("editSintomas").value.trim();
+
+    const comorbidades =
+      document.getElementById("editComorbidades").value.trim();
+
+    if (!consultaAnamneseId) {
+
+      HematoAI.showToast(
+        "Consulta não identificada.",
+        "error"
+      );
+
+      return;
     }
 
-    const sintomas = document.getElementById("editSintomas").value.trim();
-    const comorbidades = document.getElementById("editComorbidades").value.trim();
+    const consulta = consultas.find(
+      c => Number(c.id_consulta) === Number(consultaAnamneseId)
+    );
+
+    if (!consulta) {
+
+      HematoAI.showToast(
+        "Consulta não encontrada.",
+        "error"
+      );
+
+      return;
+    }
 
     try {
 
-        const token = localStorage.getItem("token");
+      const token = localStorage.getItem("token");
+
+      /*
+       * ==========================================
+       * EDITAR ANAMNESE EXISTENTE
+       * ==========================================
+       */
+
+      if (anamneseAtual) {
 
         const response = await fetch(
-            `http://localhost:3000/anamnese/${anamneseAtual.id_anamnese}`,
-            {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: "Bearer " + token
-                },
-                body: JSON.stringify({
-                    cpf: anamneseAtual.cpf,
-                    id_consulta: anamneseAtual.id_consulta,
-                    sintomas,
-                    comorbidades
-                })
-            }
+          `http://localhost:3000/anamnese/${anamneseAtual.id_anamnese}`,
+          {
+            method: "PUT",
+
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + token
+            },
+
+            body: JSON.stringify({
+
+              cpf: anamneseAtual.cpf,
+
+              id_consulta:
+                anamneseAtual.id_consulta,
+
+              sintomas,
+
+              comorbidades
+
+            })
+          }
         );
 
         const dados = await response.json();
 
         if (!dados.status) {
-            HematoAI.showToast(dados.msg, "error");
-            return;
+
+          HematoAI.showToast(
+            dados.msg,
+            "error"
+          );
+
+          return;
         }
 
-        HematoAI.showToast("Anamnese atualizada com sucesso!", "success");
-
-        HematoAI.closeModal(
-            document.getElementById("modalEditarAnamnese")
+        HematoAI.showToast(
+          "Anamnese atualizada com sucesso!",
+          "success"
         );
 
+      }
+
+      /*
+       * ==========================================
+       * CADASTRAR NOVA ANAMNESE
+       * ==========================================
+       */
+
+      else {
+
+        const response = await fetch(
+          "http://localhost:3000/anamnese",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + token
+            },
+
+            body: JSON.stringify({
+
+              cpf: consulta.cpf,
+
+              id_consulta:
+                consulta.id_consulta,
+
+              sintomas,
+
+              comorbidades
+
+            })
+          }
+        );
+
+        const dados = await response.json();
+
+        if (!dados.status) {
+
+          HematoAI.showToast(
+            dados.msg,
+            "error"
+          );
+
+          return;
+        }
+
+        HematoAI.showToast(
+          "Anamnese cadastrada com sucesso!",
+          "success"
+        );
+
+      }
+
+      HematoAI.closeModal(
+        document.getElementById("modalEditarAnamnese")
+      );
+
+      /*
+       * Recarrega consultas + anamneses
+       * para atualizar automaticamente
+       * o texto do botão.
+       */
+      await carregarConsultas();
+
+      /*
+       * Se o modal de detalhes estiver aberto,
+       * atualiza também.
+       */
+      if (idDetalhe) {
         await carregarAnamnese(idDetalhe);
+      }
 
     } catch (erro) {
 
-        console.error(erro);
+      console.error(erro);
 
-        HematoAI.showToast(
-            "Erro ao atualizar anamnese.",
-            "error"
-        );
+      HematoAI.showToast(
+        "Erro ao salvar anamnese.",
+        "error"
+      );
 
     }
   });
