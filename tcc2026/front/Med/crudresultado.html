@@ -19,7 +19,7 @@
       padding: 10px 14px;
       border: 1.5px solid var(--border);
       border-radius: 40px;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       background: var(--surface);
       color: var(--text-1);
       font-family: var(--font);
@@ -32,12 +32,53 @@
       box-shadow: 0 0 0 3px rgba(185,28,28,0.08);
     }
 
+    /* ── Barra de pesquisa estilo botão ── */
+    .search-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+
+    .search-wrapper input {
+      padding: 10px 14px 10px 40px;
+      border: 1.5px solid var(--border);
+      border-radius: 40px;
+      font-size: 0.9rem;
+      background: var(--surface);
+      color: var(--text-1);
+      font-family: var(--font);
+      outline: none;
+      width: 100%;
+      min-width: 200px;
+      transition: var(--transition);
+    }
+
+    .search-wrapper input:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(185,28,28,0.08);
+    }
+
+    .search-wrapper input::placeholder {
+      color: var(--text-3);
+      font-weight: 400;
+    }
+
+    .search-wrapper .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-3);
+      pointer-events: none;
+      font-size: 1rem;
+      line-height: 1;
+    }
+
     /* Badges de suspeita */
     .badge-suspeita {
       display: inline-block;
-      padding: 2px 12px;
+      padding: 3px 12px;
       border-radius: 20px;
-      font-size: 0.7rem;
+      font-size: 0.8rem;
       font-weight: 700;
     }
     .badge-suspeita.sem       { background: #dcfce7; color: #15803d; }
@@ -47,9 +88,9 @@
 
     .badge-tipo {
       display: inline-block;
-      padding: 2px 12px;
+      padding: 3px 12px;
       border-radius: 20px;
-      font-size: 0.7rem;
+      font-size: 0.8rem;
       font-weight: 700;
       background: var(--purple-light);
       color: var(--purple);
@@ -59,7 +100,7 @@
       display: grid;
       grid-template-columns: 160px 1fr;
       gap: 10px 16px;
-      font-size: 0.875rem;
+      font-size: 0.95rem;
     }
     .detail-key { color: var(--text-2); font-weight: 600; }
     .detail-value { color: var(--text-1); }
@@ -69,10 +110,12 @@
       padding: 16px;
       border-radius: var(--radius-md);
       border: 1px solid var(--border);
-      font-size: 0.85rem;
+      font-size: 0.95rem;
       line-height: 1.7;
       white-space: pre-wrap;
-      min-height: 100px;
+      word-wrap: break-word;
+      min-height: 50px;
+      width: 100%;
     }
 
     .info-box {
@@ -80,7 +123,7 @@
       border: 1px solid #bfdbfe;
       border-radius: var(--radius-lg);
       padding: 14px 16px;
-      font-size: 0.82rem;
+      font-size: 0.9rem;
       color: var(--blue);
       line-height: 1.6;
       margin-bottom: 18px;
@@ -92,13 +135,13 @@
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
       padding: 16px 18px;
-      margin-bottom: 20px;
+      margin-bottom: 14px;
     }
     .exame-info-panel .grid {
       display: grid;
       grid-template-columns: 120px 1fr;
       gap: 4px 16px;
-      font-size: 0.85rem;
+      font-size: 0.95rem;
     }
     .exame-info-panel .grid .label {
       color: var(--text-2);
@@ -112,8 +155,49 @@
       font-weight: 700;
       color: var(--red);
     }
+    .exame-info-panel .panel-title {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--text-2);
+      margin-bottom: 8px;
+    }
 
-    /* ── Seletor de exame (tabela + pesquisa + resumo) ── */
+    /* ── Painel de Resultado ── */
+    .resultado-panel {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px 18px;
+      margin-bottom: 14px;
+    }
+    .resultado-panel .panel-title {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--text-2);
+      margin-bottom: 8px;
+    }
+    .resultado-panel .grid {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 6px 16px;
+      font-size: 0.95rem;
+    }
+    .resultado-panel .grid .label {
+      color: var(--text-2);
+      font-weight: 600;
+      padding-top: 2px;
+    }
+    .resultado-panel .grid .valor {
+      color: var(--text-1);
+      font-weight: 500;
+      padding-top: 2px;
+    }
+    .resultado-panel .grid .valor.destaque {
+      font-weight: 700;
+      color: var(--red);
+    }
+
+    /* ── Seletor de exame ── */
     .exame-selector {
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
@@ -128,10 +212,10 @@
     }
     .exame-selector .search-wrapper input {
       width: 100%;
-      padding: 8px 14px 8px 36px;
+      padding: 10px 14px 10px 40px;
       border: 1.5px solid var(--border);
       border-radius: 40px;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       background: var(--surface);
       color: var(--text-1);
       outline: none;
@@ -143,10 +227,10 @@
     }
     .exame-selector .search-wrapper .lupa {
       position: absolute;
-      left: 12px;
+      left: 14px;
       top: 50%;
       transform: translateY(-50%);
-      font-size: 0.95rem;
+      font-size: 1rem;
       color: var(--text-3);
     }
 
@@ -160,7 +244,7 @@
     .exame-tabela-wrapper table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.8rem;
+      font-size: 0.9rem;
     }
     .exame-tabela-wrapper thead {
       background: var(--bg);
@@ -172,7 +256,7 @@
       padding: 8px 12px;
       text-align: left;
       font-weight: 700;
-      font-size: 0.7rem;
+      font-size: 0.8rem;
       text-transform: uppercase;
       color: var(--text-2);
       border-bottom: 1px solid var(--border);
@@ -193,8 +277,8 @@
       cursor: pointer;
     }
     .exame-tabela-wrapper .btn-selecionar {
-      padding: 2px 12px;
-      font-size: 0.7rem;
+      padding: 4px 14px;
+      font-size: 0.8rem;
       border-radius: 30px;
     }
 
@@ -213,7 +297,7 @@
       display: grid;
       grid-template-columns: 100px 1fr;
       gap: 4px 16px;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
     }
     .resumo-exame .grid .label {
       color: var(--text-2);
@@ -228,6 +312,71 @@
       color: var(--red);
     }
 
+    /* ── Botões de ação na tabela ── */
+    .td-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .td-actions .btn {
+      font-size: 0.8rem;
+      padding: 5px 12px;
+      border-radius: 30px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    .td-actions .btn i {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* Botão Ver (estilo ghost) */
+    .td-actions .btn-ver {
+      background: transparent;
+      border: 1.5px solid var(--border);
+      color: var(--text-2);
+    }
+
+    .td-actions .btn-ver:hover {
+      border-color: var(--red);
+      color: var(--red);
+      background: var(--red-light);
+    }
+
+    /* Botão Editar (estilo outline) */
+    .td-actions .btn-editar {
+      background: transparent;
+      border: 1.5px solid var(--red);
+      color: var(--red);
+    }
+
+    .td-actions .btn-editar:hover {
+      background: var(--red);
+      color: white;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(185,28,28,0.3);
+    }
+
+    /* Botão Excluir (estilo danger - fundo vermelho) */
+    .td-actions .btn-excluir {
+      background: var(--red);
+      border: 1.5px solid var(--red);
+      color: white;
+    }
+
+    .td-actions .btn-excluir:hover {
+      background: var(--red-dark);
+      border-color: var(--red-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(185,28,28,0.4);
+    }
+
     /* ── Seção de imagens do exame ── */
     .imagens-exame-section {
       margin-top: 18px;
@@ -238,7 +387,7 @@
     }
     .imagens-exame-section .secao-titulo {
       font-weight: 700;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       color: var(--text-2);
       margin-bottom: 10px;
     }
@@ -268,20 +417,20 @@
       cursor: zoom-in;
     }
     .imagem-thumb .aviso {
-      font-size: 0.75rem;
+      font-size: 0.8rem;
       color: var(--text-3);
       text-align: center;
       padding: 0 8px;
     }
     .imagem-card .meta {
       padding: 8px 10px;
-      font-size: 0.72rem;
+      font-size: 0.8rem;
       color: var(--text-2);
       line-height: 1.5;
       border-top: 1px solid var(--border);
     }
     .imagens-status {
-      font-size: 0.82rem;
+      font-size: 0.9rem;
       color: var(--text-3);
       text-align: center;
       padding: 14px 0;
@@ -311,6 +460,46 @@
       display: none !important;
     }
 
+    /* Aumentar fontes da tabela */
+    .table-wrapper table th {
+      font-size: 0.85rem;
+      padding: 12px 16px;
+    }
+    .table-wrapper table td {
+      font-size: 0.9rem;
+      padding: 12px 16px;
+    }
+    .table-wrapper table td .btn {
+      font-size: 0.8rem;
+    }
+
+    /* Aumentar fontes do header */
+    .page-header h1 {
+      font-size: 1.8rem;
+    }
+    .page-header p {
+      font-size: 1rem;
+    }
+
+    /* Aumentar fontes do card */
+    .card-title {
+      font-size: 1.1rem;
+    }
+
+    /* Aumentar fontes do modal */
+    .modal-header h2 {
+      font-size: 1.4rem;
+    }
+    .modal-body label {
+      font-size: 0.9rem;
+    }
+    .modal-body input,
+    .modal-body select,
+    .modal-body textarea {
+      font-size: 0.95rem;
+      padding: 12px 16px;
+    }
+
     /* ── Modo escuro ── */
     .dark-mode .badge-suspeita.sem       { background: #064e3b; color: #6ee7b7; }
     .dark-mode .badge-suspeita.baixa     { background: #1e3a8a; color: #93c5fd; }
@@ -318,7 +507,8 @@
     .dark-mode .badge-suspeita.alta      { background: #7f1d1d; color: #fca5a5; }
     .dark-mode .badge-tipo               { background: #4c1d95; color: #c4b5fd; }
     .dark-mode .exame-info-panel,
-    .dark-mode .exame-selector {
+    .dark-mode .exame-selector,
+    .dark-mode .resultado-panel {
       background: var(--surface);
       border-color: var(--border);
     }
@@ -357,8 +547,9 @@
         <div class="card-header">
           <span class="card-title">Lista de Resultados</span>
           <div class="filter-row">
-            <div class="search-bar" style="max-width:260px">
-              <input type="text" id="searchResultado" placeholder="Buscar por nome ou CPF do paciente...">
+            <div class="search-wrapper">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="searchResultado" placeholder="Buscar por paciente, CPF ou data...">
             </div>
             <select id="filterSuspeita" class="filter-select">
               <option value="">Todas as suspeitas</option>
@@ -381,7 +572,6 @@
           <table>
             <thead>
               <tr>
-                <th>ID</th>
                 <th>Paciente</th>
                 <th>CPF</th>
                 <th>Resultado</th>
@@ -395,7 +585,7 @@
           </table>
           <div class="empty-state" id="emptyState" style="display:none">
             <p>Nenhum resultado encontrado.</p>
-            <p style="font-size:0.78rem;color:var(--text-3);margin-top:4px">Ajuste os filtros ou cadastre um novo resultado.</p>
+            <p style="font-size:0.9rem;color:var(--text-3);margin-top:4px">Ajuste os filtros ou cadastre um novo resultado.</p>
           </div>
         </div>
       </div>
@@ -422,13 +612,12 @@
           <div class="exame-selector">
             <div class="search-wrapper">
               <span class="lupa">🔍</span>
-              <input type="text" id="searchExameSelect" placeholder="Pesquisar por paciente, CPF, ID ou tipo...">
+              <input type="text" id="searchExameSelect" placeholder="Pesquisar por paciente, CPF, tipo ou data...">
             </div>
             <div class="exame-tabela-wrapper">
               <table>
                 <thead>
                   <tr>
-                    <th>ID</th>
                     <th>Paciente</th>
                     <th>CPF</th>
                     <th>Tipo</th>
@@ -440,10 +629,8 @@
               </table>
             </div>
             <div class="resumo-exame" id="resumoExame">
-              <div style="font-weight:700;font-size:0.8rem;color:var(--text-2);margin-bottom:6px;">Exame selecionado</div>
+              <div style="font-weight:700;font-size:0.9rem;color:var(--text-2);margin-bottom:6px;">Exame selecionado</div>
               <div class="grid">
-                <span class="label">ID</span>
-                <span class="valor destaque" id="resumoExameId">—</span>
                 <span class="label">Paciente</span>
                 <span class="valor" id="resumoExamePaciente">—</span>
                 <span class="label">CPF</span>
@@ -460,10 +647,8 @@
 
       <!-- ─── Painel de Exame (Edição) ─── -->
       <div id="examePanel" class="exame-info-panel hidden">
-        <div style="font-weight:700;font-size:0.85rem;color:var(--text-2);margin-bottom:8px;">Exame vinculado (somente leitura)</div>
+        <div class="panel-title">Exame vinculado (somente leitura)</div>
         <div class="grid">
-          <span class="label">ID</span>
-          <span class="valor destaque" id="exameIdDisplay">—</span>
           <span class="label">Paciente</span>
           <span class="valor" id="examePacienteDisplay">—</span>
           <span class="label">CPF</span>
@@ -479,7 +664,7 @@
       <div class="form-grid">
         <div class="form-group">
           <label>Data do Resultado *</label>
-          <input type="date" id="rDataResultado">
+          <input type="date" id="rDataResultado" readonly>
         </div>
         <div class="form-group col-span-2">
           <label>Resultado *</label>
@@ -552,7 +737,7 @@
   let modoEdicao = false;
   let idEdicao = null;
   let idDetalhe = null;
-  let exameSelecionado = null; // objeto completo do exame selecionado
+  let exameSelecionado = null;
 
   /* ── Helpers ── */
   function formatarData(iso) {
@@ -571,6 +756,12 @@
     if (!cpf) return '—';
     const c = String(cpf).replace(/\D/g, '').padStart(11, '0');
     return c.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+  }
+
+  function formatarDataBusca(iso) {
+    if (!iso) return '';
+    const d = new Date(iso);
+    return d.toLocaleDateString('pt-BR');
   }
 
   function badgeSuspeita(suspeita) {
@@ -637,17 +828,18 @@
 
     if (filtroLower) {
       lista = exames.filter(e => {
+        const dataStr = e.data_exame ? formatarDataBusca(e.data_exame) : '';
         return (e.paciente || '').toLowerCase().includes(filtroLower) ||
                (e.cpf || '').includes(filtroLower) ||
-               String(e.id_exame).includes(filtroLower) ||
-               (e.tipo_exame || '').toLowerCase().includes(filtroLower);
+               (e.tipo_exame || '').toLowerCase().includes(filtroLower) ||
+               dataStr.includes(filtroLower);
       });
     }
 
     if (lista.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="6" style="text-align:center;padding:20px;color:var(--text-3);">
+          <td colspan="5" style="text-align:center;padding:20px;color:var(--text-3);">
             Nenhum exame encontrado.
           </td>
         </tr>
@@ -661,18 +853,10 @@
       if (isSelecionado) tr.classList.add('selecionado');
 
       tr.innerHTML = `
-        <tr>
-        <td style="font-family:var(--font-mono);font-size:0.75rem;">
-            #${e.id_exame}
-        </td>
-        <td style="font-weight:600;">
-            ${e.paciente || '—'}
-        </td>
-        <td style="font-family:var(--font-mono);font-size:0.75rem;">
-            ${formatarCPF(e.cpf)}
-        </td>
+        <td style="font-weight:600;">${e.paciente || '—'}</td>
+        <td style="font-family:var(--font-mono);font-size:0.85rem;">${formatarCPF(e.cpf)}</td>
         <td>${e.tipo_exame || '—'}</td>
-        <td style="font-size:0.8rem;">
+        <td style="font-size:0.85rem;">
           ${e.data_exame ? formatarData(e.data_exame) : '—'}
         </td>
         <td>
@@ -700,8 +884,6 @@
     exameSelecionado = exame;
     document.getElementById('rIdExame').value = exame.id_exame;
 
-    // Atualiza resumo
-    document.getElementById('resumoExameId').textContent = '#' + exame.id_exame;
     document.getElementById('resumoExamePaciente').textContent = exame.paciente || '—';
     document.getElementById('resumoExameCpf').textContent = formatarCPF(exame.cpf);
     document.getElementById('resumoExameTipo').textContent = exame.tipo_exame || '—';
@@ -710,7 +892,6 @@
     const resumoDiv = document.getElementById('resumoExame');
     resumoDiv.classList.add('ativo');
 
-    // Re-renderiza a lista para destacar
     const search = document.getElementById('searchExameSelect').value;
     renderizarListaExames(search);
   }
@@ -735,62 +916,47 @@
     data.forEach(r => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td style="font-family:var(--font-mono);font-size:0.78rem;color:var(--text-3)">#${r.id_resultado}</td>
-        <td style="color:var(--text-1);font-weight:600;">
-            ${r.paciente || '—'}
-        </td>
-        <td>${formatarCPF(r.cpf)}</td>
-        <td style="font-size:0.85rem;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+        <td style="font-weight:600;font-size:0.95rem;">${r.paciente || '—'}</td>
+        <td style="font-family:var(--font-mono);font-size:0.9rem;">${formatarCPF(r.cpf)}</td>
+        <td style="font-size:0.9rem;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
           ${r.resultado_texto || '—'}
         </td>
         <td>${badgeSuspeita(r.suspeita_leucemia)}</td>
         <td>${badgeTipo(r.tipo_leucemia)}</td>
-        <td style="font-size:0.85rem;">${formatarData(r.data_resultado)}</td>
+        <td style="font-size:0.9rem;">${formatarData(r.data_resultado)}</td>
         <td>
           <div class="td-actions">
-            <button class="btn btn-ghost btn-sm" onclick="abrirDetalhes(${r.id_resultado})">Ver</button>
-            <button class="btn btn-ghost btn-sm" onclick="abrirEdicao(${r.id_resultado})">Editar</button>
-            <button class="btn btn-danger btn-sm" onclick="confirmarExclusao(${r.id_resultado})">Excluir</button>
+            <button class="btn btn-ver" onclick="abrirDetalhes(${r.id_resultado})">Ver</button>
+            <button class="btn btn-editar" onclick="abrirEdicao(${r.id_resultado})">
+              <i data-lucide="pencil"></i>
+              Editar
+            </button>
+            <button class="btn btn-excluir" onclick="confirmarExclusao(${r.id_resultado})">
+              <i data-lucide="trash-2"></i>
+              Excluir
+            </button>
           </div>
         </td>
       `;
       tbody.appendChild(tr);
     });
+    lucide.createIcons();
   }
 
   /* ── Filtros ── */
   function aplicarFiltros() {
-    const q = document.getElementById('searchResultado').value
-        .toLowerCase()
-        .trim();
-
+    const q = document.getElementById('searchResultado').value.toLowerCase().trim();
     const suspeita = document.getElementById('filterSuspeita').value;
 
     filtrados = resultados.filter(r => {
+      const dataStr = r.data_resultado ? formatarDataBusca(r.data_resultado) : '';
+      const matchPaciente = (r.paciente || '').toLowerCase().includes(q);
+      const cpfBusca = q.replace(/\D/g, '');
+      const matchCpf = cpfBusca !== '' && (r.cpf || '').includes(cpfBusca);
+      const matchData = dataStr.includes(q);
+      const matchSuspeita = !suspeita || r.suspeita_leucemia === suspeita;
 
-        console.log("Pesquisando:", q, "| Paciente:", r.paciente);
-
-        const matchPaciente =
-            (r.paciente || "")
-                .toLowerCase()
-                .includes(q);
-
-        const cpfBusca = q.replace(/\D/g, "");
-
-        const matchCpf =
-            cpfBusca !== "" &&
-            (r.cpf || "").includes(cpfBusca);
-
-        const matchSuspeita =
-            !suspeita || r.suspeita_leucemia === suspeita;
-
-        console.log({
-            paciente: matchPaciente,
-            cpf: matchCpf,
-            suspeita: matchSuspeita
-        });
-
-        return (matchPaciente || matchCpf) && matchSuspeita;
+      return (matchPaciente || matchCpf || matchData) && matchSuspeita;
     });
 
     renderTabela(filtrados);
@@ -809,27 +975,26 @@
     document.getElementById('modalTitulo').textContent = 'Novo Resultado';
     document.getElementById('infoBox').style.display = '';
 
-    // Exibe seletor, esconde painel de leitura
     document.getElementById('exameSelector').classList.remove('hidden');
     document.getElementById('examePanel').classList.add('hidden');
 
-    // Limpa campos
     document.getElementById('searchExameSelect').value = '';
     document.getElementById('rIdExame').value = '';
-    document.getElementById('rDataResultado').value = '';
+    
+    const hoje = new Date();
+    const dataAtual = hoje.toISOString().split('T')[0];
+    document.getElementById('rDataResultado').value = dataAtual;
+    
     document.getElementById('rResultado').value = '';
     document.getElementById('rSuspeita').value = '';
     document.getElementById('rTipoLeucemia').value = '';
 
-    // Limpa resumo
     document.getElementById('resumoExame').classList.remove('ativo');
-    document.getElementById('resumoExameId').textContent = '—';
     document.getElementById('resumoExamePaciente').textContent = '—';
     document.getElementById('resumoExameCpf').textContent = '—';
     document.getElementById('resumoExameTipo').textContent = '—';
     document.getElementById('resumoExameData').textContent = '—';
 
-    // Carrega exames e renderiza lista
     if (exames.length === 0) {
       await carregarExames();
     } else {
@@ -927,27 +1092,21 @@
     modoEdicao = true;
     idEdicao = id;
 
-    // Busca o exame relacionado para preencher o painel
     const exame = exames.find(e => e.id_exame === r.id_exame);
 
-    document.getElementById('modalTitulo').textContent = `Editar Resultado #${id}`;
+    document.getElementById('modalTitulo').textContent = 'Editar Resultado';
     document.getElementById('infoBox').style.display = 'none';
 
-    // Esconde seletor, mostra painel de exame
     document.getElementById('exameSelector').classList.add('hidden');
     document.getElementById('examePanel').classList.remove('hidden');
 
-    // Preenche painel
-    document.getElementById('exameIdDisplay').textContent = `#${r.id_exame}`;
     document.getElementById('examePacienteDisplay').textContent = exame?.paciente || '—';
     document.getElementById('exameCpfDisplay').textContent = exame?.cpf ? formatarCPF(exame.cpf) : '—';
     document.getElementById('exameTipoDisplay').textContent = exame?.tipo_exame || '—';
     document.getElementById('exameDataDisplay').textContent = exame?.data_exame ? formatarData(exame.data_exame) : '—';
 
-    // Guarda id_exame no hidden
     document.getElementById('rIdExame').value = r.id_exame;
 
-    // Preenche campos editáveis
     document.getElementById('rDataResultado').value = formatarDataInput(r.data_resultado);
     document.getElementById('rResultado').value = r.resultado_texto || '';
     document.getElementById('rSuspeita').value = r.suspeita_leucemia || '';
@@ -1018,13 +1177,11 @@
       card.innerHTML = `
         <div class="imagem-thumb"><span class="aviso">Carregando...</span></div>
         <div class="meta">
-          <strong>#${img.id_imagem}</strong> · ${img.descricao || 'Imagem do exame'}<br>
-          Upload: ${formatarData(img.data_upload)}
+          ${img.descricao || 'Imagem do exame'} · Upload: ${formatarData(img.data_upload)}
         </div>
       `;
       grid.appendChild(card);
 
-      // O arquivo exige o token, então é buscado como blob em vez de src direto.
       try {
         const respostaArquivo = await fetch(
           `http://localhost:3000/imagens-exame/${img.id_imagem}/arquivo`,
@@ -1075,7 +1232,7 @@
     if (exame) {
       html += `
         <div class="exame-info-panel" style="margin-bottom:14px;">
-          <div style="font-weight:700;font-size:0.85rem;color:var(--text-2);margin-bottom:8px;">Dados do Paciente</div>
+          <div class="panel-title">Dados do Paciente</div>
           <div class="grid">
             <span class="label">Nome</span>
             <span class="valor" style="font-weight:600;">${exame.paciente || '—'}</span>
@@ -1088,10 +1245,8 @@
       // Dados do Exame
       html += `
         <div class="exame-info-panel" style="margin-bottom:14px;">
-          <div style="font-weight:700;font-size:0.85rem;color:var(--text-2);margin-bottom:8px;">Dados do Exame</div>
+          <div class="panel-title">Dados do Exame</div>
           <div class="grid">
-            <span class="label">ID do Exame</span>
-            <span class="valor destaque">#${exame.id_exame}</span>
             <span class="label">Tipo</span>
             <span class="valor">${exame.tipo_exame || '—'}</span>
             <span class="label">Data da Consulta</span>
@@ -1107,17 +1262,20 @@
 
     // Resultado
     html += `
-      <div class="detail-grid">
-        <span class="detail-key">ID do Resultado</span>
-        <span class="detail-value" style="font-family:var(--font-mono)">#${r.id_resultado}</span>
-        <span class="detail-key">Resultado</span>
-        <span class="detail-value"><div class="resultado-texto">${r.resultado_texto || '—'}</div></span>
-        <span class="detail-key">Suspeita de Leucemia</span>
-        <span class="detail-value">${badgeSuspeita(r.suspeita_leucemia)}</span>
-        <span class="detail-key">Tipo de Leucemia</span>
-        <span class="detail-value">${badgeTipo(r.tipo_leucemia)}</span>
-        <span class="detail-key">Data do Resultado</span>
-        <span class="detail-value">${formatarData(r.data_resultado)}</span>
+      <div class="resultado-panel">
+        <div class="panel-title">Resultado do Exame</div>
+        <div class="grid">
+          <span class="label">Resultado</span>
+          <span class="valor" style="padding:0;">
+            <div class="resultado-texto">${r.resultado_texto || '—'}</div>
+          </span>
+          <span class="label">Suspeita</span>
+          <span class="valor" style="padding-top:2px;">${badgeSuspeita(r.suspeita_leucemia)}</span>
+          <span class="label">Tipo</span>
+          <span class="valor" style="padding-top:2px;">${badgeTipo(r.tipo_leucemia)}</span>
+          <span class="label">Data</span>
+          <span class="valor" style="padding-top:2px;">${formatarData(r.data_resultado)}</span>
+        </div>
       </div>
     `;
 
@@ -1146,7 +1304,7 @@
   /* ── Excluir ── */
   function confirmarExclusao(id) {
     HematoAI.confirmDialog(
-      `Deseja excluir o resultado <strong>#${id}</strong>?<br>Esta ação não pode ser desfeita.`,
+      `Deseja excluir o resultado?<br>Esta ação não pode ser desfeita.`,
       async () => {
         try {
           const response = await fetch(`http://localhost:3000/resultados-exame/${id}`, {

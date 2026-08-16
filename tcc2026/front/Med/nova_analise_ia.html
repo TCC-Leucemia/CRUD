@@ -17,7 +17,7 @@
     }
 
     .form-section-title {
-      font-size: 1rem;
+      font-size: 1.2rem;
       font-weight: 800;
       margin-bottom: 22px;
       color: var(--text-1);
@@ -36,7 +36,7 @@
 
     .input-group label {
       font-weight: 700;
-      font-size: 0.75rem;
+      font-size: 0.9rem;
       color: var(--text-2);
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -45,10 +45,10 @@
     .input-group input,
     .input-group select,
     .input-group textarea {
-      padding: 10px 14px;
+      padding: 12px 16px;
       border: 1.5px solid var(--border);
       border-radius: var(--radius-md);
-      font-size: 0.875rem;
+      font-size: 1rem;
       transition: var(--transition);
       font-family: var(--font);
       background: var(--bg);
@@ -73,7 +73,7 @@
 
     .input-group textarea {
       resize: vertical;
-      min-height: 90px;
+      min-height: 110px;
       line-height: 1.6;
     }
 
@@ -94,13 +94,17 @@
     }
 
     .upload-text {
-      font-size: 0.875rem;
+      font-size: 1rem;
       color: var(--text-2);
       margin-bottom: 6px;
       font-weight: 500;
     }
 
-    .upload-hint { font-size: 0.75rem; color: var(--text-3); }
+    .upload-hint { 
+      font-size: 0.85rem; 
+      color: var(--text-3); 
+    }
+    
     #imagensInput { display: none; }
 
     .file-preview {
@@ -123,14 +127,22 @@
     }
 
     .file-info { flex: 1; }
-    .file-name { font-size: 0.875rem; font-weight: 600; color: var(--text-1); margin-bottom: 3px; }
-    .file-size { font-size: 0.75rem; color: var(--text-3); }
+    .file-name { 
+      font-size: 1rem; 
+      font-weight: 600; 
+      color: var(--text-1); 
+      margin-bottom: 3px; 
+    }
+    .file-size { 
+      font-size: 0.85rem; 
+      color: var(--text-3); 
+    }
 
     .remove-file {
       background: transparent;
       border: 1px solid var(--border);
       padding: 5px 12px;
-      font-size: 0.75rem;
+      font-size: 0.85rem;
       color: var(--text-2);
       border-radius: var(--radius-sm);
       cursor: pointer;
@@ -147,10 +159,10 @@
       background: var(--red);
       border: none;
       color: white;
-      padding: 13px 28px;
+      padding: 16px 28px;
       border-radius: 40px;
       font-weight: 700;
-      font-size: 0.95rem;
+      font-size: 1.1rem;
       cursor: pointer;
       transition: var(--transition);
       width: 100%;
@@ -174,7 +186,7 @@
     }
 
     .resultados-section h3 {
-      font-size: 1rem;
+      font-size: 1.2rem;
       font-weight: 800;
       margin-bottom: 20px;
       color: var(--text-1);
@@ -197,13 +209,13 @@
       font-weight: 700;
       color: var(--red);
       margin-bottom: 8px;
-      font-size: 0.72rem;
+      font-size: 0.85rem;
       text-transform: uppercase;
       letter-spacing: 0.7px;
     }
 
     .result-value {
-      font-size: 0.875rem;
+      font-size: 1rem;
       color: var(--text-1);
       line-height: 1.7;
       white-space: pre-wrap;
@@ -215,7 +227,7 @@
       background: var(--bg);
       padding: 16px;
       border-radius: var(--radius-md);
-      font-size: 0.82rem;
+      font-size: 0.95rem;
       line-height: 1.7;
       border: 1px solid var(--border);
     }
@@ -224,10 +236,10 @@
       background: var(--surface);
       border: 2px solid var(--red);
       color: var(--red);
-      padding: 11px 24px;
+      padding: 14px 24px;
       border-radius: 40px;
       font-weight: 700;
-      font-size: 0.9rem;
+      font-size: 1.05rem;
       cursor: pointer;
       transition: var(--transition);
       margin-top: 4px;
@@ -258,7 +270,7 @@
 
     /* Estilo para o select com dados do paciente */
     .select-info {
-      font-size: 0.72rem;
+      font-size: 0.85rem;
       color: var(--text-3);
       margin-top: 4px;
     }
@@ -267,12 +279,12 @@
       background: var(--bg);
       border: 1.5px solid var(--border);
       border-radius: var(--radius-md);
-      padding: 10px 14px;
-      font-size: 0.875rem;
+      padding: 12px 16px;
+      font-size: 1rem;
       color: var(--text-1);
       opacity: 0.7;
       cursor: not-allowed;
-      min-height: 42px;
+      min-height: 48px;
       display: flex;
       align-items: center;
     }
@@ -282,7 +294,7 @@
       font-style: italic;
     }
 
-    /* ── Seletor de exames (Novo) ── */
+    /* ── Seletor de exames ── */
     .exame-selector {
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
@@ -298,10 +310,10 @@
 
     .exame-selector .search-wrapper input {
       width: 100%;
-      padding: 8px 14px 8px 36px;
+      padding: 12px 14px 12px 40px;
       border: 1.5px solid var(--border);
       border-radius: 40px;
-      font-size: 0.85rem;
+      font-size: 1rem;
       background: var(--surface);
       color: var(--text-1);
       outline: none;
@@ -315,15 +327,15 @@
 
     .exame-selector .search-wrapper .lupa {
       position: absolute;
-      left: 12px;
+      left: 14px;
       top: 50%;
       transform: translateY(-50%);
-      font-size: 0.95rem;
+      font-size: 1.1rem;
       color: var(--text-3);
     }
 
     .exame-tabela-wrapper {
-      max-height: 200px;
+      max-height: 220px;
       overflow-y: auto;
       border: 1px solid var(--border);
       border-radius: var(--radius-md);
@@ -333,7 +345,7 @@
     .exame-tabela-wrapper table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.8rem;
+      font-size: 0.9rem;
     }
 
     .exame-tabela-wrapper thead {
@@ -344,17 +356,17 @@
     }
 
     .exame-tabela-wrapper th {
-      padding: 8px 12px;
+      padding: 10px 14px;
       text-align: left;
       font-weight: 700;
-      font-size: 0.7rem;
+      font-size: 0.8rem;
       text-transform: uppercase;
       color: var(--text-2);
       border-bottom: 1px solid var(--border);
     }
 
     .exame-tabela-wrapper td {
-      padding: 8px 12px;
+      padding: 10px 14px;
       border-bottom: 1px solid var(--border);
       color: var(--text-1);
       vertical-align: middle;
@@ -375,8 +387,8 @@
     }
 
     .exame-tabela-wrapper .btn-selecionar {
-      padding: 2px 12px;
-      font-size: 0.7rem;
+      padding: 4px 14px;
+      font-size: 0.8rem;
       border-radius: 30px;
     }
 
@@ -385,7 +397,7 @@
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
-      padding: 12px 16px;
+      padding: 14px 18px;
       display: none;
     }
 
@@ -397,7 +409,7 @@
       display: grid;
       grid-template-columns: 100px 1fr;
       gap: 4px 16px;
-      font-size: 0.85rem;
+      font-size: 0.95rem;
     }
 
     .resumo-exame .grid .label {
@@ -415,18 +427,51 @@
       color: var(--red);
     }
 
+    /* Aviso de anamnese */
+    .aviso-anamnese {
+      background: var(--yellow-light);
+      border: 1px solid #f59e0b;
+      border-radius: var(--radius-lg);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin: 12px 0;
+      flex-wrap: wrap;
+    }
+
+    .aviso-anamnese strong {
+      font-size: 1rem;
+      color: #92400e;
+    }
+
+    .aviso-anamnese p {
+      font-size: 0.95rem;
+      color: #78350f;
+      margin: 4px 0 0 0;
+    }
+
+    .aviso-anamnese .btn {
+      flex-shrink: 0;
+    }
+
     @media (max-width: 700px) {
       .input-group.full-width { grid-column: span 1; }
       .exame-tabela-wrapper table {
-        font-size: 0.7rem;
+        font-size: 0.8rem;
       }
       .exame-tabela-wrapper th,
       .exame-tabela-wrapper td {
-        padding: 6px 8px;
+        padding: 8px 10px;
       }
       .resumo-exame .grid {
         grid-template-columns: 1fr 1fr;
         gap: 4px 8px;
+      }
+      .aviso-anamnese {
+        flex-direction: column;
+        text-align: center;
       }
     }
   </style>
@@ -455,23 +500,22 @@
         <div class="form-section-title">Anamnese e imagens do paciente</div>
         <form id="formAnamnese">
           <div class="form-grid">
-            <!-- Seletor de Exame (Novo) -->
+            <!-- Seletor de Exame -->
             <div class="input-group full-width">
               <label>Selecione o Exame *</label>
               <div class="exame-selector">
                 <div class="search-wrapper">
                   <span class="lupa">🔍</span>
-                  <input type="text" id="searchExame" placeholder="Pesquisar por paciente, CPF, ID ou data...">
+                  <input type="text" id="searchExame" placeholder="Pesquisar por paciente, CPF ou tipo de exame...">
                 </div>
                 <div class="exame-tabela-wrapper" id="exameTabelaWrapper">
                   <table>
                     <thead>
                       <tr>
-                        <th>ID</th>
                         <th>Paciente</th>
                         <th>CPF</th>
+                        <th>Tipo Exame</th>
                         <th>Data Exame</th>
-                        <th>Tipo</th>
                         <th style="width:80px;">Ação</th>
                       </tr>
                     </thead>
@@ -479,16 +523,16 @@
                   </table>
                 </div>
                 <div class="resumo-exame" id="resumoExame">
-                  <div style="font-weight:700;font-size:0.8rem;color:var(--text-2);margin-bottom:6px;">Exame selecionado</div>
+                  <div style="font-weight:700;font-size:0.9rem;color:var(--text-2);margin-bottom:6px;">Exame selecionado</div>
                   <div class="grid">
                     <span class="label">Paciente</span>
                     <span class="valor" id="resumoPaciente">—</span>
                     <span class="label">CPF</span>
                     <span class="valor" id="resumoCpf">—</span>
+                    <span class="label">Tipo Exame</span>
+                    <span class="valor" id="resumoTipo">—</span>
                     <span class="label">Data Exame</span>
                     <span class="valor" id="resumoData">—</span>
-                    <span class="label">ID</span>
-                    <span class="valor destaque" id="resumoId">—</span>
                   </div>
                 </div>
               </div>
@@ -627,8 +671,8 @@ document.addEventListener('DOMContentLoaded', function () {
   const resumoExame = document.getElementById('resumoExame');
   const resumoPaciente = document.getElementById('resumoPaciente');
   const resumoCpf = document.getElementById('resumoCpf');
+  const resumoTipo = document.getElementById('resumoTipo');
   const resumoData = document.getElementById('resumoData');
-  const resumoId = document.getElementById('resumoId');
   const inputIdExame = document.getElementById('idExame');
 
   const displayNome   = document.getElementById('displayNome');
@@ -639,7 +683,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const inputSexo     = document.getElementById('sexo');
 
   let pdfUrlAtual = null;
-  let examesData = []; // Armazena os dados completos dos exames
+  let examesData = [];
   let exameSelecionado = null;
 
   // ============================================
@@ -671,6 +715,12 @@ document.addEventListener('DOMContentLoaded', function () {
     return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
   }
 
+  function formatarDataBusca(iso) {
+    if (!iso) return '';
+    const d = new Date(iso);
+    return d.toLocaleDateString('pt-BR');
+  }
+
   function formatarCPF(cpf) {
     if (!cpf) return '—';
     const c = String(cpf).replace(/\D/g, '').padStart(11, '0');
@@ -693,11 +743,6 @@ document.addEventListener('DOMContentLoaded', function () {
     if (tipo === 'Hemograma')  return `<span class="tipo-badge tipo-hemograma">Hemograma</span>`;
     if (tipo === 'Mielograma') return `<span class="tipo-badge tipo-mielograma">Mielograma</span>`;
     return `<span style="color:var(--text-3)">—</span>`;
-  }
-
-  function statusPill(s) {
-    const map = { 'Pendente': 'pendente', 'Em andamento': 'andamento', 'Finalizado': 'finalizado' };
-    return `<span class="status-pill status-${map[s] || 'pendente'}">${s}</span>`;
   }
 
   function preencherDadosPaciente(exame) {
@@ -743,11 +788,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const inputSintomas = document.getElementById('sintomas');
     const inputHistorico = document.getElementById('historico');
 
-    // Limpa os campos
     inputSintomas.value = '';
     inputHistorico.value = '';
 
-    // Esconde o aviso inicialmente
     avisoSemAnamnese.style.display = 'none';
 
     if (!exame || !exame.id_consulta) {
@@ -784,10 +827,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const anamnese = json.dados;
 
-        // ==========================================
-        // NÃO EXISTE ANAMNESE
-        // ==========================================
-
         if (!anamnese) {
             console.warn(
                 `Consulta ${exame.id_consulta} não possui anamnese.`
@@ -800,10 +839,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
             return false;
         }
-
-        // ==========================================
-        // EXISTE ANAMNESE
-        // ==========================================
 
         inputSintomas.value = anamnese.sintomas || '';
         inputHistorico.value = anamnese.comorbidades || '';
@@ -856,18 +891,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
     resumoPaciente.textContent = exame.paciente || '—';
     resumoCpf.textContent = formatarCPF(exame.cpf);
-
+    resumoTipo.textContent = exame.tipo_exame || '—';
     resumoData.textContent = exame.data_exame
         ? formatarDataHora(exame.data_exame)
         : '—';
-
-    resumoId.textContent = '#' + exame.id_exame;
 
     resumoExame.classList.add('ativo');
 
     preencherDadosPaciente(exame);
 
-    // Verifica se existe anamnese
     anamneseDisponivel =
         await carregarAnamneseDoExame(exame);
 
@@ -885,10 +917,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (filtroLower) {
       lista = examesData.filter(e => {
-        const dataStr = e.data_exame ? formatarDataHora(e.data_exame) : '';
+        const dataStr = e.data_exame ? formatarDataBusca(e.data_exame) : '';
         return (e.paciente || '').toLowerCase().includes(filtroLower) ||
                (e.cpf || '').includes(filtroLower) ||
-               String(e.id_exame).includes(filtroLower) ||
+               (e.tipo_exame || '').toLowerCase().includes(filtroLower) ||
                dataStr.includes(filtroLower);
       });
     }
@@ -896,7 +928,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (lista.length === 0) {
       tbodyExames.innerHTML = `
         <tr>
-          <td colspan="6" style="text-align:center;padding:20px;color:var(--text-3);">
+          <td colspan="5" style="text-align:center;padding:20px;color:var(--text-3);">
             Nenhum exame encontrado.
           </td>
         </tr>
@@ -910,11 +942,10 @@ document.addEventListener('DOMContentLoaded', function () {
       if (isSelecionado) tr.classList.add('selecionada');
 
       tr.innerHTML = `
-        <td style="font-family:var(--font-mono);font-size:0.75rem;">#${e.id_exame}</td>
-        <td style="font-weight:600;">${e.paciente || '—'}</td>
-        <td style="font-family:var(--font-mono);font-size:0.75rem;">${formatarCPF(e.cpf)}</td>
-        <td style="font-size:0.8rem;">${e.data_exame ? formatarDataHora(e.data_exame) : '—'}</td>
+        <td style="font-weight:600;font-size:0.95rem;">${e.paciente || '—'}</td>
+        <td style="font-family:var(--font-mono);font-size:0.85rem;">${formatarCPF(e.cpf)}</td>
         <td>${tipoBadge(e.tipo_exame)}</td>
+        <td style="font-size:0.85rem;">${e.data_exame ? formatarDataHora(e.data_exame) : '—'}</td>
         <td>
           <button class="btn btn-primary btn-sm btn-selecionar" onclick="selecionarExame(${e.id_exame})">
             Selecionar
@@ -1119,8 +1150,6 @@ document.addEventListener('DOMContentLoaded', function () {
   // BAIXAR PDF
   // ============================================
   function baixarPDF() {
-    // Só baixa o PDF real gerado pelo backend. O texto do laudo não é um PDF
-    // válido: salvá-lo com extensão .pdf produz um arquivo que não abre.
     if (!pdfUrlAtual) {
       HematoAI.showToast('Nenhum PDF disponível. Gere o laudo novamente.', 'error');
       return;

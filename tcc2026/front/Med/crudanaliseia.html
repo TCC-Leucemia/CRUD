@@ -29,7 +29,7 @@
       padding: 10px 14px;
       border: 1.5px solid var(--border);
       border-radius: 40px;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       background: var(--surface);
       color: var(--text-1);
       font-family: var(--font);
@@ -42,11 +42,52 @@
       box-shadow: 0 0 0 3px rgba(185,28,28,0.08);
     }
 
+    /* ── Barra de pesquisa estilo botão ── */
+    .search-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+
+    .search-wrapper input {
+      padding: 10px 14px 10px 40px;
+      border: 1.5px solid var(--border);
+      border-radius: 40px;
+      font-size: 0.9rem;
+      background: var(--surface);
+      color: var(--text-1);
+      font-family: var(--font);
+      outline: none;
+      width: 100%;
+      min-width: 200px;
+      transition: var(--transition);
+    }
+
+    .search-wrapper input:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(185,28,28,0.08);
+    }
+
+    .search-wrapper input::placeholder {
+      color: var(--text-3);
+      font-weight: 400;
+    }
+
+    .search-wrapper .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-3);
+      pointer-events: none;
+      font-size: 1rem;
+      line-height: 1;
+    }
+
     .suspeita-badge {
       display: inline-block;
       padding: 3px 10px;
       border-radius: 20px;
-      font-size: 0.72rem;
+      font-size: 0.8rem;
       font-weight: 700;
     }
     .suspeita-alta { background: #fee2e2; color: #dc2626; }
@@ -54,59 +95,66 @@
     .suspeita-baixa { background: #dbeafe; color: #2563eb; }
     .suspeita-sem { background: #dcfce7; color: #15803d; }
 
-    .status-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 0.72rem;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-    .status-pill::before {
-      content: '';
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      display: inline-block;
-      margin-right: 6px;
-    }
-    .status-pendente { background: #fef3c7; color: #d97706; }
-    .status-pendente::before { background: #d97706; }
-    .status-andamento { background: #dbeafe; color: #2563eb; }
-    .status-andamento::before { background: #2563eb; }
-    .status-finalizado { background: #dcfce7; color: #15803d; }
-    .status-finalizado::before { background: #15803d; }
-
     .tipo-badge {
       display: inline-block;
       padding: 3px 10px;
       border-radius: 20px;
-      font-size: 0.72rem;
+      font-size: 0.8rem;
       font-weight: 700;
     }
     .tipo-hemograma { background: var(--red-light); color: var(--red); }
     .tipo-mielograma { background: var(--purple-light); color: var(--purple); }
 
-    .detail-grid {
-      display: grid;
-      grid-template-columns: 180px 1fr;
-      gap: 10px 16px;
-      font-size: 0.875rem;
+    /* ── Painéis do modal de detalhes ── */
+    .detalhe-panel {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px 18px;
+      margin-bottom: 14px;
     }
-    .detail-key { color: var(--text-2); font-weight: 600; }
-    .detail-value { color: var(--text-1); }
+    .detalhe-panel:last-child {
+      margin-bottom: 0;
+    }
+    .detalhe-panel .panel-title {
+      font-weight: 700;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-2);
+      margin-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 6px;
+    }
+    .detalhe-panel .grid {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 4px 16px;
+      font-size: 0.95rem;
+    }
+    .detalhe-panel .grid .label {
+      color: var(--text-2);
+      font-weight: 600;
+    }
+    .detalhe-panel .grid .valor {
+      color: var(--text-1);
+      font-weight: 500;
+    }
+    .detalhe-panel .grid .valor.destaque {
+      font-weight: 700;
+      color: var(--red);
+    }
 
     .resultado-texto {
       background: var(--bg);
       padding: 16px;
       border-radius: var(--radius-md);
       border: 1px solid var(--border);
-      font-size: 0.85rem;
+      font-size: 0.95rem;
       line-height: 1.7;
       white-space: pre-wrap;
       min-height: 80px;
+      margin-top: 4px;
     }
 
     .info-box {
@@ -114,10 +162,61 @@
       border: 1px solid #bfdbfe;
       border-radius: var(--radius-lg);
       padding: 14px 16px;
-      font-size: 0.82rem;
+      font-size: 0.9rem;
       color: var(--blue);
       line-height: 1.6;
       margin-bottom: 18px;
+    }
+
+    /* ── Botões de ação na tabela ── */
+    .td-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .td-actions .btn {
+      font-size: 0.8rem;
+      padding: 5px 12px;
+      border-radius: 30px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    .td-actions .btn i {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* Botão Ver (estilo ghost) */
+    .td-actions .btn-ver {
+      background: transparent;
+      border: 1.5px solid var(--border);
+      color: var(--text-2);
+    }
+
+    .td-actions .btn-ver:hover {
+      border-color: var(--red);
+      color: var(--red);
+      background: var(--red-light);
+    }
+
+    /* Botão Excluir (estilo danger - fundo vermelho) */
+    .td-actions .btn-excluir {
+      background: var(--red);
+      border: 1.5px solid var(--red);
+      color: white;
+    }
+
+    .td-actions .btn-excluir:hover {
+      background: var(--red-dark);
+      border-color: var(--red-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(185,28,28,0.4);
     }
 
     .btn-success {
@@ -129,6 +228,55 @@
       background: #166534;
       box-shadow: 0 4px 16px rgba(21,128,61,0.4);
       transform: translateY(-1px);
+    }
+
+    /* Aumentar fontes da tabela */
+    .table-wrapper table th {
+      font-size: 0.85rem;
+      padding: 12px 16px;
+    }
+    .table-wrapper table td {
+      font-size: 0.9rem;
+      padding: 12px 16px;
+    }
+    .table-wrapper table td .btn {
+      font-size: 0.8rem;
+    }
+
+    /* Aumentar fontes do header */
+    .page-header h1 {
+      font-size: 1.8rem;
+    }
+    .page-header p {
+      font-size: 1rem;
+    }
+
+    /* Aumentar fontes do card */
+    .card-title {
+      font-size: 1.1rem;
+    }
+
+    /* Aumentar fontes do modal */
+    .modal-header h2 {
+      font-size: 1.4rem;
+    }
+    .modal-body label {
+      font-size: 0.9rem;
+    }
+    .modal-body input,
+    .modal-body select,
+    .modal-body textarea {
+      font-size: 0.95rem;
+      padding: 12px 16px;
+    }
+
+    /* ── Modo escuro ── */
+    .dark-mode .detalhe-panel {
+      background: var(--surface);
+      border-color: var(--border);
+    }
+    .dark-mode .detalhe-panel .panel-title {
+      border-bottom-color: var(--border);
     }
   </style>
 </head>
@@ -155,8 +303,9 @@
         <div class="card-header">
           <span class="card-title">Lista de Análises</span>
           <div class="filter-row">
-            <div class="search-bar" style="max-width:280px">
-              <input type="text" id="searchAnalise" placeholder="Paciente, CPF ou tipo do exame...">
+            <div class="search-wrapper">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="searchAnalise" placeholder="Buscar por paciente ou CPF...">
             </div>
             <select id="filterSuspeita" class="filter-select">
               <option value="">Todas as suspeitas</option>
@@ -165,11 +314,18 @@
               <option value="Baixa">Baixa</option>
               <option value="Sem suspeita">Sem suspeita</option>
             </select>
-            <select id="filterStatus" class="filter-select">
-              <option value="">Todos os status</option>
-              <option value="Pendente">Pendente</option>
-              <option value="Em andamento">Em andamento</option>
-              <option value="Finalizado">Finalizado</option>
+            <select id="filterTipoExame" class="filter-select">
+              <option value="">Todos os tipos</option>
+              <option value="Hemograma">Hemograma</option>
+              <option value="Mielograma">Mielograma</option>
+            </select>
+            <select id="filterTipoLeucemia" class="filter-select">
+              <option value="">Todos os tipos de leucemia</option>
+              <option value="LLA">LLA</option>
+              <option value="LMA">LMA</option>
+              <option value="LLC">LLC</option>
+              <option value="LMC">LMC</option>
+              <option value="Não identificado">Não identificado</option>
             </select>
             <button class="btn btn-ghost btn-sm" id="btnRecarregar">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -185,14 +341,12 @@
           <table>
             <thead>
               <tr>
-                <th>ID</th>
                 <th>Paciente</th>
                 <th>CPF</th>
                 <th>Data Consulta</th>
                 <th>Tipo Leucemia</th>
                 <th>Tipo Exame</th>
                 <th>Suspeita</th>
-                <th>Status</th>
                 <th>Ações</th>
               </tr>
             </thead>
@@ -200,7 +354,7 @@
           </table>
           <div class="empty-state" id="emptyState" style="display:none">
             <p>Nenhuma análise IA encontrada.</p>
-            <p style="font-size:0.78rem;color:var(--text-3);margin-top:4px">Ajuste os filtros ou aguarde novas análises.</p>
+            <p style="font-size:0.9rem;color:var(--text-3);margin-top:4px">Ajuste os filtros ou aguarde novas análises.</p>
           </div>
         </div>
       </div>
@@ -287,11 +441,6 @@
     return `<span class="suspeita-badge suspeita-${map[suspeita] || 'sem'}">${suspeita || '—'}</span>`;
   }
 
-  function statusPill(s) {
-    const map = { 'Pendente': 'pendente', 'Em andamento': 'andamento', 'Finalizado': 'finalizado' };
-    return `<span class="status-pill status-${map[s] || 'pendente'}">${s}</span>`;
-  }
-
   function tipoBadge(tipo) {
     if (tipo === 'Hemograma') return `<span class="tipo-badge tipo-hemograma">Hemograma</span>`;
     if (tipo === 'Mielograma') return `<span class="tipo-badge tipo-mielograma">Mielograma</span>`;
@@ -322,45 +471,46 @@
     data.forEach(a => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td style="font-family:var(--font-mono);font-size:0.78rem;color:var(--text-3)">#${a.id_analise}</td>
-        <td style="font-weight:600;font-size:0.85rem">${a.nome}</td>
-        <td style="font-family:var(--font-mono);font-size:0.8rem">${formatarCPF(a.cpf)}</td>
-        <td style="font-size:0.8rem">${formatarDataHora(a.data_consulta)}</td>
+        <td style="font-weight:600;font-size:0.95rem">${a.nome}</td>
+        <td style="font-family:var(--font-mono);font-size:0.9rem">${formatarCPF(a.cpf)}</td>
+        <td style="font-size:0.9rem">${formatarDataHora(a.data_consulta)}</td>
         <td>
-        <span class="badge badge-purple">
+          <span class="badge badge-purple" style="font-size:0.8rem;padding:4px 12px;">
             ${a.tipo_leucemia_ia || "Não identificado"}
-        </span>
+          </span>
         </td>
         <td>${tipoBadge(a.tipo_exame)}</td>
         <td>${suspeitaBadge(a.suspeita_ia)}</td>
-        <td>${statusPill(a.statusc)}</td>
         <td>
           <div class="td-actions">
-            <button class="btn btn-ghost btn-sm" onclick="abrirDetalhes(${a.id_analise})">Ver</button>
-            <button class="btn btn-danger btn-sm" onclick="confirmarExclusao(${a.id_analise})">Excluir</button>
+            <button class="btn btn-ver" onclick="abrirDetalhes(${a.id_analise})">Ver</button>
+            <button class="btn btn-excluir" onclick="confirmarExclusao(${a.id_analise})">
+              <i data-lucide="trash-2"></i>
+              Excluir
+            </button>
           </div>
         </td>
       `;
       tbody.appendChild(tr);
     });
+    lucide.createIcons();
   }
 
   function aplicarFiltros() {
-    const q = document.getElementById('searchAnalise').value.toLowerCase();
+    const q = document.getElementById('searchAnalise').value.toLowerCase().trim();
     const suspeita = document.getElementById('filterSuspeita').value;
-    const status = document.getElementById('filterStatus').value;
+    const tipoExame = document.getElementById('filterTipoExame').value;
+    const tipoLeucemia = document.getElementById('filterTipoLeucemia').value;
 
     filtrados = analises.filter(a => {
+      const matchPaciente = a.nome.toLowerCase().includes(q);
+      const cpfBusca = q.replace(/\D/g, '');
+      const matchCpf = cpfBusca !== '' && (a.cpf || '').includes(cpfBusca);
 
-    const matchPaciente =
-        a.nome.toLowerCase().includes(q) ||
-        a.cpf.includes(q) ||
-        String(a.id_exame).includes(q);
-
-          return matchPaciente &&
-              (!suspeita || a.suspeita_ia === suspeita) &&
-              (!status || a.statusc === status);
-
+      return (matchPaciente || matchCpf) &&
+          (!suspeita || a.suspeita_ia === suspeita) &&
+          (!tipoExame || a.tipo_exame === tipoExame) &&
+          (!tipoLeucemia || (a.tipo_leucemia_ia || 'Não identificado') === tipoLeucemia);
     });
     renderTabela(filtrados);
   }
@@ -410,7 +560,7 @@
 
     HematoAI.confirmDialog(
 
-        `Deseja excluir a análise IA <strong>#${id}</strong>?`,
+        `Deseja excluir a análise IA?<br>Esta ação não pode ser desfeita.`,
 
         () => excluirAnalise(id)
 
@@ -420,7 +570,8 @@
 
   document.getElementById('searchAnalise').addEventListener('input', aplicarFiltros);
   document.getElementById('filterSuspeita').addEventListener('change', aplicarFiltros);
-  document.getElementById('filterStatus').addEventListener('change', aplicarFiltros);
+  document.getElementById('filterTipoExame').addEventListener('change', aplicarFiltros);
+  document.getElementById('filterTipoLeucemia').addEventListener('change', aplicarFiltros);
   document.getElementById('btnRecarregar').addEventListener('click', carregar);
 
   // ============================================
@@ -442,33 +593,48 @@
     if (!a) {
       document.getElementById('detalheBody').innerHTML = '<p style="color:var(--red);padding:20px">Análise não encontrada.</p>';
     } else {
-      const paciente = a;
       document.getElementById('detalheBody').innerHTML = `
-        <div class="detail-grid">
-          <span class="detail-key">ID</span>
-          <span class="detail-value" style="font-family:var(--font-mono)">#${a.id_analise}</span>
-          <span class="detail-key">Paciente</span>
-          <span class="detail-value" style="font-weight:600">${a.nome}</span>
-          <span class="detail-key">CPF</span>
-          <span class="detail-value" style="font-family:var(--font-mono)">${formatarCPF(a.cpf)}</span>
-          <span class="detail-key">Data da Consulta</span>
-          <span class="detail-value">${formatarDataHora(a.data_consulta)}</span>
-          <span class="detail-key">ID Exame</span>
-          <span class="detail-value" style="font-family:var(--font-mono);color:var(--blue)">#${a.id_exame}</span>
-          <span class="detail-key">Tipo de Exame</span>
-          <span class="detail-value">${tipoBadge(a.tipo_exame)}</span>
-          <span class="detail-key">Suspeita</span>
-          <span class="detail-value">${suspeitaBadge(a.suspeita_ia)}</span>
-          <span class="detail-key">Tipo Leucemia</span>
-          <span class="detail-value"><span class="badge badge-purple">${a.tipo_leucemia_ia || 'Não identificado'}</span></span>
-          <span class="detail-key">Confiança</span>
-          <span class="detail-value" style="font-weight:700;color:${a.confianca >= 80 ? '#15803d' : a.confianca >= 50 ? '#d97706' : '#94a3b8'}">${a.confianca ? a.confianca + '%' : '—'}</span>
-          <span class="detail-key">Status</span>
-          <span class="detail-value">${statusPill(a.statusc)}</span>
-          <span class="detail-key">Data</span>
-          <span class="detail-value">${formatarData(a.data_analise)}</span>
-          <span class="detail-key">Resultado IA</span>
-          <span class="detail-value"><div class="resultado-texto">${a.resultado_ia}</div></span>
+        <!-- Painel: Informações do Paciente -->
+        <div class="detalhe-panel">
+          <div class="panel-title">Informações do Paciente</div>
+          <div class="grid">
+            <span class="label">Paciente</span>
+            <span class="valor" style="font-weight:600;">${a.nome}</span>
+            <span class="label">CPF</span>
+            <span class="valor" style="font-family:var(--font-mono);">${formatarCPF(a.cpf)}</span>
+          </div>
+        </div>
+
+        <!-- Painel: Informações da Consulta -->
+        <div class="detalhe-panel">
+          <div class="panel-title">Informações da Consulta</div>
+          <div class="grid">
+            <span class="label">Data da Consulta</span>
+            <span class="valor">${formatarDataHora(a.data_consulta)}</span>
+            <span class="label">Tipo de Exame</span>
+            <span class="valor">${tipoBadge(a.tipo_exame)}</span>
+          </div>
+        </div>
+
+        <!-- Painel: Informações Retornadas pela IA -->
+        <div class="detalhe-panel">
+          <div class="panel-title">Informações Retornadas pela IA</div>
+          <div class="grid">
+            <span class="label">Suspeita</span>
+            <span class="valor">${suspeitaBadge(a.suspeita_ia)}</span>
+            <span class="label">Tipo de Leucemia</span>
+            <span class="valor"><span class="badge badge-purple" style="font-size:0.9rem;padding:4px 14px;">${a.tipo_leucemia_ia || 'Não identificado'}</span></span>
+            <span class="label">Confiança</span>
+            <span class="valor" style="font-weight:700;color:${a.confianca >= 80 ? '#15803d' : a.confianca >= 50 ? '#d97706' : '#94a3b8'}">${a.confianca ? a.confianca + '%' : '—'}</span>
+            <span class="label">Data da Análise</span>
+            <span class="valor">${formatarData(a.data_analise)}</span>
+          </div>
+        </div>
+
+        <!-- Painel: Resultado da IA -->
+        <div class="detalhe-panel">
+          <div class="panel-title">Resultado da IA</div>
+          <div class="resultado-texto">${a.resultado_ia}</div>
         </div>
       `;
     }
@@ -491,14 +657,11 @@
     const conteudoPDF = `
 HEMATOAI - RELATÓRIO DE ANÁLISE IA
 =============================================
-ID da Análise: #${a.id_analise}
 Paciente: ${a.nome}
 CPF: ${formatarCPF(a.cpf)}
 Data da Consulta: ${formatarDataHora(a.data_consulta)}
-ID do Exame: #${a.id_exame}
 Tipo de Exame: ${a.tipo_exame}
 Data da Análise: ${formatarData(a.data_analise)}
-Status: ${a.statusc}
 
 ---------------------------------------------
 RESULTADO DA ANÁLISE:
@@ -514,8 +677,6 @@ Este relatório é gerado automaticamente pelo sistema HematoAI.
 Consulte um especialista para validação do diagnóstico.
 `;
 
-    // O conteúdo aqui é texto puro, não um PDF. Salvá-lo como .pdf gera um
-    // arquivo que nenhum leitor consegue abrir, por isso baixamos como .txt.
     const blob = new Blob([conteudoPDF], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const aLink = document.createElement('a');
@@ -535,9 +696,6 @@ Consulte um especialista para validação do diagnóstico.
   
   document.getElementById('closeModalDetalhes').addEventListener('click', () => HematoAI.closeModal(document.getElementById('modalDetalhes')));
   document.getElementById('fecharDetalhes').addEventListener('click', () => HematoAI.closeModal(document.getElementById('modalDetalhes')));
-  // ============================================
-  // INICIALIZAÇÃO
-  // ============================================
   
   carregar();
   verificarPerfil("Médico");

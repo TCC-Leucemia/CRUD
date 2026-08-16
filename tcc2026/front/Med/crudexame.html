@@ -18,7 +18,7 @@
       padding: 10px 14px;
       border: 1.5px solid var(--border);
       border-radius: 40px;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       background: var(--surface);
       color: var(--text-1);
       font-family: var(--font);
@@ -31,6 +31,47 @@
       box-shadow: 0 0 0 3px rgba(185,28,28,0.08);
     }
 
+    /* ── Barra de pesquisa estilo botão ── */
+    .search-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+
+    .search-wrapper input {
+      padding: 10px 14px 10px 40px;
+      border: 1.5px solid var(--border);
+      border-radius: 40px;
+      font-size: 0.9rem;
+      background: var(--surface);
+      color: var(--text-1);
+      font-family: var(--font);
+      outline: none;
+      width: 100%;
+      min-width: 200px;
+      transition: var(--transition);
+    }
+
+    .search-wrapper input:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(185,28,28,0.08);
+    }
+
+    .search-wrapper input::placeholder {
+      color: var(--text-3);
+      font-weight: 400;
+    }
+
+    .search-wrapper .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-3);
+      pointer-events: none;
+      font-size: 1rem;
+      line-height: 1;
+    }
+
     /* Status pills */
     .status-pill {
       display: inline-flex;
@@ -38,7 +79,7 @@
       gap: 5px;
       padding: 3px 10px;
       border-radius: 20px;
-      font-size: 0.72rem;
+      font-size: 0.8rem;
       font-weight: 700;
       white-space: nowrap;
     }
@@ -61,7 +102,7 @@
       display: inline-block;
       padding: 3px 10px;
       border-radius: 20px;
-      font-size: 0.72rem;
+      font-size: 0.8rem;
       font-weight: 700;
     }
 
@@ -87,7 +128,7 @@
       display: grid;
       grid-template-columns: 160px 1fr;
       gap: 10px 16px;
-      font-size: 0.875rem;
+      font-size: 0.95rem;
     }
     .detail-key   { color: var(--text-2); font-weight: 600; }
     .detail-value { color: var(--text-1); }
@@ -98,14 +139,14 @@
       border: 1px solid #bfdbfe;
       border-radius: var(--radius-lg);
       padding: 14px 16px;
-      font-size: 0.82rem;
+      font-size: 0.9rem;
       color: var(--blue);
       line-height: 1.6;
       margin-bottom: 18px;
     }
 
     .field-hint {
-      font-size: 0.72rem;
+      font-size: 0.8rem;
       color: var(--text-3);
       margin-top: 3px;
     }
@@ -137,19 +178,19 @@
     }
 
     .tipo-option-label {
-      font-size: 0.85rem;
+      font-size: 0.95rem;
       font-weight: 700;
       color: var(--text-1);
       margin-top: 8px;
     }
 
     .tipo-option-sub {
-      font-size: 0.72rem;
+      font-size: 0.8rem;
       color: var(--text-3);
       margin-top: 4px;
     }
 
-    /* ── Seletor de consultas (Novo) ── */
+    /* ── Seletor de consultas ── */
     .consulta-selector {
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
@@ -165,10 +206,10 @@
 
     .consulta-selector .search-wrapper input {
       width: 100%;
-      padding: 8px 14px 8px 36px;
+      padding: 10px 14px 10px 40px;
       border: 1.5px solid var(--border);
       border-radius: 40px;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       background: var(--surface);
       color: var(--text-1);
       outline: none;
@@ -182,10 +223,10 @@
 
     .consulta-selector .search-wrapper .lupa {
       position: absolute;
-      left: 12px;
+      left: 14px;
       top: 50%;
       transform: translateY(-50%);
-      font-size: 0.95rem;
+      font-size: 1rem;
       color: var(--text-3);
     }
 
@@ -200,7 +241,7 @@
     .consulta-tabela-wrapper table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.8rem;
+      font-size: 0.9rem;
     }
 
     .consulta-tabela-wrapper thead {
@@ -214,7 +255,7 @@
       padding: 8px 12px;
       text-align: left;
       font-weight: 700;
-      font-size: 0.7rem;
+      font-size: 0.8rem;
       text-transform: uppercase;
       color: var(--text-2);
       border-bottom: 1px solid var(--border);
@@ -242,8 +283,8 @@
     }
 
     .consulta-tabela-wrapper .btn-selecionar {
-      padding: 2px 12px;
-      font-size: 0.7rem;
+      padding: 4px 14px;
+      font-size: 0.8rem;
       border-radius: 30px;
     }
 
@@ -264,7 +305,7 @@
       display: grid;
       grid-template-columns: 100px 1fr;
       gap: 4px 16px;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
     }
 
     .resumo-consulta .grid .label {
@@ -295,7 +336,7 @@
       display: grid;
       grid-template-columns: 120px 1fr;
       gap: 4px 16px;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
     }
 
     .consulta-info-card .grid .label {
@@ -319,7 +360,7 @@
 
     @media (max-width: 600px) {
       .consulta-tabela-wrapper table {
-        font-size: 0.7rem;
+        font-size: 0.8rem;
       }
       .consulta-tabela-wrapper th,
       .consulta-tabela-wrapper td {
@@ -330,6 +371,80 @@
         grid-template-columns: 1fr 1fr;
         gap: 4px 8px;
       }
+      .search-wrapper input {
+        min-width: 150px;
+        font-size: 0.85rem;
+        padding: 10px 12px 10px 36px;
+      }
+      .search-wrapper .search-icon {
+        left: 12px;
+        font-size: 0.9rem;
+      }
+    }
+
+    /* ── Botões de ação na tabela ── */
+    .td-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .td-actions .btn {
+      font-size: 0.8rem;
+      padding: 5px 12px;
+      border-radius: 30px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    .td-actions .btn i {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* Botão Ver (estilo ghost) */
+    .td-actions .btn-ver {
+      background: transparent;
+      border: 1.5px solid var(--border);
+      color: var(--text-2);
+    }
+
+    .td-actions .btn-ver:hover {
+      border-color: var(--red);
+      color: var(--red);
+      background: var(--red-light);
+    }
+
+    /* Botão Editar (estilo outline) */
+    .td-actions .btn-editar {
+      background: transparent;
+      border: 1.5px solid var(--red);
+      color: var(--red);
+    }
+
+    .td-actions .btn-editar:hover {
+      background: var(--red);
+      color: white;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(185,28,28,0.3);
+    }
+
+    /* Botão Excluir (estilo danger - fundo vermelho) */
+    .td-actions .btn-excluir {
+      background: var(--red);
+      border: 1.5px solid var(--red);
+      color: white;
+    }
+
+    .td-actions .btn-excluir:hover {
+      background: var(--red-dark);
+      border-color: var(--red-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(185,28,28,0.4);
     }
 
     /* ── Nova seção: Resultado da Análise IA ── */
@@ -340,7 +455,7 @@
     }
     .resultado-ia-section .section-title {
       font-weight: 700;
-      font-size: 0.85rem;
+      font-size: 0.95rem;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       color: var(--text-2);
@@ -360,7 +475,7 @@
       margin-bottom: 0;
     }
     .resultado-ia-card .ia-label {
-      font-size: 0.7rem;
+      font-size: 0.8rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.4px;
@@ -369,7 +484,7 @@
       margin-bottom: 2px;
     }
     .resultado-ia-card .ia-value {
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       color: var(--text-1);
       font-weight: 500;
       padding: 4px 0;
@@ -382,6 +497,7 @@
       border-bottom: none;
       white-space: pre-wrap;
       line-height: 1.5;
+      text-align: left !important;
     }
 
     /* Sem dados */
@@ -400,7 +516,7 @@
       margin-bottom: 4px;
     }
     .ia-sem-dados small {
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       opacity: 0.8;
     }
     .dark-mode .ia-sem-dados {
@@ -419,7 +535,7 @@
     }
     .imagens-exame-section .secao-titulo {
       font-weight: 700;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       color: var(--text-2);
       margin-bottom: 10px;
     }
@@ -449,20 +565,20 @@
       cursor: zoom-in;
     }
     .imagem-thumb .aviso {
-      font-size: 0.75rem;
+      font-size: 0.8rem;
       color: var(--text-3);
       text-align: center;
       padding: 0 8px;
     }
     .imagem-card .meta {
       padding: 8px 10px;
-      font-size: 0.72rem;
+      font-size: 0.8rem;
       color: var(--text-2);
       line-height: 1.5;
       border-top: 1px solid var(--border);
     }
     .imagens-status {
-      font-size: 0.82rem;
+      font-size: 0.9rem;
       color: var(--text-3);
       text-align: center;
       padding: 14px 0;
@@ -486,6 +602,64 @@
       max-height: 100%;
       border-radius: var(--radius-md);
       box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    }
+
+    /* Aumentar fontes da tabela */
+    .table-wrapper table th {
+      font-size: 0.85rem;
+      padding: 12px 16px;
+    }
+    .table-wrapper table td {
+      font-size: 0.9rem;
+      padding: 12px 16px;
+    }
+    .table-wrapper table td .btn {
+      font-size: 0.8rem;
+    }
+
+    /* Aumentar fontes do header */
+    .page-header h1 {
+      font-size: 1.8rem;
+    }
+    .page-header p {
+      font-size: 1rem;
+    }
+
+    /* Aumentar fontes do card */
+    .card-title {
+      font-size: 1.1rem;
+    }
+
+    /* Aumentar fontes do modal */
+    .modal-header h2 {
+      font-size: 1.4rem;
+    }
+    .modal-body label {
+      font-size: 0.9rem;
+    }
+    .modal-body input,
+    .modal-body select,
+    .modal-body textarea {
+      font-size: 0.95rem;
+      padding: 12px 16px;
+    }
+
+    /* Alinhar resultado à esquerda - FORÇADO */
+    #resultadoContainer .resultado-ia-card .ia-value.observacoes {
+      text-align: left !important;
+    }
+
+    /* Garantir que o container do resultado também esteja alinhado à esquerda */
+    #resultadoContainer {
+      text-align: left;
+    }
+
+    #resultadoContainer .resultado-ia-card {
+      text-align: left;
+    }
+
+    #resultadoContainer .resultado-ia-card .ia-item {
+      text-align: left;
     }
   </style>
 </head>
@@ -513,8 +687,9 @@
         <div class="card-header">
           <span class="card-title">Lista de Exames</span>
           <div class="filter-row">
-            <div class="search-bar" style="max-width:240px">
-              <input type="text" id="searchExame" placeholder="Paciente, CPF ou ID...">
+            <div class="search-wrapper">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="searchExame" placeholder="Buscar por paciente, CPF ou data...">
             </div>
             <select id="filterTipo" class="filter-select">
               <option value="">Todos os tipos</option>
@@ -530,8 +705,6 @@
             <select id="sortExame" class="filter-select" aria-label="Ordenar por">
               <option value="data_desc">Ordenar por: Data mais recente</option>
               <option value="data_asc">Data mais antiga</option>
-              <option value="id_asc">ID crescente</option>
-              <option value="id_desc">ID decrescente</option>
               <option value="nome_asc">Paciente A-Z</option>
               <option value="nome_desc">Paciente Z-A</option>
             </select>
@@ -554,7 +727,6 @@
           <table>
             <thead>
               <tr>
-                <th>ID</th>
                 <th>Paciente</th>
                 <th>CPF</th>
                 <th>Data Consulta</th>
@@ -571,7 +743,7 @@
               <path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/>
             </svg>
             <p>Nenhum exame encontrado.</p>
-            <p style="font-size:0.78rem;color:var(--text-3);margin-top:4px">Ajuste os filtros ou cadastre um novo exame.</p>
+            <p style="font-size:0.9rem;color:var(--text-3);margin-top:4px">Ajuste os filtros ou cadastre um novo exame.</p>
           </div>
         </div>
       </div>
@@ -599,13 +771,12 @@
           <div class="consulta-selector">
             <div class="search-wrapper">
               <span class="lupa">🔍</span>
-              <input type="text" id="searchConsulta" placeholder="Pesquisar por paciente, CPF, ID ou data...">
+              <input type="text" id="searchConsulta" placeholder="Pesquisar por paciente, CPF ou data...">
             </div>
             <div class="consulta-tabela-wrapper" id="consultaTabelaWrapper">
               <table>
                 <thead>
                   <tr>
-                    <th>ID</th>
                     <th>Paciente</th>
                     <th>CPF</th>
                     <th>Data</th>
@@ -616,7 +787,7 @@
               </table>
             </div>
             <div class="resumo-consulta" id="resumoConsulta">
-              <div style="font-weight:700;font-size:0.8rem;color:var(--text-2);margin-bottom:6px;">Consulta selecionada</div>
+              <div style="font-weight:700;font-size:0.9rem;color:var(--text-2);margin-bottom:6px;">Consulta selecionada</div>
               <div class="grid">
                 <span class="label">Paciente</span>
                 <span class="valor" id="resumoPaciente">—</span>
@@ -624,8 +795,6 @@
                 <span class="valor" id="resumoCpf">—</span>
                 <span class="label">Data</span>
                 <span class="valor" id="resumoData">—</span>
-                <span class="label">ID</span>
-                <span class="valor destaque" id="resumoId">—</span>
               </div>
             </div>
           </div>
@@ -644,8 +813,6 @@
               <span class="valor" id="infoCpf">—</span>
               <span class="label">Data</span>
               <span class="valor" id="infoData">—</span>
-              <span class="label">ID</span>
-              <span class="valor destaque" id="infoId">—</span>
             </div>
           </div>
         </div>
@@ -653,7 +820,7 @@
 
       <!-- ─── Tipo de Exame ─── -->
       <div style="margin-bottom:20px;">
-        <label style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:var(--text-2);display:block;margin-bottom:10px;">Tipo de Exame *</label>
+        <label style="font-size:0.85rem;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:var(--text-2);display:block;margin-bottom:10px;">Tipo de Exame *</label>
         <div class="tipo-selector">
           <div class="tipo-option" id="tipoHemograma" onclick="selecionarTipo('Hemograma')">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#b91c1c" stroke-width="1.5" style="margin:0 auto;display:block">
@@ -718,13 +885,10 @@
       <div class="resultado-ia-section" id="resultadoIaSecao">
         <div class="section-title">Resultado</div>
         <div id="resultadoIaConteudo">
-          <!-- Conteúdo será exibido via JavaScript futuramente -->
-          <!-- Por enquanto, placeholder estático com mensagem de "sem dados" -->
           <div class="ia-sem-dados" id="resultadoSemDados">
             <strong>Nenhum resultado disponível para este exame.</strong>
             <small>O exame ainda não foi emitido pelo médico.</small>
           </div>
-          <!-- Estrutura oculta para quando houver dados (será exibida via JS) -->
           <div class="resultado-ia-card" id="resultadoIaCard" style="display:none;">
             <div class="ia-item">
               <span class="ia-label">Classificação</span>
@@ -784,6 +948,12 @@
 
   function formatarData(iso) {
     if (!iso) return '—';
+    const d = new Date(iso);
+    return d.toLocaleDateString('pt-BR');
+  }
+
+  function formatarDataBusca(iso) {
+    if (!iso) return '';
     const d = new Date(iso);
     return d.toLocaleDateString('pt-BR');
   }
@@ -861,10 +1031,9 @@
 
     if (filtroLower) {
       lista = consultas.filter(c => {
-        const dataStr = c.data_consulta ? formatarDataHora(c.data_consulta) : '';
+        const dataStr = c.data_consulta ? formatarDataBusca(c.data_consulta) : '';
         return (c.paciente || '').toLowerCase().includes(filtroLower) ||
                (c.cpf || '').includes(filtroLower) ||
-               String(c.id_consulta).includes(filtroLower) ||
                dataStr.includes(filtroLower);
       });
     }
@@ -872,7 +1041,7 @@
     if (lista.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="5" style="text-align:center;padding:20px;color:var(--text-3);">
+          <td colspan="4" style="text-align:center;padding:20px;color:var(--text-3);">
             Nenhuma consulta encontrada.
           </td>
         </tr>
@@ -886,10 +1055,9 @@
       if (isSelecionada) tr.classList.add('selecionada');
 
       tr.innerHTML = `
-        <td style="font-family:var(--font-mono);font-size:0.75rem;">#${c.id_consulta}</td>
         <td style="font-weight:600;">${c.paciente || '—'}</td>
-        <td style="font-family:var(--font-mono);font-size:0.75rem;">${formatarCPF(c.cpf)}</td>
-        <td style="font-size:0.8rem;">${c.data_consulta ? formatarDataHora(c.data_consulta) : '—'}</td>
+        <td style="font-family:var(--font-mono);font-size:0.85rem;">${formatarCPF(c.cpf)}</td>
+        <td style="font-size:0.85rem;">${c.data_consulta ? formatarDataHora(c.data_consulta) : '—'}</td>
         <td>
           <button class="btn btn-primary btn-sm btn-selecionar" onclick="selecionarConsulta(${c.id_consulta})">
             Selecionar
@@ -918,7 +1086,6 @@
     document.getElementById('resumoPaciente').textContent = consulta.paciente || '—';
     document.getElementById('resumoCpf').textContent = formatarCPF(consulta.cpf);
     document.getElementById('resumoData').textContent = consulta.data_consulta ? formatarDataHora(consulta.data_consulta) : '—';
-    document.getElementById('resumoId').textContent = '#' + consulta.id_consulta;
 
     document.getElementById('resumoConsulta').classList.add('ativo');
 
@@ -946,25 +1113,31 @@
     data.forEach(e => {
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td style="font-family:var(--font-mono);font-size:0.78rem;color:var(--text-3)">#${e.id_exame}</td>
-        <td style="font-weight:600;font-size:0.85rem;">${e.paciente || '—'}</td>
-        <td style="font-family:var(--font-mono);font-size:0.8rem;">${e.cpf || '—'}</td>
-        <td style="font-size:0.8rem;">${e.data_consulta ? formatarDataHora(e.data_consulta) : '—'}</td>
-        <td style="font-size:0.8rem;">
+        <td style="font-weight:600;font-size:0.95rem;">${e.paciente || '—'}</td>
+        <td style="font-family:var(--font-mono);font-size:0.9rem;">${e.cpf || '—'}</td>
+        <td style="font-size:0.9rem;">${e.data_consulta ? formatarDataHora(e.data_consulta) : '—'}</td>
+        <td style="font-size:0.9rem;">
             ${formatarDataHora(e.data_exame)}
         </td>
         <td>${tipoBadge(e.tipo_exame)}</td>
         <td>${statusPill(e.statusc)}</td>
         <td>
           <div class="td-actions">
-            <button class="btn btn-ghost btn-sm" onclick="abrirDetalhes(${e.id_exame})">Ver</button>
-            <button class="btn btn-ghost btn-sm" onclick="abrirEdicao(${e.id_exame})">Editar</button>
-            <button class="btn btn-danger btn-sm" onclick="confirmarExclusao(${e.id_exame})">Excluir</button>
+            <button class="btn btn-ver" onclick="abrirDetalhes(${e.id_exame})">Ver</button>
+            <button class="btn btn-editar" onclick="abrirEdicao(${e.id_exame})">
+              <i data-lucide="pencil"></i>
+              Editar
+            </button>
+            <button class="btn btn-excluir" onclick="confirmarExclusao(${e.id_exame})">
+              <i data-lucide="trash-2"></i>
+              Excluir
+            </button>
           </div>
         </td>
       `;
       tbody.appendChild(tr);
     });
+    lucide.createIcons();
   }
 
   /* ── Filtros ── */
@@ -975,10 +1148,10 @@
     const ordem  = document.getElementById('sortExame').value;
 
     filtrados = exames.filter(e => {
+      const dataExameStr = e.data_exame ? formatarDataBusca(e.data_exame) : '';
       const matchPaciente = (e.paciente || '').toLowerCase().includes(q) ||
                             (e.cpf || '').includes(q) ||
-                            String(e.id_exame).includes(q) ||
-                            String(e.id_consulta).includes(q);
+                            dataExameStr.includes(q);
       return matchPaciente &&
         (!tipo   || e.tipo_exame === tipo) &&
         (!status || e.statusc === status);
@@ -986,8 +1159,6 @@
     const comparar = (a, b) => String(a ?? '').localeCompare(String(b ?? ''), 'pt-BR', { sensitivity: 'base', numeric: true });
     filtrados.sort((a, b) => {
       if (ordem === 'data_asc') return (Date.parse(a.data_exame) || 0) - (Date.parse(b.data_exame) || 0);
-      if (ordem === 'id_asc') return Number(a.id_exame) - Number(b.id_exame);
-      if (ordem === 'id_desc') return Number(b.id_exame) - Number(a.id_exame);
       if (ordem === 'nome_asc') return comparar(a.paciente, b.paciente);
       if (ordem === 'nome_desc') return comparar(b.paciente, a.paciente);
       return (Date.parse(b.data_exame) || 0) - (Date.parse(a.data_exame) || 0);
@@ -1017,18 +1188,14 @@
     document.getElementById('tipoHemograma').classList.remove('selected');
     document.getElementById('tipoMielograma').classList.remove('selected');
 
-    // Mostra seletor, esconde card informativo
     document.getElementById('consultaSelector').classList.remove('hidden');
     document.getElementById('consultaInfo').classList.add('hidden');
 
-    // Reseta resumo
     document.getElementById('resumoConsulta').classList.remove('ativo');
     document.getElementById('resumoPaciente').textContent = '—';
     document.getElementById('resumoCpf').textContent = '—';
     document.getElementById('resumoData').textContent = '—';
-    document.getElementById('resumoId').textContent = '—';
 
-    // Carrega consultas e renderiza lista
     await carregarConsultas();
 
     const agora = new Date();
@@ -1115,7 +1282,7 @@
     idEdicao = id;
     tipoSelecionado = e.tipo_exame;
 
-    document.getElementById('modalTitulo').textContent = `Editar Exame #${id}`;
+    document.getElementById('modalTitulo').textContent = `Editar Exame`;
     document.getElementById('infoBox').style.display = 'none';
     document.getElementById('eConsultaId').value = e.id_consulta;
     document.getElementById('eTipo').value = e.tipo_exame;
@@ -1133,17 +1300,13 @@
     }
     document.getElementById('eData').removeAttribute('min');
 
-    // ─── Modo edição: esconde seletor, mostra card informativo ───
     document.getElementById('consultaSelector').classList.add('hidden');
     document.getElementById('consultaInfo').classList.remove('hidden');
 
-    // Preenche card com os dados da consulta original (do exame)
     document.getElementById('infoPaciente').textContent = e.paciente || '—';
     document.getElementById('infoCpf').textContent = e.cpf ? formatarCPF(e.cpf) : '—';
     document.getElementById('infoData').textContent = e.data_consulta ? formatarDataHora(e.data_consulta) : '—';
-    document.getElementById('infoId').textContent = '#' + e.id_consulta;
 
-    // Garante que não há seleção de consulta ativa (para evitar conflitos)
     consultaSelecionada = null;
     document.getElementById('resumoConsulta').classList.remove('ativo');
 
@@ -1212,13 +1375,11 @@
       card.innerHTML = `
         <div class="imagem-thumb"><span class="aviso">Carregando...</span></div>
         <div class="meta">
-          <strong>#${img.id_imagem}</strong> · ${img.descricao || 'Imagem do exame'}<br>
-          Upload: ${formatarData(img.data_upload)}
+          ${img.descricao || 'Imagem do exame'} · Upload: ${formatarData(img.data_upload)}
         </div>
       `;
       grid.appendChild(card);
 
-      // O arquivo exige o token, então é buscado como blob em vez de src direto.
       try {
         const respostaArquivo = await fetch(
           `http://localhost:3000/imagens-exame/${img.id_imagem}/arquivo`,
@@ -1267,12 +1428,8 @@
       return;
     }
 
-    // Carrega primeiro os dados básicos do exame
     document.getElementById('detalheBody').innerHTML = `
       <div class="detail-grid">
-        <span class="detail-key">ID do Exame</span>
-        <span class="detail-value" style="font-family:var(--font-mono)">#${e.id_exame}</span>
-
         <span class="detail-key">Paciente</span>
         <span class="detail-value" style="font-weight:600">${e.paciente || '—'}</span>
 
@@ -1284,11 +1441,6 @@
         <span class="detail-key">Data da Consulta</span>
         <span class="detail-value">
           ${e.data_consulta ? formatarDataHora(e.data_consulta) : '—'}
-        </span>
-
-        <span class="detail-key">ID da Consulta</span>
-        <span class="detail-value" style="font-family:var(--font-mono)">
-          #${e.id_consulta}
         </span>
 
         <span class="detail-key">Tipo de Exame</span>
@@ -1330,7 +1482,6 @@
     limparUrlsImagens();
     carregarImagensExame(e.id_exame, 'imagensExameContainer');
 
-    // Agora busca o resultado no back
     try {
 
       const response = await fetch("http://localhost:3000/resultados-exame", {
@@ -1422,7 +1573,7 @@
   /* ── Excluir ── */
   function confirmarExclusao(id) {
     HematoAI.confirmDialog(
-      `Deseja excluir o exame <strong>#${id}</strong>?<br>Esta ação não pode ser desfeita.`,
+      `Deseja excluir o exame?<br>Esta ação não pode ser desfeita.`,
       async () => {
         try {
           const response = await fetch("http://localhost:3000/exames/" + id, {
