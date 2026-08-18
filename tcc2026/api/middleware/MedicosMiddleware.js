@@ -48,7 +48,7 @@ module.exports = class MedicosMiddleware {
             throw new ErrorResponse(400, "Caracteres inválidos detectados");
         }
 
-
+        console.log("CRM recebido:", JSON.stringify(crm), "tipo:", typeof crm);
         const crmRegex = /^\d{4,11}$/;
 
         if (!crmRegex.test(crm)) {

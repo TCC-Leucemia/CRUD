@@ -81,7 +81,7 @@ module.exports = class ConsultasMiddleware {
         }
 
         const crmRegex = /^\d{4,11}$/;
-
+        console.log("CRM recebido:", JSON.stringify(crm), "tipo:", typeof crm);
         if (!crmRegex.test(crm)) {
             throw new ErrorResponse(400, "CRM inválido");
         }
