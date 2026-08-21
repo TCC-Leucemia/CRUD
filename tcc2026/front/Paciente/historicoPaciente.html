@@ -455,6 +455,7 @@
 <script src="../JS/auth.js"></script>
 <script src="../JS/api.js"></script>
 <script src="../JS/navbar.js"></script>
+<script src="../JS/popup-erro.js"></script>
 <script>
 
 let CONSULTAS = [];
@@ -493,7 +494,7 @@ async function carregarConsultas() {
         console.log("Resposta da API:", dados);
 
         if (!dados.status) {
-            HematoAI.showToast("Erro ao carregar consultas", "error");
+            mostrarErro("Erro ao carregar consultas");
             return;
         }
 
@@ -519,10 +520,7 @@ async function carregarConsultas() {
 
         console.error(e);
 
-        HematoAI.showToast(
-            "Erro ao carregar consultas",
-            "error"
-        );
+        mostrarErro("Erro ao carregar consultas");
     }
   }
 
@@ -547,10 +545,7 @@ async function carregarConsultas() {
 
         if (!dados.status) {
 
-            HematoAI.showToast(
-                "Erro ao carregar exames",
-                "error"
-            );
+            mostrarErro("Erro ao carregar exames");
 
             return;
         }
@@ -585,10 +580,7 @@ async function carregarConsultas() {
 
         console.error(e);
 
-        HematoAI.showToast(
-            "Erro ao carregar exames",
-            "error"
-        );
+        mostrarErro("Erro ao carregar exames");
     }
   }
 

@@ -849,6 +849,7 @@
 <script src="../JS/api.js"></script>
 <script src="../JS/auth.js"></script>
 <script src="../JS/navbar.js"></script>
+<script src="../JS/popup-erro.js"></script>
 <script>
   // ============================================================
   //  SESSÃO E SIDEBAR
@@ -976,7 +977,7 @@
     const resp = await get("/pacientes");
     const dados = await resp.json();
     if (!resp.ok) {
-      HematoAI.showToast(dados.msg || "Erro ao carregar pacientes.", "error");
+      mostrarErro(dados.msg || "Erro ao carregar pacientes.");
       return;
     }
     pacientes = dados.dados || [];
@@ -987,7 +988,7 @@
     const resp = await get("/medicos");
     const dados = await resp.json();
     if (!resp.ok) {
-      HematoAI.showToast(dados.msg || "Erro ao carregar médicos.", "error");
+      mostrarErro(dados.msg || "Erro ao carregar médicos.");
       return;
     }
     medicos = dados.dados || [];
@@ -998,7 +999,7 @@
     const resp = await get("/consultas");
     const dados = await resp.json();
     if (!resp.ok) {
-      HematoAI.showToast(dados.msg || "Erro ao carregar consultas.", "error");
+      mostrarErro(dados.msg || "Erro ao carregar consultas.");
       return;
     }
     consultas = dados.dados || [];
@@ -1354,7 +1355,7 @@
         currentYear = novoAno;
         renderCalendar();
       } else {
-        alert('Ano inválido. Use entre 2000 e 2100.');
+        mostrarErro('Ano inválido. Use um valor entre 2000 e 2100.');
       }
       document.body.removeChild(overlay);
     });
@@ -1459,19 +1460,19 @@
     const status = document.getElementById('cStatus').value;
 
     if (!cpf || cpf.length !== 11) {
-      HematoAI.showToast('Selecione um paciente válido.', 'error');
+      mostrarErro('Selecione um paciente válido.');
       return;
     }
     if (!crm) {
-      HematoAI.showToast('Selecione um médico válido.', 'error');
+      mostrarErro('Selecione um médico válido.');
       return;
     }
     if (!data) {
-      HematoAI.showToast('Selecione uma data e hora para a consulta.', 'error');
+      mostrarErro('Selecione uma data e hora para a consulta.');
       return;
     }
     if (!status) {
-      HematoAI.showToast('Selecione o status.', 'error');
+      mostrarErro('Selecione o status.');
       return;
     }
 
@@ -1492,7 +1493,7 @@
       }
       const dados = await resp.json();
       if (!resp.ok) {
-        HematoAI.showToast(dados.msg || 'Erro ao salvar consulta.', 'error');
+        mostrarErro(dados.msg || 'Erro ao salvar consulta.');
         return;
       }
       HematoAI.showToast(
@@ -1503,7 +1504,7 @@
       await carregarConsultas();
     } catch (erro) {
       console.error(erro);
-      HematoAI.showToast('Erro ao conectar ao servidor.', 'error');
+      mostrarErro('Erro ao conectar ao servidor.');
     }
   });
 
@@ -1578,7 +1579,7 @@
       const resp = await get('/consultas/' + id);
       const dados = await resp.json();
       if (!resp.ok) {
-        HematoAI.showToast(dados.msg || 'Erro ao carregar consulta.', 'error');
+        mostrarErro(dados.msg || 'Erro ao carregar consulta.');
         return;
       }
       const c = dados.dados;
@@ -1607,7 +1608,7 @@
       HematoAI.openModal(document.getElementById('modalDetalhes'));
     } catch (erro) {
       console.error(erro);
-      HematoAI.showToast('Erro ao conectar ao servidor.', 'error');
+      mostrarErro('Erro ao conectar ao servidor.');
     }
   }
 
@@ -1633,14 +1634,14 @@
           const resp = await del('/consultas/' + id);
           const dados = await resp.json();
           if (!resp.ok) {
-            HematoAI.showToast(dados.msg || 'Erro ao excluir consulta.', 'error');
+            mostrarErro(dados.msg || 'Erro ao excluir consulta.');
             return;
           }
           HematoAI.showToast('Consulta excluída com sucesso.', 'success');
           await carregarConsultas();
         } catch (erro) {
           console.error(erro);
-          HematoAI.showToast('Erro ao conectar ao servidor.', 'error');
+          mostrarErro('Erro ao conectar ao servidor.');
         }
       }
     );

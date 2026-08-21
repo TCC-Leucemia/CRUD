@@ -357,6 +357,7 @@
         <p>HematoAI · Sistema de apoio ao diagnóstico hematológico · Segurança e confidencialidade</p>
     </footer>
 </div>
+<script src="JS/popup-erro.js"></script>
 <script src="JS/api.js"></script>
 <script>
     
@@ -399,7 +400,7 @@
                     window.location.href = "Paciente/paciente.html";
                     break;
                 default:
-                    alert("Perfil inválido");
+                    mostrarErro("Perfil de usuário inválido. Entre em contato com o suporte.");
             }
         }
 
@@ -421,7 +422,7 @@
                 const dados = await resposta.json();
 
                 if (!resposta.ok || !dados.status) {
-                    alert(dados.msg || "Login inválido");
+                    mostrarErro(dados.msg || "E-mail ou senha inválidos.", { titulo: "Login inválido" });
                     return;
                 }
 
@@ -433,7 +434,7 @@
                         : [];
 
                     if (typeof dados.tokenPerfil !== "string" || !dados.tokenPerfil || perfis.length < 2) {
-                        alert("Não foi possível iniciar a seleção de perfil. Tente entrar novamente.");
+                        mostrarErro("Não foi possível iniciar a seleção de perfil. Tente entrar novamente.");
                         return;
                     }
 
@@ -449,7 +450,7 @@
                 concluirLogin(dados);
             } catch (erro) {
                 console.error("Erro:", erro);
-                alert("Não foi possível conectar ao servidor.");
+                mostrarErro("Não foi possível conectar ao servidor.", { titulo: "Servidor indisponível" });
             }
         }
 

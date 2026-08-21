@@ -629,6 +629,7 @@
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="../JS/navbar.js"></script>
 <script src="../JS/auth.js"></script>
+<script src="../JS/popup-erro.js"></script>
 <script>
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -693,10 +694,7 @@ document.addEventListener('DOMContentLoaded', function () {
   btnCadastrarAnamnese.addEventListener('click', function () {
 
     if (!exameSelecionado || !exameSelecionado.id_consulta) {
-      HematoAI.showToast(
-        'Selecione um exame primeiro.',
-        'error'
-      );
+      mostrarErro('Selecione um exame primeiro.');
       return;
     }
 
@@ -864,10 +862,7 @@ document.addEventListener('DOMContentLoaded', function () {
         anamneseDisponivel = false;
         btnGerar.disabled = true;
 
-        HematoAI.showToast(
-            'Erro ao verificar a anamnese da consulta.',
-            'error'
-        );
+        mostrarErro('Erro ao verificar a anamnese da consulta.');
 
         return false;
     }
@@ -978,7 +973,7 @@ document.addEventListener('DOMContentLoaded', function () {
       const json = await response.json();
 
       if (!json.status) {
-        HematoAI.showToast(json.msg || 'Erro ao carregar exames.', 'error');
+        mostrarErro(json.msg || 'Erro ao carregar exames.');
         return;
       }
 
@@ -988,7 +983,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     } catch (error) {
       console.error('Erro ao carregar exames:', error);
-      HematoAI.showToast('Erro ao carregar exames.', 'error');
+      mostrarErro('Erro ao carregar exames.');
     }
   }
 
@@ -1019,7 +1014,7 @@ document.addEventListener('DOMContentLoaded', function () {
       imagensInput.files = files;
       handleFilePreview(files[0]);
     } else {
-      HematoAI.showToast('Por favor, envie apenas imagens (JPG, PNG, JPEG)', 'error');
+      mostrarErro('Por favor, envie apenas imagens (JPG, PNG, JPEG)');
     }
   });
 
@@ -1053,10 +1048,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // ============================================
   async function gerarLaudo() {
     if (!anamneseDisponivel) {
-        HematoAI.showToast(
-            'É necessário cadastrar a anamnese antes de realizar a análise pela IA.',
-            'error'
-        );
+        mostrarErro('É necessário cadastrar a anamnese antes de realizar a análise pela IA.');
         return;
     }
     console.log("INICIOU gerarLaudo");
@@ -1072,12 +1064,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const imagemFile = imagensInput.files[0];
 
     if (!nome || !idade || !sexo || !sintomas || !historico || !idExame) {
-      HematoAI.showToast('Preencha todos os campos da anamnese.', 'error');
+      mostrarErro('Preencha todos os campos da anamnese.');
       return;
     }
 
     if (!imagemFile) {
-      HematoAI.showToast('Selecione uma imagem da lâmina.', 'error');
+      mostrarErro('Selecione uma imagem da lâmina.');
       return;
     }
 
@@ -1139,7 +1131,7 @@ document.addEventListener('DOMContentLoaded', function () {
       console.error('❌ Erro:', error);
       laudoEl.textContent = `ERRO NA ANÁLISE\n\n${error.message}`;
       resultadosDiv.classList.remove('hidden');
-      HematoAI.showToast(error.message, 'error');
+      mostrarErro(error.message);
     } finally {
       btnGerar.innerHTML = textoOriginal;
       btnGerar.disabled  = false;
@@ -1151,7 +1143,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // ============================================
   function baixarPDF() {
     if (!pdfUrlAtual) {
-      HematoAI.showToast('Nenhum PDF disponível. Gere o laudo novamente.', 'error');
+      mostrarErro('Nenhum PDF disponível. Gere o laudo novamente.');
       return;
     }
 

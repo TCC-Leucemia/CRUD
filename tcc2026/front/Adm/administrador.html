@@ -258,21 +258,13 @@
 <script src="../JS/navbar.js"></script>
 <script src="../JS/auth.js"></script>
 <script src="../JS/api.js"></script>
+<script src="../JS/popup-erro.js"></script>
 <script>
+  verificarPerfil("Administrador");
+
   // ============================================
   // FUNÇÕES PARA GERENCIAMENTO (Quick Actions)
   // ============================================
-  const usuario = JSON.parse(localStorage.getItem("usuario"));
-
-  if (!usuario) {
-      window.location.href = "../login.html";
-  }
-
-  if (usuario.role !== "Administrador") {
-      alert("Acesso negado!");
-      window.location.href = "../login.html";
-  }
-
   function gerenciarMedicos() {
     window.location.href = 'crudmedico.html';
   }
@@ -306,7 +298,7 @@
       const dadosConsultas = await respConsultas.json();
 
       if (!respMedicos.ok || !respPacientes.ok || !respConsultas.ok) {
-        HematoAI.showToast("Erro ao carregar informações do Dashboard.", "error");
+        mostrarErro("Erro ao carregar informações do Dashboard.");
         return;
       }
 
@@ -321,7 +313,7 @@
 
     } catch (erro) {
       console.error(erro);
-      HematoAI.showToast("Erro ao conectar ao servidor.", "error");
+      mostrarErro("Erro ao conectar ao servidor.");
     }
   }
 
@@ -398,7 +390,6 @@
   
   // Carregar dados do dashboard
   carregarDadosDashboard();
-  verificarPerfil("Administrador");
 </script>
 </body>
 </html>

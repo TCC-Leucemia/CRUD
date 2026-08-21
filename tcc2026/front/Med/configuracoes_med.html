@@ -296,6 +296,7 @@
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="../JS/navbar.js"></script>
 <script src="../JS/auth.js"></script>
+<script src="../JS/popup-erro.js"></script>
 <script>
   const iconeOlho = `
     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -361,7 +362,7 @@
       medicoDados = dados.dados;
       preencherFormulario();
     } catch (erro) {
-      HematoAI.showToast(erro.message || "Erro ao conectar com o servidor.", "error");
+      mostrarErro(erro.message || "Erro ao conectar com o servidor.");
     }
   }
 
@@ -493,7 +494,7 @@
       HematoAI.initSidebar("config");
       HematoAI.showToast(dados.msg, "success");
     } catch (erro) {
-      HematoAI.showToast(erro.message || "Erro ao comunicar com o servidor.", "error");
+      mostrarErro(erro.message || "Erro ao comunicar com o servidor.");
     } finally {
       btnSalvar.disabled = false;
       btnSalvar.textContent = textoOriginal;

@@ -369,6 +369,7 @@
         <p>HematoAI · Sistema de apoio ao diagnóstico hematológico · Segurança e confidencialidade</p>
     </footer>
 </div>
+<script src="../JS/popup-erro.js"></script>
 <script>
     (function() {
         // Contato
@@ -472,7 +473,7 @@
 
                     }else{
 
-                        alert(dados.msg);
+                        mostrarErro(dados.msg);
 
                     }
 
@@ -480,7 +481,7 @@
 
                 .catch(() =>{
 
-                    alert("Erro ao alterar senha.");
+                    mostrarErro("Não foi possível alterar a senha. Tente novamente.");
 
                 });
             });

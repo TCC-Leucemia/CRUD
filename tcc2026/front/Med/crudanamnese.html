@@ -405,6 +405,8 @@
 
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="../JS/navbar.js"></script>
+<script src="../JS/auth.js"></script>
+<script src="../JS/popup-erro.js"></script>
 <script>
   
   HematoAI.initSidebar('anamnese');
@@ -670,7 +672,7 @@
     const comorbidades = document.getElementById('aComorbidades').value.trim();
 
     if (!sintomas) {
-      HematoAI.showToast('Os sintomas são obrigatórios.', 'error');
+      mostrarErro('Os sintomas são obrigatórios.');
       return;
     }
 
@@ -689,7 +691,7 @@
       // Criação
       const idConsulta = parseInt(document.getElementById('aIdConsulta').value);
       if (!idConsulta || !consultaSelecionada) {
-        HematoAI.showToast('Selecione uma consulta válida.', 'error');
+        mostrarErro('Selecione uma consulta válida.');
         return;
       }
 

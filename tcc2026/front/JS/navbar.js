@@ -216,6 +216,21 @@
     });
   }
 
+  /* ---------- Ícones dos avisos ---------- */
+  const ICONE_SAIR =
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" ' +
+    'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+    '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>' +
+    '<polyline points="16 17 21 12 16 7"></polyline>' +
+    '<line x1="21" y1="12" x2="9" y2="12"></line></svg>';
+
+  const ICONE_ATENCAO =
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" ' +
+    'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+    '<path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>' +
+    '<line x1="12" y1="9" x2="12" y2="13"></line>' +
+    '<line x1="12" y1="17" x2="12.01" y2="17"></line></svg>';
+
   /* ---------- Modal de Logout ---------- */
   function openLogoutModal() {
     let overlay = document.getElementById('logoutModal');
@@ -224,20 +239,22 @@
       overlay.id = 'logoutModal';
       overlay.className = 'modal-overlay';
       overlay.innerHTML = `
-        <div class="modal" style="max-width:420px">
+        <div class="modal modal-compacto">
           <div class="modal-header">
             <h2>Sair da conta</h2>
             <button class="btn-close-modal" id="closeLogout">✕</button>
           </div>
-          <div class="modal-body" style="text-align:center;padding:36px 26px 20px">
-            <div style="font-size:3rem;margin-bottom:14px">🚪</div>
-            <p style="font-size:1rem;font-weight:700;color:var(--text-1);margin-bottom:8px">
-              Deseja realmente sair?
-            </p>
-            <p style="font-size:0.85rem;color:var(--text-2);line-height:1.6">
-              Sua sessão será encerrada com segurança.<br>
-              Você precisará fazer login novamente para acessar o sistema.
-            </p>
+          <div class="modal-body">
+            <div class="aviso-compacto">
+              <span class="aviso-icone">${ICONE_SAIR}</span>
+              <div class="aviso-conteudo">
+                <p class="aviso-titulo">Deseja realmente sair?</p>
+                <p class="aviso-texto">
+                  Sua sessão será encerrada com segurança. Você precisará
+                  fazer login novamente para acessar o sistema.
+                </p>
+              </div>
+            </div>
           </div>
           <div class="modal-footer">
             <button class="btn btn-ghost" id="cancelLogout">Cancelar</button>
@@ -295,14 +312,18 @@
     overlay.id = 'confirmDialog';
     overlay.className = 'modal-overlay';
     overlay.innerHTML = `
-      <div class="modal" style="max-width:400px">
+      <div class="modal modal-compacto">
         <div class="modal-header">
           <h2>Confirmar ação</h2>
           <button class="btn-close-modal" id="closeConfirm">✕</button>
         </div>
-        <div class="modal-body" style="text-align:center;padding:30px 26px 16px">
-          <div style="font-size:2.5rem;margin-bottom:12px">⚠️</div>
-          <p style="font-size:0.9rem;color:var(--text-1);line-height:1.6">${message}</p>
+        <div class="modal-body">
+          <div class="aviso-compacto">
+            <span class="aviso-icone">${ICONE_ATENCAO}</span>
+            <div class="aviso-conteudo">
+              <p class="aviso-texto">${message}</p>
+            </div>
+          </div>
         </div>
         <div class="modal-footer">
           <button class="btn btn-ghost"  id="cancelConfirm">Cancelar</button>

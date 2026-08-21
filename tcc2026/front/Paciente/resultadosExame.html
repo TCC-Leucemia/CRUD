@@ -533,6 +533,7 @@
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="../JS/navbar.js"></script>
 <script src="../JS/auth.js"></script>
+<script src="../JS/popup-erro.js"></script>
 <script>
   // ============================================================
   //  CÓDIGO EXISTENTE (preservado integralmente)
@@ -548,14 +549,14 @@
       });
       const dados = await response.json();
       if (!dados.status) {
-        HematoAI.showToast("Erro ao carregar exames", "error");
+        mostrarErro("Erro ao carregar exames");
         return;
       }
       EXAMES = dados.dados;
       console.log(EXAMES);
     } catch (e) {
       console.error(e);
-      HematoAI.showToast("Erro ao carregar exames", "error");
+      mostrarErro("Erro ao carregar exames");
     }
   }
 

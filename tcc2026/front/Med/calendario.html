@@ -539,6 +539,7 @@
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="../JS/navbar.js"></script>
 <script src="../JS/auth.js"></script>
+<script src="../JS/popup-erro.js"></script>
 <script>
   let consultas = [];
   let mesAtual = new Date().getMonth();
@@ -675,10 +676,7 @@
 
         console.error(error);
 
-        HematoAI.showToast(
-            error.message,
-            "error"
-        );
+        mostrarErro(error.message);
 
     }
 
@@ -863,19 +861,19 @@
     // Formato dd/mm/aaaa
     const partes = input.split('/');
     if (partes.length !== 3) {
-      HematoAI.showToast('Formato inválido. Use dd/mm/aaaa.', 'error');
+      mostrarErro('Formato inválido. Use dd/mm/aaaa.');
       return;
     }
     const dia = parseInt(partes[0]);
     const mes = parseInt(partes[1]) - 1;
     const ano = parseInt(partes[2]);
     if (isNaN(dia) || isNaN(mes) || isNaN(ano) || dia < 1 || dia > 31 || mes < 0 || mes > 11 || ano < 1900) {
-      HematoAI.showToast('Data inválida.', 'error');
+      mostrarErro('Data inválida.');
       return;
     }
     const data = new Date(ano, mes, dia);
     if (data.getMonth() !== mes || data.getDate() !== dia) {
-      HematoAI.showToast('Data inválida.', 'error');
+      mostrarErro('Data inválida.');
       return;
     }
     // Navegar para o mês

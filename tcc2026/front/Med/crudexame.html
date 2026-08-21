@@ -920,6 +920,8 @@
 
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="../JS/navbar.js"></script>
+<script src="../JS/auth.js"></script>
+<script src="../JS/popup-erro.js"></script>
 <script>
   // =============================================================
   //  TODO O JAVASCRIPT EXISTENTE PERMANECE INALTERADO
@@ -990,7 +992,7 @@
       });
       const dados = await response.json();
       if (!dados.status) {
-        HematoAI.showToast(dados.msg, "error");
+        mostrarErro(dados.msg);
         return;
       }
       exames = dados.dados;
@@ -998,7 +1000,7 @@
       aplicarFiltros();
     } catch (erro) {
       console.error(erro);
-      HematoAI.showToast("Erro ao conectar ao servidor.", "error");
+      mostrarErro("Erro ao conectar ao servidor.");
     }
   }
 
@@ -1010,14 +1012,14 @@
       });
       const dados = await response.json();
       if (!dados.status) {
-        HematoAI.showToast(dados.msg, "error");
+        mostrarErro(dados.msg);
         return;
       }
       consultas = dados.dados;
       renderizarListaConsultas();
     } catch (erro) {
       console.error(erro);
-      HematoAI.showToast("Erro ao carregar consultas.", "error");
+      mostrarErro("Erro ao carregar consultas.");
     }
   }
 
@@ -1214,11 +1216,11 @@
     const status = document.getElementById('eStatus').value;
 
     if (!idConsulta) {
-      HematoAI.showToast('Selecione uma consulta.', 'error');
+      mostrarErro('Selecione uma consulta.');
       return;
     }
     if (!tipo) {
-      HematoAI.showToast('Selecione o tipo de exame.', 'error');
+      mostrarErro('Selecione o tipo de exame.');
       return;
     }
 
@@ -1256,7 +1258,7 @@
 
       const dados = await response.json();
       if (!dados.status) {
-        HematoAI.showToast(dados.msg, "error");
+        mostrarErro(dados.msg);
         return;
       }
 
@@ -1269,7 +1271,7 @@
 
     } catch (erro) {
       console.error(erro);
-      HematoAI.showToast("Erro ao conectar ao servidor.", "error");
+      mostrarErro("Erro ao conectar ao servidor.");
     }
   });
 
@@ -1582,14 +1584,14 @@
           });
           const dados = await response.json();
           if (!dados.status) {
-            HematoAI.showToast(dados.msg, "error");
+            mostrarErro(dados.msg);
             return;
           }
           HematoAI.showToast("Exame excluído com sucesso.", "success");
           await carregarExames();
         } catch (erro) {
           console.error(erro);
-          HematoAI.showToast("Erro ao conectar ao servidor.", "error");
+          mostrarErro("Erro ao conectar ao servidor.");
         }
       }
     );

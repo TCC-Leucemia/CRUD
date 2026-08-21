@@ -409,6 +409,7 @@
 <script src="../JS/navbar.js"></script>
 <script src="../JS/auth.js"></script>
 <script src="../JS/api.js"></script>
+<script src="../JS/popup-erro.js"></script>
 <script>
   if (!localStorage.getItem('hematoai_session')) {
     HematoAI.setSession({ tipo: 'Administrador', nome: 'Admin HematoAI' });
@@ -493,7 +494,7 @@
         });
       } else {
         if (typeof HematoAI !== 'undefined' && HematoAI.showToast) {
-          HematoAI.showToast('CEP não encontrado. Verifique o número digitado.', 'error');
+          mostrarErro('CEP não encontrado. Verifique o número digitado.');
         }
         document.getElementById('pRua').value = '';
         document.getElementById('pBairro').value = '';
@@ -503,7 +504,7 @@
     } catch (error) {
       console.error('Erro ao buscar CEP:', error);
       if (typeof HematoAI !== 'undefined' && HematoAI.showToast) {
-        HematoAI.showToast('Erro ao buscar CEP. Tente novamente.', 'error');
+        mostrarErro('Erro ao buscar CEP. Tente novamente.');
       }
     } finally {
       cepField.classList.remove('cep-loading');
@@ -521,10 +522,7 @@
 
         if (!resposta.ok) {
 
-            HematoAI.showToast(
-                dados.msg || "Erro ao carregar pacientes.",
-                "error"
-            );
+            mostrarErro(dados.msg || "Erro ao carregar pacientes.");
 
             return;
         }
@@ -537,10 +535,7 @@
 
         console.error(erro);
 
-        HematoAI.showToast(
-            "Erro ao conectar ao servidor.",
-            "error"
-        );
+        mostrarErro("Erro ao conectar ao servidor.");
     }
   }
 
@@ -718,19 +713,19 @@
       const email = document.getElementById('pEmail').value.trim();
 
       if (!cpf || cpf.length !== 11) {
-        HematoAI.showToast('CPF inválido. Deve conter 11 dígitos.', 'error');
+        mostrarErro('CPF inválido. Deve conter 11 dígitos.');
         return false;
       }
       if (!nome || nome.length < 3) {
-        HematoAI.showToast('Nome deve ter ao menos 3 caracteres.', 'error');
+        mostrarErro('Nome deve ter ao menos 3 caracteres.');
         return false;
       }
       if (!sexo) {
-        HematoAI.showToast('Selecione o sexo.', 'error');
+        mostrarErro('Selecione o sexo.');
         return false;
       }
       if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
-        HematoAI.showToast('E-mail inválido.', 'error');
+        mostrarErro('E-mail inválido.');
         return false;
       }
     } else if (currentStep === 1) {
@@ -742,11 +737,11 @@
       const estado = document.getElementById('pEstado').value;
 
       if (!cep || cep.length !== 8) {
-        HematoAI.showToast('CEP inválido.', 'error');
+        mostrarErro('CEP inválido.');
         return false;
       }
       if (!rua || !numero || !bairro || !cidade || !estado) {
-        HematoAI.showToast('Preencha todos os campos obrigatórios do endereço.', 'error');
+        mostrarErro('Preencha todos os campos obrigatórios do endereço.');
         return false;
       }
     } else if (currentStep === 2) {
@@ -755,15 +750,15 @@
       const confirm = document.getElementById('pSenhaConfirm').value;
 
       if (!email || !email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
-        HematoAI.showToast('E-mail de acesso inválido.', 'error');
+        mostrarErro('E-mail de acesso inválido.');
         return false;
       }
       if (!senha || senha.length < 8) {
-        HematoAI.showToast('Senha deve ter no mínimo 8 caracteres.', 'error');
+        mostrarErro('Senha deve ter no mínimo 8 caracteres.');
         return false;
       }
       if (senha !== confirm) {
-        HematoAI.showToast('As senhas não coincidem.', 'error');
+        mostrarErro('As senhas não coincidem.');
         return false;
       }
     }
@@ -815,10 +810,7 @@
 
         console.error(erro);
 
-        HematoAI.showToast(
-            "Erro ao conectar ao servidor.",
-            "error"
-        );
+        mostrarErro("Erro ao conectar ao servidor.");
     }
   }
 
@@ -829,10 +821,7 @@
         !wizardData.paciente.sexo ||
         !wizardData.paciente.email) {
 
-        HematoAI.showToast(
-            "Complete os dados pessoais.",
-            "error"
-        );
+        mostrarErro("Complete os dados pessoais.");
 
         currentStep = 0;
 
@@ -850,10 +839,7 @@
         !wizardData.endereco.cidade ||
         !wizardData.endereco.estado) {
 
-        HematoAI.showToast(
-            "Complete os dados de endereço.",
-            "error"
-        );
+        mostrarErro("Complete os dados de endereço.");
 
         currentStep = 1;
 
@@ -867,10 +853,7 @@
     if (!wizardData.login.email ||
         !wizardData.login.senha) {
 
-        HematoAI.showToast(
-            "Complete as credenciais.",
-            "error"
-        );
+        mostrarErro("Complete as credenciais.");
 
         currentStep = 2;
 
@@ -884,10 +867,7 @@
     if (!editingCpf &&
         pacientes.find(x => x.cpf === wizardData.paciente.cpf)) {
 
-        HematoAI.showToast(
-            "CPF já cadastrado.",
-            "error"
-        );
+        mostrarErro("CPF já cadastrado.");
 
         return false;
     }
@@ -987,10 +967,7 @@
 
     if (!respEndereco.ok) {
 
-        HematoAI.showToast(
-            dadosEndereco.msg || "Erro ao atualizar endereço.",
-            "error"
-        );
+        mostrarErro(dadosEndereco.msg || "Erro ao atualizar endereço.");
 
         throw new Error("Erro ao atualizar endereço");
     }
@@ -1021,10 +998,7 @@
 
     if (!respLogin.ok) {
 
-        HematoAI.showToast(
-            dadosLogin.msg || "Erro ao atualizar login.",
-            "error"
-        );
+        mostrarErro(dadosLogin.msg || "Erro ao atualizar login.");
 
         throw new Error("Erro ao atualizar login");
     }
@@ -1052,10 +1026,7 @@
 
     if (!respPaciente.ok) {
 
-        HematoAI.showToast(
-            dadosPaciente.msg || "Erro ao atualizar paciente.",
-            "error"
-        );
+        mostrarErro(dadosPaciente.msg || "Erro ao atualizar paciente.");
 
         throw new Error("Erro ao atualizar paciente");
     }
@@ -1081,10 +1052,7 @@
 
     if (!respEndereco.ok) {
 
-        HematoAI.showToast(
-            dadosEndereco.msg || "Erro ao cadastrar endereço.",
-            "error"
-        );
+        mostrarErro(dadosEndereco.msg || "Erro ao cadastrar endereço.");
 
         throw new Error("Erro ao cadastrar endereço");
     }
@@ -1109,10 +1077,7 @@
 
     if (!respLogin.ok) {
 
-        HematoAI.showToast(
-            dadosLogin.msg || "Erro ao criar login.",
-            "error"
-        );
+        mostrarErro(dadosLogin.msg || "Erro ao criar login.");
 
         throw new Error("Erro ao criar login");
     }
@@ -1145,10 +1110,7 @@
 
     if (!respPaciente.ok) {
 
-        HematoAI.showToast(
-            dadosPaciente.msg || "Erro ao cadastrar paciente.",
-            "error"
-        );
+        mostrarErro(dadosPaciente.msg || "Erro ao cadastrar paciente.");
 
         throw new Error("Erro ao cadastrar paciente");
     }
@@ -1281,10 +1243,7 @@
                 const dados = await resposta.json();
 
                 if (!resposta.ok) {
-                    HematoAI.showToast(
-                        dados.msg || "Erro ao excluir paciente.",
-                        "error"
-                    );
+                    mostrarErro(dados.msg || "Erro ao excluir paciente.");
                     return;
                 }
 
@@ -1299,10 +1258,7 @@
 
                 console.error(erro);
 
-                HematoAI.showToast(
-                    "Erro ao conectar ao servidor.",
-                    "error"
-                );
+                mostrarErro("Erro ao conectar ao servidor.");
             }
 
         }
@@ -1347,7 +1303,7 @@
         loadStepData();
         updateWizardUI();
       } else {
-        HematoAI.showToast('Complete os dados pessoais primeiro.', 'error');
+        mostrarErro('Complete os dados pessoais primeiro.');
       }
     }
   });
@@ -1359,7 +1315,7 @@
         loadStepData();
         updateWizardUI();
       } else {
-        HematoAI.showToast('Complete as etapas anteriores primeiro.', 'error');
+        mostrarErro('Complete as etapas anteriores primeiro.');
       }
     }
   });

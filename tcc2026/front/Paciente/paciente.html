@@ -375,6 +375,7 @@
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="../JS/navbar.js"></script>
 <script src="../JS/auth.js"></script>
+<script src="../JS/popup-erro.js"></script>
 <script>
   // ============================================================
   //  AUTENTICAÇÃO E SIDEBAR
@@ -444,7 +445,7 @@
         const dados = await response.json();
 
         if (!dados.status) {
-            HematoAI.showToast("Erro ao carregar consultas", "error");
+            mostrarErro("Erro ao carregar consultas");
             return;
         }
 
@@ -470,10 +471,7 @@
 
         console.error(e);
 
-        HematoAI.showToast(
-            "Erro ao carregar consultas",
-            "error"
-        );
+        mostrarErro("Erro ao carregar consultas");
     }
   }
 
@@ -498,10 +496,7 @@
 
         if (!dados.status) {
 
-            HematoAI.showToast(
-                "Erro ao carregar exames",
-                "error"
-            );
+            mostrarErro("Erro ao carregar exames");
 
             return;
         }
@@ -536,10 +531,7 @@
 
         console.error(e);
 
-        HematoAI.showToast(
-            "Erro ao carregar exames",
-            "error"
-        );
+        mostrarErro("Erro ao carregar exames");
     }
   }
   function atualizarIndicadores(){

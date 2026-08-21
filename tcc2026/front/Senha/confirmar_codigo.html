@@ -365,6 +365,7 @@
         <p>HematoAI · Sistema de apoio ao diagnóstico hematológico · Segurança e confidencialidade</p>
     </footer>
 </div>
+<script src="../JS/popup-erro.js"></script>
 <script>
     (function() {
         // Contato
@@ -517,14 +518,18 @@
                 const codigo = codigoCompleto.value;
 
                 if (codigo.length !== 6) {
-                    alert('Por favor, digite o código completo de 6 dígitos.');
+                    mostrarErro('Digite o código completo de 6 dígitos.');
                     return;
                 }
 
                 const cpf = localStorage.getItem("cpfRecuperacao");
                 if (!cpf) {
-                    alert("Sessão de recuperação expirada.");
-                    window.location.href = "esqueci_senha.html";
+                    mostrarErro("Sessão de recuperação expirada. Peça um novo código.", {
+                        titulo: "Sessão expirada",
+                        aoFechar: () => {
+                            window.location.href = "esqueci_senha.html";
+                        }
+                    });
                     return;
                 }
 
@@ -563,7 +568,7 @@
 
                 .catch((erro) => {
 
-                    alert(erro.message);
+                    mostrarErro(erro.message);
 
                 });
             });

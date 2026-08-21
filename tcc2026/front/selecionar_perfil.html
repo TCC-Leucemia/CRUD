@@ -338,6 +338,7 @@
     </footer>
 </div>
 
+<script src="JS/popup-erro.js"></script>
 <script>
     (function () {
         const PENDENCIA_PERFIL = "hematoai_perfil_pendente";
@@ -415,10 +416,13 @@
             statusMessage.textContent = ativo ? `Entrando como ${tipo.toLowerCase()}...` : "";
         }
 
-        function mostrarErro(mensagem) {
-            statusMessage.classList.add("error");
-            statusMessage.setAttribute("role", "alert");
-            statusMessage.textContent = mensagem;
+        // Erro desta tela também passa pelo pop-up padrão do sistema; a linha
+        // de status volta ao estado neutro para não repetir a mensagem.
+        function exibirErroPerfil(mensagem) {
+            statusMessage.classList.remove("error");
+            statusMessage.setAttribute("role", "status");
+            statusMessage.textContent = "";
+            mostrarErro(mensagem);
         }
 
         function invalidarPendencia() {
@@ -428,7 +432,7 @@
             profileButtons.forEach((botao) => {
                 botao.disabled = true;
             });
-            mostrarErro("Sua seleção expirou. Volte ao login e entre novamente.");
+            exibirErroPerfil("Sua seleção expirou. Volte ao login e entre novamente.");
             backLink.focus();
         }
 
@@ -463,7 +467,7 @@
             } catch (erro) {
                 console.error("Erro ao selecionar perfil:", erro);
                 definirCarregamento(false);
-                mostrarErro(erro.message || "Não foi possível conectar ao servidor.");
+                exibirErroPerfil(erro.message || "Não foi possível conectar ao servidor.");
             }
         }
 

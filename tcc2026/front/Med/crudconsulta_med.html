@@ -533,6 +533,8 @@
 
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="../JS/navbar.js"></script>
+<script src="../JS/auth.js"></script>
+<script src="../JS/popup-erro.js"></script>
 <script>
   
   HematoAI.initSidebar('consultas');
@@ -591,7 +593,7 @@
       const dadosAnamneses = await responseAnamneses.json();
 
       if (!dadosConsultas.status) {
-        HematoAI.showToast(dadosConsultas.msg || "Erro ao carregar consultas.", "error");
+        mostrarErro(dadosConsultas.msg || "Erro ao carregar consultas.");
         return;
       }
 
@@ -621,12 +623,12 @@
           abrirAnamnese(idConsulta);
         } else {
           console.warn("Consulta não encontrada para o ID:", idConsulta);
-          HematoAI.showToast("A consulta selecionada não foi encontrada.", "error");
+          mostrarErro("A consulta selecionada não foi encontrada.");
         }
       }
     } catch (erro) {
       console.error("Erro ao carregar consultas:", erro);
-      HematoAI.showToast("Erro ao carregar dados das consultas.", "error");
+      mostrarErro("Erro ao carregar dados das consultas.");
     }
   }
 
@@ -717,7 +719,7 @@
     console.log("CPF CONSULTA:", consulta?.cpf);
 
     if (!consulta) {
-      HematoAI.showToast("Consulta não encontrada.", "error");
+      mostrarErro("Consulta não encontrada.");
       return;
     }
 
@@ -778,7 +780,7 @@
       );
       const dados = await response.json();
       if (!dados.status) {
-        HematoAI.showToast("Erro ao carregar anamnese.", "error");
+        mostrarErro("Erro ao carregar anamnese.");
         return;
       }
 
@@ -807,7 +809,7 @@
       lucide.createIcons();
     } catch (erro) {
       console.error(erro);
-      HematoAI.showToast("Erro ao carregar anamnese.", "error");
+      mostrarErro("Erro ao carregar anamnese.");
     }
   }
 
@@ -828,7 +830,7 @@
     const id = parseInt(document.getElementById("editandoId").value);
     const novoStatus = document.getElementById("novoStatus").value;
     if (!novoStatus) {
-      HematoAI.showToast("Selecione um status.", "error");
+      mostrarErro("Selecione um status.");
       return;
     }
     try {
@@ -843,14 +845,14 @@
       });
       const dados = await response.json();
       if (!dados.status) {
-        HematoAI.showToast(dados.msg, "error");
+        mostrarErro(dados.msg);
         return;
       }
       HematoAI.showToast(dados.msg, "success");
       HematoAI.closeModal(document.getElementById("modalStatus"));
       await carregarConsultas();
     } catch (erro) {
-      HematoAI.showToast("Erro ao atualizar status.", "error");
+      mostrarErro("Erro ao atualizar status.");
       console.error(erro);
     }
   });
@@ -861,7 +863,7 @@
 
   document.getElementById('editarAnamneseBtn').addEventListener('click', function() {
     if (!idDetalhe) {
-      HematoAI.showToast("Consulta não identificada.", "error");
+      mostrarErro("Consulta não identificada.");
       return;
     }
     abrirAnamnese(idDetalhe);
@@ -890,14 +892,14 @@
     const comorbidades = document.getElementById("editComorbidades").value.trim();
 
     if (!consultaAnamneseId) {
-      HematoAI.showToast("Consulta não identificada.", "error");
+      mostrarErro("Consulta não identificada.");
       return;
     }
 
     const consulta = consultas.find(c => Number(c.id_consulta) === Number(consultaAnamneseId));
 
     if (!consulta) {
-      HematoAI.showToast("Consulta não encontrada.", "error");
+      mostrarErro("Consulta não encontrada.");
       return;
     }
 
@@ -924,7 +926,7 @@
 
         const dados = await response.json();
         if (!dados.status) {
-          HematoAI.showToast(dados.msg, "error");
+          mostrarErro(dados.msg);
           return;
         }
         HematoAI.showToast("Anamnese atualizada com sucesso!", "success");
@@ -947,7 +949,7 @@
 
         const dados = await response.json();
         if (!dados.status) {
-          HematoAI.showToast(dados.msg, "error");
+          mostrarErro(dados.msg);
           return;
         }
         HematoAI.showToast("Anamnese cadastrada com sucesso!", "success");
@@ -961,7 +963,7 @@
       }
     } catch (erro) {
       console.error(erro);
-      HematoAI.showToast("Erro ao salvar anamnese.", "error");
+      mostrarErro("Erro ao salvar anamnese.");
     }
   });
 
@@ -981,6 +983,7 @@
   // ============================================
 
   carregarConsultas();
+  verificarPerfil("Médico");
 </script>
 </body>
 </html>

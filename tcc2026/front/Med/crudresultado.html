@@ -724,6 +724,8 @@
 
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="../JS/navbar.js"></script>
+<script src="../JS/auth.js"></script>
+<script src="../JS/popup-erro.js"></script>
 <script>
 
   HematoAI.initSidebar('resultados');
@@ -788,7 +790,7 @@
       });
       const dados = await response.json();
       if (!dados.status) {
-        HematoAI.showToast(dados.msg || "Erro ao carregar resultados.", "error");
+        mostrarErro(dados.msg || "Erro ao carregar resultados.");
         return;
       }
       resultados = dados.dados || [];
@@ -796,7 +798,7 @@
       aplicarFiltros();
     } catch (erro) {
       console.error(erro);
-      HematoAI.showToast("Erro ao conectar ao servidor.", "error");
+      mostrarErro("Erro ao conectar ao servidor.");
     }
   }
 
@@ -807,14 +809,14 @@
       });
       const dados = await response.json();
       if (!dados.status) {
-        HematoAI.showToast(dados.msg || "Erro ao carregar exames.", "error");
+        mostrarErro(dados.msg || "Erro ao carregar exames.");
         return;
       }
       exames = dados.dados || [];
       renderizarListaExames();
     } catch (erro) {
       console.error(erro);
-      HematoAI.showToast("Erro ao conectar ao servidor.", "error");
+      mostrarErro("Erro ao conectar ao servidor.");
     }
   }
 
@@ -1019,19 +1021,19 @@
     const tipo = document.getElementById('rTipoLeucemia').value;
 
     if (!idExame || idExame <= 0) {
-      HematoAI.showToast('Selecione um exame válido.', 'error');
+      mostrarErro('Selecione um exame válido.');
       return;
     }
     if (!dataResultado) {
-      HematoAI.showToast('Selecione a data do resultado.', 'error');
+      mostrarErro('Selecione a data do resultado.');
       return;
     }
     if (!resultado) {
-      HematoAI.showToast('O resultado é obrigatório.', 'error');
+      mostrarErro('O resultado é obrigatório.');
       return;
     }
     if (!suspeita) {
-      HematoAI.showToast('Selecione a suspeita de leucemia.', 'error');
+      mostrarErro('Selecione a suspeita de leucemia.');
       return;
     }
 
@@ -1067,7 +1069,7 @@
 
       const dados = await response.json();
       if (!dados.status) {
-        HematoAI.showToast(dados.msg || 'Erro ao salvar resultado.', 'error');
+        mostrarErro(dados.msg || 'Erro ao salvar resultado.');
         return;
       }
 
@@ -1080,7 +1082,7 @@
 
     } catch (erro) {
       console.error(erro);
-      HematoAI.showToast('Erro ao conectar ao servidor.', 'error');
+      mostrarErro('Erro ao conectar ao servidor.');
     }
   });
 
@@ -1313,14 +1315,14 @@
           });
           const dados = await response.json();
           if (!dados.status) {
-            HematoAI.showToast(dados.msg || 'Erro ao excluir resultado.', 'error');
+            mostrarErro(dados.msg || 'Erro ao excluir resultado.');
             return;
           }
           HematoAI.showToast('Resultado excluído com sucesso.', 'success');
           await carregarResultados();
         } catch (erro) {
           console.error(erro);
-          HematoAI.showToast('Erro ao conectar ao servidor.', 'error');
+          mostrarErro('Erro ao conectar ao servidor.');
         }
       }
     );

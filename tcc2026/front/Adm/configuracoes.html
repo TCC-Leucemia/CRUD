@@ -338,6 +338,7 @@
 <script src="../JS/navbar.js"></script>
 <script src="../JS/api.js"></script>
 <script src="../JS/auth.js"></script>
+<script src="../JS/popup-erro.js"></script>
 <script>
   // ============================================
   // CONFIGURAÇÕES - USANDO FUNÇÕES GLOBAIS
@@ -445,22 +446,22 @@
     const confirmarSenha = document.getElementById('confirmarSenha')?.value || '';
     
     if (!senhaAtual) {
-      if (typeof HematoAI !== 'undefined') HematoAI.showToast('Preencha a senha atual.', 'error');
+      if (typeof mostrarErro === 'function') mostrarErro('Preencha a senha atual.');
       return false;
     }
     
     if (novaSenha && novaSenha !== confirmarSenha) {
-      if (typeof HematoAI !== 'undefined') HematoAI.showToast('As novas senhas não coincidem.', 'error');
+      if (typeof mostrarErro === 'function') mostrarErro('As novas senhas não coincidem.');
       return false;
     }
     
     if (novaSenha && novaSenha.length < 8) {
-      if (typeof HematoAI !== 'undefined') HematoAI.showToast('A nova senha deve ter no mínimo 8 caracteres.', 'error');
+      if (typeof mostrarErro === 'function') mostrarErro('A nova senha deve ter no mínimo 8 caracteres.');
       return false;
     }
     
     if (novoEmail && !novoEmail.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
-      if (typeof HematoAI !== 'undefined') HematoAI.showToast('E-mail inválido.', 'error');
+      if (typeof mostrarErro === 'function') mostrarErro('E-mail inválido.');
       return false;
     }
     
@@ -476,10 +477,7 @@
         const dados = await resp.json();
 
         if (!resp.ok) {
-            HematoAI.showToast(
-                dados.msg || "Erro ao carregar usuário.",
-                "error"
-            );
+            mostrarErro(dados.msg || "Erro ao carregar usuário.");
             return;
         }
 
@@ -491,10 +489,7 @@
 
         console.error(erro);
 
-        HematoAI.showToast(
-            "Erro ao conectar ao servidor.",
-            "error"
-        );
+        mostrarErro("Erro ao conectar ao servidor.");
     }
   }
 
@@ -538,7 +533,7 @@
         const dados = await resp.json();
 
         if (!resp.ok) {
-            HematoAI.showToast(dados.msg || "Erro ao atualizar credenciais.", "error");
+            mostrarErro(dados.msg || "Erro ao atualizar credenciais.");
             return;
         }
 
@@ -558,7 +553,7 @@
 
     } catch (erro) {
         console.error(erro);
-        HematoAI.showToast("Erro ao conectar ao servidor.", "error");
+        mostrarErro("Erro ao conectar ao servidor.");
     }
   }
 

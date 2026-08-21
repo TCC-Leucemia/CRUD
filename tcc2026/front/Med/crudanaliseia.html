@@ -379,6 +379,8 @@
 
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="../JS/navbar.js"></script>
+<script src="../JS/auth.js"></script>
+<script src="../JS/popup-erro.js"></script>
 <script>
   
   HematoAI.initSidebar('analises-ia');
@@ -418,10 +420,7 @@
     }
     catch (erro) {
 
-        HematoAI.showToast(
-            erro.message,
-            "error"
-        );
+        mostrarErro(erro.message);
     }
   }
   function formatarCPF(cpf) {
@@ -549,10 +548,7 @@
     }
     catch (erro) {
 
-        HematoAI.showToast(
-            erro.message,
-            "error"
-        );
+        mostrarErro(erro.message);
     }
 
   }
@@ -649,7 +645,7 @@
   document.getElementById('btnBaixarPDFDetalhe').addEventListener('click', () => {
     const a = analises.find(x => x.id_analise === idDetalhe);
     if (!a) {
-      HematoAI.showToast('Análise não encontrada.', 'error');
+      mostrarErro('Análise não encontrada.');
       return;
     }
 

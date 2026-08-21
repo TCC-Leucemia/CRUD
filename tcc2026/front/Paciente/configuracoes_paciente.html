@@ -446,6 +446,7 @@
 <script src="../JS/navbar.js"></script>
 <script src="../JS/auth.js"></script>
 <script src="../JS/api.js"></script>
+<script src="../JS/popup-erro.js"></script>
 <script>
   
   const temaAtual = localStorage.getItem('hematoai_theme') || 'light';
@@ -500,7 +501,7 @@
 
         const json = await response.json();
 
-        pacienteDados = json.dados;
+        pacienteDados = json.dados || {};
 
         document.getElementById("displayNome").textContent =
             pacienteDados.nome || "—";
@@ -521,29 +522,30 @@
             pacienteDados.telefone || "—";
 
         document.getElementById("sessaoNome").textContent =
-            pacienteDados.nome;
+            pacienteDados.nome || "—";
 
         document.getElementById("sessaoEmail").textContent =
-            pacienteDados.email;
+            pacienteDados.email || "—";
 
-        const iniciais = pacienteDados.nome
-            .split(" ")
+        // Cadastro sem nome não pode derrubar a tela inteira num erro: os
+        // demais campos já foram preenchidos e o aviso seria falso.
+        const iniciais = String(pacienteDados.nome || "")
+            .trim()
+            .split(/\s+/)
+            .filter(Boolean)
             .map(p => p[0])
             .join("")
             .substring(0, 2)
             .toUpperCase();
 
         document.getElementById("avatarIniciais").textContent =
-            iniciais;
+            iniciais || "—";
 
     } catch (erro) {
 
         console.error(erro);
 
-        HematoAI.showToast(
-            "Erro ao carregar dados.",
-            "error"
-        );
+        mostrarErro("Erro ao carregar dados.");
 
     }
 
@@ -610,23 +612,23 @@
     const confirmarSenha = document.getElementById('confirmarSenha')?.value || '';
 
     if (!senhaAtual) {
-      HematoAI.showToast('Preencha a senha atual.', 'error');
+      mostrarErro('Preencha a senha atual.');
       return false;
     }
     if (senhaAtual !== usuarioLogado.senha) {
-      HematoAI.showToast('Senha atual incorreta.', 'error');
+      mostrarErro('Senha atual incorreta.');
       return false;
     }
     if (novaSenha && novaSenha !== confirmarSenha) {
-      HematoAI.showToast('As novas senhas não coincidem.', 'error');
+      mostrarErro('As novas senhas não coincidem.');
       return false;
     }
     if (novaSenha && novaSenha.length < 8) {
-      HematoAI.showToast('A nova senha deve ter no mínimo 8 caracteres.', 'error');
+      mostrarErro('A nova senha deve ter no mínimo 8 caracteres.');
       return false;
     }
     if (novoEmail && !novoEmail.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
-      HematoAI.showToast('E-mail inválido.', 'error');
+      mostrarErro('E-mail inválido.');
       return false;
     }
     return true;
@@ -648,20 +650,14 @@
 
     if (!senhaAtual) {
 
-        HematoAI.showToast(
-            "Informe sua senha atual.",
-            "error"
-        );
+        mostrarErro("Informe sua senha atual.");
 
         return;
     }
 
     if (novaSenha && novaSenha !== confirmarSenha) {
 
-        HematoAI.showToast(
-            "As senhas não coincidem.",
-            "error"
-        );
+        mostrarErro("As senhas não coincidem.");
 
         return;
     }
@@ -671,10 +667,7 @@
         novaSenha.length < 8
     ) {
 
-        HematoAI.showToast(
-            "A nova senha deve possuir no mínimo 8 caracteres.",
-            "error"
-        );
+        mostrarErro("A nova senha deve possuir no mínimo 8 caracteres.");
 
         return;
     }
@@ -714,10 +707,7 @@
         );
 
     } catch (erro) {
-        HematoAI.showToast(
-            erro.message,
-            "error"
-        );
+        mostrarErro(erro.message);
     }
   }
 

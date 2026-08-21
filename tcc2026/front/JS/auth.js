@@ -5,9 +5,21 @@ function getToken() {
 }
 
 function getUsuario() {
-    return JSON.parse(
-        localStorage.getItem("usuario")
-    );
+
+    try {
+
+        return JSON.parse(
+            localStorage.getItem("usuario")
+        );
+
+    } catch (erro) {
+
+        // Sessão gravada pela metade ou corrompida: trata como "sem usuário"
+        // em vez de derrubar a página com um erro de parse.
+        console.error("Sessão inválida no armazenamento local:", erro);
+
+        return null;
+    }
 }
 
 function logout() {
@@ -25,15 +37,29 @@ function verificarLogin() {
 
     if (!token) {
 
-        alert("Faça login primeiro.");
+        mostrarErro(
+            "Faça login para continuar. Sua sessão não foi encontrada.",
+            {
+                titulo: "Sessão não encontrada",
+                aoFechar: () => {
+                    window.location.href = "../login.html";
+                }
+            }
+        );
 
-        window.location.href = "../login.html";
+        return false;
     }
+
+    return true;
 }
 
 function verificarPerfil(...perfisPermitidos) {
 
-    verificarLogin();
+    // Sem sessão o aviso de login já foi exibido: não empilha um segundo
+    // pop-up por cima dele.
+    if (!verificarLogin()) {
+        return false;
+    }
 
     const usuario = getUsuario();
 
@@ -44,12 +70,18 @@ function verificarPerfil(...perfisPermitidos) {
         )
     ) {
 
-        alert(
-            "Você não tem permissão para acessar esta página."
+        mostrarErro(
+            "Você não tem permissão para acessar esta página.",
+            {
+                titulo: "Acesso não permitido",
+                aoFechar: logout
+            }
         );
 
-        logout();
+        return false;
     }
+
+    return true;
 }
 
 async function apiFetch(url, options = {}) {

@@ -324,6 +324,7 @@
         <p>HematoAI · Sistema de apoio ao diagnóstico hematológico · Segurança e confidencialidade</p>
     </footer>
 </div>
+<script src="../JS/popup-erro.js"></script>
 <script>
     (function() {
         // Contato
@@ -369,7 +370,7 @@
                 .value.replace(/\D/g, "");
 
             if (cpf.length !== 11) {
-                alert("Informe um CPF válido.");
+                mostrarErro("Informe um CPF válido.");
                 return;
             }
             
@@ -397,13 +398,7 @@
 
                 const dados = await resposta.json();
                 if (!resposta.ok || !dados.status) {
-                    alert(dados.msg || "Erro ao enviar código.");
-                    return;
-                }
-
-                if (!dados.status) {
-
-                    alert(dados.msg);
+                    mostrarErro(dados.msg || "Não foi possível enviar o código.");
                     return;
                 }
 
@@ -424,8 +419,9 @@
 
                 console.error(erro);
 
-                alert(
-                    "Erro ao conectar ao servidor."
+                mostrarErro(
+                    "Não foi possível conectar ao servidor.",
+                    { titulo: "Servidor indisponível" }
                 );
 
             }finally {
