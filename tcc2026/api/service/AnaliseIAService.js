@@ -65,6 +65,16 @@ const extrairDiagnostico = (laudo) => {
     };
 };
 
+const extrairRelatorioClinico = (laudo) => {
+    const texto = String(laudo || "");
+
+    const separador = texto.match(/={10,}/);
+
+    return separador
+        ? texto.slice(separador.index).trim()
+        : texto.trim();
+};
+
 const validarAssinaturaImagem = (arquivo) => {
     let descritor;
     let valida = false;
@@ -674,6 +684,11 @@ module.exports = class AnaliseIAService {
                     laudo
                 );
 
+            const relatorioClinico =
+                extrairRelatorioClinico(
+                    laudo
+                );
+
             const raizProjeto =
                 path.resolve(
                     __dirname,
@@ -727,7 +742,7 @@ module.exports = class AnaliseIAService {
                 analise,
                 {
                     id_exame,
-                    resultado_ia: laudo,
+                    resultado_ia: relatorioClinico,
                     ...diagnostico,
                     data_analise: data,
                     statusc: "Finalizado"
@@ -826,7 +841,7 @@ module.exports = class AnaliseIAService {
             concluido = true;
 
             return {
-                laudo,
+                laudo: relatorioClinico,
 
                 pdf:
                     `data:application/pdf;base64,${pdfBase64}`,

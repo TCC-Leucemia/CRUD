@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 import io
 import warnings
@@ -24,6 +25,19 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 if not os.getenv("OPENAI_API_KEY"):
     raise ValueError("API key não encontrada. Verifique o .env (analise_celular)")
+
+def extrair_relatorio_clinico(texto_completo):
+    """
+    Remove o bloco de compatibilidade (SUSPEITA_PRINCIPAL / NÍVEL_CONFIANÇA)
+    que a IA gera no início da resposta apenas para o backend interpretar o
+    diagnóstico. Esse bloco é redundante com "SUSPEITA DIAGNOSTICA" e
+    "GRAU DE CERTEZA" já presentes dentro do laudo clínico e não deve
+    aparecer para o médico nem no PDF.
+    """
+    separador = re.search(r"={10,}", texto_completo)
+    if not separador:
+        return texto_completo
+    return texto_completo[separador.start():].strip()
 
 #Hemogram / Lab Values (if available): {hemograma}
 def analisar_celula(caminho_da_imagem, idade, sexo, sintomas, historia):
@@ -412,22 +426,13 @@ ACHADOS DETERMINANTES
 - [second relevant finding, if applicable]
 - [third relevant finding, only if clinically relevant]
 
-INTERPRETACAO
-----------------------------------------------------------------
-Padrao: [Agudo / Cronico / Normal / Inconclusivo]
-Linhagem: [Mieloide / Linfoide / Indeterminada / Nao se aplica]
-Suspeita diagnostica: [LMA / LLA / LMC / LLC / Normal / Indeterminado]
-Grau de certeza: [Alto / Moderado / Baixo]
-
-CORRELACAO CLINICA
-----------------------------------------------------------------
-[One concise sentence relating the morphological findings to the
-provided clinical and laboratory information.]
-
 CONCLUSAO
 ----------------------------------------------------------------
 [One or two concise sentences summarizing the main morphological finding
-and the diagnostic suspicion.]
+and the diagnostic suspicion, briefly relating it to the clinical
+symptoms/history provided (e.g. "de acordo com os sintomas e o historico
+apresentados, ..."). If no clinical symptoms/history were provided, omit
+that part and state only the morphological/diagnostic conclusion.]
 
 ================================================================
 Laudo gerado por sistema de apoio diagnostico por Inteligencia Artificial.
@@ -527,21 +532,11 @@ ACHADOS DETERMINANTES
 - Predominio de blastos mieloides.
 - Hiato leucemico.
 
-INTERPRETACAO
-----------------------------------------------------------------
-Padrao: Agudo
-Linhagem: Mieloide
-Suspeita diagnostica: LMA
-Grau de certeza: Alto
-
-CORRELACAO CLINICA
-----------------------------------------------------------------
-Achados morfologicos compativeis com os dados clinicos informados.
-
 CONCLUSAO
 ----------------------------------------------------------------
-Padrao morfologico compativel com Leucemia Mieloide Aguda (LMA),
-com grau de certeza alto.
+Padrao morfologico compativel com Leucemia Mieloide Aguda (LMA), com grau
+de certeza alto. De acordo com os sintomas e o historico apresentados, o
+quadro morfologico e compativel com os dados clinicos informados.
 
 ================================================================
 Laudo gerado por sistema de apoio diagnostico por Inteligencia Artificial.
@@ -569,13 +564,14 @@ Requer revisao e validacao por medico hematologista responsavel.
         ) 
 
         laudo_texto = response.output[0].content[0].text
-        
+        relatorio_clinico = extrair_relatorio_clinico(laudo_texto)
+
         timestamp = int(time.time())
         nome_arquivo_pdf = f"laudo_{timestamp}.pdf"
-        
-        hemoPDF.gerar_laudo_pdf(laudo_texto, {
-            "idade": idade, 
-            "sexo": sexo, 
+
+        hemoPDF.gerar_laudo_pdf(relatorio_clinico, {
+            "idade": idade,
+            "sexo": sexo,
             "sintomas": sintomas
         }, nome_arquivo_pdf)
 
