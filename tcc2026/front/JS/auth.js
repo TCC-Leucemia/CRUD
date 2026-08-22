@@ -10,11 +10,16 @@ function getUsuario() {
     );
 }
 
-function logout() {
+function limparSessao() {
 
     localStorage.removeItem("token");
     localStorage.removeItem("usuario");
     localStorage.removeItem("hematoai_session");
+}
+
+function logout() {
+
+    limparSessao();
 
     window.location.href = "../login.html";
 }
@@ -25,15 +30,28 @@ function verificarLogin() {
 
     if (!token) {
 
-        alert("Faça login primeiro.");
+        // O redirecionamento espera o usuário fechar o pop-up, senão a
+        // navegação apaga a mensagem antes de ela ser lida.
+        mostrarErro(
+            "É necessário entrar no sistema para acessar esta página.",
+            {
+                categoria: "Sessão",
+                titulo: "Você não está conectado",
+                aoFechar: () => { window.location.href = "../login.html"; }
+            }
+        );
 
-        window.location.href = "../login.html";
+        return false;
     }
+
+    return true;
 }
 
 function verificarPerfil(...perfisPermitidos) {
 
-    verificarLogin();
+    if (!verificarLogin()) {
+        return false;
+    }
 
     const usuario = getUsuario();
 
@@ -44,12 +62,23 @@ function verificarPerfil(...perfisPermitidos) {
         )
     ) {
 
-        alert(
-            "Você não tem permissão para acessar esta página."
+        // A sessão cai na hora (o token deixa de valer para a API); só o
+        // redirecionamento espera a leitura da mensagem.
+        limparSessao();
+
+        mostrarErro(
+            "Você não tem permissão para acessar esta página com o perfil atual.",
+            {
+                categoria: "Acesso negado",
+                titulo: "Permissão insuficiente",
+                aoFechar: () => { window.location.href = "../login.html"; }
+            }
         );
 
-        logout();
+        return false;
     }
+
+    return true;
 }
 
 async function apiFetch(url, options = {}) {

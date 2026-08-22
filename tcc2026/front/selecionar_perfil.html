@@ -284,6 +284,7 @@
             }
         }
     </style>
+  <script src="JS/erro-popup.js"></script>
 </head>
 <body>
 <div class="bg-accent"></div>
@@ -415,7 +416,10 @@
             statusMessage.textContent = ativo ? `Entrando como ${tipo.toLowerCase()}...` : "";
         }
 
-        function mostrarErro(mensagem) {
+        // Texto de apoio abaixo dos perfis. O erro em si vai para o pop-up
+        // padronizado (mostrarErro global) — nomes diferentes para o local
+        // não sobrescrever o componente do sistema.
+        function mostrarStatusInline(mensagem) {
             statusMessage.classList.add("error");
             statusMessage.setAttribute("role", "alert");
             statusMessage.textContent = mensagem;
@@ -428,7 +432,15 @@
             profileButtons.forEach((botao) => {
                 botao.disabled = true;
             });
-            mostrarErro("Sua seleção expirou. Volte ao login e entre novamente.");
+            mostrarStatusInline("Sua seleção expirou. Volte ao login e entre novamente.");
+            mostrarErro(
+                "Sua seleção de perfil expirou. Volte ao login e entre novamente.",
+                {
+                    categoria: "Sessão",
+                    titulo: "Seleção expirada",
+                    aoFechar: () => { window.location.replace("login.html"); }
+                }
+            );
             backLink.focus();
         }
 
@@ -461,9 +473,8 @@
 
                 concluirLogin(dados, tipo);
             } catch (erro) {
-                console.error("Erro ao selecionar perfil:", erro);
                 definirCarregamento(false);
-                mostrarErro(erro.message || "Não foi possível conectar ao servidor.");
+                mostrarErro(erro, { aoTentarNovamente: () => selecionarPerfil(tipo) });
             }
         }
 

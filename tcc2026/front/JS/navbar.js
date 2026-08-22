@@ -260,6 +260,13 @@
 
   /* ---------- Toast ---------- */
   function showToast(message, type = '') {
+    // Erro nunca sai como toast: vai para o pop-up padronizado do sistema,
+    // que trata a mensagem e fica por cima da tela até o usuário fechar.
+    if (type === 'error' && typeof window.mostrarErro === 'function') {
+      window.mostrarErro(message);
+      return;
+    }
+
     let toast = document.getElementById('globalToast');
     if (!toast) {
       toast = document.createElement('div');

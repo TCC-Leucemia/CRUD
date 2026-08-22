@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <script src="../JS/theme-init.js"></script>
+  <script src="../JS/erro-popup.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HematoAI · Gerenciar Consultas</title>
   <link rel="stylesheet" href="../CSS/navbar.css">
@@ -1354,7 +1355,7 @@
         currentYear = novoAno;
         renderCalendar();
       } else {
-        alert('Ano inválido. Use entre 2000 e 2100.');
+        mostrarAviso('Informe um ano entre 2000 e 2100.', { titulo: 'Ano inválido' });
       }
       document.body.removeChild(overlay);
     });

@@ -97,10 +97,17 @@ def gerar_laudo_pdf(texto_ai, dados_paciente, nome_saida):
                 continue
             
             linha_limpa = linha.replace('##', '').replace('**', '').replace('*', '').strip()
-            
-            # Detecção de títulos para negrito
-            is_title = any(x in linha_limpa.upper() for x in ['CONCLUSÃO', 'PARECER', 'ERITROGRAMA', 'LEUCOGRAMA', 'SÉRIE'])
-            
+
+            # Título de seção é a linha inteiramente em caixa alta (ex.:
+            # "ACHADOS MORFOLÓGICOS"). Procurar a palavra dentro da linha
+            # transformava conteúdo em título — "Série vermelha: ..." virava
+            # uma linha toda maiúscula e sem quebra.
+            is_title = (
+                linha_limpa == linha_limpa.upper()
+                and len(linha_limpa) <= 80
+                and any(caractere.isalpha() for caractere in linha_limpa)
+            )
+
             if y_position < 100:
                 c.showPage()
                 y_position = margem_top

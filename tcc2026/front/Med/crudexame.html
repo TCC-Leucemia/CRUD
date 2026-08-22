@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <script src="../JS/theme-init.js"></script>
+  <script src="../JS/erro-popup.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HematoAI · Gerenciar Exames</title>
   <link rel="stylesheet" href="../CSS/navbar.css">
@@ -1351,13 +1352,16 @@
       const dados = await response.json();
 
       if (!dados.status) {
-        container.innerHTML = `<div class="imagens-status">${dados.msg || 'Não foi possível carregar as imagens.'}</div>`;
+        const msg = dados.msg || 'Não foi possível carregar as imagens.';
+        container.innerHTML = `<div class="imagens-status">${msg}</div>`;
+        HematoAI.showToast(msg, 'error');
         return;
       }
       imagens = dados.dados || [];
     } catch (erro) {
       console.error(erro);
       container.innerHTML = `<div class="imagens-status">Erro ao conectar ao servidor.</div>`;
+      HematoAI.showToast('Erro ao conectar ao servidor.', 'error');
       return;
     }
 
@@ -1368,6 +1372,7 @@
 
     container.innerHTML = `<div class="imagens-grid"></div>`;
     const grid = container.querySelector('.imagens-grid');
+    const falhas = [];
 
     for (const img of imagens) {
       const card = document.createElement('div');
@@ -1406,9 +1411,21 @@
 
       } catch (erro) {
         console.error(erro);
-        card.querySelector('.imagem-thumb').innerHTML =
-          `<span class="aviso">${erro.message || 'Não foi possível carregar a imagem.'}</span>`;
+        const msg = erro.message || 'Não foi possível carregar a imagem.';
+        card.querySelector('.imagem-thumb').innerHTML = `<span class="aviso">${msg}</span>`;
+        falhas.push(msg);
       }
+    }
+
+    // Um pop-up só no fim: avisar imagem por imagem empilharia vários
+    // pop-ups seguidos quando o exame tem mais de uma imagem.
+    if (falhas.length) {
+      HematoAI.showToast(
+        falhas.length === 1
+          ? falhas[0]
+          : `Não foi possível carregar ${falhas.length} imagens deste exame.`,
+        'error'
+      );
     }
   }
 

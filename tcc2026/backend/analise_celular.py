@@ -30,7 +30,7 @@ def extrair_relatorio_clinico(texto_completo):
     """
     Remove o bloco de compatibilidade (SUSPEITA_PRINCIPAL / NÍVEL_CONFIANÇA)
     que a IA gera no início da resposta apenas para o backend interpretar o
-    diagnóstico. Esse bloco é redundante com "SUSPEITA DIAGNOSTICA" e
+    diagnóstico. Esse bloco é redundante com "SUSPEITA DIAGNÓSTICA" e
     "GRAU DE CERTEZA" já presentes dentro do laudo clínico e não deve
     aparecer para o médico nem no PDF.
     """
@@ -349,6 +349,15 @@ IMPORTANT LANGUAGE RULE:
 - All instructions in this section are written in English for clarity.
 - ALL content generated in the final response MUST be written in Brazilian Portuguese (PT-BR).
 - Do not write the clinical report in English.
+- MANDATORY ACCENTUATION: write full, orthographically correct Brazilian
+  Portuguese, with every required diacritical mark (á é í ó ú, ã õ, â ê ô,
+  à, ç). Never strip accents or replace an accented character with its
+  plain-ASCII equivalent — write "ANÁLISE MORFOLÓGICA", "IDENTIFICAÇÃO",
+  "CONCLUSÃO", "Série", "Hemácias", "Predomínio", "Neutrófilos",
+  "linfócitos", "núcleo", "leucêmico", "histórico", "clínicos", never
+  "ANALISE MORFOLOGICA", "IDENTIFICACAO", "Serie" or "Hemacias". This
+  applies to headings, body text and the diagnosis line alike, because the
+  report is printed and handed to the responsible physician.
 - Do not translate medical diagnosis abbreviations: use LMA, LLA, LMC and LLC.
 - Use objective, concise medical language.
 - Avoid explanations, speculation, repetition, or unnecessary descriptive text.
@@ -401,23 +410,22 @@ Generate a concise clinical report in Brazilian Portuguese.
 Use exactly the following structure:
 
 ================================================================
-LAUDO DE HEMATOLOGIA - ANALISE MORFOLOGICA DE ESFREGAÇO DE SANGUE PERIFERICO
+LAUDO DE HEMATOLOGIA - ANÁLISE MORFOLÓGICA DE ESFREGAÇO DE SANGUE PERIFÉRICO
 ================================================================
 
-SUSPEITA DIAGNOSTICA: [full diagnosis in Portuguese + abbreviation]
+SUSPEITA DIAGNÓSTICA: [full diagnosis in Portuguese + abbreviation]
 GRAU DE CERTEZA: [Alto / Moderado / Baixo] ([confidence percentage
 corresponding to the diagnostic level])
 
-IDENTIFICACAO
+IDENTIFICAÇÃO
 ----------------------------------------------------------------
-Idade: {idade} anos
-Sexo: {sexo}
+Idade: {idade} anos  |  Sexo: {sexo}
 
-ACHADOS MORFOLOGICOS
+ACHADOS MORFOLÓGICOS
 ----------------------------------------------------------------
-Serie vermelha: [brief objective description of red blood cell morphology]
+Série vermelha: [brief objective description of red blood cell morphology]
 
-Serie branca: [brief objective description of the relevant white blood
+Série branca: [brief objective description of the relevant white blood
 cells observed, including their morphology and relative predominance]
 
 ACHADOS DETERMINANTES
@@ -426,17 +434,17 @@ ACHADOS DETERMINANTES
 - [second relevant finding, if applicable]
 - [third relevant finding, only if clinically relevant]
 
-CONCLUSAO
+CONCLUSÃO
 ----------------------------------------------------------------
 [One or two concise sentences summarizing the main morphological finding
 and the diagnostic suspicion, briefly relating it to the clinical
-symptoms/history provided (e.g. "de acordo com os sintomas e o historico
+symptoms/history provided (e.g. "de acordo com os sintomas e o histórico
 apresentados, ..."). If no clinical symptoms/history were provided, omit
 that part and state only the morphological/diagnostic conclusion.]
 
 ================================================================
-Laudo gerado por sistema de apoio diagnostico por Inteligencia Artificial.
-Requer revisao e validacao por medico hematologista responsavel.
+Laudo gerado por sistema de apoio diagnóstico por Inteligência Artificial.
+Requer revisão e validação por médico hematologista responsável.
 ================================================================
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -453,7 +461,7 @@ or morphological findings that are not available.
 
 4. Do not repeat the same information in multiple sections.
 
-5. The "Serie branca" section should preferably contain 1-3 concise
+5. The "Série branca" section should preferably contain 1-3 concise
 sentences.
 
 6. "ACHADOS DETERMINANTES" should contain only the most relevant findings.
@@ -482,12 +490,12 @@ NÍVEL_CONFIANÇA.
 SUSPEITA_PRINCIPAL: NORMAL
 
 and in the clinical report write:
-SUSPEITA DIAGNOSTICA: Sem evidencia morfologica de leucemia (Normal)
+SUSPEITA DIAGNÓSTICA: Sem evidência morfológica de leucemia (Normal)
 
 14. If the diagnosis is INDETERMINADO, write:
-SUSPEITA DIAGNOSTICA: Indeterminado
+SUSPEITA DIAGNÓSTICA: Indeterminado
 
-15. Do not include a "RECOMENDACOES" section.
+15. Do not include a "RECOMENDAÇÕES" section.
 
 16. Do not include treatment suggestions.
 
@@ -508,39 +516,38 @@ SUSPEITA_PRINCIPAL: LMA
 NÍVEL_CONFIANÇA: ALTO
 
 ================================================================
-LAUDO DE HEMATOLOGIA - ANALISE MORFOLOGICA DE ESFREGAÇO DE SANGUE PERIFERICO
+LAUDO DE HEMATOLOGIA - ANÁLISE MORFOLÓGICA DE ESFREGAÇO DE SANGUE PERIFÉRICO
 ================================================================
 
-SUSPEITA DIAGNOSTICA: Leucemia Mieloide Aguda (LMA)
+SUSPEITA DIAGNÓSTICA: Leucemia Mieloide Aguda (LMA)
 GRAU DE CERTEZA: Alto (85%)
 
-IDENTIFICACAO
+IDENTIFICAÇÃO
 ----------------------------------------------------------------
-Idade: 45 anos
-Sexo: Masculino
+Idade: 45 anos  |  Sexo: Masculino
 
-ACHADOS MORFOLOGICOS
+ACHADOS MORFOLÓGICOS
 ----------------------------------------------------------------
-Serie vermelha: Hemacias com morfologia preservada.
+Série vermelha: Hemácias com morfologia preservada.
 
-Serie branca: Predominio de blastos mieloides, com cromatina frouxa,
-nucleolos visiveis e citoplasma moderado. Neutrofilos maduros presentes,
-com reducao de formas intermediarias.
+Série branca: Predomínio de blastos mieloides, com cromatina frouxa,
+nucléolos visíveis e citoplasma moderado. Neutrófilos maduros presentes,
+com redução de formas intermediárias.
 
 ACHADOS DETERMINANTES
 ----------------------------------------------------------------
-- Predominio de blastos mieloides.
-- Hiato leucemico.
+- Predomínio de blastos mieloides.
+- Hiato leucêmico.
 
-CONCLUSAO
+CONCLUSÃO
 ----------------------------------------------------------------
-Padrao morfologico compativel com Leucemia Mieloide Aguda (LMA), com grau
-de certeza alto. De acordo com os sintomas e o historico apresentados, o
-quadro morfologico e compativel com os dados clinicos informados.
+Padrão morfológico compatível com Leucemia Mieloide Aguda (LMA), com grau
+de certeza alto. De acordo com os sintomas e o histórico apresentados, o
+quadro morfológico é compatível com os dados clínicos informados.
 
 ================================================================
-Laudo gerado por sistema de apoio diagnostico por Inteligencia Artificial.
-Requer revisao e validacao por medico hematologista responsavel.
+Laudo gerado por sistema de apoio diagnóstico por Inteligência Artificial.
+Requer revisão e validação por médico hematologista responsável.
 ================================================================"""
         sys.stderr.write(f"DEBUG caminho imagem: {caminho_da_imagem}\n")
         with open(caminho_da_imagem, "rb") as f:
@@ -572,7 +579,8 @@ Requer revisao e validacao por medico hematologista responsavel.
         hemoPDF.gerar_laudo_pdf(relatorio_clinico, {
             "idade": idade,
             "sexo": sexo,
-            "sintomas": sintomas
+            "sintomas": sintomas,
+            "historia": historia
         }, nome_arquivo_pdf)
 
         return f"{nome_arquivo_pdf}|||{laudo_texto}"

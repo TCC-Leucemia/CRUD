@@ -308,6 +308,7 @@
             .btn-outline { padding: 6px 14px; font-size: 0.8rem; }
         }
     </style>
+  <script src="../JS/erro-popup.js"></script>
 </head>
 <body>
 <div class="bg-accent"></div>
@@ -375,7 +376,10 @@
         const btnContato = document.getElementById('btnContatoLogin');
         if (btnContato) {
             btnContato.addEventListener('click', () => {
-                alert("Central de suporte: contato@hematoai.com.br | Telefone: (11) 4000-1234. Segunda a sexta, 8h-18h.");
+                mostrarInfo(
+                    "Central de suporte: contato@hematoai.com.br | Telefone: (11) 4000-1234. Segunda a sexta, 8h-18h.",
+                    { categoria: "Contato", titulo: "Fale com o suporte" }
+                );
             });
         }
 
@@ -464,23 +468,27 @@
 
                     if(dados.status){
 
-                        alert("Senha alterada com sucesso!");
-
                         localStorage.removeItem("cpfRecuperacao");
 
-                        window.location.href = "../login.html";
+                        mostrarSucesso(
+                            "Sua senha foi alterada. Entre novamente com a nova senha.",
+                            {
+                                titulo: "Senha alterada",
+                                aoFechar: () => { window.location.href = "../login.html"; }
+                            }
+                        );
 
                     }else{
 
-                        alert(dados.msg);
+                        mostrarErro(dados.msg, { titulo: "Não foi possível alterar a senha" });
 
                     }
 
                 })
 
-                .catch(() =>{
+                .catch((erro) =>{
 
-                    alert("Erro ao alterar senha.");
+                    mostrarErro(erro, { titulo: "Não foi possível alterar a senha" });
 
                 });
             });

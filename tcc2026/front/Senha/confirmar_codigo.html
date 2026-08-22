@@ -314,6 +314,7 @@
             .codigo-input { width: 38px; height: 46px; font-size: 1.1rem; }
         }
     </style>
+  <script src="../JS/erro-popup.js"></script>
 </head>
 <body>
 <div class="bg-accent"></div>
@@ -371,7 +372,10 @@
         const btnContato = document.getElementById('btnContatoLogin');
         if (btnContato) {
             btnContato.addEventListener('click', () => {
-                alert("Central de suporte: contato@hematoai.com.br | Telefone: (11) 4000-1234. Segunda a sexta, 8h-18h.");
+                mostrarInfo(
+                    "Central de suporte: contato@hematoai.com.br | Telefone: (11) 4000-1234. Segunda a sexta, 8h-18h.",
+                    { categoria: "Contato", titulo: "Fale com o suporte" }
+                );
             });
         }
 
@@ -517,14 +521,20 @@
                 const codigo = codigoCompleto.value;
 
                 if (codigo.length !== 6) {
-                    alert('Por favor, digite o código completo de 6 dígitos.');
+                    mostrarAviso('Digite o código completo, com os 6 dígitos recebidos por e-mail.', { titulo: 'Código incompleto' });
                     return;
                 }
 
                 const cpf = localStorage.getItem("cpfRecuperacao");
                 if (!cpf) {
-                    alert("Sessão de recuperação expirada.");
-                    window.location.href = "esqueci_senha.html";
+                    mostrarErro(
+                        "A recuperação de senha expirou. Informe seu CPF novamente para receber um novo código.",
+                        {
+                            categoria: "Sessão",
+                            titulo: "Recuperação expirada",
+                            aoFechar: () => { window.location.href = "esqueci_senha.html"; }
+                        }
+                    );
                     return;
                 }
 
@@ -563,7 +573,7 @@
 
                 .catch((erro) => {
 
-                    alert(erro.message);
+                    mostrarErro(erro, { categoria: "Código inválido", titulo: "Não foi possível validar" });
 
                 });
             });
@@ -573,7 +583,7 @@
         const reenviarBtn = document.getElementById('reenviarCodigo');
         if (reenviarBtn) {
             reenviarBtn.addEventListener('click', function() {
-                alert("Um novo código foi enviado para seu e-mail.");
+                mostrarSucesso("Um novo código foi enviado para o e-mail cadastrado.", { titulo: "Código reenviado" });
                 // Limpa os campos
                 inputs.forEach(input => {
                     input.value = '';

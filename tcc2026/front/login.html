@@ -306,6 +306,7 @@
             .btn-outline { padding: 6px 14px; font-size: 0.8rem; }
         }
     </style>
+  <script src="JS/erro-popup.js"></script>
 </head>
 <body>
 <div class="bg-accent"></div>
@@ -365,7 +366,10 @@
         const btnContato = document.getElementById('btnContatoLogin');
         if (btnContato) {
             btnContato.addEventListener('click', () => {
-                alert("Central de suporte: contato@hematoai.com.br | Telefone: (11) 4000-1234. Segunda a sexta, 8h-18h.");
+                mostrarInfo(
+                    "Central de suporte: contato@hematoai.com.br | Telefone: (11) 4000-1234. Segunda a sexta, 8h-18h.",
+                    { categoria: "Contato", titulo: "Fale com o suporte" }
+                );
             });
         }
 
@@ -399,7 +403,10 @@
                     window.location.href = "Paciente/paciente.html";
                     break;
                 default:
-                    alert("Perfil inválido");
+                    mostrarErro(
+                        "O perfil vinculado a este acesso não é reconhecido pelo sistema. Procure o administrador.",
+                        { categoria: "Falha no acesso", titulo: "Perfil inválido" }
+                    );
             }
         }
 
@@ -421,7 +428,7 @@
                 const dados = await resposta.json();
 
                 if (!resposta.ok || !dados.status) {
-                    alert(dados.msg || "Login inválido");
+                    mostrarErro({ status: resposta.status, msg: dados.msg });
                     return;
                 }
 
@@ -433,7 +440,10 @@
                         : [];
 
                     if (typeof dados.tokenPerfil !== "string" || !dados.tokenPerfil || perfis.length < 2) {
-                        alert("Não foi possível iniciar a seleção de perfil. Tente entrar novamente.");
+                        mostrarErro(
+                            "Não foi possível iniciar a seleção de perfil. Tente entrar novamente.",
+                            { categoria: "Falha no acesso", titulo: "Seleção de perfil indisponível" }
+                        );
                         return;
                     }
 
@@ -448,8 +458,7 @@
 
                 concluirLogin(dados);
             } catch (erro) {
-                console.error("Erro:", erro);
-                alert("Não foi possível conectar ao servidor.");
+                mostrarErro(erro, { aoTentarNovamente: autenticar });
             }
         }
 

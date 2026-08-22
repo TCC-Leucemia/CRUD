@@ -398,6 +398,7 @@
             }
         }
     </style>
+  <script src="JS/erro-popup.js"></script>
 </head>
 <body>
 <div class="bg-accent"></div>
@@ -480,7 +481,10 @@
 
         if (btnContato) {
             btnContato.addEventListener('click', () => {
-                alert("Central de suporte médico: contato@hematoai.com.br | Telefone: (11) 4000-1234\nHorário comercial: segunda a sexta, 8h às 18h.");
+                mostrarInfo(
+                    "Central de suporte médico: contato@hematoai.com.br | Telefone: (11) 4000-1234. Horário comercial: segunda a sexta, 8h às 18h.",
+                    { categoria: "Contato", titulo: "Fale com o suporte" }
+                );
             });
         }
 

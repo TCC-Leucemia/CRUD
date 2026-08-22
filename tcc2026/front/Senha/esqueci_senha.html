@@ -281,6 +281,7 @@
             .btn-outline { padding: 6px 14px; font-size: 0.8rem; }
         }
     </style>
+  <script src="../JS/erro-popup.js"></script>
 </head>
 <body>
 <div class="bg-accent"></div>
@@ -330,7 +331,10 @@
         const btnContato = document.getElementById('btnContatoLogin');
         if (btnContato) {
             btnContato.addEventListener('click', () => {
-                alert("Central de suporte: contato@hematoai.com.br | Telefone: (11) 4000-1234. Segunda a sexta, 8h-18h.");
+                mostrarInfo(
+                    "Central de suporte: contato@hematoai.com.br | Telefone: (11) 4000-1234. Segunda a sexta, 8h-18h.",
+                    { categoria: "Contato", titulo: "Fale com o suporte" }
+                );
             });
         }
 
@@ -369,7 +373,7 @@
                 .value.replace(/\D/g, "");
 
             if (cpf.length !== 11) {
-                alert("Informe um CPF válido.");
+                mostrarAviso("Informe um CPF válido, com 11 dígitos.", { titulo: "CPF incompleto" });
                 return;
             }
             
@@ -397,13 +401,7 @@
 
                 const dados = await resposta.json();
                 if (!resposta.ok || !dados.status) {
-                    alert(dados.msg || "Erro ao enviar código.");
-                    return;
-                }
-
-                if (!dados.status) {
-
-                    alert(dados.msg);
+                    mostrarErro({ status: resposta.status, msg: dados.msg });
                     return;
                 }
 
@@ -413,20 +411,17 @@
                     cpf
                 );
 
-                alert(
-                    "Código enviado para seu e-mail."
+                mostrarSucesso(
+                    "Enviamos um código de verificação para o e-mail cadastrado.",
+                    {
+                        titulo: "Código enviado",
+                        aoFechar: () => { window.location.href = "confirmar_codigo.html"; }
+                    }
                 );
-
-                window.location.href =
-                    "confirmar_codigo.html";
 
             } catch (erro) {
 
-                console.error(erro);
-
-                alert(
-                    "Erro ao conectar ao servidor."
-                );
+                mostrarErro(erro);
 
             }finally {
 
