@@ -594,29 +594,41 @@
   function obterConsultasFiltradas() {
     let lista = [...consultas];
 
+    // Filtro por status
     if (filtroStatus) {
-        lista = lista.filter(c => c.statusc === filtroStatus);
+      lista = lista.filter(c =>
+        (c.statusc || '').trim().toLowerCase() ===
+        filtroStatus.trim().toLowerCase()
+      );
     }
 
-    if (buscaPaciente.trim()) {
+    // Filtro por nome ou CPF
+    const termo = (buscaPaciente || '').trim().toLowerCase();
 
-        const termo = buscaPaciente.trim().toLowerCase();
-        const termoCpf = termo.replace(/\D/g, "");
+    if (termo) {
+      // Remove tudo que não for número para comparação do CPF
+      const termoCpf = termo.replace(/\D/g, '');
 
-        lista = lista.filter(c => {
+      lista = lista.filter(c => {
 
-            const matchPaciente =
-                (c.paciente || "")
-                    .toLowerCase()
-                    .includes(termo);
+        const nomePaciente = (c.paciente || '')
+          .toString()
+          .trim()
+          .toLowerCase();
 
-            const matchCpf =
-                termoCpf.length > 0 &&
-                (c.cpf || "")
-                    .includes(termoCpf);
+        const cpfPaciente = (c.cpf || '')
+          .toString()
+          .replace(/\D/g, '');
 
-            return matchPaciente || matchCpf;
-        });
+        const encontrouNome =
+          nomePaciente.includes(termo);
+
+        const encontrouCpf =
+          termoCpf.length > 0 &&
+          cpfPaciente.includes(termoCpf);
+
+        return encontrouNome || encontrouCpf;
+      });
     }
 
     return lista;
@@ -685,15 +697,45 @@
 
 }
 
+  function selecionarConsultaMaisProxima() {
+    const agora = new Date();
+
+    const consultasFuturas = consultas
+      .filter(c => {
+        const dataConsulta = new Date(c.data_consulta);
+        return !isNaN(dataConsulta.getTime()) && dataConsulta >= agora;
+      })
+      .sort((a, b) => {
+        return new Date(a.data_consulta) - new Date(b.data_consulta);
+      });
+
+    if (consultasFuturas.length === 0) {
+      return false;
+    }
+
+    const proximaConsulta = consultasFuturas[0];
+    const dataProxima = new Date(proximaConsulta.data_consulta);
+
+    mesAtual = dataProxima.getMonth();
+    anoAtual = dataProxima.getFullYear();
+
+    diaSelecionado = dataProxima;
+
+    return true;
+  }
+
   function renderizarCalendario() {
     const grid = document.getElementById('calendarioGrid');
     const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
                    'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-    document.getElementById('mesAnoDisplay').textContent = `${meses[mesAtual]} ${anoAtual}`;
+
+    document.getElementById('mesAnoDisplay').textContent =
+      `${meses[mesAtual]} ${anoAtual}`;
 
     // Dias da semana
     const diasSemana = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
     let html = '';
+
     diasSemana.forEach(d => {
       html += `<div class="cal-dia-semana">${d}</div>`;
     });
@@ -704,102 +746,243 @@
 
     // Dias do mês anterior
     const diasAnt = primeiroDia;
+
     for (let i = diasAnt - 1; i >= 0; i--) {
       const dia = diasMesAnterior - i;
-      html += `<div class="cal-dia outro-mes" data-dia="${dia}" data-mes="${mesAtual-1}" data-ano="${anoAtual}">
-        <span class="num">${dia}</span>
-        <span class="indicador"></span>
-      </div>`;
+
+      html += `
+        <div class="cal-dia outro-mes"
+             data-dia="${dia}"
+             data-mes="${mesAtual - 1}"
+             data-ano="${anoAtual}">
+          <span class="num">${dia}</span>
+          <span class="indicador"></span>
+        </div>
+      `;
     }
 
     // Dias do mês atual
     const hoje = new Date();
+
     const consultasMes = consultasDoMes(anoAtual, mesAtual);
     const consultasPorDia = {};
+
     consultasMes.forEach(c => {
       const d = new Date(c.data_consulta);
       const key = d.getDate();
-      if (!consultasPorDia[key]) consultasPorDia[key] = [];
+
+      if (!consultasPorDia[key]) {
+        consultasPorDia[key] = [];
+      }
+
       consultasPorDia[key].push(c);
     });
 
     for (let d = 1; d <= diasNoMes; d++) {
-      const isHoje = (d === hoje.getDate() && mesAtual === hoje.getMonth() && anoAtual === hoje.getFullYear());
-      const temConsulta = consultasPorDia[d] && consultasPorDia[d].length > 0;
-      const qtd = temConsulta ? consultasPorDia[d].length : 0;
-      const isSelecionado = diaSelecionado && diaSelecionado.getDate() === d && diaSelecionado.getMonth() === mesAtual && diaSelecionado.getFullYear() === anoAtual;
+
+      const isHoje =
+        d === hoje.getDate() &&
+        mesAtual === hoje.getMonth() &&
+        anoAtual === hoje.getFullYear();
+
+      const temConsulta =
+        consultasPorDia[d] &&
+        consultasPorDia[d].length > 0;
+
+      const qtd = temConsulta
+        ? consultasPorDia[d].length
+        : 0;
+
+      const isSelecionado =
+        diaSelecionado &&
+        diaSelecionado.getDate() === d &&
+        diaSelecionado.getMonth() === mesAtual &&
+        diaSelecionado.getFullYear() === anoAtual;
 
       let classes = 'cal-dia';
-      if (isHoje) classes += ' hoje';
-      if (isSelecionado) classes += ' selecionado';
-      if (temConsulta) classes += ' tem-consulta';
+
+      if (isHoje) {
+        classes += ' hoje';
+      }
+
+      if (isSelecionado) {
+        classes += ' selecionado';
+      }
+
+      if (temConsulta) {
+        classes += ' tem-consulta';
+      }
 
       let indicador = '';
+
       if (qtd > 0) {
+
         if (qtd <= 3) {
           indicador = `<span class="indicador"></span>`;
         } else {
-          indicador = `<span class="indicador muitas">+${qtd}</span>`;
+          indicador =
+            `<span class="indicador muitas">+${qtd}</span>`;
         }
+
       }
 
-      html += `<div class="${classes}" data-dia="${d}" data-mes="${mesAtual}" data-ano="${anoAtual}">
-        <span class="num">${d}</span>
-        ${indicador}
-      </div>`;
+      html += `
+        <div class="${classes}"
+             data-dia="${d}"
+             data-mes="${mesAtual}"
+             data-ano="${anoAtual}">
+          <span class="num">${d}</span>
+          ${indicador}
+        </div>
+      `;
     }
 
     // Dias do mês seguinte para preencher o grid
     const totalDias = diasAnt + diasNoMes;
     const restante = (7 - (totalDias % 7)) % 7;
+
     for (let d = 1; d <= restante; d++) {
-      html += `<div class="cal-dia outro-mes" data-dia="${d}" data-mes="${mesAtual+1}" data-ano="${anoAtual}">
-        <span class="num">${d}</span>
-        <span class="indicador"></span>
-      </div>`;
+
+      html += `
+        <div class="cal-dia outro-mes"
+             data-dia="${d}"
+             data-mes="${mesAtual + 1}"
+             data-ano="${anoAtual}">
+          <span class="num">${d}</span>
+          <span class="indicador"></span>
+        </div>
+      `;
     }
 
     grid.innerHTML = html;
 
     // Adicionar event listeners nos dias
     document.querySelectorAll('.cal-dia').forEach(el => {
+
       el.addEventListener('click', function(e) {
+
         const dia = parseInt(this.dataset.dia);
         const mes = parseInt(this.dataset.mes);
         const ano = parseInt(this.dataset.ano);
+
         const dataSelecionada = new Date(ano, mes, dia);
+
         // Se for dia de outro mês, navegar para aquele mês
         if (mes !== mesAtual || ano !== anoAtual) {
+
           mesAtual = mes;
           anoAtual = ano;
+
           renderizarCalendario();
+
           // Re-selecionar o dia após renderizar
           setTimeout(() => {
-            const novoEl = document.querySelector(`.cal-dia[data-dia="${dia}"][data-mes="${mes}"][data-ano="${ano}"]`);
-            if (novoEl) novoEl.click();
+
+            const novoEl = document.querySelector(
+              `.cal-dia[data-dia="${dia}"][data-mes="${mes}"][data-ano="${ano}"]`
+            );
+
+            if (novoEl) {
+              novoEl.click();
+            }
+
           }, 10);
+
           return;
         }
+
         selecionarDia(dataSelecionada);
       });
     });
 
-    // Se não houver dia selecionado, selecionar hoje (se estiver no mês)
-    if (!diaSelecionado || diaSelecionado.getMonth() !== mesAtual || diaSelecionado.getFullYear() !== anoAtual) {
-      const hojeData = new Date();
-      if (hojeData.getMonth() === mesAtual && hojeData.getFullYear() === anoAtual) {
-        selecionarDia(hojeData);
+    // =============================================================
+    // SELEÇÃO AUTOMÁTICA DA CONSULTA MAIS PRÓXIMA
+    // =============================================================
+
+    if (!diaSelecionado) {
+
+      const agora = new Date();
+
+      // Todas as consultas disponíveis após o momento atual
+      const consultasFuturas = consultas
+        .filter(c => {
+          const dataConsulta = new Date(c.data_consulta);
+          return dataConsulta >= agora;
+        })
+        .sort((a, b) => {
+          return new Date(a.data_consulta) -
+                 new Date(b.data_consulta);
+        });
+
+      // Se houver consulta futura, selecionar automaticamente
+      // o dia da consulta mais próxima.
+      if (consultasFuturas.length > 0) {
+
+        const proximaConsulta = consultasFuturas[0];
+        const dataProximaConsulta =
+          new Date(proximaConsulta.data_consulta);
+
+        // Se a consulta estiver em outro mês,
+        // atualizar o calendário para esse mês.
+        if (
+          dataProximaConsulta.getMonth() !== mesAtual ||
+          dataProximaConsulta.getFullYear() !== anoAtual
+        ) {
+
+          mesAtual = dataProximaConsulta.getMonth();
+          anoAtual = dataProximaConsulta.getFullYear();
+
+          renderizarCalendario();
+          return;
+        }
+
+        selecionarDia(dataProximaConsulta);
+
       } else {
-        // Selecionar o primeiro dia do mês com consulta, ou o dia 1
-        const diasComConsulta = Object.keys(consultasPorDia).map(Number).sort((a,b)=>a-b);
-        if (diasComConsulta.length > 0) {
-          selecionarDia(new Date(anoAtual, mesAtual, diasComConsulta[0]));
+
+        // Se não houver consultas futuras,
+        // manter o comportamento padrão.
+
+        const hojeData = new Date();
+
+        if (
+          hojeData.getMonth() === mesAtual &&
+          hojeData.getFullYear() === anoAtual
+        ) {
+
+          selecionarDia(hojeData);
+
         } else {
-          selecionarDia(new Date(anoAtual, mesAtual, 1));
+
+          const diasComConsulta =
+            Object.keys(consultasPorDia)
+              .map(Number)
+              .sort((a, b) => a - b);
+
+          if (diasComConsulta.length > 0) {
+
+            selecionarDia(
+              new Date(
+                anoAtual,
+                mesAtual,
+                diasComConsulta[0]
+              )
+            );
+
+          } else {
+
+            selecionarDia(
+              new Date(
+                anoAtual,
+                mesAtual,
+                1
+              )
+            );
+          }
         }
       }
     }
-  }
+}
 
   function selecionarDia(data) {
     diaSelecionado = data;
@@ -902,12 +1085,36 @@
   }
 
   function aplicarFiltros() {
-    const statusSelect = document.getElementById('filtroStatus');
-    filtroStatus = statusSelect.value;
-    const buscaInput = document.getElementById('buscaPaciente');
-    buscaPaciente = buscaInput.value;
-    renderizarCalendario();
+  const statusSelect = document.getElementById('filtroStatus');
+  const buscaInput = document.getElementById('buscaPaciente');
+
+  filtroStatus = statusSelect ? statusSelect.value : '';
+  buscaPaciente = buscaInput ? buscaInput.value : '';
+
+  const resultados = obterConsultasFiltradas();
+
+  // Se encontrou consultas após o filtro,
+  // selecionar automaticamente a primeira
+  if (resultados.length > 0) {
+
+    resultados.sort((a, b) =>
+      new Date(a.data_consulta) - new Date(b.data_consulta)
+    );
+
+    const primeira = resultados[0];
+    const dataPrimeira = new Date(primeira.data_consulta);
+
+    mesAtual = dataPrimeira.getMonth();
+    anoAtual = dataPrimeira.getFullYear();
+    diaSelecionado = dataPrimeira;
+
+  } else {
+    // Nenhum resultado
+    diaSelecionado = null;
   }
+
+  renderizarCalendario();
+}
 
   // =============================================================
   //  EVENT LISTENERS
@@ -958,9 +1165,22 @@
   HematoAI.initSidebar('consultas');
 
   (async () => {
-        await carregarConsultas();
-        renderizarCalendario();
-    })();
+    await carregarConsultas();
+
+    const encontrouProxima = selecionarConsultaMaisProxima();
+
+    if (!encontrouProxima) {
+      const hoje = new Date();
+      mesAtual = hoje.getMonth();
+      anoAtual = hoje.getFullYear();
+    }
+
+    renderizarCalendario();
+
+    if (encontrouProxima) {
+      selecionarDia(diaSelecionado);
+    }
+  })();
 
   // Atualizar data no header
   const hoje = new Date();
