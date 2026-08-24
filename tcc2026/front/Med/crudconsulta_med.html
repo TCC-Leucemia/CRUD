@@ -579,55 +579,50 @@
     const token = localStorage.getItem("token");
 
     try {
-      const [responseConsultas, responseAnamneses] = await Promise.all([
-        fetch("http://localhost:3000/consultas", {
-          headers: { Authorization: "Bearer " + token }
-        }),
-        fetch("http://localhost:3000/anamnese", {
-          headers: { Authorization: "Bearer " + token }
-        })
-      ]);
+        const [responseConsultas, responseAnamneses] = await Promise.all([
+            fetch("http://localhost:3000/consultas", {
+                headers: {
+                    Authorization: "Bearer " + token
+                }
+            }),
+            fetch("http://localhost:3000/anamnese", {
+                headers: {
+                    Authorization: "Bearer " + token
+                }
+            })
+        ]);
 
-      const dadosConsultas = await responseConsultas.json();
-      const dadosAnamneses = await responseAnamneses.json();
+        const dadosConsultas = await responseConsultas.json();
+        const dadosAnamneses = await responseAnamneses.json();
 
-      if (!dadosConsultas.status) {
-        HematoAI.showToast(dadosConsultas.msg || "Erro ao carregar consultas.", "error");
-        return;
-      }
-
-      consultas = dadosConsultas.dados || [];
-      console.log("CONSULTAS CARREGADAS:", consultas);
-
-      if (dadosAnamneses.status) {
-        anamneses = dadosAnamneses.dados || [];
-      } else {
-        anamneses = [];
-      }
-
-      console.log("ANAMNESES CARREGADAS:", anamneses);
-
-      aplicarFiltros();
-
-      const params = new URLSearchParams(window.location.search);
-      const idConsultaURL = params.get("id_consulta");
-
-      if (idConsultaURL) {
-        const idConsulta = Number(idConsultaURL);
-        console.log("ID DA CONSULTA RECEBIDO PELA URL:", idConsulta);
-        const consulta = consultas.find(c => Number(c.id_consulta) === idConsulta);
-        if (consulta) {
-          console.log("CONSULTA ENCONTRADA:", consulta);
-          idDetalhe = idConsulta;
-          abrirAnamnese(idConsulta);
-        } else {
-          console.warn("Consulta não encontrada para o ID:", idConsulta);
-          HematoAI.showToast("A consulta selecionada não foi encontrada.", "error");
+        if (!dadosConsultas.status) {
+            HematoAI.showToast(
+                dadosConsultas.msg || "Erro ao carregar consultas.",
+                "error"
+            );
+            return;
         }
-      }
+
+        consultas = dadosConsultas.dados || [];
+
+        console.log("CONSULTAS CARREGADAS:", consultas);
+
+        if (dadosAnamneses.status) {
+            anamneses = dadosAnamneses.dados || [];
+        } else {
+            anamneses = [];
+        }
+
+        console.log("ANAMNESES CARREGADAS:", anamneses);
+
+        aplicarFiltros();
+
     } catch (erro) {
-      console.error("Erro ao carregar consultas:", erro);
-      HematoAI.showToast("Erro ao carregar dados das consultas.", "error");
+        console.error("Erro ao carregar consultas:", erro);
+        HematoAI.showToast(
+            "Erro ao carregar dados das consultas.",
+            "error"
+        );
     }
   }
 
@@ -981,7 +976,20 @@
   // INICIALIZAÇÃO
   // ============================================
 
-  carregarConsultas();
+  (async () => {
+      await carregarConsultas();
+
+      const params = new URLSearchParams(window.location.search);
+      const idConsultaURL = params.get("id");
+
+      if (idConsultaURL) {
+          const idConsulta = Number(idConsultaURL);
+
+          if (!isNaN(idConsulta)) {
+              abrirDetalhes(idConsulta);
+          }
+      }
+  })();
 </script>
 </body>
 </html>

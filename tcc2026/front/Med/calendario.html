@@ -1170,18 +1170,17 @@
     const encontrouProxima = selecionarConsultaMaisProxima();
 
     if (!encontrouProxima) {
-      const hoje = new Date();
-      mesAtual = hoje.getMonth();
-      anoAtual = hoje.getFullYear();
+        const hoje = new Date();
+        mesAtual = hoje.getMonth();
+        anoAtual = hoje.getFullYear();
     }
 
     renderizarCalendario();
 
     if (encontrouProxima) {
-      selecionarDia(diaSelecionado);
+        selecionarDia(diaSelecionado);
     }
   })();
-
   // Atualizar data no header
   const hoje = new Date();
   const headerDate = document.getElementById('headerDate');
