@@ -216,16 +216,16 @@
           <span class="card-title">Lista de Pacientes</span>
           <div class="filter-row">
             <div class="search-bar" style="max-width:280px">
-              <input type="text" id="searchPaciente" placeholder="Buscar por nome, CPF ou e-mail...">
+              <!-- ALTERADO: placeholder sem "e-mail" -->
+              <input type="text" id="searchPaciente" placeholder="Buscar por nome ou CPF...">
             </div>
             <select id="filterSexo" class="filter-select">
               <option value="">Todos os sexos</option>
               <option value="Masculino">Masculino</option>
               <option value="Feminino">Feminino</option>
             </select>
+            <!-- ALTERADO: apenas ordenação alfabética -->
             <select id="sortPaciente" class="filter-select" aria-label="Ordenar por">
-              <option value="id_asc">Ordenar por: ID crescente</option>
-              <option value="id_desc">ID decrescente</option>
               <option value="nome_asc">Nome A-Z</option>
               <option value="nome_desc">Nome Z-A</option>
             </select>
@@ -258,7 +258,7 @@
   </div>
 </div>
 
-<!-- Modal Wizard -->
+<!-- Modal Wizard (inalterado) -->
 <div class="modal-overlay" id="modalPaciente">
   <div class="modal modal-lg">
     <div class="modal-header">
@@ -693,7 +693,7 @@
     if (currentStep === 0) {
       document.getElementById('pCpf').value = maskCPF(wizardData.paciente.cpf);
       document.getElementById('pNome').value = wizardData.paciente.nome;
-      document.getElementById("pDataNasc").value =wizardData.paciente.data_nasc? wizardData.paciente.data_nasc.split("T")[0]: "";
+      document.getElementById("pDataNasc").value = wizardData.paciente.data_nasc ? wizardData.paciente.data_nasc.split("T")[0] : "";
       document.getElementById('pSexo').value = wizardData.paciente.sexo;
       document.getElementById('pEmail').value = wizardData.paciente.email;
       document.getElementById('pTelefone').value = wizardData.paciente.telefone;
@@ -1218,6 +1218,7 @@
     });
   }
 
+  // ALTERADO: applyFilter com busca apenas por nome e CPF, ordenação apenas alfabética
   function applyFilter() {
     const q = document.getElementById('searchPaciente').value.toLowerCase().trim();
     const sexo = document.getElementById('filterSexo').value;
@@ -1225,16 +1226,14 @@
     
     const filtrados = pacientes.filter(p =>
       (!q || (p.nome || '').toLowerCase().includes(q) ||
-             (p.cpf || '').toLowerCase().includes(q) ||
-             (p.email || '').toLowerCase().includes(q)) &&
+             (p.cpf || '').toLowerCase().includes(q)) &&
       (!sexo || p.sexo === sexo)
     );
     const comparar = (a, b) => String(a ?? '').localeCompare(String(b ?? ''), 'pt-BR', { sensitivity: 'base', numeric: true });
     filtrados.sort((a, b) => {
-      if (ordem === 'id_desc') return comparar(b.id_usuario ?? b.cpf, a.id_usuario ?? a.cpf);
       if (ordem === 'nome_asc') return comparar(a.nome, b.nome);
       if (ordem === 'nome_desc') return comparar(b.nome, a.nome);
-      return comparar(a.id_usuario ?? a.cpf, b.id_usuario ?? b.cpf);
+      return 0;
     });
     renderTable(filtrados);
   }

@@ -221,9 +221,8 @@
               <option>Pediatria</option>
               <option>Medicina Interna</option>
             </select>
+            <!-- Select de ordenação apenas alfabética -->
             <select id="sortMedico" class="filter-select" aria-label="Ordenar por">
-              <option value="id_asc">Ordenar por: ID crescente</option>
-              <option value="id_desc">ID decrescente</option>
               <option value="nome_asc">Nome A-Z</option>
               <option value="nome_desc">Nome Z-A</option>
             </select>
@@ -1034,11 +1033,11 @@
       (!esp || m.especialidade === esp)
     );
     const comparar = (a, b) => String(a ?? '').localeCompare(String(b ?? ''), 'pt-BR', { sensitivity: 'base', numeric: true });
+    // Ordenação apenas alfabética
     filtrados.sort((a, b) => {
-      if (ordem === 'id_desc') return comparar(b.id_usuario ?? b.crm, a.id_usuario ?? a.crm);
       if (ordem === 'nome_asc') return comparar(a.nome, b.nome);
       if (ordem === 'nome_desc') return comparar(b.nome, a.nome);
-      return comparar(a.id_usuario ?? a.crm, b.id_usuario ?? b.crm);
+      return 0;
     });
     renderTable(filtrados);
   }

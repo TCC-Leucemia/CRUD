@@ -587,7 +587,8 @@
           <span class="card-title">Lista de Consultas</span>
           <div class="filter-row">
             <div class="search-bar" style="max-width:260px">
-              <input type="text" id="searchConsulta" placeholder="CPF paciente ou CRM médico...">
+              <!-- ALTERADO: placeholder sem menção a ID -->
+              <input type="text" id="searchConsulta" placeholder="Buscar por paciente, médico, CPF ou CRM...">
             </div>
             <select id="filterStatus" class="filter-select">
               <option value="">Todos os status</option>
@@ -602,11 +603,10 @@
               <option value="Consulta clínica">Consulta clínica</option>
               <option value="Retorno">Retorno</option>
             </select>
+            <!-- ALTERADO: removidas opções de ordenação por ID -->
             <select id="sortConsulta" class="filter-select" aria-label="Ordenar por">
-              <option value="data_desc">Ordenar por: Data mais recente</option>
+              <option value="data_desc">Data mais recente</option>
               <option value="data_asc">Data mais antiga</option>
-              <option value="id_asc">ID crescente</option>
-              <option value="id_desc">ID decrescente</option>
               <option value="nome_asc">Paciente A-Z</option>
               <option value="nome_desc">Paciente Z-A</option>
             </select>
@@ -629,7 +629,7 @@
           <table>
             <thead>
               <tr>
-                <th>ID</th>
+                <!-- ALTERADO: coluna ID removida -->
                 <th>Paciente (CPF)</th>
                 <th>Médico (CRM)</th>
                 <th>Data da Consulta</th>
@@ -909,7 +909,6 @@
     data.forEach(c => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td style="font-family:var(--font-mono);font-size:0.78rem;color:var(--text-3)">#${c.id_consulta}</td>
         <td>
           <strong>${c.paciente || '—'}</strong><br>
           <small style="color:var(--text-3)">${formatarCPF(c.cpf)}</small>
@@ -955,8 +954,6 @@
     const comparar = (a, b) => String(a ?? '').localeCompare(String(b ?? ''), 'pt-BR', { sensitivity: 'base', numeric: true });
     filtradas.sort((a, b) => {
       if (ordem === 'data_asc') return (Date.parse(a.data_consulta) || 0) - (Date.parse(b.data_consulta) || 0);
-      if (ordem === 'id_asc') return Number(a.id_consulta) - Number(b.id_consulta);
-      if (ordem === 'id_desc') return Number(b.id_consulta) - Number(a.id_consulta);
       if (ordem === 'nome_asc') return comparar(a.paciente, b.paciente);
       if (ordem === 'nome_desc') return comparar(b.paciente, a.paciente);
       return (Date.parse(b.data_consulta) || 0) - (Date.parse(a.data_consulta) || 0);
@@ -1585,8 +1582,7 @@
       const c = dados.dados;
       document.getElementById('detalheBody').innerHTML = `
         <div class="detail-grid">
-          <span class="detail-key">ID</span>
-          <span class="detail-value" style="font-family:var(--font-mono)">#${c.id_consulta}</span>
+          <!-- ALTERADO: linha do ID removida -->
           <span class="detail-key">Paciente</span>
           <span class="detail-value">
             <strong>${c.paciente || '—'}</strong><br>

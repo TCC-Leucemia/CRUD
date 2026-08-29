@@ -49,7 +49,7 @@ module.exports = class MedicosMiddleware {
         }
 
         console.log("CRM recebido:", JSON.stringify(crm), "tipo:", typeof crm);
-        const crmRegex = /^\d{4,11}$/;
+        const crmRegex = /^\d{4,11}-[A-Z]{2}$/;
 
         if (!crmRegex.test(crm)) {
             throw new ErrorResponse(400, "CRM inválido");
