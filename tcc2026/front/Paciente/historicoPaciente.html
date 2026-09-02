@@ -83,6 +83,38 @@
       background: var(--bg);
     }
 
+    /* Novo campo de filtro por data */
+    .filtro-data {
+      padding: 10px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg);
+    }
+    .filtro-data label {
+      font-size: .8rem;
+      color: var(--text-2);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .filtro-data input[type="date"] {
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: .8rem;
+      background: var(--surface);
+      color: var(--text-1);
+      outline: none;
+      font-family: var(--font);
+      flex: 1;
+      transition: var(--transition);
+    }
+    .filtro-data input[type="date"]:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.08);
+    }
+
     .lista-body { overflow-y: auto; max-height: calc(100vh - 280px); }
     .lista-body::-webkit-scrollbar { width: 4px; }
     .lista-body::-webkit-scrollbar-thumb { background: var(--border-dark); border-radius: 2px; }
@@ -280,6 +312,22 @@
       justify-content: center;
     }
 
+    /* Classe para consulta selecionada (automática ou manual) */
+    .cal-grid .day.consulta-selecionada {
+      background: var(--red);
+      color: #fff;
+      font-weight: 800;
+      box-shadow: 0 0 0 2px var(--red-dark);
+      transform: scale(1.05);
+    }
+    .cal-grid .day.consulta-selecionada.has-consulta {
+      background: var(--red);
+      color: #fff;
+    }
+    .cal-grid .day.consulta-selecionada.today {
+      border-color: var(--red-dark);
+    }
+
     /* ── Modo escuro ── */
     .dark-mode .diagnostico-box {
       background: #1e3a8a;
@@ -310,6 +358,15 @@
     }
     .dark-mode .cal-grid .day.other-month {
       color: var(--text-3);
+    }
+    .dark-mode .cal-grid .day.consulta-selecionada {
+      background: var(--red);
+      color: #fff;
+      box-shadow: 0 0 0 2px #b91c1c;
+    }
+    .dark-mode .cal-grid .day.consulta-selecionada.has-consulta {
+      background: var(--red);
+      color: #fff;
     }
 
     .dark-mode .badge.badge-green {
@@ -378,6 +435,7 @@
     }
     @media (max-width: 540px) {
       .pac-nav { max-width: 100%; }
+      .filtro-data { flex-direction: column; align-items: stretch; }
     }
   </style>
 </head>
@@ -427,6 +485,11 @@
               <span id="listaTitulo">Minhas Consultas</span>
               <span class="badge badge-gray" id="listaContador">0</span>
             </div>
+            <!-- Campo de filtro por data -->
+            <div class="filtro-data">
+              <label for="filtroData">Filtrar por data:</label>
+              <input type="date" id="filtroData">
+            </div>
             <div class="lista-body" id="listaBody"></div>
           </div>
 
@@ -463,6 +526,7 @@ let EXAMES = [];
 
 let viewAtiva  = 'consultas';
 let idSelecionado = null;
+let dataSelecionada = null; // guarda a data (YYYY-MM-DD) da consulta selecionada
 
 // Inicializar sidebar
 if (typeof HematoAI !== 'undefined' && HematoAI.initSidebar) {
@@ -471,7 +535,7 @@ if (typeof HematoAI !== 'undefined' && HematoAI.initSidebar) {
 
 /* ═══════════════════════════════════════════════════════
    CALENDÁRIO
-══════════════════════════════f═════════════════════════ */
+═══════════════════════════════════════════════════════ */
 let mesAtual = new Date().getMonth();
 let anoAtual = new Date().getFullYear();
 
@@ -622,11 +686,15 @@ function renderCalendario(mes, ano) {
     const dataStr = `${ano}-${String(mes+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const isToday = (d === hoje.getDate() && mes === hoje.getMonth() && ano === hoje.getFullYear());
     const temConsulta = CONSULTAS.some(c => c.data.substring(0,10) === dataStr);
+    const isSelecionada = (dataSelecionada === dataStr);
+
     let classes = 'day';
     if (temConsulta) classes += ' has-consulta';
     if (isToday) classes += ' today';
+    if (isSelecionada) classes += ' consulta-selecionada';
+
     html += `<div class="${classes}" data-data="${dataStr}">${d}`;
-    // Lembrete se consulta futura
+    // Lembrete se consulta futura (mantido como antes)
     if (temConsulta && new Date(dataStr) > hoje) {
       html += `<span class="lembrete-badge">!</span>`;
     }
@@ -641,11 +709,7 @@ function renderCalendario(mes, ano) {
       const data = this.dataset.data;
       const consulta = CONSULTAS.find(c => c.data.substring(0,10) === data);
       if (consulta) {
-        setView('consultas');
-        idSelecionado = consulta.id;
-        renderLista(CONSULTAS, 'consulta');
-        renderDetalheConsulta(consulta);
-        document.getElementById('btnExportarPDF').style.display = 'block';
+        selecionarConsulta(consulta);
       }
     });
   });
@@ -671,6 +735,9 @@ document.getElementById('btnExames').addEventListener('click',   () => setView('
 function setView(view) {
   viewAtiva = view;
   idSelecionado = null;
+  dataSelecionada = null;
+  // Limpar filtro de data ao trocar de view
+  document.getElementById('filtroData').value = '';
 
   document.getElementById('btnConsultas').classList.toggle('ativo', view === 'consultas');
   document.getElementById('btnExames').classList.toggle('ativo',    view === 'exames');
@@ -689,7 +756,49 @@ function setView(view) {
       <p style="font-size:.82rem;">Clique em um registro à esquerda para ver os detalhes completos.</p>
     </div>`;
   document.getElementById('btnExportarPDF').style.display = 'none';
+
+  // Re-renderizar calendário para limpar destaque de seleção, se necessário
+  if (document.getElementById('calGrid').innerHTML !== '') {
+    renderCalendario(mesAtual, anoAtual);
+  }
 }
+
+/* ═══════════════════════════════════════════════════════
+   FILTRO POR DATA
+═══════════════════════════════════════════════════════ */
+document.getElementById('filtroData').addEventListener('change', function() {
+  const dataFiltro = this.value;
+  if (viewAtiva === 'consultas') {
+    let dados = CONSULTAS;
+    if (dataFiltro) {
+      dados = CONSULTAS.filter(c => c.data.substring(0,10) === dataFiltro);
+    }
+    renderLista(dados, 'consulta');
+    // Limpar seleção e detalhe
+    idSelecionado = null;
+    dataSelecionada = null;
+    document.getElementById('detalhePanel').innerHTML = `
+      <div class="detalhe-vazio">
+        <p style="font-size:.95rem;font-weight:700;color:var(--text-2);margin-bottom:8px;">Selecione um item</p>
+        <p style="font-size:.82rem;">Clique em um registro à esquerda para ver os detalhes completos.</p>
+      </div>`;
+    document.getElementById('btnExportarPDF').style.display = 'none';
+  } else {
+    let dados = EXAMES;
+    if (dataFiltro) {
+      dados = EXAMES.filter(e => e.data.substring(0,10) === dataFiltro);
+    }
+    renderLista(dados, 'exame');
+    idSelecionado = null;
+    dataSelecionada = null;
+    document.getElementById('detalhePanel').innerHTML = `
+      <div class="detalhe-vazio">
+        <p style="font-size:.95rem;font-weight:700;color:var(--text-2);margin-bottom:8px;">Selecione um item</p>
+        <p style="font-size:.82rem;">Clique em um registro à esquerda para ver os detalhes completos.</p>
+      </div>`;
+    document.getElementById('btnExportarPDF').style.display = 'none';
+  }
+});
 
 /* ═══════════════════════════════════════════════════════
    RENDERIZAR LISTA
@@ -718,10 +827,7 @@ function renderLista(dados, tipo) {
         <div class="item-sub">${item.medico} · ${item.especialidade}</div>
         <span class="badge badge-${corStatus(item.status)}" style="font-size:.68rem">${item.status}</span>`;
       div.addEventListener('click', () => {
-        idSelecionado = item.id;
-        renderLista(CONSULTAS, 'consulta');
-        renderDetalheConsulta(item);
-        document.getElementById('btnExportarPDF').style.display = 'block';
+        selecionarConsulta(item);
       });
     } else {
       // Exames
@@ -735,6 +841,7 @@ function renderLista(dados, tipo) {
         <span class="badge badge-${corStatus(item.status)}" style="font-size:.68rem">${item.status}</span>`;
       div.addEventListener('click', () => {
         idSelecionado = item.id;
+        dataSelecionada = null; // não há destaque de data para exames
         renderLista(EXAMES, 'exame');
         renderDetalheExame(item);
         document.getElementById('btnExportarPDF').style.display = 'block';
@@ -743,6 +850,48 @@ function renderLista(dados, tipo) {
 
     body.appendChild(div);
   });
+}
+
+/* ═══════════════════════════════════════════════════════
+   FUNÇÃO PARA SELECIONAR CONSULTA (REUTILIZÁVEL)
+═══════════════════════════════════════════════════════ */
+function selecionarConsulta(consulta) {
+  if (!consulta) return;
+
+  idSelecionado = consulta.id;
+  dataSelecionada = consulta.data.substring(0,10);
+  viewAtiva = 'consultas';
+
+  // Atualizar botões de navegação
+  document.getElementById('btnConsultas').classList.add('ativo');
+  document.getElementById('btnExames').classList.remove('ativo');
+
+  // Atualizar título da lista
+  document.getElementById('listaTitulo').textContent = 'Minhas Consultas';
+
+  // Renderizar lista com destaque
+  renderLista(CONSULTAS, 'consulta');
+
+  // Renderizar detalhes
+  renderDetalheConsulta(consulta);
+
+  // Mostrar botão PDF
+  document.getElementById('btnExportarPDF').style.display = 'block';
+
+  // Re-renderizar calendário para atualizar destaque (classe consulta-selecionada)
+  renderCalendario(mesAtual, anoAtual);
+}
+
+/* ═══════════════════════════════════════════════════════
+   ENCONTRAR PRÓXIMA CONSULTA
+═══════════════════════════════════════════════════════ */
+function encontrarProximaConsulta() {
+  const agora = new Date();
+  const proximas = CONSULTAS
+    .filter(c => new Date(c.data) > agora)
+    .sort((a, b) => new Date(a.data) - new Date(b.data));
+
+  return proximas.length > 0 ? proximas[0] : null;
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -873,18 +1022,49 @@ document.getElementById('btnExportarPDF').addEventListener('click', function() {
   HematoAI.showToast('PDF exportado com sucesso!', 'success');
 });
 
+/* ═══════════════════════════════════════════════════════
+   INICIALIZAÇÃO
+═══════════════════════════════════════════════════════ */
 (async () => {
-
     verificarPerfil("Paciente");
-
     await carregarConsultas();
-
     await carregarExames();
 
+    // Configurar a view padrão como 'consultas' sem renderizar ainda
+    viewAtiva = 'consultas';
+    document.getElementById('btnConsultas').classList.add('ativo');
+    document.getElementById('btnExames').classList.remove('ativo');
+    document.getElementById('listaTitulo').textContent = 'Minhas Consultas';
+    renderLista(CONSULTAS, 'consulta');
+    // Não renderiza detalhe ainda (fica vazio)
+
+    // Encontrar próxima consulta
+    const proxima = encontrarProximaConsulta();
+
+    if (proxima) {
+      const dataProxima = new Date(proxima.data);
+      mesAtual = dataProxima.getMonth();
+      anoAtual = dataProxima.getFullYear();
+      dataSelecionada = proxima.data.substring(0,10); // para destaque no calendário
+    } else {
+      dataSelecionada = null;
+    }
+
+    // Renderizar calendário (com possível destaque)
     renderCalendario(mesAtual, anoAtual);
 
-    setView("consultas");
-
+    // Selecionar automaticamente a próxima consulta, se existir
+    if (proxima) {
+      selecionarConsulta(proxima);
+    } else {
+      // Sem próxima consulta: manter painel vazio
+      document.getElementById('detalhePanel').innerHTML = `
+        <div class="detalhe-vazio">
+          <p style="font-size:.95rem;font-weight:700;color:var(--text-2);margin-bottom:8px;">Selecione um item</p>
+          <p style="font-size:.82rem;">Clique em um registro à esquerda para ver os detalhes completos.</p>
+        </div>`;
+      document.getElementById('btnExportarPDF').style.display = 'none';
+    }
 })();
 </script>
 </body>

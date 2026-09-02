@@ -12,6 +12,7 @@
     .pac-dashboard {
       max-width: 1100px;
       margin: 0 auto;
+      padding: 0 4px;
     }
 
     /* ── Indicadores ────────────────────────────────────── */
@@ -31,6 +32,7 @@
       transition: all 0.3s ease;
       position: relative;
       overflow: hidden;
+      box-shadow: var(--shadow-sm);
     }
 
     .stat-indicator-card::before {
@@ -56,12 +58,13 @@
     }
 
     .stat-indicator-number {
-      font-size: 2rem;
+      font-size: 2.2rem;
       font-weight: 800;
       color: var(--red);
       line-height: 1.2;
       margin-bottom: 4px;
       letter-spacing: -0.5px;
+      display: block;
     }
 
     .stat-indicator-label {
@@ -69,13 +72,7 @@
       color: var(--text-2);
       font-weight: 600;
       letter-spacing: 0.2px;
-    }
-
-    .stat-indicator-icon {
-      font-size: 1.6rem;
-      display: block;
-      margin-bottom: 6px;
-      opacity: 0.8;
+      text-transform: uppercase;
     }
 
     /* ── Grid principal (2x2) ──────────────────────────── */
@@ -85,21 +82,62 @@
       gap: 20px;
     }
 
-    .pac-grid .card {
+    /* ── Cards do dashboard ────────────────────────────── */
+    .pac-dashboard .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-sm);
       transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
 
-    .pac-grid .card:hover {
+    .pac-dashboard .card:hover {
       box-shadow: var(--shadow-md);
+      border-color: var(--border-dark);
     }
 
-    /* ── Estilos dos cards ──────────────────────────────── */
+    .pac-dashboard .card-header {
+      padding: 16px 20px 12px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .pac-dashboard .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-1);
+      letter-spacing: -0.2px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pac-dashboard .card-title i {
+      font-size: 1.1rem;
+      color: var(--red);
+    }
+
+    .pac-dashboard .card-body {
+      padding: 16px 20px 20px 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Linhas de informação ──────────────────────────── */
     .info-linha {
       display: flex;
       justify-content: space-between;
-      padding: 7px 0;
-      font-size: 0.85rem;
+      align-items: center;
+      padding: 10px 0;
+      font-size: 0.9rem;
       border-bottom: 1px solid var(--border);
+      gap: 12px;
     }
     .info-linha:last-of-type {
       border-bottom: none;
@@ -107,16 +145,25 @@
     .info-linha .label {
       color: var(--text-2);
       font-weight: 500;
+      white-space: nowrap;
     }
     .info-linha .valor {
       color: var(--text-1);
       font-weight: 600;
       text-align: right;
+      word-break: break-word;
+    }
+
+    /* Destaque para data/horário em Próxima Consulta */
+    .info-linha .valor-destaque {
+      font-weight: 700;
+      color: var(--red);
+      font-size: 1.05rem;
     }
 
     .consulta-status {
-      margin-top: 10px;
-      padding-top: 10px;
+      margin-top: 12px;
+      padding-top: 12px;
       border-top: 1px solid var(--border);
       display: flex;
       justify-content: flex-end;
@@ -125,19 +172,23 @@
     .placeholder-text {
       color: var(--text-3);
       font-size: 0.9rem;
-      padding: 16px 0;
+      padding: 24px 0;
       text-align: center;
       font-weight: 500;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-lg);
+      background: var(--bg);
     }
 
     /* ── Badges de status ── */
     .status-badge {
       display: inline-block;
-      padding: 3px 14px;
+      padding: 4px 14px;
       border-radius: 20px;
       font-size: 0.7rem;
       font-weight: 700;
       letter-spacing: 0.3px;
+      text-transform: uppercase;
     }
     .status-finalizado {
       background: #dcfce7;
@@ -170,39 +221,51 @@
       display: flex;
       align-items: center;
       gap: 14px;
-      padding: 10px 0;
-      border-bottom: 1px solid var(--border);
-      transition: background 0.2s ease;
+      padding: 12px 16px;
       border-radius: var(--radius-md);
-      padding: 10px 12px;
-      margin: 0 -12px;
+      background: var(--bg);
+      margin-bottom: 8px;
+      border-left: 4px solid var(--red);
+      transition: background 0.2s ease;
+      font-size: 0.9rem;
     }
     .alerta-item:last-child {
-      border-bottom: none;
+      margin-bottom: 0;
     }
     .alerta-item:hover {
-      background: var(--bg);
+      background: var(--surface-hover, #f8fafc);
     }
     .alerta-item .icone {
       font-size: 1.2rem;
       width: 28px;
       text-align: center;
       flex-shrink: 0;
+      color: var(--red);
     }
     .alerta-item .texto {
-      font-size: 0.85rem;
       color: var(--text-1);
       flex: 1;
       font-weight: 500;
+      line-height: 1.4;
+    }
+
+    /* Alerta sem pendências */
+    .alerta-item.alerta-ok {
+      border-left-color: var(--blue, #2563eb);
+    }
+    .alerta-item.alerta-ok .icone {
+      color: var(--blue, #2563eb);
     }
 
     /* ── Resumo Clínico ── */
     .resumo-linha {
       display: flex;
       justify-content: space-between;
-      padding: 9px 0;
+      align-items: center;
+      padding: 10px 0;
       border-bottom: 1px solid var(--border);
-      font-size: 0.85rem;
+      font-size: 0.9rem;
+      gap: 12px;
     }
     .resumo-linha:last-child {
       border-bottom: none;
@@ -210,20 +273,26 @@
     .resumo-linha .label {
       color: var(--text-2);
       font-weight: 500;
+      white-space: nowrap;
     }
     .resumo-linha .valor {
       color: var(--text-1);
       font-weight: 700;
+      text-align: right;
     }
 
     /* ── Botão "Ver histórico" ── */
     .btn-ver-historico {
       width: 100%;
       justify-content: center;
-      margin-top: 4px;
+      margin-top: 8px;
       font-weight: 600;
       letter-spacing: 0.3px;
       transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
     }
     .btn-ver-historico:hover {
       transform: translateY(-2px);
@@ -231,27 +300,64 @@
     }
 
     /* ── Modo escuro ── */
-    .dark-mode .info-linha {
-      border-bottom-color: var(--border);
+    .dark-mode .pac-dashboard .card {
+      background: var(--surface);
+      border-color: var(--border);
     }
-    .dark-mode .alerta-item {
-      border-bottom-color: var(--border);
-    }
+    .dark-mode .info-linha,
+    .dark-mode .consulta-status,
     .dark-mode .resumo-linha {
       border-bottom-color: var(--border);
     }
-    .dark-mode .consulta-status {
-      border-top-color: var(--border);
+    .dark-mode .alerta-item {
+      background: var(--surface);
+      border-left-color: var(--red);
+    }
+    .dark-mode .alerta-item.alerta-ok {
+      border-left-color: var(--blue);
+    }
+    .dark-mode .placeholder-text {
+      background: var(--surface);
+      border-color: var(--border);
+      color: var(--text-3);
     }
 
     /* ── Responsividade ────────────────────────────────── */
     @media (max-width: 1024px) {
-      .pac-grid { grid-template-columns: 1fr; }
-      .stats-indicators { grid-template-columns: repeat(2, 1fr); }
+      .pac-grid {
+        grid-template-columns: 1fr;
+      }
+      .stats-indicators {
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
     @media (max-width: 600px) {
-      .stats-indicators { grid-template-columns: 1fr; }
-      .stat-indicator-number { font-size: 1.6rem; }
+      .stats-indicators {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+      .stat-indicator-number {
+        font-size: 1.8rem;
+      }
+      .pac-dashboard .card-header {
+        padding: 14px 16px 10px;
+      }
+      .pac-dashboard .card-body {
+        padding: 14px 16px 16px;
+      }
+      .info-linha,
+      .resumo-linha {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+      }
+      .info-linha .valor,
+      .resumo-linha .valor {
+        text-align: left;
+      }
+      .alerta-item {
+        padding: 10px 12px;
+      }
     }
   </style>
 </head>
@@ -279,24 +385,20 @@
         <!-- ─── INDICADORES ────────────────────────────────── -->
         <div class="stats-indicators">
           <div class="stat-indicator-card">
-            <span class="stat-indicator-icon">📋</span>
             <div class="stat-indicator-number" id="totalConsultas">0</div>
             <div class="stat-indicator-label">Consultas</div>
           </div>
           <div class="stat-indicator-card">
-            <span class="stat-indicator-icon">🧪</span>
             <div class="stat-indicator-number" id="totalExames">0</div>
             <div class="stat-indicator-label">Exames</div>
           </div>
           <div class="stat-indicator-card">
-            <span class="stat-indicator-icon">📄</span>
             <div class="stat-indicator-number" id="totalResultados">0</div>
             <div class="stat-indicator-label">Resultados</div>
           </div>
           <div class="stat-indicator-card">
-            <span class="stat-indicator-icon">📅</span>
             <div class="stat-indicator-number" id="proximasConsultas">0</div>
-            <div class="stat-indicator-label">Próximas consultas</div>
+            <div class="stat-indicator-label">Próximas</div>
           </div>
         </div>
 
@@ -306,7 +408,9 @@
           <!-- Card 1: Próxima Consulta -->
           <div class="card">
             <div class="card-header">
-              <span class="card-title">Próxima Consulta</span>
+              <span class="card-title">
+                <i data-lucide="calendar-clock"></i> Próxima Consulta
+              </span>
             </div>
             <div class="card-body">
               <div id="proximaConsulta">
@@ -315,7 +419,7 @@
               </div>
               <div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border);">
                 <a href="historicoPaciente.html" class="btn btn-outline btn-sm btn-ver-historico">
-                  Ver histórico →
+                  <i data-lucide="history"></i> Ver histórico
                 </a>
               </div>
             </div>
@@ -324,7 +428,9 @@
           <!-- Card 2: Último Exame -->
           <div class="card">
             <div class="card-header">
-              <span class="card-title">Último Exame</span>
+              <span class="card-title">
+                <i data-lucide="flask-conical"></i> Último Exame
+              </span>
             </div>
             <div class="card-body">
               <div id="ultimoExame">
@@ -337,15 +443,13 @@
           <!-- Card 3: Alertas -->
           <div class="card">
             <div class="card-header">
-              <span class="card-title">Alertas</span>
+              <span class="card-title">
+                <i data-lucide="bell"></i> Alertas
+              </span>
             </div>
             <div class="card-body">
               <div id="listaAlertas">
                 <!-- Preenchido via JavaScript -->
-                <div class="alerta-item">
-                  <span class="icone">✔</span>
-                  <span class="texto">Nenhuma pendência</span>
-                </div>
               </div>
             </div>
           </div>
@@ -353,15 +457,13 @@
           <!-- Card 4: Resumo Clínico -->
           <div class="card">
             <div class="card-header">
-              <span class="card-title">Resumo Clínico</span>
+              <span class="card-title">
+                <i data-lucide="clipboard-list"></i> Resumo Clínico
+              </span>
             </div>
             <div class="card-body">
               <div id="resumoClinico">
                 <!-- Preenchido via JavaScript -->
-                <div class="resumo-linha"><span class="label">Última consulta</span><span class="valor">—</span></div>
-                <div class="resumo-linha"><span class="label">Próxima consulta</span><span class="valor">—</span></div>
-                <div class="resumo-linha"><span class="label">Último exame</span><span class="valor">—</span></div>
-                <div class="resumo-linha"><span class="label">Resultados disponíveis</span><span class="valor">0</span></div>
               </div>
             </div>
           </div>
@@ -386,8 +488,6 @@
     window.location.href = "../login.html";
   }
 
-  
-
   if (typeof HematoAI !== 'undefined' && HematoAI.initSidebar) {
     HematoAI.initSidebar('paciente');
   } else {
@@ -408,367 +508,248 @@
 
   let CONSULTAS = [];
   let EXAMES = [];
-  let RESULTADOS = [];
 
   async function carregarDashboard() {
-
-      await carregarConsultas();
-      await carregarExames();
-
-      atualizarIndicadores();
-
-      preencherProximaConsulta();
-
-      preencherUltimoExame();
-
-      preencherAlertas();
-
-      preencherResumo();
-
+    await carregarConsultas();
+    await carregarExames();
+    atualizarIndicadores();
+    preencherProximaConsulta();
+    preencherUltimoExame();
+    preencherAlertas();
+    preencherResumo();
+    // Inicializar ícones Lucide após renderização dinâmica
+    if (window.lucide) {
+      lucide.createIcons();
+    }
   }
 
   async function carregarConsultas() {
-
     try {
-
-        const token = localStorage.getItem("token");
-
-        const response = await fetch(
-            "http://localhost:3000/consultas",
-            {
-                headers: {
-                    Authorization: "Bearer " + token
-                }
-            }
-        );
-
-        const dados = await response.json();
-
-        if (!dados.status) {
-            HematoAI.showToast("Erro ao carregar consultas", "error");
-            return;
-        }
-
-        CONSULTAS = dados.dados.map(c => ({
-
-            id: c.id_consulta,
-
-            medico: c.medico,
-
-            crm: c.crm,
-
-            data: c.data_consulta,
-
-            tipo: c.tipo_consulta,
-
-            status: c.statusc,
-
-            especialidade: c.especialidade || "Hematologia"
-
-        }));
-
+      const token = localStorage.getItem("token");
+      const response = await fetch("http://localhost:3000/consultas", {
+        headers: { Authorization: "Bearer " + token }
+      });
+      const dados = await response.json();
+      if (!dados.status) {
+        HematoAI.showToast("Erro ao carregar consultas", "error");
+        return;
+      }
+      CONSULTAS = dados.dados.map(c => ({
+        id: c.id_consulta,
+        medico: c.medico,
+        crm: c.crm,
+        data: c.data_consulta,
+        tipo: c.tipo_consulta,
+        status: c.statusc,
+        especialidade: c.especialidade || "Hematologia"
+      }));
     } catch (e) {
-
-        console.error(e);
-
-        HematoAI.showToast(
-            "Erro ao carregar consultas",
-            "error"
-        );
+      console.error(e);
+      HematoAI.showToast("Erro ao carregar consultas", "error");
     }
   }
 
   async function carregarExames() {
-
     try {
-
-        const token = localStorage.getItem("token");
-        
-        console.log("TOKEN:", token);
-
-        const response = await fetch(
-            "http://localhost:3000/exames",
-            {
-                headers: {
-                    Authorization: "Bearer " + token
-                }
-            }
-        );
-
-        const dados = await response.json();
-
-        if (!dados.status) {
-
-            HematoAI.showToast(
-                "Erro ao carregar exames",
-                "error"
-            );
-
-            return;
-        }
-
-        EXAMES = dados.dados.map(e => ({
-
-            id: e.id_exame,
-
-            tipo: e.tipo_exame,
-
-            data: e.data_exame,
-
-            medico: e.medico,
-
-            status: e.statusc,
-
-            diagnostico: e.resultado_texto ? {
-
-                resultado_texto: e.resultado_texto,
-
-                suspeita_leucemia: e.suspeita_leucemia,
-
-                tipo_leucemia: e.tipo_leucemia,
-
-                data_resultado: e.data_resultado
-
-            } : null
-
-        }));
-
+      const token = localStorage.getItem("token");
+      const response = await fetch("http://localhost:3000/exames", {
+        headers: { Authorization: "Bearer " + token }
+      });
+      const dados = await response.json();
+      if (!dados.status) {
+        HematoAI.showToast("Erro ao carregar exames", "error");
+        return;
+      }
+      EXAMES = dados.dados.map(e => ({
+        id: e.id_exame,
+        tipo: e.tipo_exame,
+        data: e.data_exame,
+        medico: e.medico,
+        status: e.statusc,
+        diagnostico: e.resultado_texto ? {
+          resultado_texto: e.resultado_texto,
+          suspeita_leucemia: e.suspeita_leucemia,
+          tipo_leucemia: e.tipo_leucemia,
+          data_resultado: e.data_resultado
+        } : null
+      }));
     } catch (e) {
-
-        console.error(e);
-
-        HematoAI.showToast(
-            "Erro ao carregar exames",
-            "error"
-        );
+      console.error(e);
+      HematoAI.showToast("Erro ao carregar exames", "error");
     }
   }
-  function atualizarIndicadores(){
 
-    document.getElementById("totalConsultas").textContent =
-        CONSULTAS.length;
-
-    document.getElementById("totalExames").textContent =
-        EXAMES.length;
-
-    document.getElementById("totalResultados").textContent =
-        EXAMES.filter(e=>e.diagnostico).length;
-
-    document.getElementById("proximasConsultas").textContent =
-        CONSULTAS.filter(c=>new Date(c.data)>new Date()).length;
-
+  function atualizarIndicadores() {
+    document.getElementById("totalConsultas").textContent = CONSULTAS.length;
+    document.getElementById("totalExames").textContent = EXAMES.length;
+    document.getElementById("totalResultados").textContent = EXAMES.filter(e => e.diagnostico).length;
+    document.getElementById("proximasConsultas").textContent = CONSULTAS.filter(c => new Date(c.data) > new Date()).length;
   }
+
   function preencherProximaConsulta() {
-
     const div = document.getElementById("proximaConsulta");
-
     const futuras = CONSULTAS
-        .filter(c => new Date(c.data) > new Date())
-        .sort((a, b) => new Date(a.data) - new Date(b.data));
+      .filter(c => new Date(c.data) > new Date())
+      .sort((a, b) => new Date(a.data) - new Date(b.data));
 
     const consulta = futuras[0];
 
     if (!consulta) {
-
-        div.innerHTML = `
-            <div class="placeholder-text">
-                Nenhuma consulta agendada.
-            </div>
-        `;
-
-        return;
+      div.innerHTML = `<div class="placeholder-text">Nenhuma consulta agendada.</div>`;
+      return;
     }
 
+    // Extrair data e hora separadamente para melhor hierarquia
+    const dataConsulta = new Date(consulta.data);
+    const dataFormatada = dataConsulta.toLocaleDateString('pt-BR');
+    const horaFormatada = dataConsulta.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
     div.innerHTML = `
-        <div class="info-linha">
-            <span class="label">Data</span>
-            <span class="valor">
-                ${formatarDataHora(consulta.data)}
-            </span>
-        </div>
-
-        <div class="info-linha">
-            <span class="label">Médico</span>
-            <span class="valor">
-                ${consulta.medico}
-            </span>
-        </div>
-
-        <div class="info-linha">
-            <span class="label">Especialidade</span>
-            <span class="valor">
-                ${consulta.especialidade}
-            </span>
-        </div>
-
-        <div class="consulta-status">
-            ${statusBadge(consulta.status)}
-        </div>
+      <div class="info-linha">
+        <span class="label">Data</span>
+        <span class="valor valor-destaque">${dataFormatada}</span>
+      </div>
+      <div class="info-linha">
+        <span class="label">Horário</span>
+        <span class="valor">${horaFormatada}</span>
+      </div>
+      <div class="info-linha">
+        <span class="label">Médico</span>
+        <span class="valor">${consulta.medico || '—'}</span>
+      </div>
+      <div class="info-linha">
+        <span class="label">Especialidade</span>
+        <span class="valor">${consulta.especialidade}</span>
+      </div>
+      <div class="consulta-status">
+        ${statusBadge(consulta.status)}
+      </div>
     `;
   }
-  function preencherUltimoExame() {
 
+  function preencherUltimoExame() {
     const div = document.getElementById("ultimoExame");
 
     if (EXAMES.length === 0) {
-
-        div.innerHTML = `
-            <div class="placeholder-text">
-                Nenhum exame encontrado.
-            </div>
-        `;
-
-        return;
+      div.innerHTML = `<div class="placeholder-text">Nenhum exame encontrado.</div>`;
+      return;
     }
 
-    const exame = EXAMES
-        .sort((a, b) => new Date(b.data) - new Date(a.data))[0];
+    // Ordenar sem alterar o array original
+    const exame = [...EXAMES].sort((a, b) => new Date(b.data) - new Date(a.data))[0];
 
     div.innerHTML = `
-        <div class="info-linha">
-            <span class="label">Tipo</span>
-            <span class="valor">${exame.tipo}</span>
-        </div>
-
-        <div class="info-linha">
-            <span class="label">Data</span>
-            <span class="valor">
-                ${formatarData(exame.data)}
-            </span>
-        </div>
-
-        <div class="info-linha">
-            <span class="label">Status</span>
-            <span class="valor">
-                ${statusBadge(exame.status)}
-            </span>
-        </div>
-
-        <div class="info-linha">
-            <span class="label">Resultado</span>
-            <span class="valor">
-                ${exame.diagnostico ? "Disponível" : "Pendente"}
-            </span>
-        </div>
+      <div class="info-linha">
+        <span class="label">Tipo</span>
+        <span class="valor">${exame.tipo}</span>
+      </div>
+      <div class="info-linha">
+        <span class="label">Data</span>
+        <span class="valor">${formatarData(exame.data)}</span>
+      </div>
+      <div class="info-linha">
+        <span class="label">Status</span>
+        <span class="valor">${statusBadge(exame.status)}</span>
+      </div>
+      <div class="info-linha">
+        <span class="label">Resultado</span>
+        <span class="valor">${exame.diagnostico ? 'Disponível' : 'Pendente'}</span>
+      </div>
     `;
   }
+
   function preencherAlertas() {
-
     const div = document.getElementById("listaAlertas");
-
     let html = "";
 
-    const futuras = CONSULTAS.filter(
-        c => new Date(c.data) > new Date()
-    );
+    const futuras = CONSULTAS.filter(c => new Date(c.data) > new Date());
+    const pendentes = EXAMES.filter(e => e.status === "Pendente");
+    const resultados = EXAMES.filter(e => e.diagnostico);
 
     if (futuras.length > 0) {
-
-        html += `
-            <div class="alerta-item">
-                <span class="icone">📅</span>
-                <span class="texto">
-                    Você possui consulta agendada.
-                </span>
-            </div>
-        `;
+      html += `
+        <div class="alerta-item">
+          <span class="icone"><i data-lucide="calendar-clock"></i></span>
+          <span class="texto">Você possui consulta agendada.</span>
+        </div>
+      `;
     }
-
-    const pendentes = EXAMES.filter(
-        e => e.status === "Pendente"
-    );
 
     if (pendentes.length > 0) {
-
-        html += `
-            <div class="alerta-item">
-                <span class="icone">🧪</span>
-                <span class="texto">
-                    Existem exames pendentes.
-                </span>
-            </div>
-        `;
+      html += `
+        <div class="alerta-item">
+          <span class="icone"><i data-lucide="flask-conical"></i></span>
+          <span class="texto">Existem exames pendentes.</span>
+        </div>
+      `;
     }
 
-    const resultados = EXAMES.filter(
-        e => e.diagnostico
-    );
-
     if (resultados.length > 0) {
-
-        html += `
-            <div class="alerta-item">
-                <span class="icone">📄</span>
-                <span class="texto">
-                    Existem resultados disponíveis.
-                </span>
-            </div>
-        `;
+      html += `
+        <div class="alerta-item">
+          <span class="icone"><i data-lucide="file-text"></i></span>
+          <span class="texto">Existem resultados disponíveis.</span>
+        </div>
+      `;
     }
 
     if (html === "") {
-
-        html = `
-            <div class="alerta-item">
-                <span class="icone">✔</span>
-                <span class="texto">
-                    Nenhuma pendência.
-                </span>
-            </div>
-        `;
+      html = `
+        <div class="alerta-item alerta-ok">
+          <span class="icone"><i data-lucide="check-circle"></i></span>
+          <span class="texto">Nenhuma pendência.</span>
+        </div>
+      `;
     }
 
     div.innerHTML = html;
   }
 
   function preencherResumo() {
-
     const div = document.getElementById("resumoClinico");
 
-    const ultimaConsulta =
-        CONSULTAS
-            .sort((a, b) => new Date(b.data) - new Date(a.data))[0];
+    // Ordenar sem alterar arrays originais
+    const ultimaConsulta = [...CONSULTAS].sort((a, b) => new Date(b.data) - new Date(a.data))[0];
+    const proximaConsulta = CONSULTAS
+      .filter(c => new Date(c.data) > new Date())
+      .sort((a, b) => new Date(a.data) - new Date(b.data))[0];
+    const ultimoExame = [...EXAMES].sort((a, b) => new Date(b.data) - new Date(a.data))[0];
 
-    const proximaConsulta =
-        CONSULTAS
-            .filter(c => new Date(c.data) > new Date())
-            .sort((a, b) => new Date(a.data) - new Date(b.data))[0];
-
-    const ultimoExame =
-        EXAMES
-            .sort((a, b) => new Date(b.data) - new Date(a.data))[0];
+    // Dados clínicos adicionais
+    const examesComDiagnostico = EXAMES.filter(e => e.diagnostico);
+    const ultimoDiagnostico = examesComDiagnostico.length > 0
+      ? [...examesComDiagnostico].sort((a, b) => new Date(b.data) - new Date(a.data))[0].diagnostico
+      : null;
 
     div.innerHTML = `
-        <div class="resumo-linha">
-            <span class="label">Última consulta</span>
-            <span class="valor">
-                ${ultimaConsulta ? formatarData(ultimaConsulta.data) : "—"}
-            </span>
-        </div>
-
-        <div class="resumo-linha">
-            <span class="label">Próxima consulta</span>
-            <span class="valor">
-                ${proximaConsulta ? formatarData(proximaConsulta.data) : "—"}
-            </span>
-        </div>
-
-        <div class="resumo-linha">
-            <span class="label">Último exame</span>
-            <span class="valor">
-                ${ultimoExame ? formatarData(ultimoExame.data) : "—"}
-            </span>
-        </div>
-
-        <div class="resumo-linha">
-            <span class="label">Resultados disponíveis</span>
-            <span class="valor">
-                ${EXAMES.filter(e => e.diagnostico).length}
-            </span>
-        </div>
+      <div class="resumo-linha">
+        <span class="label">Última consulta</span>
+        <span class="valor">${ultimaConsulta ? formatarData(ultimaConsulta.data) : '—'}</span>
+      </div>
+      <div class="resumo-linha">
+        <span class="label">Próxima consulta</span>
+        <span class="valor">${proximaConsulta ? formatarData(proximaConsulta.data) : '—'}</span>
+      </div>
+      <div class="resumo-linha">
+        <span class="label">Último exame</span>
+        <span class="valor">${ultimoExame ? formatarData(ultimoExame.data) : '—'}</span>
+      </div>
+      <div class="resumo-linha">
+        <span class="label">Resultados disponíveis</span>
+        <span class="valor">${EXAMES.filter(e => e.diagnostico).length}</span>
+      </div>
+      ${ultimoDiagnostico ? `
+      <div class="resumo-linha">
+        <span class="label">Suspeita de leucemia</span>
+        <span class="valor">${ultimoDiagnostico.suspeita_leucemia || 'Não avaliada'}</span>
+      </div>
+      <div class="resumo-linha">
+        <span class="label">Tipo de leucemia</span>
+        <span class="valor">${ultimoDiagnostico.tipo_leucemia || 'Não identificado'}</span>
+      </div>
+      ` : ''}
     `;
   }
-
 
   function statusBadge(status) {
     const map = {
@@ -785,23 +766,15 @@
     return d.toLocaleDateString('pt-BR');
   }
 
-  function formatarDataHora(iso) {
-    if (!iso) return '—';
-    const d = new Date(iso);
-    return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-  }
-
   // ============================================================
-  //  PREENCHER DADOS (MOCK — FUTURAMENTE VINDO DA API)
+  //  INICIALIZAÇÃO
   // ============================================================
   window.onload = async () => {
-
     verificarPerfil("Paciente");
-
     await carregarDashboard();
-  }
+  };
 
-  // Verificação de perfil
+  // Verificação de perfil adicional
   if (typeof verificarPerfil !== 'undefined') {
     verificarPerfil("Paciente");
   }

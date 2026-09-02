@@ -14,36 +14,6 @@
       margin: 0 auto;
     }
 
-    /* ── Indicadores ────────────────────────────────────── */
-    .stats-indicators {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      margin-bottom: 28px;
-    }
-
-    .stat-indicator-card {
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-xl);
-      padding: 18px;
-      text-align: center;
-    }
-
-    .stat-indicator-number {
-      font-size: 2rem;
-      font-weight: 800;
-      color: var(--red);
-      line-height: 1;
-      margin-bottom: 6px;
-    }
-
-    .stat-indicator-label {
-      font-size: 0.8rem;
-      color: var(--text-2);
-      font-weight: 500;
-    }
-
     /* ── Área de pesquisa e filtros ────────────────────── */
     .filtros-area {
       background: var(--surface);
@@ -116,84 +86,83 @@
       box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.08);
     }
 
-    /* ── Lista de resultados em barras ──────────────────── */
+    /* ── Lista de resultados em cards ──────────────────── */
     .resultados-list {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 12px;
     }
 
-    .resultado-linha {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 16px;
+    .resultado-card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      cursor: pointer;
+      border-radius: var(--radius-xl);
+      padding: 16px 20px;
       transition: var(--transition);
-      gap: 12px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
       flex-wrap: wrap;
+      align-items: center;
+      gap: 16px;
     }
 
-    .resultado-linha:hover {
+    .resultado-card:hover {
       background: var(--bg);
       border-color: var(--border-dark);
-      box-shadow: var(--shadow-sm);
+      box-shadow: var(--shadow-md);
     }
 
-    .resultado-linha .info {
-      display: flex;
-      align-items: center;
-      gap: 14px;
+    .resultado-card .info-principal {
       flex: 1;
       min-width: 180px;
     }
 
-    .resultado-linha .info .tipo {
-      font-weight: 600;
-      font-size: 0.9rem;
+    .resultado-card .info-principal .tipo {
+      font-weight: 700;
+      font-size: 1rem;
       color: var(--text-1);
+      margin-bottom: 4px;
+      display: block;
     }
 
-    .resultado-linha .info .data {
+    .resultado-card .info-principal .data {
       font-size: 0.8rem;
       color: var(--text-3);
-      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
 
-    .resultado-linha .badges {
+    .resultado-card .badges {
       display: flex;
       align-items: center;
       gap: 8px;
       flex-wrap: wrap;
     }
 
-    .resultado-linha .badges .badge-status {
-      display: inline-block;
-      padding: 2px 10px;
+    .badge-status,
+    .badge-suspeita {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 12px;
       border-radius: 20px;
       font-size: 0.7rem;
       font-weight: 700;
+      letter-spacing: 0.2px;
+      white-space: nowrap;
     }
+
     .badge-status.finalizado { background: #dcfce7; color: #15803d; }
     .badge-status.analise   { background: #dbeafe; color: #2563eb; }
     .badge-status.pendente  { background: #fef3c7; color: #d97706; }
 
-    .resultado-linha .badges .badge-suspeita {
-      display: inline-block;
-      padding: 2px 10px;
-      border-radius: 20px;
-      font-size: 0.7rem;
-      font-weight: 700;
-    }
     .badge-suspeita.sem       { background: #dcfce7; color: #15803d; }
     .badge-suspeita.baixa     { background: #dbeafe; color: #2563eb; }
     .badge-suspeita.moderada  { background: #fef3c7; color: #d97706; }
     .badge-suspeita.alta      { background: #fee2e2; color: #dc2626; }
 
-    .resultado-linha .btn-ver {
+    .resultado-card .acao {
       flex-shrink: 0;
     }
 
@@ -229,8 +198,8 @@
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.4);
-      backdrop-filter: blur(3px);
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -249,7 +218,7 @@
       background: var(--surface);
       border-radius: var(--radius-2xl);
       box-shadow: var(--shadow-lg);
-      max-width: 640px;
+      max-width: 720px;
       width: 100%;
       max-height: 90vh;
       overflow-y: auto;
@@ -261,23 +230,31 @@
       transform: scale(1);
     }
 
-    .modal-content .modal-header {
+    .modal-header {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-start;
       border-bottom: 1px solid var(--border);
-      padding-bottom: 14px;
-      margin-bottom: 20px;
+      padding-bottom: 16px;
+      margin-bottom: 24px;
     }
 
-    .modal-content .modal-header h2 {
-      font-size: 1.1rem;
-      font-weight: 700;
+    .modal-header .modal-titulo {
+      font-size: 1.4rem;
+      font-weight: 800;
       color: var(--text-1);
       margin: 0;
+      letter-spacing: -0.3px;
+      line-height: 1.2;
     }
 
-    .modal-content .modal-header .close-btn {
+    .modal-header .modal-subtitulo {
+      font-size: 0.8rem;
+      color: var(--text-3);
+      margin-top: 4px;
+    }
+
+    .modal-header .close-btn {
       background: transparent;
       border: none;
       font-size: 1.5rem;
@@ -285,62 +262,76 @@
       color: var(--text-2);
       transition: var(--transition);
       line-height: 1;
+      padding: 4px;
+      border-radius: 50%;
     }
-    .modal-content .modal-header .close-btn:hover {
+    .modal-header .close-btn:hover {
       color: var(--red);
+      background: rgba(185, 28, 28, 0.05);
     }
 
-    .modal-content .modal-body {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .modal-content .modal-body .linha {
-      display: flex;
-      justify-content: space-between;
-      padding: 4px 0;
-      border-bottom: 1px solid var(--border);
-      font-size: 0.9rem;
-    }
-    .modal-content .modal-body .linha:last-child {
-      border-bottom: none;
-    }
-    .modal-content .modal-body .linha .label {
-      color: var(--text-2);
-      font-weight: 600;
-    }
-    .modal-content .modal-body .linha .valor {
-      color: var(--text-1);
-      font-weight: 500;
-      text-align: right;
-      max-width: 60%;
-    }
-
-    .modal-content .modal-body .resultado-box {
+    /* Destaque do resultado */
+    .resultado-destaque {
       background: var(--bg);
       border-radius: var(--radius-lg);
-      padding: 14px 18px;
-      border-left: 4px solid var(--blue);
-      margin-top: 4px;
+      padding: 18px 20px;
+      border-left: 5px solid var(--blue);
+      margin-bottom: 24px;
     }
-    .modal-content .modal-body .resultado-box .label {
+    .resultado-destaque .label-destaque {
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-3);
+      margin-bottom: 8px;
+      display: block;
+    }
+    .resultado-destaque .texto-destaque {
+      font-size: 1rem;
+      color: var(--text-1);
+      line-height: 1.7;
+      white-space: pre-wrap;
+      font-weight: 500;
+    }
+
+    /* Grade de informações */
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px 24px;
+      margin-bottom: 24px;
+    }
+
+    .info-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding-bottom: 8px;
+      border-bottom: 1px dashed var(--border);
+    }
+    .info-item:last-child {
+      border-bottom: none;
+    }
+
+    .info-item .label {
       font-size: 0.7rem;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.4px;
+      letter-spacing: 0.3px;
       color: var(--text-3);
-      margin-bottom: 4px;
     }
-    .modal-content .modal-body .resultado-box .texto {
+    .info-item .valor {
       font-size: 0.9rem;
+      font-weight: 600;
       color: var(--text-1);
-      line-height: 1.6;
-      white-space: pre-wrap;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
-    .modal-content .modal-footer {
-      margin-top: 20px;
+    .modal-footer {
+      margin-top: 24px;
       padding-top: 16px;
       border-top: 1px solid var(--border);
       display: flex;
@@ -349,11 +340,11 @@
     }
 
     /* ── Modo escuro ────────────────────────────────────── */
-    .dark-mode .resultado-linha {
+    .dark-mode .resultado-card {
       background: var(--surface);
       border-color: var(--border);
     }
-    .dark-mode .resultado-linha:hover {
+    .dark-mode .resultado-card:hover {
       background: var(--bg);
     }
     .dark-mode .badge-status.finalizado { background: #064e3b; color: #6ee7b7; }
@@ -363,12 +354,12 @@
     .dark-mode .badge-suspeita.baixa     { background: #1e3a8a; color: #93c5fd; }
     .dark-mode .badge-suspeita.moderada  { background: #78350f; color: #fcd34d; }
     .dark-mode .badge-suspeita.alta      { background: #7f1d1d; color: #fca5a5; }
-    .dark-mode .modal-content .modal-body .linha {
-      border-bottom-color: var(--border);
-    }
-    .dark-mode .modal-content .resultado-box {
+    .dark-mode .modal-content .resultado-destaque {
       background: var(--surface);
       border-left-color: var(--blue);
+    }
+    .dark-mode .info-item {
+      border-bottom-color: var(--border);
     }
     .dark-mode .filtros-area {
       background: var(--surface);
@@ -394,9 +385,6 @@
     }
 
     /* ── Responsividade ────────────────────────────────── */
-    @media (max-width: 1024px) {
-      .stats-indicators { grid-template-columns: repeat(2, 1fr); }
-    }
     @media (max-width: 768px) {
       .filtros-area {
         flex-direction: column;
@@ -410,27 +398,32 @@
         flex: 1;
         min-width: 0;
       }
-      .resultado-linha {
+      .resultado-card {
         flex-direction: column;
         align-items: stretch;
-        gap: 6px;
-        padding: 12px 14px;
+        gap: 12px;
+        padding: 14px 16px;
       }
-      .resultado-linha .info {
-        flex-wrap: wrap;
-        gap: 6px;
+      .resultado-card .info-principal {
+        min-width: auto;
       }
-      .resultado-linha .badges {
-        flex-wrap: wrap;
-      }
-      .resultado-linha .btn-ver {
+      .resultado-card .acao {
         align-self: flex-end;
+      }
+      .info-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
       }
     }
     @media (max-width: 600px) {
-      .stats-indicators { grid-template-columns: 1fr; }
       .modal-content {
         padding: 20px 16px;
+      }
+      .modal-header .modal-titulo {
+        font-size: 1.2rem;
+      }
+      .resultado-destaque {
+        padding: 14px 16px;
       }
     }
   </style>
@@ -456,26 +449,6 @@
     <div class="page-body">
       <div class="resultados-container">
 
-        <!-- ─── INDICADORES ────────────────────────────────── -->
-        <div class="stats-indicators">
-          <div class="stat-indicator-card">
-            <div class="stat-indicator-number" id="totalExames">0</div>
-            <div class="stat-indicator-label">Total de exames</div>
-          </div>
-          <div class="stat-indicator-card">
-            <div class="stat-indicator-number" id="resultadosDisponiveis">0</div>
-            <div class="stat-indicator-label">Resultados disponíveis</div>
-          </div>
-          <div class="stat-indicator-card">
-            <div class="stat-indicator-number" id="emAnalise">0</div>
-            <div class="stat-indicator-label">Em análise</div>
-          </div>
-          <div class="stat-indicator-card">
-            <div class="stat-indicator-number" id="finalizados">0</div>
-            <div class="stat-indicator-label">Finalizados</div>
-          </div>
-        </div>
-
         <!-- ─── ÁREA DE PESQUISA E FILTROS ────────────────── -->
         <div class="filtros-area">
           <div class="search-wrapper">
@@ -484,12 +457,9 @@
           </div>
           <div class="filter-group">
             <select id="filtroTipo">
-              <option value="">Todos os tipos</option>
+              <option value="">Todos</option>
               <option value="Hemograma">Hemograma</option>
               <option value="Mielograma">Mielograma</option>
-              <option value="Esfregaço">Esfregaço</option>
-              <option value="Imunofenotipagem">Imunofenotipagem</option>
-              <option value="Citometria">Citometria</option>
             </select>
             <select id="filtroStatus">
               <option value="">Todos os status</option>
@@ -500,13 +470,11 @@
             <select id="filtroOrdenacao">
               <option value="recentes">Mais recentes</option>
               <option value="antigos">Mais antigos</option>
-              <option value="tipo-asc">Tipo A-Z</option>
-              <option value="tipo-desc">Tipo Z-A</option>
             </select>
           </div>
         </div>
 
-        <!-- ─── LISTA DE RESULTADOS (BARRAS) ────────────────── -->
+        <!-- ─── LISTA DE RESULTADOS (CARDS) ────────────────── -->
         <div id="listaResultados" class="resultados-list"></div>
 
       </div><!-- /resultados-container -->
@@ -518,7 +486,10 @@
 <div class="modal-overlay" id="modalDetalhes">
   <div class="modal-content">
     <div class="modal-header">
-      <h2 id="modalTitulo">Detalhes do Exame</h2>
+      <div>
+        <h2 class="modal-titulo" id="modalTitulo">Detalhes do Exame</h2>
+        <div class="modal-subtitulo" id="modalSubtitulo">Exame realizado</div>
+      </div>
       <button class="close-btn" id="modalCloseBtn">✕</button>
     </div>
     <div class="modal-body" id="modalBody">
@@ -536,7 +507,7 @@
 <script src="../JS/auth.js"></script>
 <script>
   // ============================================================
-  //  CÓDIGO EXISTENTE (preservado integralmente)
+  //  CÓDIGO EXISTENTE (preservado, com ajustes solicitados)
   // ============================================================
 
   let EXAMES = [];
@@ -560,18 +531,6 @@
     }
   }
 
-  function atualizarIndicadores() {
-    const resultados = EXAMES.filter(e => e.resultado_texto);
-    document.getElementById("totalExames").textContent = EXAMES.length;
-    document.getElementById("resultadosDisponiveis").textContent = resultados.length;
-    document.getElementById("emAnalise").textContent = EXAMES.filter(e => e.statusc === "Em andamento").length;
-  }
-
-  function atualizarFinalizados() {
-    const finalizados = EXAMES.filter(e => e.statusc === "Finalizado").length;
-    document.getElementById("finalizados").textContent = finalizados;
-  }
-
   function classeStatus(status) {
     switch (status) {
       case "Finalizado": return "finalizado";
@@ -581,7 +540,7 @@
   }
 
   // ============================================================
-  //  RENDERIZAÇÃO EM LISTA (SEM ÍCONES)
+  //  RENDERIZAÇÃO EM CARDS (MELHORADA)
   // ============================================================
 
   function renderizarLista(dados) {
@@ -610,35 +569,32 @@
         'Moderada': 'moderada',
         'Alta': 'alta'
       };
-      const classeSuspeita =
-      suspeitaMap[exame.suspeita_leucemia] || 'sem';
+      const classeSuspeita = suspeitaMap[exame.suspeita_leucemia] || 'sem';
+      const suspeitaLabel = exame.suspeita_leucemia || 'Sem suspeita';
 
-      const suspeitaLabel =
-      exame.suspeita_leucemia || 'Sem suspeita';
+      const card = document.createElement('div');
+      card.className = 'resultado-card';
 
-      const linha = document.createElement('div');
-      linha.className = 'resultado-linha';
-
-      linha.innerHTML = `
-        <div class="info">
+      card.innerHTML = `
+        <div class="info-principal">
           <span class="tipo">${exame.tipo_exame || "Exame"}</span>
-          <span class="data">${dataExame}</span>
+          <span class="data">📅 ${dataExame}</span>
         </div>
         <div class="badges">
           <span class="badge-status ${classeStatus(exame.statusc)}">${exame.statusc || "Pendente"}</span>
           <span class="badge-suspeita ${classeSuspeita}">${suspeitaLabel}</span>
         </div>
-        <div class="btn-ver">
+        <div class="acao">
           <button class="btn btn-ghost btn-sm" onclick="abrirModal(${exame.id_exame})">Visualizar</button>
         </div>
       `;
 
-      lista.appendChild(linha);
+      lista.appendChild(card);
     });
   }
 
   // ============================================================
-  //  MODAL DE DETALHES
+  //  MODAL DE DETALHES (REDESENHADO)
   // ============================================================
 
   function abrirModal(idExame) {
@@ -648,8 +604,12 @@
     const modal = document.getElementById('modalDetalhes');
     const body = document.getElementById('modalBody');
     const titulo = document.getElementById('modalTitulo');
+    const subtitulo = document.getElementById('modalSubtitulo');
 
     titulo.textContent = exame.tipo_exame || 'Exame';
+    subtitulo.textContent = exame.data_exame
+      ? 'Exame realizado em ' + new Date(exame.data_exame).toLocaleDateString("pt-BR")
+      : 'Data não disponível';
 
     const dataExame = exame.data_exame
       ? new Date(exame.data_exame).toLocaleDateString("pt-BR")
@@ -664,25 +624,49 @@
       'Moderada': 'moderada',
       'Alta': 'alta'
     };
-    const classeSuspeita =
-      suspeitaMap[exame.suspeita_leucemia] || 'sem';
-
-    const suspeitaLabel =
-        exame.suspeita_leucemia || 'Sem suspeita';
+    const classeSuspeita = suspeitaMap[exame.suspeita_leucemia] || 'sem';
+    const suspeitaLabel = exame.suspeita_leucemia || 'Sem suspeita';
 
     body.innerHTML = `
-      <div class="resultado-box">
-        <div class="label">Resultado</div>
-        <div class="texto">${exame.resultado_texto || 'Resultado ainda não disponível.'}</div>
+      <div class="resultado-destaque">
+        <span class="label-destaque">Resultado do exame</span>
+        <div class="texto-destaque">${exame.resultado_texto || 'Resultado ainda não disponível.'}</div>
       </div>
 
-      <div class="linha"><span class="label">Médico</span><span class="valor">${exame.medico || 'Não informado'}</span></div>
-      <div class="linha"><span class="label">Especialidade</span><span class="valor">${exame.especialidade || 'Não informado'}</span></div>
-      <div class="linha"><span class="label">Status</span><span class="valor"><span class="badge-status ${classeStatus(exame.statusc)}">${exame.statusc || 'Pendente'}</span></span></div>
-      <div class="linha"><span class="label">Suspeita</span><span class="valor"><span class="badge-suspeita ${classeSuspeita}">${suspeitaLabel}</span></span></div>
-      <div class="linha"><span class="label">Tipo de leucemia</span><span class="valor">${exame.tipo_leucemia || 'Não identificado'}</span></div>
-      <div class="linha"><span class="label">Data do exame</span><span class="valor">${dataExame}</span></div>
-      <div class="linha"><span class="label">Data do resultado</span><span class="valor">${dataResultado}</span></div>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="label">Médico</span>
+          <span class="valor">${exame.medico || 'Não informado'}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Especialidade</span>
+          <span class="valor">${exame.especialidade || 'Não informado'}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Status</span>
+          <span class="valor">
+            <span class="badge-status ${classeStatus(exame.statusc)}">${exame.statusc || 'Pendente'}</span>
+          </span>
+        </div>
+        <div class="info-item">
+          <span class="label">Suspeita</span>
+          <span class="valor">
+            <span class="badge-suspeita ${classeSuspeita}">${suspeitaLabel}</span>
+          </span>
+        </div>
+        <div class="info-item">
+          <span class="label">Tipo de leucemia</span>
+          <span class="valor">${exame.tipo_leucemia || 'Não identificado'}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Data do exame</span>
+          <span class="valor">${dataExame}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Data do resultado</span>
+          <span class="valor">${dataResultado}</span>
+        </div>
+      </div>
     `;
 
     modal.dataset.exameId = idExame;
@@ -708,7 +692,7 @@
   });
 
   // ============================================================
-  //  FILTROS E ORDENAÇÃO
+  //  FILTROS E ORDENAÇÃO (SEM A-Z)
   // ============================================================
 
   function filtrarResultados() {
@@ -744,12 +728,6 @@
       case 'antigos':
         filtrados.sort((a, b) => new Date(a.data_exame) - new Date(b.data_exame));
         break;
-      case 'tipo-asc':
-        filtrados.sort((a, b) => (a.tipo_exame || '').localeCompare(b.tipo_exame || ''));
-        break;
-      case 'tipo-desc':
-        filtrados.sort((a, b) => (b.tipo_exame || '').localeCompare(a.tipo_exame || ''));
-        break;
       default:
         break;
     }
@@ -763,8 +741,6 @@
     window.location.href = "../login.html";
   }
 
-  
-
   if (typeof HematoAI !== 'undefined' && HematoAI.initSidebar) {
     HematoAI.initSidebar('resultados');
   } else {
@@ -775,9 +751,6 @@
     verificarPerfil("Paciente");
 
     await carregarExames();
-
-    atualizarIndicadores();
-    atualizarFinalizados();
 
     const todosResultados = EXAMES.filter(e => e.resultado_texto);
     renderizarLista(todosResultados);
