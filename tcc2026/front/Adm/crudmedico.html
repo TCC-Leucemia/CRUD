@@ -184,6 +184,71 @@
       transform: translateY(-50%);
       font-size: 1rem;
     }
+
+    /* ── Botões de ação na tabela (estilo da página de exames) ── */
+    .td-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .td-actions .btn {
+      font-size: 0.8rem;
+      padding: 5px 12px;
+      border-radius: 30px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    .td-actions .btn i {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* Botão Ver (estilo ghost) */
+    .td-actions .btn-ver {
+      background: transparent;
+      border: 1.5px solid var(--border);
+      color: var(--text-2);
+    }
+
+    .td-actions .btn-ver:hover {
+      border-color: var(--red);
+      color: var(--red);
+      background: var(--red-light);
+    }
+
+    /* Botão Editar (estilo outline) */
+    .td-actions .btn-editar {
+      background: transparent;
+      border: 1.5px solid var(--red);
+      color: var(--red);
+    }
+
+    .td-actions .btn-editar:hover {
+      background: var(--red);
+      color: white;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(185,28,28,0.3);
+    }
+
+    /* Botão Excluir (estilo danger - fundo vermelho) */
+    .td-actions .btn-excluir {
+      background: var(--red);
+      border: 1.5px solid var(--red);
+      color: white;
+    }
+
+    .td-actions .btn-excluir:hover {
+      background: var(--red-dark);
+      border-color: var(--red-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(185,28,28,0.4);
+    }
   </style>
 </head>
 <body>
@@ -221,7 +286,6 @@
               <option>Pediatria</option>
               <option>Medicina Interna</option>
             </select>
-            <!-- Select de ordenação apenas alfabética -->
             <select id="sortMedico" class="filter-select" aria-label="Ordenar por">
               <option value="nome_asc">Nome A-Z</option>
               <option value="nome_desc">Nome Z-A</option>
@@ -428,49 +492,34 @@
 
   // Função para buscar CEP na API ViaCEP
   async function buscarCEP(cep) {
-    // Remove caracteres não numéricos
     cep = cep.replace(/\D/g, '');
-    
-    // Valida se tem 8 dígitos
-    if (cep.length !== 8) {
-      return;
-    }
+    if (cep.length !== 8) return;
     
     const cepField = document.getElementById('fCep');
     const originalPlaceholder = cepField.placeholder;
     
-    // Mostra loading
     cepField.classList.add('cep-loading');
     cepField.placeholder = 'Buscando...';
     
     try {
-      // Chama a API ViaCEP
       const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
       const data = await response.json();
       
-      // Verifica se o CEP foi encontrado
       if (!data.erro) {
-        // Preenche os campos automaticamente
         document.getElementById('fRua').value = data.logradouro || '';
         document.getElementById('fBairro').value = data.bairro || '';
         document.getElementById('fCidade').value = data.localidade || '';
         document.getElementById('fEstado').value = data.uf || '';
         
-        // Salva os dados no wizardData
         wizardData.endereco.rua = data.logradouro || '';
         wizardData.endereco.bairro = data.bairro || '';
         wizardData.endereco.cidade = data.localidade || '';
         wizardData.endereco.estado = data.uf || '';
         wizardData.endereco.cep = cepField.value;
         
-        // Mostra mensagem de sucesso
-        if (typeof HematoAI !== 'undefined' && HematoAI.showToast) {
-          HematoAI.showToast('Endereço preenchido automaticamente!', 'success');
-        }
+        HematoAI.showToast('Endereço preenchido automaticamente!', 'success');
         
-        // Destaca os campos preenchidos com uma animação suave
-        const camposPreenchidos = ['fRua', 'fBairro', 'fCidade', 'fEstado'];
-        camposPreenchidos.forEach(campoId => {
+        ['fRua', 'fBairro', 'fCidade', 'fEstado'].forEach(campoId => {
           const campo = document.getElementById(campoId);
           if (campo && campo.value) {
             campo.style.transition = 'all 0.3s ease';
@@ -481,11 +530,7 @@
           }
         });
       } else {
-        // CEP não encontrado
-        if (typeof HematoAI !== 'undefined' && HematoAI.showToast) {
-          HematoAI.showToast('CEP não encontrado. Verifique o número digitado.', 'error');
-        }
-        // Limpa os campos
+        HematoAI.showToast('CEP não encontrado. Verifique o número digitado.', 'error');
         document.getElementById('fRua').value = '';
         document.getElementById('fBairro').value = '';
         document.getElementById('fCidade').value = '';
@@ -493,26 +538,21 @@
       }
     } catch (error) {
       console.error('Erro ao buscar CEP:', error);
-      if (typeof HematoAI !== 'undefined' && HematoAI.showToast) {
-        HematoAI.showToast('Erro ao buscar CEP. Tente novamente.', 'error');
-      }
+      HematoAI.showToast('Erro ao buscar CEP. Tente novamente.', 'error');
     } finally {
-      // Remove loading
       cepField.classList.remove('cep-loading');
       cepField.placeholder = originalPlaceholder;
     }
   }
 
-  // Função para debounce (evita muitas chamadas à API enquanto digita)
   let debounceTimeout;
   function debounceBuscarCEP(cep) {
     clearTimeout(debounceTimeout);
     debounceTimeout = setTimeout(() => {
       buscarCEP(cep);
-    }, 800); // Aguarda 800ms após o usuário parar de digitar
+    }, 800);
   }
 
-  // Mask functions
   function maskCPF(cpf) {
     cpf = cpf.replace(/\D/g, '');
     cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2');
@@ -534,7 +574,6 @@
     return cep;
   }
 
-  // Input masks
   document.getElementById('fCpf')?.addEventListener('input', function(e) {
     e.target.value = maskCPF(e.target.value);
   });
@@ -545,21 +584,17 @@
     const maskedValue = maskCEP(e.target.value);
     e.target.value = maskedValue;
     
-    // Dispara a busca automática quando o CEP estiver completo (9 caracteres com máscara = 8 dígitos)
     const cepNumeros = maskedValue.replace(/\D/g, '');
     if (cepNumeros.length === 8) {
       debounceBuscarCEP(maskedValue);
     }
   });
 
-  // Wizard navigation functions
   function updateWizardUI() {
-    // Hide/show step contents
     document.getElementById('step1Content').style.display = currentStep === 0 ? 'block' : 'none';
     document.getElementById('step2Content').style.display = currentStep === 1 ? 'block' : 'none';
     document.getElementById('step3Content').style.display = currentStep === 2 ? 'block' : 'none';
 
-    // Update step indicators
     for (let i = 0; i < 3; i++) {
       const stepDiv = document.getElementById(`step${i+1}Indicator`);
       const stepNumber = document.getElementById(`step${i+1}Number`);
@@ -580,7 +615,6 @@
       }
     }
 
-    // Update buttons
     const btnVoltar = document.getElementById('btnVoltar');
     const btnProximo = document.getElementById('btnProximo');
     const btnFinalizar = document.getElementById('btnFinalizar');
@@ -748,7 +782,6 @@
 
       if (editingCrm) {
 
-        // Atualiza endereço
         const respEndereco = await put(
             "/enderecos/" + medicoEditando.id_endereco,
             {
@@ -872,8 +905,7 @@
         tipo: "Médico"
       });
 
-      const dadosLogin =
-        await respLogin.json();
+      const dadosLogin = await respLogin.json();
 
       if (!respLogin.ok) {
         await rollbackCadastro(null, id_endereco);
@@ -897,8 +929,7 @@
         id_endereco
       });
 
-      const dadosMedico =
-        await respMedico.json();
+      const dadosMedico = await respMedico.json();
 
       if (!respMedico.ok) {
         await rollbackCadastro(id_usuario, id_endereco);
@@ -1011,13 +1042,22 @@
         <td style="font-size:0.82rem">${m.telefone || '—'}</td>
         <td>
           <div class="td-actions">
-            <button class="btn btn-ghost btn-sm" onclick="editarMedico('${m.crm}')">Editar</button>
-            <button class="btn btn-danger btn-sm" onclick="deletarMedico('${m.crm}')">Excluir</button>
+            <button class="btn btn-editar" onclick="editarMedico('${m.crm}')">
+              <i data-lucide="pencil"></i> Editar
+            </button>
+            <button class="btn btn-excluir" onclick="deletarMedico('${m.crm}')">
+              <i data-lucide="trash-2"></i> Excluir
+            </button>
           </div>
         </td>
       `;
       tbody.appendChild(tr);
     });
+
+    // Inicializa os ícones Lucide após renderizar a tabela
+    if (window.lucide) {
+      lucide.createIcons();
+    }
   }
 
   function applyFilter() {
@@ -1033,7 +1073,6 @@
       (!esp || m.especialidade === esp)
     );
     const comparar = (a, b) => String(a ?? '').localeCompare(String(b ?? ''), 'pt-BR', { sensitivity: 'base', numeric: true });
-    // Ordenação apenas alfabética
     filtrados.sort((a, b) => {
       if (ordem === 'nome_asc') return comparar(a.nome, b.nome);
       if (ordem === 'nome_desc') return comparar(b.nome, a.nome);
@@ -1051,7 +1090,6 @@
     console.log(m);
     if (!m) return;
     
-    // Load data into wizard
     wizardData.login.email = m.email;
     wizardData.login.senha = '********';
     wizardData.medico.nome = m.nome;

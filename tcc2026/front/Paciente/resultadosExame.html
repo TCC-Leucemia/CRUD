@@ -594,12 +594,14 @@
   }
 
   // ============================================================
-  //  MODAL DE DETALHES (REDESENHADO)
+  //  MODAL DE DETALHES (REDESENHADO, INCLUI CRM)
   // ============================================================
 
   function abrirModal(idExame) {
     const exame = EXAMES.find(e => e.id_exame === idExame);
     if (!exame) return;
+    console.log("EXAME SELECIONADO:", exame);
+    console.log("CRM:", exame.crm);
 
     const modal = document.getElementById('modalDetalhes');
     const body = document.getElementById('modalBody');
@@ -637,6 +639,10 @@
         <div class="info-item">
           <span class="label">Médico</span>
           <span class="valor">${exame.medico || 'Não informado'}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">CRM</span>
+          <span class="valor">${exame.crm || 'Não informado'}</span>
         </div>
         <div class="info-item">
           <span class="label">Especialidade</span>

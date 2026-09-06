@@ -481,6 +481,71 @@
       display: none !important;
     }
 
+    /* ── Botões de ação na tabela (estilo padrão das outras páginas) ── */
+    .td-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .td-actions .btn {
+      font-size: 0.8rem;
+      padding: 5px 12px;
+      border-radius: 30px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    .td-actions .btn i {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* Botão Ver (estilo ghost, sem ícone) */
+    .td-actions .btn-ver {
+      background: transparent;
+      border: 1.5px solid var(--border);
+      color: var(--text-2);
+    }
+
+    .td-actions .btn-ver:hover {
+      border-color: var(--red);
+      color: var(--red);
+      background: var(--red-light);
+    }
+
+    /* Botão Editar (estilo outline) */
+    .td-actions .btn-editar {
+      background: transparent;
+      border: 1.5px solid var(--red);
+      color: var(--red);
+    }
+
+    .td-actions .btn-editar:hover {
+      background: var(--red);
+      color: white;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(185,28,28,0.3);
+    }
+
+    /* Botão Excluir (estilo danger - fundo vermelho) */
+    .td-actions .btn-excluir {
+      background: var(--red);
+      border: 1.5px solid var(--red);
+      color: white;
+    }
+
+    .td-actions .btn-excluir:hover {
+      background: var(--red-dark);
+      border-color: var(--red-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(185,28,28,0.4);
+    }
+
     /* Modo escuro */
     .dark-mode .calendar-popup {
       background: var(--surface);
@@ -587,7 +652,6 @@
           <span class="card-title">Lista de Consultas</span>
           <div class="filter-row">
             <div class="search-bar" style="max-width:260px">
-              <!-- ALTERADO: placeholder sem menção a ID -->
               <input type="text" id="searchConsulta" placeholder="Buscar por paciente, médico, CPF ou CRM...">
             </div>
             <select id="filterStatus" class="filter-select">
@@ -603,7 +667,6 @@
               <option value="Consulta clínica">Consulta clínica</option>
               <option value="Retorno">Retorno</option>
             </select>
-            <!-- ALTERADO: removidas opções de ordenação por ID -->
             <select id="sortConsulta" class="filter-select" aria-label="Ordenar por">
               <option value="data_desc">Data mais recente</option>
               <option value="data_asc">Data mais antiga</option>
@@ -629,7 +692,6 @@
           <table>
             <thead>
               <tr>
-                <!-- ALTERADO: coluna ID removida -->
                 <th>Paciente (CPF)</th>
                 <th>Médico (CRM)</th>
                 <th>Data da Consulta</th>
@@ -922,14 +984,23 @@
         <td>${statusPill(c.statusc)}</td>
         <td>
           <div class="td-actions">
-            <button class="btn btn-ghost btn-sm" onclick="abrirDetalhes(${c.id_consulta})">Ver</button>
-            <button class="btn btn-ghost btn-sm" onclick="abrirEdicao(${c.id_consulta})">Editar</button>
-            <button class="btn btn-danger btn-sm" onclick="confirmarExclusao(${c.id_consulta})">Excluir</button>
+            <button class="btn btn-ver" onclick="abrirDetalhes(${c.id_consulta})">Ver</button>
+            <button class="btn btn-editar" onclick="abrirEdicao(${c.id_consulta})">
+              <i data-lucide="pencil"></i> Editar
+            </button>
+            <button class="btn btn-excluir" onclick="confirmarExclusao(${c.id_consulta})">
+              <i data-lucide="trash-2"></i> Excluir
+            </button>
           </div>
         </td>
       `;
       tbody.appendChild(tr);
     });
+
+    // Inicializa ícones Lucide após renderizar a tabela
+    if (window.lucide) {
+      lucide.createIcons();
+    }
   }
 
   // ============================================================
@@ -1443,9 +1514,6 @@
     HematoAI.openModal(document.getElementById('modalConsulta'));
   });
 
-  // ============================================================
-  //  SALVAR CONSULTA
-  // ============================================================
   document.getElementById('salvarConsulta').addEventListener('click', async () => {
     let cpf = document.getElementById('cCpf').value;
     let crm = document.getElementById('cCrm').value;
@@ -1505,9 +1573,6 @@
     }
   });
 
-  // ============================================================
-  //  EDITAR CONSULTA
-  // ============================================================
   function abrirEdicao(id) {
     const c = consultas.find(x => x.id_consulta === id);
     if (!c) return;
@@ -1567,9 +1632,6 @@
     HematoAI.openModal(document.getElementById('modalConsulta'));
   }
 
-  // ============================================================
-  //  DETALHES
-  // ============================================================
   async function abrirDetalhes(id) {
     idDetalhe = id;
     try {
@@ -1582,7 +1644,6 @@
       const c = dados.dados;
       document.getElementById('detalheBody').innerHTML = `
         <div class="detail-grid">
-          <!-- ALTERADO: linha do ID removida -->
           <span class="detail-key">Paciente</span>
           <span class="detail-value">
             <strong>${c.paciente || '—'}</strong><br>
@@ -1619,9 +1680,6 @@
     if (idDetalhe) abrirEdicao(idDetalhe);
   });
 
-  // ============================================================
-  //  EXCLUIR CONSULTA
-  // ============================================================
   function confirmarExclusao(id) {
     HematoAI.confirmDialog(
       `Deseja excluir a consulta <strong>#${id}</strong>?<br>Esta ação não pode ser desfeita.`,
@@ -1643,9 +1701,6 @@
     );
   }
 
-  // ============================================================
-  //  FECHAR MODAIS
-  // ============================================================
   ['closeModalConsulta', 'cancelarConsulta'].forEach(id => {
     document.getElementById(id).addEventListener('click', () =>
       HematoAI.closeModal(document.getElementById('modalConsulta'))
@@ -1656,9 +1711,6 @@
       HematoAI.closeModal(document.getElementById('modalConsulta'));
   });
 
-  // ============================================================
-  //  INICIALIZAÇÃO
-  // ============================================================
   window.addEventListener('DOMContentLoaded', async () => {
     await carregarPacientes();
     await carregarMedicos();

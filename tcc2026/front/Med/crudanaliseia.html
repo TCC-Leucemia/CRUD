@@ -647,48 +647,55 @@
   // BAIXAR PDF
   // ============================================
   
-  document.getElementById('btnBaixarPDFDetalhe').addEventListener('click', () => {
+  document.getElementById('btnBaixarPDFDetalhe').addEventListener('click', async () => {
     const a = analises.find(x => x.id_analise === idDetalhe);
     if (!a) {
       HematoAI.showToast('Análise não encontrada.', 'error');
       return;
     }
 
-    const paciente = a;
-    const conteudoPDF = `
-HEMATOAI - RELATÓRIO DE ANÁLISE IA
-=============================================
-Paciente: ${a.nome}
-CPF: ${formatarCPF(a.cpf)}
-Data da Consulta: ${formatarDataHora(a.data_consulta)}
-Tipo de Exame: ${a.tipo_exame}
-Data da Análise: ${formatarData(a.data_analise)}
+    try {
+      // Obtém token da sessão
+      const session = JSON.parse(localStorage.getItem("hematoai_session"));
+      const token = session?.token;
 
----------------------------------------------
-RESULTADO DA ANÁLISE:
-${a.resultado_ia}
+      if (!token) {
+        HematoAI.showToast('Sessão expirada. Faça login novamente.', 'error');
+        return;
+      }
 
----------------------------------------------
-SUSPEITA: ${a.suspeita_ia}
-TIPO DE LEUCEMIA: ${a.tipo_leucemia_ia || 'Não identificado'}
-CONFIANÇA: ${a.confianca ? a.confianca + '%' : '—'}
+      // Faz a requisição para o endpoint que gera o PDF via Python
+      // Substitua o endpoint abaixo pelo real do seu backend, se necessário
+      const response = await fetch(`http://localhost:3000/baixar-pdf-analise/${a.id_analise}`, {
+        method: 'GET', // ou POST, dependendo da implementação
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
 
----------------------------------------------
-Este relatório é gerado automaticamente pelo sistema HematoAI.
-Consulte um especialista para validação do diagnóstico.
-`;
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({ msg: 'Erro ao baixar PDF' }));
+        throw new Error(err.msg || 'Erro ao baixar PDF');
+      }
 
-    const blob = new Blob([conteudoPDF], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const aLink = document.createElement('a');
-    aLink.href = url;
-    aLink.download = `analise_ia_${a.id_analise}.txt`;
-    document.body.appendChild(aLink);
-    aLink.click();
-    document.body.removeChild(aLink);
-    URL.revokeObjectURL(url);
+      // Converte a resposta em blob (PDF)
+      const blob = await response.blob();
 
-    HematoAI.showToast('Relatório baixado com sucesso!', 'success');
+      // Cria um link temporário para download
+      const url = URL.createObjectURL(blob);
+      const aLink = document.createElement('a');
+      aLink.href = url;
+      aLink.download = `analise_ia_${a.id_analise}.pdf`;
+      document.body.appendChild(aLink);
+      aLink.click();
+      document.body.removeChild(aLink);
+      URL.revokeObjectURL(url);
+
+      HematoAI.showToast('PDF baixado com sucesso!', 'success');
+    } catch (erro) {
+      console.error(erro);
+      HematoAI.showToast(erro.message || 'Erro ao baixar PDF', 'error');
+    }
   });
 
   // ============================================

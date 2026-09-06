@@ -189,6 +189,71 @@
       font-size: 0.72rem;
       font-weight: 700;
     }
+
+    /* ── Botões de ação na tabela (estilo da página de exames/médicos) ── */
+    .td-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .td-actions .btn {
+      font-size: 0.8rem;
+      padding: 5px 12px;
+      border-radius: 30px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    .td-actions .btn i {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* Botão Ver (estilo ghost) */
+    .td-actions .btn-ver {
+      background: transparent;
+      border: 1.5px solid var(--border);
+      color: var(--text-2);
+    }
+
+    .td-actions .btn-ver:hover {
+      border-color: var(--red);
+      color: var(--red);
+      background: var(--red-light);
+    }
+
+    /* Botão Editar (estilo outline) */
+    .td-actions .btn-editar {
+      background: transparent;
+      border: 1.5px solid var(--red);
+      color: var(--red);
+    }
+
+    .td-actions .btn-editar:hover {
+      background: var(--red);
+      color: white;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(185,28,28,0.3);
+    }
+
+    /* Botão Excluir (estilo danger - fundo vermelho) */
+    .td-actions .btn-excluir {
+      background: var(--red);
+      border: 1.5px solid var(--red);
+      color: white;
+    }
+
+    .td-actions .btn-excluir:hover {
+      background: var(--red-dark);
+      border-color: var(--red-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(185,28,28,0.4);
+    }
   </style>
 </head>
 <body>
@@ -216,7 +281,6 @@
           <span class="card-title">Lista de Pacientes</span>
           <div class="filter-row">
             <div class="search-bar" style="max-width:280px">
-              <!-- ALTERADO: placeholder sem "e-mail" -->
               <input type="text" id="searchPaciente" placeholder="Buscar por nome ou CPF...">
             </div>
             <select id="filterSexo" class="filter-select">
@@ -224,7 +288,6 @@
               <option value="Masculino">Masculino</option>
               <option value="Feminino">Feminino</option>
             </select>
-            <!-- ALTERADO: apenas ordenação alfabética -->
             <select id="sortPaciente" class="filter-select" aria-label="Ordenar por">
               <option value="nome_asc">Nome A-Z</option>
               <option value="nome_desc">Nome Z-A</option>
@@ -416,12 +479,10 @@
   }
   HematoAI.initSidebar('pacientes');
 
-  // Demo data
   let pacientes = [];
   let editingCpf = null;
   let pacienteEditando = null;
 
-  // Wizard state
   let currentStep = 0;
   let wizardData = {
     paciente: {
@@ -955,7 +1016,6 @@
             "success"
         );
 
-        // evita rollback caso algum erro aconteça depois
         id_usuario = null;
         id_endereco = null;
 
@@ -1209,13 +1269,22 @@
         <td style="font-size:0.82rem">${p.telefone || '—'}</td>
         <td>
           <div class="td-actions">
-            <button class="btn btn-ghost btn-sm" onclick="editarPaciente('${p.cpf}')">Editar</button>
-            <button class="btn btn-danger btn-sm" onclick="deletarPaciente('${p.cpf}', '${p.nome.replace(/'/g, "\\'")}')">Excluir</button>
+            <button class="btn btn-editar" onclick="editarPaciente('${p.cpf}')">
+              <i data-lucide="pencil"></i> Editar
+            </button>
+            <button class="btn btn-excluir" onclick="deletarPaciente('${p.cpf}', '${p.nome.replace(/'/g, "\\'")}')">
+              <i data-lucide="trash-2"></i> Excluir
+            </button>
           </div>
         </td>
       `;
       tbody.appendChild(tr);
     });
+
+    // Inicializa ícones Lucide após renderizar a tabela
+    if (window.lucide) {
+      lucide.createIcons();
+    }
   }
 
   // ALTERADO: applyFilter com busca apenas por nome e CPF, ordenação apenas alfabética

@@ -53,6 +53,7 @@ module.exports = class ExamesDAO {
                 c.data_consulta,
 
                 m.nome AS medico,
+                m.crm,
                 m.especialidade,
 
                 p.nome AS paciente,

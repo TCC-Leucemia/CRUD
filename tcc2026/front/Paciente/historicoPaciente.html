@@ -53,7 +53,7 @@
       box-shadow: 0 2px 8px rgba(185,28,28,.25);
     }
 
-    /* ── Grid ──────────────────────────────────────────── */
+    /* ── Grid principal (lateral + detalhes) ───────────── */
     .pac-grid {
       display: grid;
       grid-template-columns: 340px 1fr;
@@ -70,6 +70,9 @@
       box-shadow: var(--shadow-sm);
       position: sticky;
       top: 20px;
+      display: flex;
+      flex-direction: column;
+      max-height: calc(100vh - 200px);
     }
 
     .lista-header {
@@ -81,9 +84,10 @@
       align-items: center;
       gap: 8px;
       background: var(--bg);
+      flex-shrink: 0;
     }
 
-    /* Novo campo de filtro por data */
+    /* Campo de filtro por data */
     .filtro-data {
       padding: 10px 20px;
       border-bottom: 1px solid var(--border);
@@ -91,6 +95,7 @@
       align-items: center;
       gap: 8px;
       background: var(--bg);
+      flex-shrink: 0;
     }
     .filtro-data label {
       font-size: .8rem;
@@ -115,7 +120,10 @@
       box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.08);
     }
 
-    .lista-body { overflow-y: auto; max-height: calc(100vh - 280px); }
+    .lista-body {
+      overflow-y: auto;
+      flex: 1;
+    }
     .lista-body::-webkit-scrollbar { width: 4px; }
     .lista-body::-webkit-scrollbar-thumb { background: var(--border-dark); border-radius: 2px; }
 
@@ -218,116 +226,6 @@
     .diag-baixa    { background: var(--green-light);  color: var(--green);  }
     .diag-sem      { background: #f1f5f9;             color: #475569;       }
 
-    /* ── Calendário ────────────────────────────────────── */
-    .calendario-wrapper {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow-sm);
-      padding: 20px;
-      margin-bottom: 20px;
-    }
-
-    .cal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-    .cal-header .mes-ano {
-      font-weight: 700;
-      font-size: 1.1rem;
-      color: var(--text-1);
-    }
-    .cal-nav-btn {
-      background: transparent;
-      border: 1px solid var(--border);
-      border-radius: 40px;
-      padding: 6px 14px;
-      font-size: .85rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: var(--transition);
-      color: var(--text-2);
-    }
-    .cal-nav-btn:hover {
-      background: var(--bg);
-      border-color: var(--red);
-      color: var(--red);
-    }
-
-    .cal-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 4px;
-      text-align: center;
-    }
-    .cal-grid .weekday {
-      font-weight: 700;
-      font-size: .7rem;
-      text-transform: uppercase;
-      color: var(--text-3);
-      padding: 6px 0;
-    }
-    .cal-grid .day {
-      padding: 8px 0;
-      border-radius: var(--radius-md);
-      font-size: .85rem;
-      font-weight: 500;
-      color: var(--text-1);
-      transition: var(--transition);
-      cursor: default;
-      position: relative;
-    }
-    .cal-grid .day.other-month {
-      color: var(--text-3);
-      opacity: .5;
-    }
-    .cal-grid .day.has-consulta {
-      background: var(--red-light);
-      color: var(--red);
-      font-weight: 700;
-      cursor: pointer;
-    }
-    .cal-grid .day.has-consulta:hover {
-      background: var(--red-mid);
-    }
-    .cal-grid .day.today {
-      border: 2px solid var(--red);
-      background: var(--surface);
-    }
-    .cal-grid .day .lembrete-badge {
-      position: absolute;
-      top: -2px;
-      right: -2px;
-      background: var(--red);
-      color: white;
-      font-size: .55rem;
-      font-weight: 700;
-      border-radius: 50%;
-      width: 18px;
-      height: 18px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    /* Classe para consulta selecionada (automática ou manual) */
-    .cal-grid .day.consulta-selecionada {
-      background: var(--red);
-      color: #fff;
-      font-weight: 800;
-      box-shadow: 0 0 0 2px var(--red-dark);
-      transform: scale(1.05);
-    }
-    .cal-grid .day.consulta-selecionada.has-consulta {
-      background: var(--red);
-      color: #fff;
-    }
-    .cal-grid .day.consulta-selecionada.today {
-      border-color: var(--red-dark);
-    }
-
     /* ── Modo escuro ── */
     .dark-mode .diagnostico-box {
       background: #1e3a8a;
@@ -343,31 +241,6 @@
     .dark-mode .diag-moderada { background: #78350f; color: #fcd34d; }
     .dark-mode .diag-baixa    { background: #1e3a8a; color: #93c5fd; }
     .dark-mode .diag-sem      { background: #334155; color: #cbd5e1; }
-
-    .dark-mode .calendario-wrapper {
-      background: var(--surface);
-      border-color: var(--border);
-    }
-    .dark-mode .cal-grid .day.has-consulta {
-      background: #7f1d1d;
-      color: #fca5a5;
-    }
-    .dark-mode .cal-grid .day.today {
-      border-color: var(--red);
-      background: var(--surface);
-    }
-    .dark-mode .cal-grid .day.other-month {
-      color: var(--text-3);
-    }
-    .dark-mode .cal-grid .day.consulta-selecionada {
-      background: var(--red);
-      color: #fff;
-      box-shadow: 0 0 0 2px #b91c1c;
-    }
-    .dark-mode .cal-grid .day.consulta-selecionada.has-consulta {
-      background: var(--red);
-      color: #fff;
-    }
 
     .dark-mode .badge.badge-green {
       background: #064e3b;
@@ -415,11 +288,12 @@
       font-size: 0.95rem;
       cursor: pointer;
       transition: var(--transition);
-      width: 50%;
+      width: auto;
       margin-top: 4px;
       font-family: var(--font);
       box-shadow: 0 2px 8px rgba(185,28,28,0.3);
       display: none;
+      align-self: flex-end;
     }
     .btn-exportar-pdf:hover {
       background: var(--red-dark);
@@ -430,12 +304,12 @@
 
     @media (max-width: 900px) {
       .pac-grid { grid-template-columns: 1fr; }
-      .lista-panel { position: static; }
-      .lista-body { max-height: 340px; }
+      .lista-panel { position: static; max-height: 340px; }
     }
     @media (max-width: 540px) {
       .pac-nav { max-width: 100%; }
       .filtro-data { flex-direction: column; align-items: stretch; }
+      .detalhe-linha { grid-template-columns: 1fr; gap: 4px; }
     }
   </style>
 </head>
@@ -460,23 +334,13 @@
     <div class="page-body">
       <div class="pac-wrap">
 
-        <!-- ── Calendário ─────────────────────────────────── -->
-        <div class="calendario-wrapper" id="calendarioWrapper">
-          <div class="cal-header">
-            <button class="cal-nav-btn" id="calAnterior">◀</button>
-            <span class="mes-ano" id="mesAno"></span>
-            <button class="cal-nav-btn" id="calProximo">▶</button>
-          </div>
-          <div class="cal-grid" id="calGrid"></div>
-        </div>
-
         <!-- ── Navegação Consultas / Exames ──────────────── -->
         <div class="pac-nav">
           <button class="pac-nav-btn ativo" id="btnConsultas">Consultas</button>
           <button class="pac-nav-btn" id="btnExames">Exames</button>
         </div>
 
-        <!-- ── Grid ───────────────────────────────────────── -->
+        <!-- ── Grid principal (lista + detalhes) ─────────── -->
         <div class="pac-grid">
 
           <!-- Lista lateral -->
@@ -487,14 +351,14 @@
             </div>
             <!-- Campo de filtro por data -->
             <div class="filtro-data">
-              <label for="filtroData">Filtrar por data:</label>
+              <label for="filtroData">📅 Filtrar por data:</label>
               <input type="date" id="filtroData">
             </div>
             <div class="lista-body" id="listaBody"></div>
           </div>
 
-          <!-- Detalhe + Botão -->
-          <div style="display:flex;flex-direction:column;gap:14px;align-items:center;">
+          <!-- Detalhe + Botão Exportar PDF -->
+          <div style="display:flex;flex-direction:column;gap:14px;">
             <div class="detalhe-panel" id="detalhePanel" style="width:100%;">
               <div class="detalhe-vazio">
                 <p style="font-size:.95rem;font-weight:700;color:var(--text-2);margin-bottom:8px;">
@@ -526,7 +390,6 @@ let EXAMES = [];
 
 let viewAtiva  = 'consultas';
 let idSelecionado = null;
-let dataSelecionada = null; // guarda a data (YYYY-MM-DD) da consulta selecionada
 
 // Inicializar sidebar
 if (typeof HematoAI !== 'undefined' && HematoAI.initSidebar) {
@@ -534,11 +397,8 @@ if (typeof HematoAI !== 'undefined' && HematoAI.initSidebar) {
 }
 
 /* ═══════════════════════════════════════════════════════
-   CALENDÁRIO
+   CARREGAMENTO DE DADOS
 ═══════════════════════════════════════════════════════ */
-let mesAtual = new Date().getMonth();
-let anoAtual = new Date().getFullYear();
-
 async function carregarConsultas() {
 
     try {
@@ -657,75 +517,6 @@ async function carregarConsultas() {
     }
   }
 
-function renderCalendario(mes, ano) {
-  const grid = document.getElementById('calGrid');
-  const mesAnoEl = document.getElementById('mesAno');
-  const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-  mesAnoEl.textContent = `${meses[mes]} ${ano}`;
-
-  const primeiroDia = new Date(ano, mes, 1).getDay(); // 0=Dom
-  const diasNoMes = new Date(ano, mes + 1, 0).getDate();
-  const hoje = new Date();
-
-  // Dias do mês anterior para preencher
-  const diasMesAnterior = new Date(ano, mes, 0).getDate();
-
-  let html = '';
-  // Cabeçalho dos dias da semana
-  const semana = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
-  semana.forEach(d => html += `<div class="weekday">${d}</div>`);
-
-  // Dias do mês anterior
-  for (let i = primeiroDia; i > 0; i--) {
-    const dia = diasMesAnterior - i + 1;
-    html += `<div class="day other-month">${dia}</div>`;
-  }
-
-  // Dias do mês atual
-  for (let d = 1; d <= diasNoMes; d++) {
-    const dataStr = `${ano}-${String(mes+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const isToday = (d === hoje.getDate() && mes === hoje.getMonth() && ano === hoje.getFullYear());
-    const temConsulta = CONSULTAS.some(c => c.data.substring(0,10) === dataStr);
-    const isSelecionada = (dataSelecionada === dataStr);
-
-    let classes = 'day';
-    if (temConsulta) classes += ' has-consulta';
-    if (isToday) classes += ' today';
-    if (isSelecionada) classes += ' consulta-selecionada';
-
-    html += `<div class="${classes}" data-data="${dataStr}">${d}`;
-    // Lembrete se consulta futura (mantido como antes)
-    if (temConsulta && new Date(dataStr) > hoje) {
-      html += `<span class="lembrete-badge">!</span>`;
-    }
-    html += `</div>`;
-  }
-
-  grid.innerHTML = html;
-
-  // Adicionar evento de clique nos dias com consulta para selecionar a consulta
-  document.querySelectorAll('.day.has-consulta').forEach(el => {
-    el.addEventListener('click', function() {
-      const data = this.dataset.data;
-      const consulta = CONSULTAS.find(c => c.data.substring(0,10) === data);
-      if (consulta) {
-        selecionarConsulta(consulta);
-      }
-    });
-  });
-}
-
-document.getElementById('calAnterior').addEventListener('click', () => {
-  if (mesAtual === 0) { mesAtual = 11; anoAtual--; }
-  else mesAtual--;
-  renderCalendario(mesAtual, anoAtual);
-});
-document.getElementById('calProximo').addEventListener('click', () => {
-  if (mesAtual === 11) { mesAtual = 0; anoAtual++; }
-  else mesAtual++;
-  renderCalendario(mesAtual, anoAtual);
-});
-
 /* ═══════════════════════════════════════════════════════
    NAVEGAÇÃO
 ═══════════════════════════════════════════════════════ */
@@ -735,7 +526,6 @@ document.getElementById('btnExames').addEventListener('click',   () => setView('
 function setView(view) {
   viewAtiva = view;
   idSelecionado = null;
-  dataSelecionada = null;
   // Limpar filtro de data ao trocar de view
   document.getElementById('filtroData').value = '';
 
@@ -756,11 +546,6 @@ function setView(view) {
       <p style="font-size:.82rem;">Clique em um registro à esquerda para ver os detalhes completos.</p>
     </div>`;
   document.getElementById('btnExportarPDF').style.display = 'none';
-
-  // Re-renderizar calendário para limpar destaque de seleção, se necessário
-  if (document.getElementById('calGrid').innerHTML !== '') {
-    renderCalendario(mesAtual, anoAtual);
-  }
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -776,7 +561,6 @@ document.getElementById('filtroData').addEventListener('change', function() {
     renderLista(dados, 'consulta');
     // Limpar seleção e detalhe
     idSelecionado = null;
-    dataSelecionada = null;
     document.getElementById('detalhePanel').innerHTML = `
       <div class="detalhe-vazio">
         <p style="font-size:.95rem;font-weight:700;color:var(--text-2);margin-bottom:8px;">Selecione um item</p>
@@ -790,7 +574,6 @@ document.getElementById('filtroData').addEventListener('change', function() {
     }
     renderLista(dados, 'exame');
     idSelecionado = null;
-    dataSelecionada = null;
     document.getElementById('detalhePanel').innerHTML = `
       <div class="detalhe-vazio">
         <p style="font-size:.95rem;font-weight:700;color:var(--text-2);margin-bottom:8px;">Selecione um item</p>
@@ -841,7 +624,6 @@ function renderLista(dados, tipo) {
         <span class="badge badge-${corStatus(item.status)}" style="font-size:.68rem">${item.status}</span>`;
       div.addEventListener('click', () => {
         idSelecionado = item.id;
-        dataSelecionada = null; // não há destaque de data para exames
         renderLista(EXAMES, 'exame');
         renderDetalheExame(item);
         document.getElementById('btnExportarPDF').style.display = 'block';
@@ -859,7 +641,6 @@ function selecionarConsulta(consulta) {
   if (!consulta) return;
 
   idSelecionado = consulta.id;
-  dataSelecionada = consulta.data.substring(0,10);
   viewAtiva = 'consultas';
 
   // Atualizar botões de navegação
@@ -877,9 +658,6 @@ function selecionarConsulta(consulta) {
 
   // Mostrar botão PDF
   document.getElementById('btnExportarPDF').style.display = 'block';
-
-  // Re-renderizar calendário para atualizar destaque (classe consulta-selecionada)
-  renderCalendario(mesAtual, anoAtual);
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -895,7 +673,7 @@ function encontrarProximaConsulta() {
 }
 
 /* ═══════════════════════════════════════════════════════
-   DETALHE CONSULTA (sem anamnese/IA)
+   DETALHE CONSULTA
 ═══════════════════════════════════════════════════════ */
 function renderDetalheConsulta(c) {
   document.getElementById('detalhePanel').innerHTML = `
@@ -934,7 +712,7 @@ function renderDetalheConsulta(c) {
 }
 
 /* ═══════════════════════════════════════════════════════
-   DETALHE EXAME (com diagnóstico do médico)
+   DETALHE EXAME
 ═══════════════════════════════════════════════════════ */
 function renderDetalheExame(e) {
   const d = e.diagnostico || {};
@@ -1030,40 +808,24 @@ document.getElementById('btnExportarPDF').addEventListener('click', function() {
     await carregarConsultas();
     await carregarExames();
 
-    // Configurar a view padrão como 'consultas' sem renderizar ainda
+    // Configurar a view padrão como 'consultas'
     viewAtiva = 'consultas';
     document.getElementById('btnConsultas').classList.add('ativo');
     document.getElementById('btnExames').classList.remove('ativo');
     document.getElementById('listaTitulo').textContent = 'Minhas Consultas';
     renderLista(CONSULTAS, 'consulta');
-    // Não renderiza detalhe ainda (fica vazio)
+    // Detalhe vazio inicial
+    document.getElementById('detalhePanel').innerHTML = `
+      <div class="detalhe-vazio">
+        <p style="font-size:.95rem;font-weight:700;color:var(--text-2);margin-bottom:8px;">Selecione um item</p>
+        <p style="font-size:.82rem;">Clique em um registro à esquerda para ver os detalhes completos.</p>
+      </div>`;
+    document.getElementById('btnExportarPDF').style.display = 'none';
 
-    // Encontrar próxima consulta
+    // Encontrar próxima consulta e selecioná-la automaticamente
     const proxima = encontrarProximaConsulta();
-
-    if (proxima) {
-      const dataProxima = new Date(proxima.data);
-      mesAtual = dataProxima.getMonth();
-      anoAtual = dataProxima.getFullYear();
-      dataSelecionada = proxima.data.substring(0,10); // para destaque no calendário
-    } else {
-      dataSelecionada = null;
-    }
-
-    // Renderizar calendário (com possível destaque)
-    renderCalendario(mesAtual, anoAtual);
-
-    // Selecionar automaticamente a próxima consulta, se existir
     if (proxima) {
       selecionarConsulta(proxima);
-    } else {
-      // Sem próxima consulta: manter painel vazio
-      document.getElementById('detalhePanel').innerHTML = `
-        <div class="detalhe-vazio">
-          <p style="font-size:.95rem;font-weight:700;color:var(--text-2);margin-bottom:8px;">Selecione um item</p>
-          <p style="font-size:.82rem;">Clique em um registro à esquerda para ver os detalhes completos.</p>
-        </div>`;
-      document.getElementById('btnExportarPDF').style.display = 'none';
     }
 })();
 </script>

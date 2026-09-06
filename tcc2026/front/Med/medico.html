@@ -8,18 +8,14 @@
   <title>HematoAI · Painel do Médico</title>
   <link rel="stylesheet" href="../CSS/navbar.css">
   <style>
-    .med-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 20px;
+    /* ── Layout principal ───────────────────────────────── */
+    .pac-dashboard {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 4px;
     }
 
-    .med-grid-full {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 20px;
-    }
-
+    /* ── Indicadores ────────────────────────────────────── */
     .stats-indicators {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -31,60 +27,221 @@
       background: var(--surface);
       border: 1.5px solid var(--border);
       border-radius: var(--radius-xl);
-      padding: 18px;
+      padding: 20px 12px;
       text-align: center;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .stat-indicator-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--red);
+      opacity: 0.6;
+      transition: opacity 0.3s ease;
+    }
+
+    .stat-indicator-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--red);
+    }
+
+    .stat-indicator-card:hover::before {
+      opacity: 1;
     }
 
     .stat-indicator-number {
-      font-size: 2rem;
+      font-size: 2.2rem;
       font-weight: 800;
       color: var(--red);
-      line-height: 1;
-      margin-bottom: 6px;
+      line-height: 1.2;
+      margin-bottom: 4px;
+      letter-spacing: -0.5px;
+      display: block;
     }
 
     .stat-indicator-label {
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: var(--text-2);
-      font-weight: 500;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      text-transform: uppercase;
     }
 
+    /* ── Grid principal (2 colunas) ─────────────────────── */
+    .pac-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .pac-grid-full {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    /* ── Cards do dashboard ────────────────────────────── */
+    .pac-dashboard .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .pac-dashboard .card:hover {
+      box-shadow: var(--shadow-md);
+      border-color: var(--border-dark);
+    }
+
+    .pac-dashboard .card-header {
+      padding: 16px 20px 12px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .pac-dashboard .card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-1);
+      letter-spacing: -0.2px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pac-dashboard .card-title i {
+      font-size: 1.2rem;
+      color: var(--red);
+    }
+
+    .pac-dashboard .card-body {
+      padding: 16px 20px 20px 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Linhas de informação / itens de atividade ──────── */
+    .info-linha,
     .activity-item {
       display: flex;
       align-items: center;
       gap: 14px;
-      padding: 13px 0;
+      padding: 12px 0;
       border-bottom: 1px solid var(--border);
+      font-size: 0.9rem;
     }
-    .activity-item:last-child { border-bottom: none; }
+    .info-linha:last-child,
+    .activity-item:last-child {
+      border-bottom: none;
+    }
+
+    .info-linha .label,
+    .activity-text {
+      color: var(--text-2);
+      font-weight: 500;
+      flex: 1;
+    }
+
+    .info-linha .valor,
+    .activity-time {
+      color: var(--text-1);
+      font-weight: 600;
+      text-align: right;
+      white-space: nowrap;
+    }
+
     .activity-dot {
-      width: 9px; height: 9px;
+      width: 9px;
+      height: 9px;
       border-radius: 50%;
       flex-shrink: 0;
     }
-    .activity-text { flex: 1; font-size: 0.85rem; color: var(--text-1); }
-    .activity-time { font-size: 0.72rem; color: var(--text-3); white-space: nowrap; }
 
+    /* Badges de status (mantidos do estilo do paciente) */
+    .status-badge {
+      display: inline-block;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+    .status-finalizado {
+      background: #dcfce7;
+      color: #15803d;
+    }
+    .status-andamento {
+      background: #dbeafe;
+      color: #2563eb;
+    }
+    .status-pendente {
+      background: #fef3c7;
+      color: #d97706;
+    }
+
+    .dark-mode .status-finalizado {
+      background: #064e3b;
+      color: #6ee7b7;
+    }
+    .dark-mode .status-andamento {
+      background: #1e3a8a;
+      color: #93c5fd;
+    }
+    .dark-mode .status-pendente {
+      background: #78350f;
+      color: #fcd34d;
+    }
+
+    /* ── Alertas (sem emojis, com ícones Lucide) ────────── */
     .alerta-item {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 10px 0;
-      border-bottom: 1px solid var(--border);
+      gap: 14px;
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      background: var(--bg);
+      margin-bottom: 8px;
+      border-left: 4px solid var(--red);
+      transition: background 0.2s ease;
+      font-size: 0.9rem;
     }
     .alerta-item:last-child {
-      border-bottom: none;
+      margin-bottom: 0;
+    }
+    .alerta-item:hover {
+      background: var(--surface-hover, #f8fafc);
     }
     .alerta-item .icone {
-      font-size: 1.1rem;
+      font-size: 1.2rem;
       width: 24px;
       text-align: center;
       flex-shrink: 0;
+      color: var(--red);
     }
     .alerta-item .texto {
-      font-size: 0.85rem;
       color: var(--text-1);
       flex: 1;
+      font-weight: 500;
     }
     .alerta-item .badge-alerta {
       font-size: 0.7rem;
@@ -96,51 +253,61 @@
     .badge-alerta.amarelo  { background: #fef3c7; color: #d97706; }
     .badge-alerta.azul     { background: #dbeafe; color: #2563eb; }
     .badge-alerta.verde    { background: #dcfce7; color: #15803d; }
-    .badge-alerta.cinza    { background: #f1f5f9; color: #475569; }
 
     .dark-mode .badge-alerta.vermelho { background: #7f1d1d; color: #fca5a5; }
     .dark-mode .badge-alerta.amarelo  { background: #78350f; color: #fcd34d; }
     .dark-mode .badge-alerta.azul     { background: #1e3a8a; color: #93c5fd; }
     .dark-mode .badge-alerta.verde    { background: #064e3b; color: #6ee7b7; }
-    .dark-mode .badge-alerta.cinza    { background: #334155; color: #cbd5e1; }
 
+    /* ── Placeholder / vazio ────────────────────────────── */
+    .placeholder-text,
     .agenda-vazia {
       color: var(--text-3);
-      font-size: 0.85rem;
-      padding: 12px 0;
+      font-size: 0.9rem;
+      padding: 20px 0;
       text-align: center;
       font-style: italic;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-lg);
+      background: var(--bg);
     }
 
-    .resultado-suspeita {
-      font-weight: 600;
-      font-size: 0.78rem;
-      padding: 2px 10px;
-      border-radius: 20px;
-    }
-    .suspeita-alta   { background: #fee2e2; color: #dc2626; }
-    .suspeita-moderada { background: #fef3c7; color: #d97706; }
-    .suspeita-baixa  { background: #dbeafe; color: #2563eb; }
-    .suspeita-sem    { background: #dcfce7; color: #15803d; }
-
-    .dark-mode .suspeita-alta   { background: #7f1d1d; color: #fca5a5; }
-    .dark-mode .suspeita-moderada { background: #78350f; color: #fcd34d; }
-    .dark-mode .suspeita-baixa  { background: #1e3a8a; color: #93c5fd; }
-    .dark-mode .suspeita-sem    { background: #064e3b; color: #6ee7b7; }
-
-    .sem-alerta {
-      color: var(--text-3);
-      text-align: center;
-      padding: 20px 0;
-      font-size: 0.9rem;
-    }
-
+    /* ── Responsividade ────────────────────────────────── */
     @media (max-width: 1024px) {
-      .med-grid { grid-template-columns: 1fr; }
-      .stats-indicators { grid-template-columns: repeat(2, 1fr); }
+      .pac-grid {
+        grid-template-columns: 1fr;
+      }
+      .stats-indicators {
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
     @media (max-width: 600px) {
-      .stats-indicators { grid-template-columns: 1fr; }
+      .stats-indicators {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+      .stat-indicator-number {
+        font-size: 1.8rem;
+      }
+      .pac-dashboard .card-header {
+        padding: 14px 16px 10px;
+      }
+      .pac-dashboard .card-body {
+        padding: 14px 16px 16px;
+      }
+      .info-linha,
+      .activity-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+      }
+      .info-linha .valor,
+      .activity-time {
+        text-align: left;
+      }
+      .alerta-item {
+        padding: 10px 12px;
+      }
     }
   </style>
 </head>
@@ -163,188 +330,104 @@
     </div>
 
     <div class="page-body">
+      <div class="pac-dashboard">
 
-      <!-- ─── INDICADORES ─── -->
-      <div class="stats-indicators">
-        <div class="stat-indicator-card">
-          <div class="stat-indicator-number" id="totalConsultas">0</div>
-          <div class="stat-indicator-label">Consultas</div>
-        </div>
-        <div class="stat-indicator-card">
-          <div class="stat-indicator-number" id="totalExames">0</div>
-          <div class="stat-indicator-label">Exames</div>
-        </div>
-        <div class="stat-indicator-card">
-          <div class="stat-indicator-number" id="totalPacientes">0</div>
-          <div class="stat-indicator-label">Pacientes</div>
-        </div>
-        <div class="stat-indicator-card">
-          <div class="stat-indicator-number" id="totalResultados">0</div>
-          <div class="stat-indicator-label">Resultados</div>
-        </div>
-      </div>
-
-      <!-- ─── LINHA 2: Consultas Recentes | Agenda de Hoje ─── -->
-      <div class="med-grid">
-        <!-- Consultas Recentes -->
-        <div class="card">
-          <div class="card-header">
-            <span class="card-title">Consultas Recentes</span>
-            <a href="crudconsulta_med.html" class="btn btn-outline btn-sm">Ver todas →</a>
+        <!-- ─── INDICADORES ─── -->
+        <div class="stats-indicators">
+          <div class="stat-indicator-card">
+            <div class="stat-indicator-number" id="totalConsultas">0</div>
+            <div class="stat-indicator-label">Consultas</div>
           </div>
-          <div class="card-body">
-            <div id="listaConsultasRecentes">
-              <div class="activity-item">
-                <div class="activity-dot" style="background:#15803d"></div>
-                <span class="activity-text">Consulta #1045 - Maria Oliveira</span>
-                <span class="activity-time">Finalizada</span>
-              </div>
-              <div class="activity-item">
-                <div class="activity-dot" style="background:var(--blue)"></div>
-                <span class="activity-text">Consulta #1046 - Pedro Alves</span>
-                <span class="activity-time">Em andamento</span>
-              </div>
-              <div class="activity-item">
-                <div class="activity-dot" style="background:var(--yellow)"></div>
-                <span class="activity-text">Consulta #1047 - Ana Lima</span>
-                <span class="activity-time">Pendente</span>
-              </div>
+          <div class="stat-indicator-card">
+            <div class="stat-indicator-number" id="totalExames">0</div>
+            <div class="stat-indicator-label">Exames</div>
+          </div>
+          <div class="stat-indicator-card">
+            <div class="stat-indicator-number" id="totalPacientes">0</div>
+            <div class="stat-indicator-label">Pacientes</div>
+          </div>
+          <div class="stat-indicator-card">
+            <div class="stat-indicator-number" id="totalResultados">0</div>
+            <div class="stat-indicator-label">Resultados</div>
+          </div>
+        </div>
+
+        <!-- ─── PAINEL DE ALERTAS (MOVIMENTO PARA CIMA) ─── -->
+        <div class="pac-grid-full">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">
+                <i data-lucide="bell"></i> Painel de Alertas
+              </span>
+            </div>
+            <div class="card-body">
+              <div id="painelAlertas"></div>
             </div>
           </div>
         </div>
 
-        <!-- Agenda de Hoje -->
-        <div class="card">
-          <div class="card-header">
-            <span class="card-title">Agenda de Hoje</span>
-            <a href="calendario.html" class="btn btn-outline btn-sm">Ver agenda completa →</a>
-          </div>
-          <div class="card-body">
-            <div id="agendaHoje">
-              <div class="activity-item">
-                <div class="activity-dot" style="background:var(--blue)"></div>
-                <span class="activity-text">08:30 - Carlos Souza</span>
-                <span class="activity-time">Pendente</span>
-              </div>
-              <div class="activity-item">
-                <div class="activity-dot" style="background:var(--blue)"></div>
-                <span class="activity-text">10:00 - Mariana Silva</span>
-                <span class="activity-time">Pendente</span>
-              </div>
-              <div class="activity-item">
-                <div class="activity-dot" style="background:#15803d"></div>
-                <span class="activity-text">14:30 - João Pereira</span>
-                <span class="activity-time">Finalizada</span>
-              </div>
+        <!-- ─── LINHA 2: Consultas Recentes | Agenda de Hoje ─── -->
+        <div class="pac-grid">
+          <!-- Consultas Recentes -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">
+                <i data-lucide="calendar-clock"></i> Consultas Recentes
+              </span>
+              <a href="crudconsulta_med.html" class="btn btn-outline btn-sm">Ver todas →</a>
+            </div>
+            <div class="card-body">
+              <div id="listaConsultasRecentes"></div>
             </div>
           </div>
-        </div>
-      </div>
 
-      <!-- ─── LINHA 3: Exames Recentes | Últimos Resultados ─── -->
-      <div class="med-grid" style="margin-top:20px;">
-        <!-- Exames Recentes -->
-        <div class="card">
-          <div class="card-header">
-            <span class="card-title">Exames Recentes</span>
-            <a href="crudexame.html" class="btn btn-outline btn-sm">Ver todos →</a>
-          </div>
-          <div class="card-body">
-            <div id="listaExamesRecentes">
-              <div class="activity-item">
-                <div class="activity-dot" style="background:#15803d"></div>
-                <span class="activity-text">Hemograma - Maria Oliveira</span>
-                <span class="activity-time">Finalizado</span>
-              </div>
-              <div class="activity-item">
-                <div class="activity-dot" style="background:var(--blue)"></div>
-                <span class="activity-text">Mielograma - Pedro Alves</span>
-                <span class="activity-time">Em andamento</span>
-              </div>
-              <div class="activity-item">
-                <div class="activity-dot" style="background:var(--yellow)"></div>
-                <span class="activity-text">Hemograma - Ana Lima</span>
-                <span class="activity-time">Pendente</span>
-              </div>
+          <!-- Agenda de Hoje -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">
+                <i data-lucide="calendar-days"></i> Agenda de Hoje
+              </span>
+              <a href="calendario.html" class="btn btn-outline btn-sm">Ver agenda completa →</a>
+            </div>
+            <div class="card-body">
+              <div id="agendaHoje"></div>
             </div>
           </div>
         </div>
 
-        <!-- Últimos Resultados -->
-        <div class="card">
-          <div class="card-header">
-            <span class="card-title">Últimos Resultados</span>
-            <a href="crudresultado.html" class="btn btn-outline btn-sm">Ver todos →</a>
+        <!-- ─── LINHA 3: Exames Recentes | Últimos Resultados ─── -->
+        <div class="pac-grid">
+          <!-- Exames Recentes -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">
+                <i data-lucide="flask-conical"></i> Exames Recentes
+              </span>
+              <a href="crudexame.html" class="btn btn-outline btn-sm">Ver todos →</a>
+            </div>
+            <div class="card-body">
+              <div id="listaExamesRecentes"></div>
+            </div>
           </div>
-          <div class="card-body">
-            <div id="listaUltimosResultados">
-              <div class="activity-item">
-                <div class="activity-dot" style="background:var(--red)"></div>
-                <span class="activity-text">Maria Oliveira - Hemograma</span>
-                <span class="activity-time"><span class="resultado-suspeita suspeita-alta">Alta</span></span>
-              </div>
-              <div class="activity-item">
-                <div class="activity-dot" style="background:#d97706"></div>
-                <span class="activity-text">Pedro Alves - Mielograma</span>
-                <span class="activity-time"><span class="resultado-suspeita suspeita-moderada">Moderada</span></span>
-              </div>
-              <div class="activity-item">
-                <div class="activity-dot" style="background:#15803d"></div>
-                <span class="activity-text">Ana Lima - Hemograma</span>
-                <span class="activity-time"><span class="resultado-suspeita suspeita-sem">Sem suspeita</span></span>
-              </div>
+
+          <!-- Últimos Resultados -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">
+                <i data-lucide="file-text"></i> Últimos Resultados
+              </span>
+              <a href="crudresultado.html" class="btn btn-outline btn-sm">Ver todos →</a>
+            </div>
+            <div class="card-body">
+              <div id="listaUltimosResultados"></div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- ─── LINHA 4: Painel de Alertas ─── -->
-      <div class="med-grid-full" style="margin-top:20px;">
-        <div class="card">
-          <div class="card-header">
-            <span class="card-title">Painel de Alertas</span>
-          </div>
-          <div class="card-body">
-            <div id="painelAlertas">
-              <div class="alerta-item">
-                <span class="icone">📋</span>
-                <span class="texto">Consultas pendentes</span>
-                <span class="badge-alerta amarelo">3</span>
-              </div>
-              <div class="alerta-item">
-                <span class="icone">🧪</span>
-                <span class="texto">Exames pendentes</span>
-                <span class="badge-alerta amarelo">5</span>
-              </div>
-              <div class="alerta-item">
-                <span class="icone">🔬</span>
-                <span class="texto">Exames em andamento</span>
-                <span class="badge-alerta azul">2</span>
-              </div>
-              <div class="alerta-item">
-                <span class="icone">📄</span>
-                <span class="texto">Resultados emitidos</span>
-                <span class="badge-alerta verde">12</span>
-              </div>
-              <div class="alerta-item">
-                <span class="icone">🔴</span>
-                <span class="texto">Resultados com Alta suspeita</span>
-                <span class="badge-alerta vermelho">4</span>
-              </div>
-              <div class="alerta-item">
-                <span class="icone">📅</span>
-                <span class="texto">Consultas agendadas para hoje</span>
-                <span class="badge-alerta azul">3</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
+      </div><!-- /pac-dashboard -->
     </div><!-- /page-body -->
   </div><!-- /main-content -->
 </div><!-- /app-layout -->
-
 
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="../JS/navbar.js"></script>
@@ -362,428 +445,230 @@
   }
 
   // ============================================
-  // CARREGAMENTO DE DADOS (API FUTURA)
+  // CARREGAMENTO DE DADOS (API)
   // ============================================
-
-  
   async function carregarConsultas() {
-    
     const response = await fetch("http://localhost:3000/consultas", {
-        headers: {
-            Authorization: "Bearer " + token
-        }
+        headers: { Authorization: "Bearer " + token }
     });
-
     const dados = await response.json();
+    if(dados.status) consultas = dados.dados;
+  }
 
-    if(dados.status){
-        consultas = dados.dados;
-    }
-    console.log(consultas);
-}
-async function carregarExames() {
-
+  async function carregarExames() {
     const response = await fetch("http://localhost:3000/exames", {
-        headers:{
-            Authorization:"Bearer " + token
-        }
+        headers: { Authorization: "Bearer " + token }
     });
-
     const dados = await response.json();
+    if(dados.status) exames = dados.dados;
+  }
 
-    if(dados.status){
-        exames = dados.dados;
-    }
-    console.log(exames);
-
-}
-async function carregarResultados(){
-
-    const response = await fetch("http://localhost:3000/resultados-exame",{
-        headers:{
-            Authorization:"Bearer " + token
-        }
+  async function carregarResultados() {
+    const response = await fetch("http://localhost:3000/resultados-exame", {
+        headers: { Authorization: "Bearer " + token }
     });
-
     const dados = await response.json();
+    if(dados.status) resultados = dados.dados;
+  }
 
-    if(dados.status){
-        resultados = dados.dados;
+  // ============================================
+  // PREENCHIMENTO DOS COMPONENTES
+  // ============================================
+  function preencherIndicadores() {
+    document.getElementById("totalConsultas").textContent = consultas.length;
+    document.getElementById("totalExames").textContent = exames.length;
+    document.getElementById("totalResultados").textContent = resultados.length;
+
+    const pacientes = new Set(consultas.map(c => c.cpf));
+    document.getElementById("totalPacientes").textContent = pacientes.size;
+  }
+
+  function preencherConsultasRecentes() {
+    const container = document.getElementById("listaConsultasRecentes");
+    const lista = [...consultas]
+      .sort((a, b) => new Date(b.data_consulta) - new Date(a.data_consulta))
+      .slice(0, 5);
+
+    if (lista.length === 0) {
+      container.innerHTML = `<div class="agenda-vazia">Nenhuma consulta encontrada.</div>`;
+      return;
     }
 
-}
-function preencherIndicadores(){
-
-    document.getElementById("totalConsultas").textContent =
-        consultas.length;
-
-    document.getElementById("totalExames").textContent =
-        exames.length;
-
-    document.getElementById("totalResultados").textContent =
-        resultados.length;
-
-    const pacientes = new Set(
-        consultas.map(c=>c.cpf)
-    );
-
-    document.getElementById("totalPacientes").textContent =
-        pacientes.size;
-
-}
-
-function preencherConsultasRecentes() {
-
-    const container =
-        document.getElementById("listaConsultasRecentes");
-
-    const lista =
-        [...consultas]
-        .sort((a,b)=>
-            new Date(b.data_consulta) -
-            new Date(a.data_consulta)
-        )
-        .slice(0,5);
-
-    if(lista.length===0){
-
-        container.innerHTML =
-            `<div class="agenda-vazia">
-                Nenhuma consulta encontrada.
-            </div>`;
-
-        return;
-    }
-
-    container.innerHTML = lista.map(c=>`
-
-        <div class="activity-item">
-
-            <div class="activity-dot"
-                 style="background:${corStatusConsulta(c.statusc)}">
-            </div>
-
-            <span class="activity-text">
-                Consulta #${c.id_consulta} - ${c.paciente}
-            </span>
-
-            <span class="activity-time">
-                ${c.statusc}
-            </span>
-
-        </div>
-
+    container.innerHTML = lista.map(c => `
+      <div class="activity-item">
+        <div class="activity-dot" style="background:${corStatusConsulta(c.statusc)}"></div>
+        <span class="activity-text">Consulta #${c.id_consulta} - ${c.paciente}</span>
+        <span class="activity-time">${c.statusc}</span>
+      </div>
     `).join("");
+  }
 
-}
-function preencherAgendaHoje(){
+  function preencherAgendaHoje() {
+    const container = document.getElementById("agendaHoje");
+    const hoje = new Date().toISOString().split("T")[0];
+    const agenda = consultas
+      .filter(c => c.data_consulta.startsWith(hoje))
+      .sort((a, b) => new Date(a.data_consulta) - new Date(b.data_consulta));
 
-    const container =
-        document.getElementById("agendaHoje");
-
-    const hoje =
-        new Date().toISOString().split("T")[0];
-
-    const agenda =
-        consultas
-        .filter(c=>c.data_consulta.startsWith(hoje))
-        .sort((a,b)=>
-            new Date(a.data_consulta)-
-            new Date(b.data_consulta)
-        );
-
-    if(agenda.length===0){
-
-        container.innerHTML =
-            `<div class="agenda-vazia">
-                Nenhuma consulta para hoje.
-            </div>`;
-
-        return;
+    if (agenda.length === 0) {
+      container.innerHTML = `<div class="agenda-vazia">Nenhuma consulta para hoje.</div>`;
+      return;
     }
 
-    container.innerHTML = agenda.map(c=>`
-
-        <div class="activity-item">
-
-            <div class="activity-dot"
-                 style="background:${corStatusConsulta(c.statusc)}">
-            </div>
-
-            <span class="activity-text">
-                ${formatarHora(c.data_consulta)} - ${c.paciente}
-            </span>
-
-            <span class="activity-time">
-                ${c.statusc}
-            </span>
-
-        </div>
-
+    container.innerHTML = agenda.map(c => `
+      <div class="activity-item">
+        <div class="activity-dot" style="background:${corStatusConsulta(c.statusc)}"></div>
+        <span class="activity-text">${formatarHora(c.data_consulta)} - ${c.paciente}</span>
+        <span class="activity-time">${c.statusc}</span>
+      </div>
     `).join("");
+  }
 
-}
-function preencherExamesRecentes(){
+  function preencherExamesRecentes() {
+    const container = document.getElementById("listaExamesRecentes");
+    const lista = [...exames]
+      .sort((a, b) => new Date(b.data_exame) - new Date(a.data_exame))
+      .slice(0, 5);
 
-    const container =
-        document.getElementById("listaExamesRecentes");
-
-    const lista =
-        [...exames]
-        .sort((a,b)=>
-            new Date(b.data_exame)-
-            new Date(a.data_exame)
-        )
-        .slice(0,5);
-
-    if(lista.length===0){
-
-        container.innerHTML =
-            `<div class="agenda-vazia">
-                Nenhum exame encontrado.
-            </div>`;
-
-        return;
+    if (lista.length === 0) {
+      container.innerHTML = `<div class="agenda-vazia">Nenhum exame encontrado.</div>`;
+      return;
     }
 
-    container.innerHTML = lista.map(e=>`
-
-        <div class="activity-item">
-
-            <div class="activity-dot"
-                 style="background:${corStatusExame(e.statusc)}">
-            </div>
-
-            <span class="activity-text">
-                ${e.tipo_exame} - ${e.paciente}
-            </span>
-
-            <span class="activity-time">
-                ${e.statusc}
-            </span>
-
-        </div>
-
+    container.innerHTML = lista.map(e => `
+      <div class="activity-item">
+        <div class="activity-dot" style="background:${corStatusExame(e.statusc)}"></div>
+        <span class="activity-text">${e.tipo_exame} - ${e.paciente}</span>
+        <span class="activity-time">${e.statusc}</span>
+      </div>
     `).join("");
+  }
 
-}
-function preencherResultadosRecentes(){
+  function preencherResultadosRecentes() {
+    const container = document.getElementById("listaUltimosResultados");
+    const lista = [...resultados]
+      .sort((a, b) => new Date(b.data_resultado) - new Date(a.data_resultado))
+      .slice(0, 5);
 
-    const container =
-        document.getElementById("listaUltimosResultados");
-
-    const lista =
-        [...resultados]
-        .sort((a,b)=>
-            new Date(b.data_resultado)-
-            new Date(a.data_resultado)
-        )
-        .slice(0,5);
-
-    if(lista.length===0){
-
-        container.innerHTML =
-            `<div class="agenda-vazia">
-                Nenhum resultado encontrado.
-            </div>`;
-
-        return;
+    if (lista.length === 0) {
+      container.innerHTML = `<div class="agenda-vazia">Nenhum resultado encontrado.</div>`;
+      return;
     }
 
-    container.innerHTML = lista.map(r=>`
-
-        <div class="activity-item">
-
-            <div class="activity-dot"
-                 style="background:${corSuspeita(r.suspeita_leucemia)}">
-            </div>
-
-            <span class="activity-text">
-                Exame #${r.id_exame}
-            </span>
-
-            <span class="activity-time">
-
-                <span class="
-                    resultado-suspeita
-                    ${classeSuspeita(r.suspeita_leucemia)}
-                ">
-                    ${r.suspeita_leucemia}
-                </span>
-
-            </span>
-
-        </div>
-
+    container.innerHTML = lista.map(r => `
+      <div class="activity-item">
+        <div class="activity-dot" style="background:${corSuspeita(r.suspeita_leucemia)}"></div>
+        <span class="activity-text">Exame #${r.id_exame}</span>
+        <span class="activity-time">
+          <span class="status-badge ${classeSuspeita(r.suspeita_leucemia)}">${r.suspeita_leucemia}</span>
+        </span>
+      </div>
     `).join("");
+  }
 
-}
-function preencherAlertas(){
+  function preencherAlertas() {
+    const container = document.getElementById("painelAlertas");
 
-    const container =
-        document.getElementById("painelAlertas");
-
-    const consultasPendentes =
-        consultas.filter(c=>c.statusc==="Pendente").length;
-
-    const examesPendentes =
-        exames.filter(e=>e.statusc==="Pendente").length;
-
-    const examesAndamento =
-        exames.filter(e=>e.statusc==="Em andamento").length;
-
-    const resultadosEmitidos =
-        resultados.length;
-
-    const altaSuspeita =
-        resultados.filter(r=>
-            r.suspeita_leucemia==="Alta"
-        ).length;
-
-    const hoje =
-        new Date().toISOString().split("T")[0];
-
-    const agendaHoje =
-        consultas.filter(c=>
-            c.data_consulta.startsWith(hoje)
-        ).length;
+    const consultasPendentes = consultas.filter(c => c.statusc === "Pendente").length;
+    const examesPendentes = exames.filter(e => e.statusc === "Pendente").length;
+    const examesAndamento = exames.filter(e => e.statusc === "Em andamento").length;
+    const resultadosEmitidos = resultados.length;
+    const altaSuspeita = resultados.filter(r => r.suspeita_leucemia === "Alta").length;
+    const hoje = new Date().toISOString().split("T")[0];
+    const agendaHoje = consultas.filter(c => c.data_consulta.startsWith(hoje)).length;
 
     container.innerHTML = `
-
-        ${criarAlerta("📋","Consultas pendentes",consultasPendentes,"amarelo")}
-
-        ${criarAlerta("🧪","Exames pendentes",examesPendentes,"amarelo")}
-
-        ${criarAlerta("🔬","Exames em andamento",examesAndamento,"azul")}
-
-        ${criarAlerta("📄","Resultados emitidos",resultadosEmitidos,"verde")}
-
-        ${criarAlerta("🔴","Alta suspeita",altaSuspeita,"vermelho")}
-
-        ${criarAlerta("📅","Consultas hoje",agendaHoje,"azul")}
-
+      ${criarAlerta("calendar-clock", "Consultas pendentes", consultasPendentes, "amarelo")}
+      ${criarAlerta("flask-conical", "Exames pendentes", examesPendentes, "amarelo")}
+      ${criarAlerta("microscope", "Exames em andamento", examesAndamento, "azul")}
+      ${criarAlerta("file-text", "Resultados emitidos", resultadosEmitidos, "verde")}
+      ${criarAlerta("alert-circle", "Alta suspeita", altaSuspeita, "vermelho")}
+      ${criarAlerta("calendar-days", "Consultas hoje", agendaHoje, "azul")}
     `;
+  }
 
-}
-function criarAlerta(icone,texto,valor,classe){
-
+  function criarAlerta(icone, texto, valor, classe) {
     return `
-        <div class="alerta-item">
-
-            <span class="icone">${icone}</span>
-
-            <span class="texto">
-                ${texto}
-            </span>
-
-            <span class="badge-alerta ${classe}">
-                ${valor}
-            </span>
-
-        </div>
+      <div class="alerta-item">
+        <span class="icone"><i data-lucide="${icone}"></i></span>
+        <span class="texto">${texto}</span>
+        <span class="badge-alerta ${classe}">${valor}</span>
+      </div>
     `;
+  }
 
-}
-function formatarHora(data){
+  // ============================================
+  // HELPERS
+  // ============================================
+  function formatarHora(data) {
+    return new Date(data).toLocaleTimeString("pt-BR", {
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+  }
 
-    return new Date(data).toLocaleTimeString(
-        "pt-BR",
-        {
-            hour:"2-digit",
-            minute:"2-digit"
-        }
-    );
-
-}
-function corStatusConsulta(status){
-
-    switch(status){
-
-        case "Finalizado":
-            return "#15803d";
-
-        case "Em andamento":
-            return "#2563eb";
-
-        case "Pendente":
-            return "#d97706";
-
-        default:
-            return "#94a3b8";
+  function corStatusConsulta(status) {
+    switch(status) {
+      case "Finalizado": return "#15803d";
+      case "Em andamento": return "#2563eb";
+      case "Pendente": return "#d97706";
+      default: return "#94a3b8";
     }
-}
-function corStatusExame(status){
+  }
 
-    switch(status){
-
-        case "Finalizado":
-            return "#15803d";
-
-        case "Em andamento":
-            return "#2563eb";
-
-        case "Pendente":
-            return "#d97706";
-
-        default:
-            return "#94a3b8";
+  function corStatusExame(status) {
+    switch(status) {
+      case "Finalizado": return "#15803d";
+      case "Em andamento": return "#2563eb";
+      case "Pendente": return "#d97706";
+      default: return "#94a3b8";
     }
+  }
 
-}
-function corSuspeita(suspeita){
-
-    switch(suspeita){
-
-        case "Alta":
-            return "#dc2626";
-
-        case "Moderada":
-            return "#d97706";
-
-        case "Baixa":
-            return "#2563eb";
-
-        default:
-            return "#15803d";
+  function corSuspeita(suspeita) {
+    switch(suspeita) {
+      case "Alta": return "#dc2626";
+      case "Moderada": return "#d97706";
+      case "Baixa": return "#2563eb";
+      default: return "#15803d";
     }
+  }
 
-}
-function classeSuspeita(suspeita){
-
-    switch(suspeita){
-
-        case "Alta":
-            return "suspeita-alta";
-
-        case "Moderada":
-            return "suspeita-moderada";
-
-        case "Baixa":
-            return "suspeita-baixa";
-
-        default:
-            return "suspeita-sem";
+  function classeSuspeita(suspeita) {
+    switch(suspeita) {
+      case "Alta": return "status-finalizado"; // vermelho
+      case "Moderada": return "status-pendente"; // amarelo
+      case "Baixa": return "status-andamento"; // azul
+      default: return "status-finalizado"; // verde
     }
+  }
 
-}
-async function carregarDadosDashboard(){
-
+  // ============================================
+  // CARREGAMENTO COMPLETO
+  // ============================================
+  async function carregarDadosDashboard() {
     await Promise.all([
-        carregarConsultas(),
-        carregarExames(),
-        carregarResultados()
+      carregarConsultas(),
+      carregarExames(),
+      carregarResultados()
     ]);
 
     preencherIndicadores();
+    preencherAlertas(); // agora preenchido antes dos demais
     preencherConsultasRecentes();
     preencherAgendaHoje();
     preencherExamesRecentes();
     preencherResultadosRecentes();
-    preencherAlertas();
 
-}
+    // Inicializar ícones Lucide
+    if (window.lucide) {
+      lucide.createIcons();
+    }
+  }
 
-  // Inicialização da Sessão e Sidebar
+  // ============================================
+  // INICIALIZAÇÃO
+  // ============================================
   if (!localStorage.getItem('hematoai_session')) {
     if (typeof HematoAI !== 'undefined' && HematoAI.setSession) {
         HematoAI.setSession({ tipo: 'Médico', nome: 'Dr. Usuário', crm: '00000-SP' });

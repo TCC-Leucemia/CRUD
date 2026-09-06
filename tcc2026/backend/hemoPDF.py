@@ -1,4 +1,5 @@
 import os
+import re
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
@@ -90,10 +91,17 @@ def gerar_laudo_pdf(texto_ai, dados_paciente, nome_saida):
         # ==================== LAUDO (CONTEÚDO) ====================
         linhas_laudo = texto_ai.split('\n')
         
+        # Regex para identificar linhas que são apenas sequências repetidas de caracteres de separação
+        separador_pattern = re.compile(r'^[=\-_*#]{4,}\s*$')
+        
         for linha in linhas_laudo:
             linha = linha.strip()
             if not linha:
                 y_position -= 8
+                continue
+            
+            # Ignora linhas que sejam apenas repetições de caracteres como "=====", "-----", etc.
+            if separador_pattern.match(linha):
                 continue
             
             linha_limpa = linha.replace('##', '').replace('**', '').replace('*', '').strip()
