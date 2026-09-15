@@ -23,6 +23,12 @@ pop-up; `success`, `warning` e `info` continuam como toast.
 
 ## Histórico de Alterações
 
+### 2026-09-14 — Triagem morfológica conservadora na análise por IA
+- **Alteração:** reestruturado o prompt de `backend/analise_celular.py` para avaliar a qualidade e representatividade da imagem antes de classificar o caso; acrescentados diferenciais obrigatórios, regras para não forçar LMA/LLA/LLC/LMC e laudo com limitações explícitas. Corrigido também o tipo MIME enviado para imagens PNG.
+- **Motivo:** uma foto isolada não representa o esfregaço completo e não permite confirmar subtipo de leucemia, percentual de blastos, clonalidade ou alteração molecular. A mudança reduz falsos positivos por artefatos, campos pouco representativos e semelhança entre doenças.
+- **Arquivos/Módulos:** `backend/analise_celular.py`, `docs/analise-ia.md`.
+- **Validação:** pendente de validação clínica em conjunto independente e rotulado por hematopatologista; a análise automática de sintaxe e de compatibilidade de saída deve ser executada antes do deploy.
+
 ### 2026-08-20 — Pop-up de erro padronizado e ajustes no laudo da IA
 - **Alteração:** criado o componente único de pop-up de erro
   (`front/JS/erro-popup.js`) e aplicado às 24 páginas; removidos todos os
