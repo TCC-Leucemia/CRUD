@@ -2,17 +2,16 @@ create database TCCof;
 use TCCof;
 
 create table login (
-    id_usuario int auto_increment primary key not null,
+	id_usuario int auto_increment primary key not null,
     email varchar (100) not null,
     senha varchar (255) not null,
-    tipo enum ("Médico", "Paciente", "Administrador") not null,
-    constraint uq_login_email_tipo unique (email, tipo)
+    tipo enum ("Médico", "Paciente", "Administrador") not null
 );
 
 create table enderecos (
-    id_endereco int auto_increment primary key not null,
+	id_endereco int auto_increment primary key not null,
     rua varchar (255) not null,
-
+    
     numero int not null,
     bairro varchar (100) not null,
     cidade varchar (100) not null,
@@ -22,26 +21,28 @@ create table enderecos (
 
 
 create table pacientes (
-    cpf varchar (11) unique primary key not null,
+	cpf varchar (11) unique primary key not null,
     nome varchar (200) not null,
     data_nasc date,
     sexo enum ("Masculino", "Feminino") not null,
     email varchar (200) not null,
     telefone varchar (20), 
-    id_usuario int unique not null,
+	id_usuario int not null,
     id_endereco int not null,
-
+    
     foreign key (id_usuario) references login(id_usuario),
     foreign key (id_endereco) references enderecos(id_endereco)
 );
+
 create table medicos (
-    crm varchar (11) primary key not null,
+	crm varchar (11) primary key not null,
     nome varchar (200) not null,
+    
     email varchar (200) not null,
     cpf varchar (11) unique not null,
     telefone varchar (20),
     especialidade varchar (50) not null,
-    id_usuario int unique not null,
+    id_usuario int not null,
     id_endereco int not null,
     foreign key (id_usuario) references login(id_usuario),
     foreign key (id_endereco) references enderecos(id_endereco)
@@ -55,16 +56,16 @@ CREATE TABLE consultas (
     tipo_consulta varchar(50),
     statusc enum ("Pendente", "Em andamento", "Finalizado"),
     foreign key (cpf) references pacientes(cpf),
-    foreign key (crm) references medicos(crm) on update cascade
+    foreign key (crm) references medicos(crm)
 );
 
 create table exames (
     id_exame int auto_increment primary key,
     id_consulta int not null,
-    tipo_exame ENUM("Hemograma","Mielograma") NOT NULL,
+	tipo_exame ENUM("Hemograma","Mielograma") NOT NULL,
     data_exame datetime,
     statusc enum ("Pendente", "Em andamento", "Finalizado"),
-
+    
     foreign key (id_consulta) references consultas(id_consulta)
 );
 
@@ -84,9 +85,10 @@ create table resultados_exame (
     suspeita_leucemia enum("Baixa","Moderada","Alta","Sem suspeita"),
     tipo_leucemia enum("LLA","LMA","LLC","LMC","Não identificado"),
     data_resultado date,
-
+    
     foreign key (id_exame) references exames(id_exame)
 );
+
 create table analise_ia (
     id_analise int auto_increment primary key,
     id_exame int not null,
@@ -123,191 +125,378 @@ create table analise_ia (
 );
 
 create table anamnese (
-    id_anamnese int auto_increment primary key,
+	id_anamnese int auto_increment primary key,
     cpf varchar (11) not null,
     crm varchar (11) not null,
     id_consulta int not null,
     sintomas text,
     comorbidades text,
-
+    
     foreign key (id_consulta) references consultas (id_consulta),
     foreign key (cpf) references pacientes (cpf),
-    foreign key (crm) references medicos (crm) on update cascade
+    foreign key (crm) references medicos (crm)
 );
 
--- ============================================================
--- CARGA INICIAL DE TESTE
--- Todos os logins abaixo utilizam a senha: 1234
--- ============================================================
 
-START TRANSACTION;
+INSERT INTO login (email, senha, tipo) VALUES
+('admin@hematoai.com', '123456', 'Administrador'),
 
--- 21 registros para a tabela login
-INSERT INTO login (id_usuario, email, senha, tipo) VALUES
-    (1, 'ana.paciente@teste.com', '81dc9bdb52d04dc20036dbd8313ed055', 'Paciente'),
-    (2, 'bruno.paciente@teste.com', '81dc9bdb52d04dc20036dbd8313ed055', 'Paciente'),
-    (3, 'carla.paciente@teste.com', '81dc9bdb52d04dc20036dbd8313ed055', 'Paciente'),
-    (4, 'diego.medico.paciente@teste.com', '81dc9bdb52d04dc20036dbd8313ed055', 'Paciente'),
-    (5, 'diego.medico.paciente@teste.com', '81dc9bdb52d04dc20036dbd8313ed055', 'Médico'),
-    (6, 'fernanda.medica@teste.com', '81dc9bdb52d04dc20036dbd8313ed055', 'Médico'),
-    (7, 'gustavo.medico@teste.com', '81dc9bdb52d04dc20036dbd8313ed055', 'Médico'),
-    (8, 'helena.medica@teste.com', '81dc9bdb52d04dc20036dbd8313ed055', 'Médico'),
-    (9, 'igor.medico@teste.com', '81dc9bdb52d04dc20036dbd8313ed055', 'Médico'),
-    (10, 'admin@hematoai.com', '81dc9bdb52d04dc20036dbd8313ed055', 'Administrador'),
-    (11, 'juliana.medica@teste.com', '81dc9bdb52d04dc20036dbd8313ed055', 'Médico'),
-    (12, 'leandro.medico@teste.com', '81dc9bdb52d04dc20036dbd8313ed055', 'Médico'),
-    (13, 'mariana.medica@teste.com', '81dc9bdb52d04dc20036dbd8313ed055', 'Médico'),
-    (14, 'nicolas.medico@teste.com', '81dc9bdb52d04dc20036dbd8313ed055', 'Médico'),
-    (15, 'olivia.medica@teste.com', '81dc9bdb52d04dc20036dbd8313ed055', 'Médico'),
-    (16, 'elisa.paciente@teste.com', '81dc9bdb52d04dc20036dbd8313ed055', 'Paciente'),
-    (17, 'fabio.paciente@teste.com', '81dc9bdb52d04dc20036dbd8313ed055', 'Paciente'),
-    (18, 'gabriela.paciente@teste.com', '81dc9bdb52d04dc20036dbd8313ed055', 'Paciente'),
-    (19, 'henrique.paciente@teste.com', '81dc9bdb52d04dc20036dbd8313ed055', 'Paciente'),
-    (20, 'isabela.paciente@teste.com', '81dc9bdb52d04dc20036dbd8313ed055', 'Paciente'),
-    (21, 'joao.paciente@teste.com', '81dc9bdb52d04dc20036dbd8313ed055', 'Paciente');
+('joao.silva@gmail.com', 'e10adc3949ba59abbe56e057f20f883e', 'Médico'),
+('ana.costa@gmail.com', 'e10adc3949ba59abbe56e057f20f883e', 'Médico'),
+('carlos.oliveira@outlook.com', 'e10adc3949ba59abbe56e057f20f883e', 'Médico'),
+('mariana.santos@gmail.com', 'e10adc3949ba59abbe56e057f20f883e', 'Médico'),
+('ricardo.almeida@hotmail.com', 'e10adc3949ba59abbe56e057f20f883e', 'Médico'),
+('fernanda.rocha@gmail.com', 'e10adc3949ba59abbe56e057f20f883e', 'Médico'),
+('lucas.martins@outlook.com', 'e10adc3949ba59abbe56e057f20f883e', 'Médico'),
+('patricia.lima@gmail.com', 'e10adc3949ba59abbe56e057f20f883e', 'Médico'),
+('gabriel.ferreira@gmail.com', 'e10adc3949ba59abbe56e057f20f883e', 'Médico'),
+('juliana.ribeiro@hotmail.com', 'e10adc3949ba59abbe56e057f20f883e', 'Médico'),
+('andre.carvalho@gmail.com', 'e10adc3949ba59abbe56e057f20f883e', 'Médico'),
+('camila.gomes@outlook.com', 'e10adc3949ba59abbe56e057f20f883e', 'Médico'),
+('bruno.mendes@gmail.com', 'e10adc3949ba59abbe56e057f20f883e', 'Médico'),
+('aline.barros@gmail.com', 'e10adc3949ba59abbe56e057f20f883e', 'Médico'),
+('rafael.teixeira@hotmail.com', 'e10adc3949ba59abbe56e057f20f883e', 'Médico'),
 
--- 10 registros para a tabela enderecos
-INSERT INTO enderecos (id_endereco, rua, numero, bairro, cidade, estado, cep) VALUES
-    (1, 'Rua das Flores', 120, 'Centro', 'São Paulo', 'São Paulo', '01001-000'),
-    (2, 'Avenida Brasil', 450, 'Jardins', 'São Paulo', 'São Paulo', '01430-001'),
-    (3, 'Rua da Bahia', 78, 'Funcionários', 'Belo Horizonte', 'Minas Gerais', '30160-011'),
-    (4, 'Avenida Atlântica', 900, 'Copacabana', 'Rio de Janeiro', 'Rio de Janeiro', '22010-000'),
-    (5, 'Rua XV de Novembro', 315, 'Centro', 'Curitiba', 'Paraná', '80020-310'),
-    (6, 'Avenida Ipiranga', 640, 'Centro Histórico', 'Porto Alegre', 'Rio Grande do Sul', '90010-290'),
-    (7, 'Rua das Acácias', 55, 'Boa Viagem', 'Recife', 'Pernambuco', '51020-020'),
-    (8, 'Avenida Tancredo Neves', 1020, 'Caminho das Árvores', 'Salvador', 'Bahia', '41820-020'),
-    (9, 'Rua das Palmeiras', 233, 'Aldeota', 'Fortaleza', 'Ceará', '60150-160'),
-    (10, 'Avenida Goiás', 777, 'Setor Central', 'Goiânia', 'Goiás', '74010-010');
+('lucas.pereira@gmail.com', 'e10adc3949ba59abbe56e057f20f883e', 'Paciente'),
+('beatriz.souza@gmail.com', 'e10adc3949ba59abbe56e057f20f883e', 'Paciente'),
+('miguel.araujo@outlook.com', 'e10adc3949ba59abbe56e057f20f883e', 'Paciente'),
+('isabela.nunes@gmail.com', 'e10adc3949ba59abbe56e057f20f883e', 'Paciente'),
+('matheus.cardoso@hotmail.com', 'e10adc3949ba59abbe56e057f20f883e', 'Paciente'),
+('larissa.moura@gmail.com', 'e10adc3949ba59abbe56e057f20f883e', 'Paciente'),
+('pedro.monteiro@outlook.com', 'e10adc3949ba59abbe56e057f20f883e', 'Paciente'),
+('manuela.freitas@gmail.com', 'e10adc3949ba59abbe56e057f20f883e', 'Paciente'),
+('thiago.barbosa@gmail.com', 'e10adc3949ba59abbe56e057f20f883e', 'Paciente'),
+('sofia.dias@hotmail.com', 'e10adc3949ba59abbe56e057f20f883e', 'Paciente'),
+('enzo.teixeira@gmail.com', 'e10adc3949ba59abbe56e057f20f883e', 'Paciente'),
+('valentina.campos@outlook.com', 'e10adc3949ba59abbe56e057f20f883e', 'Paciente'),
+('henrique.machado@gmail.com', 'e10adc3949ba59abbe56e057f20f883e', 'Paciente'),
+('laura.rezende@gmail.com', 'e10adc3949ba59abbe56e057f20f883e', 'Paciente'),
+('arthur.vieira@hotmail.com', 'e10adc3949ba59abbe56e057f20f883e', 'Paciente');
 
--- 10 registros para a tabela pacientes
-INSERT INTO pacientes
-    (cpf, nome, data_nasc, sexo, email, telefone, id_usuario, id_endereco)
-VALUES
-    ('11111111101', 'Ana Souza', '1990-03-15', 'Feminino', 'ana.paciente@teste.com', '(11) 99111-1001', 1, 1),
-    ('11111111102', 'Bruno Lima', '1985-07-22', 'Masculino', 'bruno.paciente@teste.com', '(11) 99111-1002', 2, 2),
-    ('11111111103', 'Carla Mendes', '1998-11-05', 'Feminino', 'carla.paciente@teste.com', '(31) 99111-1003', 3, 3),
-    ('11111111104', 'Diego Alves', '1979-01-30', 'Masculino', 'diego.medico.paciente@teste.com', '(21) 99111-1004', 4, 4),
-    ('11111111105', 'Elisa Rocha', '2001-06-18', 'Feminino', 'elisa.paciente@teste.com', '(41) 99111-1005', 16, 5),
-    ('11111111106', 'Fábio Martins', '1993-09-09', 'Masculino', 'fabio.paciente@teste.com', '(51) 99111-1006', 17, 6),
-    ('11111111107', 'Gabriela Nunes', '1988-12-12', 'Feminino', 'gabriela.paciente@teste.com', '(81) 99111-1007', 18, 7),
-    ('11111111108', 'Henrique Costa', '1975-04-25', 'Masculino', 'henrique.paciente@teste.com', '(71) 99111-1008', 19, 8),
-    ('11111111109', 'Isabela Freitas', '1996-08-14', 'Feminino', 'isabela.paciente@teste.com', '(85) 99111-1009', 20, 9),
-    ('11111111110', 'João Ribeiro', '1982-02-03', 'Masculino', 'joao.paciente@teste.com', '(62) 99111-1010', 21, 10);
+INSERT INTO enderecos (rua, numero, bairro, cidade, estado, cep) VALUES
 
--- 10 registros para a tabela medicos
+('Rua das Flores', 120, 'Centro', 'São José dos Campos', 'São Paulo', '12210-000'),
+('Avenida Brasil', 450, 'Jardim América', 'São José dos Campos', 'São Paulo', '12230-000'),
+('Rua José Bonifácio', 87, 'Vila Ema', 'São José dos Campos', 'São Paulo', '12243-000'),
+('Rua XV de Novembro', 210, 'Centro', 'São José dos Campos', 'São Paulo', '12210-010'),
+('Avenida Cassiano Ricardo', 780, 'Urbanova', 'São José dos Campos', 'São Paulo', '12244-000'),
+('Rua Paraibuna', 340, 'Jardim São Dimas', 'São José dos Campos', 'São Paulo', '12245-000'),
+('Rua Euclides Miragaia', 155, 'Centro', 'São José dos Campos', 'São Paulo', '12210-000'),
+('Avenida Andrômeda', 920, 'Jardim Satélite', 'São José dos Campos', 'São Paulo', '12230-000'),
+('Rua Bacabal', 63, 'Jardim Satélite', 'São José dos Campos', 'São Paulo', '12230-000'),
+('Rua Serra do Roncador', 410, 'Bosque dos Eucaliptos', 'São José dos Campos', 'São Paulo', '12232-000'),
+('Rua dos Lírios', 275, 'Jardim Aquarius', 'São José dos Campos', 'São Paulo', '12246-000'),
+('Avenida Salmão', 510, 'Jardim Aquarius', 'São José dos Campos', 'São Paulo', '12246-000'),
+('Rua das Acácias', 95, 'Jardim Esplanada', 'São José dos Campos', 'São Paulo', '12242-000'),
+('Rua Santa Clara', 330, 'Vila Adyana', 'São José dos Campos', 'São Paulo', '12243-000'),
+('Avenida Heitor Villa Lobos', 680, 'Vila Ema', 'São José dos Campos', 'São Paulo', '12243-000'),
+
+('Rua das Palmeiras', 101, 'Centro', 'São José dos Campos', 'São Paulo', '12210-020'),
+('Rua São Bento', 215, 'Centro', 'São José dos Campos', 'São Paulo', '12210-030'),
+('Avenida Cidade Jardim', 430, 'Jardim Satélite', 'São José dos Campos', 'São Paulo', '12231-000'),
+('Rua Madre Paula', 75, 'Vila Ema', 'São José dos Campos', 'São Paulo', '12243-010'),
+('Rua José de Alencar', 290, 'Centro', 'São José dos Campos', 'São Paulo', '12210-040'),
+('Rua Machado de Assis', 145, 'Jardim Paulista', 'São José dos Campos', 'São Paulo', '12216-000'),
+('Rua Monteiro Lobato', 510, 'Vila Industrial', 'São José dos Campos', 'São Paulo', '12220-000'),
+('Avenida Cidade Jardim', 875, 'Bosque dos Eucaliptos', 'São José dos Campos', 'São Paulo', '12232-010'),
+('Rua Cecília Meireles', 60, 'Jardim Aquarius', 'São José dos Campos', 'São Paulo', '12246-010'),
+('Rua Castro Alves', 320, 'Vila Adyana', 'São José dos Campos', 'São Paulo', '12243-020'),
+('Rua Olavo Bilac', 180, 'Jardim Esplanada', 'São José dos Campos', 'São Paulo', '12242-010'),
+('Rua Gonçalves Dias', 410, 'Jardim América', 'São José dos Campos', 'São Paulo', '12230-010'),
+('Rua Álvares de Azevedo', 225, 'Vila Ema', 'São José dos Campos', 'São Paulo', '12243-030'),
+('Rua Fernando Pessoa', 350, 'Urbanova', 'São José dos Campos', 'São Paulo', '12244-010'),
+('Rua Carlos Drummond', 125, 'Jardim Satélite', 'São José dos Campos', 'São Paulo', '12230-020'),
+('Rua Vinicius de Moraes', 490, 'Bosque dos Eucaliptos', 'São José dos Campos', 'São Paulo', '12232-020');
+
+
 INSERT INTO medicos
-    (crm, nome, email, cpf, telefone, especialidade, id_usuario, id_endereco)
+(crm, nome, email, cpf, telefone, especialidade, id_usuario, id_endereco)
 VALUES
-    ('SP100001', 'Carlos Henrique', 'diego.medico.paciente@teste.com', '22222222201', '(11) 99222-2001', 'Hematologia', 5, 2),
-    ('MG100002', 'Fernanda Lopes', 'fernanda.medica@teste.com', '22222222202', '(31) 99222-2002', 'Hematologia', 6, 3),
-    ('RJ100003', 'Gustavo Pereira', 'gustavo.medico@teste.com', '22222222203', '(21) 99222-2003', 'Clínica Médica', 7, 4),
-    ('PR100004', 'Helena Castro', 'helena.medica@teste.com', '22222222204', '(41) 99222-2004', 'Oncologia', 8, 5),
-    ('RS100005', 'Igor Fernandes', 'igor.medico@teste.com', '22222222205', '(51) 99222-2005', 'Hematologia', 9, 6),
-    ('PE100006', 'Juliana Barros', 'juliana.medica@teste.com', '22222222206', '(81) 99222-2006', 'Patologia', 11, 7),
-    ('BA100007', 'Leandro Moraes', 'leandro.medico@teste.com', '22222222207', '(71) 99222-2007', 'Oncologia', 12, 8),
-    ('CE100008', 'Mariana Tavares', 'mariana.medica@teste.com', '22222222208', '(85) 99222-2008', 'Hematologia', 13, 9),
-    ('GO100009', 'Nicolas Teixeira', 'nicolas.medico@teste.com', '22222222209', '(62) 99222-2009', 'Clínica Médica', 14, 10),
-    ('SP100010', 'Olívia Cardoso', 'olivia.medica@teste.com', '22222222210', '(11) 99222-2010', 'Hematologia Pediátrica', 15, 1);
 
--- 10 registros para a tabela consultas
+('123456-SP', 'João Henrique Silva', 'joao.silva@gmail.com',
+ '52998224725', '(12) 99111-1111', 'Hematologia', 2, 1),
+
+('234567-SP', 'Ana Carolina Costa', 'ana.costa@gmail.com',
+ '11144477735', '(12) 99222-2222', 'Hematologia', 3, 2),
+
+('345678-SP', 'Carlos Eduardo Oliveira', 'carlos.oliveira@outlook.com',
+ '15350946056', '(12) 99333-3333', 'Hematologia', 4, 3),
+
+('456789-SP', 'Mariana Santos', 'mariana.santos@gmail.com',
+ '98765432029', '(12) 99444-4444', 'Hematologia', 5, 4),
+
+('567890-SP', 'Ricardo Almeida', 'ricardo.almeida@hotmail.com',
+ '24681357928', '(12) 99555-5555', 'Hematologia', 6, 5),
+
+('678901-SP', 'Fernanda Rocha', 'fernanda.rocha@gmail.com',
+ '31415926590', '(12) 99666-6666', 'Hematologia', 7, 6),
+
+('789012-SP', 'Lucas Martins', 'lucas.martins@outlook.com',
+ '27182818205', '(12) 99777-7777', 'Hematologia', 8, 7),
+
+('890123-SP', 'Patrícia Lima', 'patricia.lima@gmail.com',
+ '12345678909', '(12) 99888-8888', 'Hematologia', 9, 8),
+
+('901234-SP', 'Gabriel Ferreira', 'gabriel.ferreira@gmail.com',
+ '45678901249', '(12) 99911-1111', 'Hematologia', 10, 9),
+
+('112233-SP', 'Juliana Ribeiro', 'juliana.ribeiro@hotmail.com',
+ '13579246828', '(12) 99122-2222', 'Hematologia', 11, 10),
+
+('223344-SP', 'André Carvalho', 'andre.carvalho@gmail.com',
+ '86420975310', '(12) 99233-3333', 'Hematologia', 12, 11),
+
+('334455-SP', 'Camila Gomes', 'camila.gomes@outlook.com',
+ '97531864282', '(12) 99344-4444', 'Hematologia', 13, 12),
+
+('445566-SP', 'Bruno Mendes', 'bruno.mendes@gmail.com',
+ '19283746546', '(12) 99455-5555', 'Hematologia', 14, 13),
+
+('556677-SP', 'Aline Barros', 'aline.barros@gmail.com',
+ '56473829164', '(12) 99566-6666', 'Hematologia', 15, 14),
+
+('667788-SP', 'Rafael Teixeira', 'rafael.teixeira@hotmail.com',
+ '91827364564', '(12) 99677-7777', 'Hematologia', 16, 15);
+
+INSERT INTO pacientes
+(cpf, nome, data_nasc, sexo, email, telefone, id_usuario, id_endereco)
+VALUES
+
+('11122233344', 'Lucas Pereira', '2002-04-15', 'Masculino',
+ 'lucas.pereira@gmail.com', '(12) 99101-0101', 17, 16),
+
+('22233344455', 'Beatriz Souza', '1998-07-21', 'Feminino',
+ 'beatriz.souza@gmail.com', '(12) 99202-0202', 18, 17),
+
+('33344455566', 'Miguel Araújo', '2000-11-03', 'Masculino',
+ 'miguel.araujo@outlook.com', '(12) 99303-0303', 19, 18),
+
+('44455566677', 'Isabela Nunes', '1995-02-18', 'Feminino',
+ 'isabela.nunes@gmail.com', '(12) 99404-0404', 20, 19),
+
+('55566677788', 'Matheus Cardoso', '2001-09-10', 'Masculino',
+ 'matheus.cardoso@hotmail.com', '(12) 99505-0505', 21, 20),
+
+('66677788899', 'Larissa Moura', '1999-12-27', 'Feminino',
+ 'larissa.moura@gmail.com', '(12) 99606-0606', 22, 21),
+
+('77788899900', 'Pedro Monteiro', '1997-05-14', 'Masculino',
+ 'pedro.monteiro@outlook.com', '(12) 99707-0707', 23, 22),
+
+('88899900011', 'Manuela Freitas', '2003-03-30', 'Feminino',
+ 'manuela.freitas@gmail.com', '(12) 99808-0808', 24, 23),
+
+('99900011122', 'Thiago Barbosa', '1994-08-09', 'Masculino',
+ 'thiago.barbosa@gmail.com', '(12) 99909-0909', 25, 24),
+
+('00011122233', 'Sofia Dias', '2002-10-25', 'Feminino',
+ 'sofia.dias@hotmail.com', '(12) 99110-1010', 26, 25),
+
+('12312312312', 'Enzo Teixeira', '1996-01-17', 'Masculino',
+ 'enzo.teixeira@gmail.com', '(12) 99211-1111', 27, 26),
+
+('23423423423', 'Valentina Campos', '2004-06-12', 'Feminino',
+ 'valentina.campos@outlook.com', '(12) 99312-1212', 28, 27),
+
+('34534534534', 'Henrique Machado', '1993-11-28', 'Masculino',
+ 'henrique.machado@gmail.com', '(12) 99413-1313', 29, 28),
+
+('45645645645', 'Laura Rezende', '1998-04-06', 'Feminino',
+ 'laura.rezende@gmail.com', '(12) 99514-1414', 30, 29),
+
+('56756756756', 'Arthur Vieira', '2001-07-19', 'Masculino',
+ 'arthur.vieira@hotmail.com', '(12) 99615-1515', 31, 30);
+
 INSERT INTO consultas
-    (id_consulta, cpf, crm, data_consulta, tipo_consulta, statusc)
+(cpf, crm, data_consulta, tipo_consulta, statusc)
 VALUES
-    (1, '11111111101', 'SP100001', '2026-01-10 08:30:00', 'Primeira consulta', 'Finalizado'),
-    (2, '11111111102', 'MG100002', '2026-01-15 09:00:00', 'Retorno', 'Finalizado'),
-    (3, '11111111103', 'RJ100003', '2026-02-02 10:30:00', 'Avaliação clínica', 'Finalizado'),
-    (4, '11111111104', 'PR100004', '2026-02-18 14:00:00', 'Primeira consulta', 'Em andamento'),
-    (5, '11111111105', 'RS100005', '2026-03-05 15:30:00', 'Retorno', 'Finalizado'),
-    (6, '11111111106', 'PE100006', '2026-03-20 11:00:00', 'Avaliação de exames', 'Pendente'),
-    (7, '11111111107', 'BA100007', '2026-04-08 13:30:00', 'Primeira consulta', 'Em andamento'),
-    (8, '11111111108', 'CE100008', '2026-04-25 16:00:00', 'Retorno', 'Finalizado'),
-    (9, '11111111109', 'GO100009', '2026-05-12 08:00:00', 'Avaliação clínica', 'Pendente'),
-    (10, '11111111110', 'SP100010', '2026-05-29 17:00:00', 'Primeira consulta', 'Finalizado');
 
--- 10 registros para a tabela exames
+('11122233344', '123456-SP', '2026-09-10 09:00:00', 'Consulta inicial', 'Finalizado'),
+('22233344455', '234567-SP', '2026-09-12 10:00:00', 'Retorno', 'Finalizado'),
+('33344455566', '345678-SP', '2026-09-15 14:00:00', 'Consulta inicial', 'Finalizado'),
+('44455566677', '456789-SP', '2026-09-18 09:30:00', 'Retorno', 'Pendente'),
+('55566677788', '567890-SP', '2026-09-20 11:00:00', 'Consulta inicial', 'Pendente'),
+('66677788899', '678901-SP', '2026-09-22 15:00:00', 'Retorno', 'Pendente'),
+('77788899900', '789012-SP', '2026-09-25 08:30:00', 'Consulta inicial', 'Pendente'),
+('88899900011', '890123-SP', '2026-09-28 13:00:00', 'Retorno', 'Pendente'),
+('99900011122', '901234-SP', '2026-10-02 10:30:00', 'Consulta inicial', 'Pendente'),
+('00011122233', '112233-SP', '2026-10-05 14:30:00', 'Retorno', 'Pendente'),
+
+('12312312312', '223344-SP', '2026-10-08 09:00:00', 'Consulta inicial', 'Pendente'),
+('23423423423', '334455-SP', '2026-10-10 11:30:00', 'Retorno', 'Pendente'),
+('34534534534', '445566-SP', '2026-10-12 16:00:00', 'Consulta inicial', 'Pendente'),
+('45645645645', '556677-SP', '2026-10-15 10:00:00', 'Retorno', 'Pendente'),
+('56756756756', '667788-SP', '2026-10-18 15:30:00', 'Consulta inicial', 'Pendente'),
+
+('11122233344', '123456-SP', '2026-08-15 10:00:00', 'Retorno', 'Finalizado'),
+('22233344455', '234567-SP', '2026-08-20 14:00:00', 'Retorno', 'Finalizado'),
+('33344455566', '345678-SP', '2026-08-25 09:30:00', 'Retorno', 'Finalizado'),
+('44455566677', '456789-SP', '2026-08-30 11:00:00', 'Consulta inicial', 'Finalizado'),
+('55566677788', '567890-SP', '2026-09-01 13:30:00', 'Retorno', 'Finalizado');
+
 INSERT INTO exames
-    (id_exame, id_consulta, tipo_exame, data_exame, statusc)
+(id_consulta, tipo_exame, data_exame, statusc)
 VALUES
-    (1, 1, 'Hemograma', '2026-01-10 09:30:00', 'Finalizado'),
-    (2, 2, 'Mielograma', '2026-01-15 10:00:00', 'Finalizado'),
-    (3, 3, 'Hemograma', '2026-02-02 11:30:00', 'Finalizado'),
-    (4, 4, 'Mielograma', '2026-02-18 15:00:00', 'Em andamento'),
-    (5, 5, 'Hemograma', '2026-03-05 16:30:00', 'Finalizado'),
-    (6, 6, 'Mielograma', '2026-03-20 12:00:00', 'Pendente'),
-    (7, 7, 'Hemograma', '2026-04-08 14:30:00', 'Em andamento'),
-    (8, 8, 'Mielograma', '2026-04-25 17:00:00', 'Finalizado'),
-    (9, 9, 'Hemograma', '2026-05-12 09:00:00', 'Pendente'),
-    (10, 10, 'Mielograma', '2026-05-29 18:00:00', 'Finalizado');
 
--- 10 registros para a tabela imagens_exame
-INSERT INTO imagens_exame
-    (id_imagem, id_exame, caminho_arquivo, descricao, data_upload)
-VALUES
-    (1, 1, 'uploads/exames/hemograma_001.jpg', 'Lâmina do hemograma do exame 1', '2026-01-10'),
-    (2, 2, 'uploads/exames/mielograma_002.jpg', 'Lâmina do mielograma do exame 2', '2026-01-15'),
-    (3, 3, 'uploads/exames/hemograma_003.jpg', 'Lâmina do hemograma do exame 3', '2026-02-02'),
-    (4, 4, 'uploads/exames/mielograma_004.jpg', 'Lâmina do mielograma do exame 4', '2026-02-18'),
-    (5, 5, 'uploads/exames/hemograma_005.jpg', 'Lâmina do hemograma do exame 5', '2026-03-05'),
-    (6, 6, 'uploads/exames/mielograma_006.jpg', 'Lâmina do mielograma do exame 6', '2026-03-20'),
-    (7, 7, 'uploads/exames/hemograma_007.jpg', 'Lâmina do hemograma do exame 7', '2026-04-08'),
-    (8, 8, 'uploads/exames/mielograma_008.jpg', 'Lâmina do mielograma do exame 8', '2026-04-25'),
-    (9, 9, 'uploads/exames/hemograma_009.jpg', 'Lâmina do hemograma do exame 9', '2026-05-12'),
-    (10, 10, 'uploads/exames/mielograma_010.jpg', 'Lâmina do mielograma do exame 10', '2026-05-29');
+(1, 'Hemograma', '2026-09-10 10:00:00', 'Finalizado'),
+(2, 'Mielograma', '2026-09-12 11:00:00', 'Finalizado'),
+(3, 'Hemograma', '2026-09-15 15:00:00', 'Finalizado'),
+(16, 'Mielograma', '2026-08-15 11:00:00', 'Finalizado'),
+(17, 'Hemograma', '2026-08-20 15:00:00', 'Finalizado'),
+(18, 'Hemograma', '2026-08-25 10:30:00', 'Finalizado'),
+(19, 'Mielograma', '2026-08-30 12:00:00', 'Finalizado'),
+(20, 'Hemograma', '2026-09-01 14:30:00', 'Finalizado'),
 
--- 10 registros para a tabela resultados_exame
+(4, 'Hemograma', '2026-09-18 10:30:00', 'Pendente'),
+(5, 'Mielograma', '2026-09-20 12:00:00', 'Pendente'),
+(6, 'Hemograma', '2026-09-22 16:00:00', 'Pendente'),
+(7, 'Mielograma', '2026-09-25 09:30:00', 'Pendente'),
+(8, 'Hemograma', '2026-09-28 14:00:00', 'Pendente'),
+(9, 'Hemograma', '2026-10-02 11:30:00', 'Pendente'),
+(10, 'Mielograma', '2026-10-05 15:30:00', 'Pendente'),
+(11, 'Hemograma', '2026-10-08 10:00:00', 'Pendente'),
+(12, 'Mielograma', '2026-10-10 12:30:00', 'Pendente'),
+(13, 'Hemograma', '2026-10-12 17:00:00', 'Pendente'),
+(14, 'Hemograma', '2026-10-15 11:00:00', 'Pendente'),
+(15, 'Mielograma', '2026-10-18 16:30:00', 'Pendente');
+
 INSERT INTO resultados_exame
-    (id_resultado, id_exame, resultado_texto, suspeita_leucemia, tipo_leucemia, data_resultado)
+(id_exame, resultado_texto, suspeita_leucemia, tipo_leucemia, data_resultado)
 VALUES
-    (1, 1, 'Parâmetros hematológicos dentro da faixa de referência.', 'Sem suspeita', 'Não identificado', '2026-01-11'),
-    (2, 2, 'Presença de blastos e alterações compatíveis com investigação complementar.', 'Alta', 'LMA', '2026-01-16'),
-    (3, 3, 'Leucocitose discreta sem alterações morfológicas relevantes.', 'Baixa', 'Não identificado', '2026-02-03'),
-    (4, 4, 'Amostra em processamento, com achados preliminares inconclusivos.', 'Moderada', 'LLA', '2026-02-19'),
-    (5, 5, 'Linfocitose persistente e células maduras em quantidade aumentada.', 'Moderada', 'LLC', '2026-03-06'),
-    (6, 6, 'Exame aguardando processamento laboratorial.', 'Sem suspeita', 'Não identificado', '2026-03-21'),
-    (7, 7, 'Alteração na contagem de leucócitos; recomenda-se mielograma.', 'Moderada', 'LMC', '2026-04-09'),
-    (8, 8, 'Achados celulares compatíveis com leucemia linfoide aguda.', 'Alta', 'LLA', '2026-04-26'),
-    (9, 9, 'Amostra coletada, resultado definitivo ainda pendente.', 'Baixa', 'Não identificado', '2026-05-13'),
-    (10, 10, 'Mielograma sem evidências de proliferação leucêmica.', 'Sem suspeita', 'Não identificado', '2026-05-30');
 
--- 10 registros para a tabela analise_ia
-INSERT INTO analise_ia
-    (id_analise, id_exame, resultado_ia, suspeita_ia, tipo_leucemia_ia, confianca, data_analise, statusc)
-VALUES
-    (1, 1, 'Padrão celular sem alterações significativas detectadas.', 'Sem suspeita', 'Não identificado', 97.40, '2026-01-11', 'Finalizado'),
-    (2, 2, 'Alta concentração de blastos mieloides detectada.', 'Alta', 'LMA', 94.85, '2026-01-16', 'Finalizado'),
-    (3, 3, 'Pequenas alterações na série branca, sem padrão conclusivo.', 'Baixa', 'Não identificado', 82.30, '2026-02-03', 'Finalizado'),
-    (4, 4, 'Padrão sugestivo de proliferação linfoide aguda.', 'Moderada', 'LLA', 76.90, '2026-02-19', 'Em andamento'),
-    (5, 5, 'Predomínio de linfócitos maduros com padrão persistente.', 'Moderada', 'LLC', 88.15, '2026-03-06', 'Finalizado'),
-    (6, 6, 'Imagem ainda não processada pelo modelo.', 'Sem suspeita', 'Não identificado', 0.00, '2026-03-21', 'Pendente'),
-    (7, 7, 'Distribuição celular sugestiva de processo mieloproliferativo.', 'Moderada', 'LMC', 79.65, '2026-04-09', 'Em andamento'),
-    (8, 8, 'Blastos linfoides detectados em proporção elevada.', 'Alta', 'LLA', 96.20, '2026-04-26', 'Finalizado'),
-    (9, 9, 'Análise aguardando validação da imagem enviada.', 'Baixa', 'Não identificado', 45.50, '2026-05-13', 'Pendente'),
-    (10, 10, 'Nenhum padrão compatível com leucemia foi detectado.', 'Sem suspeita', 'Não identificado', 98.10, '2026-05-30', 'Finalizado');
+(1,
+ 'Hemograma dentro dos parâmetros esperados, sem alterações hematológicas significativas.',
+ 'Sem suspeita',
+ 'Não identificado',
+ '2026-09-11'),
 
--- 10 registros para a tabela anamnese
+(2,
+ 'Presença de células hematológicas com alterações compatíveis com investigação de leucemia.',
+ 'Moderada',
+ 'LLA',
+ '2026-09-13'),
+
+(3,
+ 'Alterações no hemograma com presença de células imaturas. Recomenda-se avaliação hematológica.',
+ 'Alta',
+ 'LMA',
+ '2026-09-16'),
+
+(4,
+ 'Mielograma com alterações celulares que necessitam de acompanhamento hematológico.',
+ 'Baixa',
+ 'Não identificado',
+ '2026-08-16'),
+
+(5,
+ 'Hemograma sem alterações relevantes nos parâmetros avaliados.',
+ 'Sem suspeita',
+ 'Não identificado',
+ '2026-08-21'),
+
+(6,
+ 'Contagem diferencial com alterações leves, sem evidências conclusivas de doença hematológica.',
+ 'Baixa',
+ 'Não identificado',
+ '2026-08-26'),
+
+(7,
+ 'Mielograma apresenta alterações celulares sugestivas de investigação complementar.',
+ 'Moderada',
+ 'LMC',
+ '2026-08-31'),
+
+(8,
+ 'Exame hematológico com alterações significativas que requerem avaliação médica.',
+ 'Alta',
+ 'LLC',
+ '2026-09-02');
+
+
 INSERT INTO anamnese
-    (id_anamnese, cpf, crm, id_consulta, sintomas, comorbidades)
+(cpf, crm, id_consulta, sintomas, comorbidades)
 VALUES
-    (1, '11111111101', 'SP100001', 1, 'Cansaço leve e palidez ocasional.', 'Nenhuma comorbidade relatada.'),
-    (2, '11111111102', 'MG100002', 2, 'Febre recorrente, fadiga e perda de peso.', 'Hipertensão arterial controlada.'),
-    (3, '11111111103', 'RJ100003', 3, 'Fraqueza e tontura há duas semanas.', 'Asma leve.'),
-    (4, '11111111104', 'PR100004', 4, 'Sangramento gengival e manchas roxas.', 'Diabetes mellitus tipo 2.'),
-    (5, '11111111105', 'RS100005', 5, 'Aumento de gânglios e suor noturno.', 'Nenhuma comorbidade relatada.'),
-    (6, '11111111106', 'PE100006', 6, 'Dor óssea e cansaço persistente.', 'Hipotireoidismo.'),
-    (7, '11111111107', 'BA100007', 7, 'Palidez, falta de ar e infecções frequentes.', 'Rinite alérgica.'),
-    (8, '11111111108', 'CE100008', 8, 'Febre alta, perda de apetite e equimoses.', 'Doença renal crônica em acompanhamento.'),
-    (9, '11111111109', 'GO100009', 9, 'Cansaço, cefaleia e indisposição.', 'Nenhuma comorbidade relatada.'),
-    (10, '11111111110', 'SP100010', 10, 'Desconforto abdominal e perda de peso recente.', 'Dislipidemia controlada.');
 
-COMMIT;
+('11122233344', '123456-SP', 1,
+ 'Cansaço frequente e episódios ocasionais de palidez.',
+ 'Sem comorbidades relatadas.'),
 
-SELECT *FROM login;
-SELECT *FROM enderecos;
-SELECT *FROM pacientes;
-SELECT *FROM medicos;
-SELECT *FROM consultas;
-SELECT *FROM exames;
-SELECT *FROM imagens_exame;
-SELECT *FROM resultados_exame;
-SELECT *FROM analise_ia;
-SELECT *FROM anamnese;
+('22233344455', '234567-SP', 2,
+ 'Fadiga e dores de cabeça ocasionais.',
+ 'Hipotireoidismo controlado.'),
+
+('33344455566', '345678-SP', 3,
+ 'Fraqueza, febre baixa e perda de disposição.',
+ 'Sem comorbidades relatadas.'),
+
+('44455566677', '456789-SP', 4,
+ 'Cansaço durante atividades físicas.',
+ 'Anemia prévia.'),
+
+('55566677788', '567890-SP', 5,
+ 'Palidez e indisposição.',
+ 'Sem comorbidades relatadas.'),
+
+('66677788899', '678901-SP', 6,
+ 'Fadiga e episódios de tontura.',
+ 'Hipertensão arterial.'),
+
+('77788899900', '789012-SP', 7,
+ 'Cansaço persistente.',
+ 'Sem comorbidades relatadas.'),
+
+('88899900011', '890123-SP', 8,
+ 'Fraqueza e episódios de febre.',
+ 'Sem comorbidades relatadas.'),
+
+('99900011122', '901234-SP', 9,
+ 'Cansaço ocasional.',
+ 'Diabetes tipo 2 controlado.'),
+
+('00011122233', '112233-SP', 10,
+ 'Palidez e indisposição.',
+ 'Sem comorbidades relatadas.'),
+
+('12312312312', '223344-SP', 11,
+ 'Fadiga após atividades físicas.',
+ 'Sem comorbidades relatadas.'),
+
+('23423423423', '334455-SP', 12,
+ 'Cansaço e dor de cabeça.',
+ 'Asma controlada.'),
+
+('34534534534', '445566-SP', 13,
+ 'Fraqueza e indisposição.',
+ 'Sem comorbidades relatadas.'),
+
+('45645645645', '556677-SP', 14,
+ 'Fadiga persistente.',
+ 'Hipotireoidismo.'),
+
+('56756756756', '667788-SP', 15,
+ 'Palidez e cansaço.',
+ 'Sem comorbidades relatadas.'),
+
+('11122233344', '123456-SP', 16,
+ 'Retorno para acompanhamento dos exames.',
+ 'Sem comorbidades relatadas.'),
+
+('22233344455', '234567-SP', 17,
+ 'Retorno para avaliação hematológica.',
+ 'Hipotireoidismo controlado.'),
+
+('33344455566', '345678-SP', 18,
+ 'Acompanhamento dos resultados laboratoriais.',
+ 'Sem comorbidades relatadas.'),
+
+('44455566677', '456789-SP', 19,
+ 'Retorno após investigação hematológica.',
+ 'Anemia prévia.'),
+
+('55566677788', '567890-SP', 20,
+ 'Acompanhamento clínico.',
+ 'Sem comorbidades relatadas.');
+ 
+
+ 
+ 
