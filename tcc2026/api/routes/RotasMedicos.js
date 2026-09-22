@@ -9,7 +9,7 @@ module.exports = (app, banco) => {
 
     const middleware = new MedicosMiddleware();
 
-    const jwtMiddleware = new JwtMiddleware();
+    const jwtMiddleware = new JwtMiddleware(banco);
 
     const roleMiddleware = new RoleMiddleware();
 
@@ -64,6 +64,13 @@ module.exports = (app, banco) => {
         roleMiddleware.authorize("Administrador"),
         middleware.validateUpdate,
         control.update
+    );
+
+    app.put(
+        "/medicos/:crm/status",
+        jwtMiddleware.validateToken,
+        roleMiddleware.authorize("Administrador"),
+        control.updateStatus
     );
 
     app.delete(

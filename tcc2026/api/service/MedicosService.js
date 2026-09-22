@@ -206,6 +206,45 @@ module.exports = class MedicosService {
             throw erro;
         }
     }
+    updateStatus = async (crm, status) => {
+
+        const medico = await this.#dao.findByCRM(crm);
+
+        if (!medico) {
+            throw new ErrorResponse(
+                404,
+                "Médico não encontrado"
+            );
+        }
+
+        if (
+            status !== "Ativo" &&
+            status !== "Desativado"
+        ) {
+            throw new ErrorResponse(
+                400,
+                "Status inválido"
+            );
+        }
+
+        const result = await this.#dao.updateStatus(
+            medico.id_usuario,
+            status
+        );
+
+        if (result.affectedRows === 0) {
+            throw new ErrorResponse(
+                404,
+                "Usuário não encontrado"
+            );
+        }
+
+        return {
+            crm: medico.crm,
+            nome: medico.nome,
+            status
+        };
+    }
 
     delete = async (crm) => {
 

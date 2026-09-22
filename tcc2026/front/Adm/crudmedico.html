@@ -303,6 +303,7 @@
                 <th>Especialidade</th>
                 <th>E-mail</th>
                 <th>Telefone</th>
+                <th>Status</th>
                 <th>Ações</th>
               </tr>
             </thead>
@@ -1023,40 +1024,100 @@
   function renderTable(data) {
     const tbody = document.getElementById('tbodyMedicos');
     const empty = document.getElementById('emptyMedicos');
+
     tbody.innerHTML = '';
 
     if (!data.length) {
-      empty.style.display = '';
-      return;
+        empty.style.display = '';
+        return;
     }
+
     empty.style.display = 'none';
 
     data.forEach(m => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td><strong>${m.nome}</strong></td>
-        <td><span class="badge badge-blue">${m.crm}</span></td>
-        <td style="font-family:var(--font-mono);font-size:0.8rem">${m.cpf}</td>
-        <td><span class="badge badge-purple">${m.especialidade}</span></td>
-        <td style="font-size:0.82rem">${m.email}</td>
-        <td style="font-size:0.82rem">${m.telefone || '—'}</td>
-        <td>
-          <div class="td-actions">
-            <button class="btn btn-editar" onclick="editarMedico('${m.crm}')">
-              <i data-lucide="pencil"></i> Editar
-            </button>
-            <button class="btn btn-excluir" onclick="deletarMedico('${m.crm}')">
-              <i data-lucide="trash-2"></i> Excluir
-            </button>
-          </div>
-        </td>
-      `;
-      tbody.appendChild(tr);
+
+        const tr = document.createElement('tr');
+
+        const statusTexto =
+            m.status === 'Ativo'
+                ? 'Ativo'
+                : 'Desativado';
+
+        tr.innerHTML = `
+            <td>
+                <strong>${m.nome}</strong>
+            </td>
+
+            <td>
+                <span class="badge badge-blue">${m.crm}</span>
+            </td>
+
+            <td style="font-family:var(--font-mono);font-size:0.8rem">
+                ${m.cpf}
+            </td>
+
+            <td>
+                <span class="badge badge-purple">
+                    ${m.especialidade}
+                </span>
+            </td>
+
+            <td style="font-size:0.82rem">
+                ${m.email}
+            </td>
+
+            <td style="font-size:0.82rem">
+                ${m.telefone || '—'}
+            </td>
+
+            <td>
+                <span class="badge ${
+                    m.status === 'Ativo'
+                        ? 'badge-blue'
+                        : 'badge-purple'
+                }">
+                    ${statusTexto}
+                </span>
+            </td>
+
+            <td>
+                <div class="td-actions">
+
+                    <button
+                        class="btn btn-editar"
+                        onclick="editarMedico('${m.crm}')">
+
+                        <i data-lucide="pencil"></i>
+                        Editar
+                    </button>
+
+                    <button
+                        class="btn btn-excluir"
+                        onclick="alterarStatusMedico('${m.crm}')">
+
+                        <i data-lucide="${
+                            m.status === 'Ativo'
+                                ? 'user-minus'
+                                : 'user-plus'
+                        }"></i>
+
+                        ${
+                            m.status === 'Ativo'
+                                ? 'Desativar'
+                                : 'Ativar'
+                        }
+
+                    </button>
+
+                </div>
+            </td>
+        `;
+
+        tbody.appendChild(tr);
     });
 
-    // Inicializa os ícones Lucide após renderizar a tabela
     if (window.lucide) {
-      lucide.createIcons();
+        lucide.createIcons();
     }
   }
 
@@ -1110,6 +1171,77 @@
     document.getElementById('modalMedicoTitulo').textContent = `Editar Médico - ${m.nome}`;
   };
 
+  window.alterarStatusMedico = function (crm) {
+
+    const m = medicos.find(x => x.crm === crm);
+
+    if (!m) {
+        HematoAI.showToast(
+            "Médico não encontrado.",
+            "error"
+        );
+        return;
+    }
+
+    const novoStatus =
+        m.status === "Ativo"
+            ? "Desativado"
+            : "Ativo";
+
+    const mensagem =
+        novoStatus === "Desativado"
+            ? `Deseja desativar o médico <strong>${m.nome}</strong>?<br>
+               O cadastro e o histórico serão mantidos no sistema.`
+            : `Deseja ativar novamente o médico <strong>${m.nome}</strong>?`;
+
+    HematoAI.confirmDialog(
+        mensagem,
+        async () => {
+
+            try {
+
+                const resposta = await put(
+                    "/medicos/" + crm + "/status",
+                    {
+                        status: novoStatus
+                    }
+                );
+
+                const dados = await resposta.json();
+
+                if (!resposta.ok) {
+
+                    HematoAI.showToast(
+                        dados.msg ||
+                        "Erro ao alterar status do médico.",
+                        "error"
+                    );
+
+                    return;
+                }
+
+                await carregarMedicos();
+
+                HematoAI.showToast(
+                    novoStatus === "Desativado"
+                        ? "Médico desativado com sucesso."
+                        : "Médico ativado com sucesso.",
+                    "success"
+                );
+
+            } catch (erro) {
+
+                console.error(erro);
+
+                HematoAI.showToast(
+                    "Erro ao conectar com o servidor.",
+                    "error"
+                );
+            }
+        }
+    );
+  };
+ /*
   window.deletarMedico = function (crm) {
 
     const m = medicos.find(x => x.crm === crm);
@@ -1154,7 +1286,7 @@
             }
         }
     );
-  };
+  };*/
 
   // Event listeners
   document.getElementById('searchMedico').addEventListener('input', applyFilter);

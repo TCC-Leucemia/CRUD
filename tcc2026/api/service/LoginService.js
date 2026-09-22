@@ -331,37 +331,94 @@ module.exports = class LoginService {
     }
 
     login = async (dados) => {
+
         const [medico, paciente, administrador] = await Promise.all([
             this.#dao.findMedicoByEmail(dados.email),
             this.#dao.findPacienteByEmail(dados.email),
             this.#dao.findAdministradorByEmail(dados.email)
         ]);
+
         const senhaHash = md5(dados.senha);
+
         const candidatos = [
             { tipo: "Médico", user: medico },
             { tipo: "Paciente", user: paciente },
             { tipo: "Administrador", user: administrador }
         ].filter(({ user }) => user && user.senha === senhaHash);
 
+        // E-mail ou senha incorretos
         if (candidatos.length === 0) {
-            throw new ErrorResponse(401, "Email ou senha inválidos");
+            throw new ErrorResponse(
+                401,
+                "Email ou senha inválidos"
+            );
         }
 
-        let selecionado = dados.tipo
-            ? candidatos.find(({ tipo }) => tipo === dados.tipo)
-            : candidatos.find(({ tipo }) => tipo === "Administrador");
+        // Quando o usuário escolheu explicitamente um perfil
+        if (dados.tipo) {
 
-        const perfis = [...new Set(
-            candidatos
-                .filter(({ tipo }) => tipo !== "Administrador")
-                .map(({ tipo }) => tipo)
-        )];
+            const candidato = candidatos.find(
+                ({ tipo }) => tipo === dados.tipo
+            );
 
-        if (!selecionado && !dados.tipo && perfis.length > 1) {
+            if (!candidato) {
+                throw new ErrorResponse(
+                    401,
+                    "Email ou senha inválidos"
+                );
+            }
+
+            if (candidato.user.statusu !== "Ativo") {
+                throw new ErrorResponse(
+                    403,
+                    "Usuário desativado."
+                );
+            }
+
+            const user = candidato.user;
+
+            return {
+                id_usuario: user.id_usuario,
+                email: user.email,
+                tipo: candidato.tipo,
+                crm: user.crm,
+                cpf: user.cpf,
+                nome: user.nome,
+                statusu: user.statusu
+            };
+        }
+
+        // Sem perfil informado: considerar somente contas ativas
+        const candidatosAtivos = candidatos.filter(
+            ({ user }) => user.statusu === "Ativo"
+        );
+
+        // Existem credenciais válidas, mas todas as contas estão desativadas
+        if (candidatosAtivos.length === 0) {
+            throw new ErrorResponse(
+                403,
+                "Usuário desativado."
+            );
+        }
+
+        let selecionado = candidatosAtivos.find(
+            ({ tipo }) => tipo === "Administrador"
+        );
+
+        const perfis = [
+            ...new Set(
+                candidatosAtivos
+                    .filter(({ tipo }) => tipo !== "Administrador")
+                    .map(({ tipo }) => tipo)
+            )
+        ];
+
+        // Mais de um perfil ativo
+        if (!selecionado && perfis.length > 1) {
             return {
                 requerPerfil: true,
                 tokenPerfil: criarSelecaoPerfil(
-                    candidatos.filter(
+                    candidatosAtivos.filter(
                         ({ tipo }) => tipo !== "Administrador"
                     )
                 ),
@@ -369,20 +426,18 @@ module.exports = class LoginService {
             };
         }
 
-        selecionado = selecionado || candidatos[0];
-
-        if (dados.tipo && selecionado.tipo !== dados.tipo) {
-            throw new ErrorResponse(401, "Email ou senha inválidos");
-        }
+        selecionado = selecionado || candidatosAtivos[0];
 
         const user = selecionado.user;
+
         return {
             id_usuario: user.id_usuario,
             email: user.email,
             tipo: selecionado.tipo,
             crm: user.crm,
             cpf: user.cpf,
-            nome: user.nome
+            nome: user.nome,
+            statusu: user.statusu
         };
     }
 

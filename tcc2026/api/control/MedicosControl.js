@@ -62,6 +62,27 @@ module.exports = class MedicosControl {
             next(err);
         }
     }
+    
+    updateStatus = async (req, res, next) => {
+        try {
+
+            const dados = await this.#service.updateStatus(
+                req.params.crm,
+                req.body.status
+            );
+
+            res.send({
+                status: true,
+                msg: dados.status === "Desativado"
+                    ? "Médico desativado com sucesso."
+                    : "Médico ativado com sucesso.",
+                dados
+            });
+
+        } catch (err) {
+            next(err);
+        }
+    }
 
     destroy = async (req, res, next) => {
         try {

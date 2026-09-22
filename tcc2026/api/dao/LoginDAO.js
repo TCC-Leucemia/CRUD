@@ -82,6 +82,7 @@ module.exports = class LoginDAO {
                 l.email,
                 l.senha,
                 l.tipo,
+                l.statusu,
                 p.cpf,
                 p.nome
             FROM login l
@@ -113,6 +114,7 @@ module.exports = class LoginDAO {
                 l.email,
                 l.senha,
                 l.tipo,
+                l.statusu,
                 m.crm,
                 m.nome
             FROM login l
@@ -143,7 +145,8 @@ module.exports = class LoginDAO {
                 l.id_usuario,
                 l.email,
                 l.senha,
-                l.tipo
+                l.tipo,
+                l.statusu
             FROM login l
             WHERE l.email = ?
             AND l.tipo = 'Administrador'
@@ -193,31 +196,33 @@ module.exports = class LoginDAO {
         });
     }
 
-    findPacienteByIdUsuario(id_usuario) {
+    findPacienteByEmail = async (email) => {
 
         const sql = `
             SELECT
-                l.*,
+                l.id_usuario,
+                l.email,
+                l.senha,
+                l.tipo,
+                l.statusu,
                 p.cpf,
-                p.nome,
-                p.data_nasc,
-                p.sexo,
-                p.telefone
+                p.nome
             FROM login l
             INNER JOIN pacientes p
                 ON p.id_usuario = l.id_usuario
-            WHERE l.id_usuario = ?
+            WHERE l.email = ?
         `;
 
         return new Promise((resolve, reject) => {
 
             this.#banco.query(
                 sql,
-                [id_usuario],
-                (erro, result) => {
+                [email],
+                (err, result) => {
 
-                    if (erro) reject(erro);
-                    else resolve(result[0] || null);
+                    if (err) return reject(err);
+
+                    resolve(result[0] || null);
                 }
             );
         });

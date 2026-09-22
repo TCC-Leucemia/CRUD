@@ -8,7 +8,7 @@ module.exports = (app, banco) => {
 
     const control = new ResultadosExameControl(banco);
     const middleware = new ResultadosExameMiddleware();
-    const jwt = new JwtMiddleware();
+    const jwt = new JwtMiddleware(banco);
     const role = new RoleMiddleware();
 
     app.post(

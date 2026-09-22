@@ -9,7 +9,7 @@ module.exports = function (app, banco) {
 
     const enderecosControl = new EnderecosControl(banco);
     const enderecosMiddleware = new EnderecosMiddleware();
-    const jwtMiddleware = new JwtMiddleware();
+    const jwtMiddleware = new JwtMiddleware(banco);
     const roleMiddleware = new RoleMiddleware();
 
     app.post(

@@ -41,6 +41,7 @@ module.exports = class MedicosDAO {
             const sql = `
                 SELECT
                     m.*,
+                    l.status AS status,
                     e.rua,
                     e.numero,
                     e.bairro,
@@ -48,6 +49,8 @@ module.exports = class MedicosDAO {
                     e.estado,
                     e.cep
                 FROM medicos m
+                INNER JOIN login l
+                    ON l.id_usuario = m.id_usuario
                 INNER JOIN enderecos e
                     ON m.id_endereco = e.id_endereco
             `;
@@ -68,6 +71,7 @@ module.exports = class MedicosDAO {
                     especialidade: m.especialidade,
                     id_usuario: m.id_usuario,
                     id_endereco: m.id_endereco,
+                    status: m.status,
 
                     endereco: {
                         rua: m.rua,
@@ -92,6 +96,7 @@ module.exports = class MedicosDAO {
         const sql = `
             SELECT
                 m.*,
+                l.statusu AS status,
                 e.rua,
                 e.numero,
                 e.bairro,
@@ -99,6 +104,8 @@ module.exports = class MedicosDAO {
                 e.estado,
                 e.cep
             FROM medicos m
+            INNER JOIN login l
+                ON l.id_usuario = m.id_usuario
             INNER JOIN enderecos e
                 ON e.id_endereco = m.id_endereco
             WHERE m.crm = ?
@@ -129,6 +136,7 @@ module.exports = class MedicosDAO {
                         especialidade: m.especialidade,
                         id_usuario: m.id_usuario,
                         id_endereco: m.id_endereco,
+                        status: m.status,
 
                         endereco: {
                             rua: m.rua,
@@ -152,8 +160,12 @@ module.exports = class MedicosDAO {
     findMedicoByPaciente(cpf) {
 
         const sql = `
-            SELECT DISTINCT m.*
+            SELECT DISTINCT
+                m.*,
+                l.status AS status
             FROM medicos m
+            INNER JOIN login l
+                ON l.id_usuario = m.id_usuario
             INNER JOIN consultas c
                 ON c.crm = m.crm
             WHERE c.cpf = ?
@@ -217,6 +229,29 @@ module.exports = class MedicosDAO {
                 if (err) return reject(err);
                 resolve(result);
             });
+        });
+    }
+    updateStatus(idUsuario, status, connection = this.#banco) {
+
+        const sql = `
+            UPDATE login
+            SET status = ?
+            WHERE id_usuario = ?
+        `;
+
+        return new Promise((resolve, reject) => {
+
+            connection.query(
+                sql,
+                [status, idUsuario],
+                (err, result) => {
+
+                    if (err) return reject(err);
+
+                    resolve(result);
+                }
+            );
+
         });
     }
 

@@ -58,7 +58,7 @@ module.exports = (app, banco) => {
     const control = new AnaliseIAControl(banco);
     const middleware = new AnaliseIAMiddleware();
 
-    const jwt = new JwtMiddleware();
+    const jwt = new JwtMiddleware(banco);
     const role = new RoleMiddleware();
     
     app.post(

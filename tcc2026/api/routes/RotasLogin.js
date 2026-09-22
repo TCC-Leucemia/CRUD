@@ -9,7 +9,7 @@ module.exports = (app, banco) => {
     const control = new LoginControl(banco);
     const middleware = new LoginMiddleware();
 
-    const jwt = new JwtMiddleware();
+    const jwt = new JwtMiddleware(banco);
     const role = new RoleMiddleware();
 
 
