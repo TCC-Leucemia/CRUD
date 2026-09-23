@@ -41,7 +41,7 @@ module.exports = class MedicosDAO {
             const sql = `
                 SELECT
                     m.*,
-                    l.status AS status,
+                    l.statusu AS status,
                     e.rua,
                     e.numero,
                     e.bairro,
@@ -235,7 +235,7 @@ module.exports = class MedicosDAO {
 
         const sql = `
             UPDATE login
-            SET status = ?
+            SET statusu = ?
             WHERE id_usuario = ?
         `;
 

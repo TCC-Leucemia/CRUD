@@ -286,6 +286,11 @@
               <option>Pediatria</option>
               <option>Medicina Interna</option>
             </select>
+            <select id="filterStatus" class="filter-select" aria-label="Filtrar por status">
+              <option value="">Todos os status</option>
+              <option value="Ativo">Ativo</option>
+              <option value="Desativado">Desativado</option>
+            </select>
             <select id="sortMedico" class="filter-select" aria-label="Ordenar por">
               <option value="nome_asc">Nome A-Z</option>
               <option value="nome_desc">Nome Z-A</option>
@@ -490,6 +495,60 @@
       cep: ""
     }
   };
+
+  // ============================================
+  // DIÁLOGO DE CONFIRMAÇÃO PERSONALIZADO
+  // (com ícone Lucide no padrão dos botões)
+  // ============================================
+  function confirmarAcaoLocal(mensagemHTML, callback) {
+    const overlay = document.createElement("div");
+    overlay.className = "modal-overlay";
+    overlay.innerHTML = `
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="tituloConfirmarAcao" style="max-width:440px">
+        <div class="modal-header">
+          <h2 id="tituloConfirmarAcao" style="display:flex;align-items:center;gap:8px;">
+            <i data-lucide="alert-triangle" style="width:18px;height:18px;color:var(--red);"></i>
+            Confirmar ação
+          </h2>
+          <button class="btn-close-modal" type="button" data-cancelar aria-label="Fechar">✕</button>
+        </div>
+        <div class="modal-body">
+          <p style="color:var(--text-1);font-size:.95rem;line-height:1.65;margin:0;">
+            ${mensagemHTML}
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" type="button" data-cancelar>Cancelar</button>
+          <button class="btn btn-primary" type="button" data-confirmar>Confirmar</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    // Inicializa o ícone Lucide dentro do overlay
+    if (window.lucide) {
+      lucide.createIcons();
+    }
+
+    let finalizado = false;
+    const finalizar = (confirmado) => {
+      if (finalizado) return;
+      finalizado = true;
+      HematoAI.closeModal(overlay);
+      setTimeout(() => overlay.remove(), 220);
+      if (confirmado && typeof callback === "function") callback();
+    };
+
+    overlay.querySelectorAll("[data-cancelar]").forEach(b =>
+      b.addEventListener("click", () => finalizar(false))
+    );
+    overlay.querySelector("[data-confirmar]").addEventListener("click", () => finalizar(true));
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) finalizar(false);
+    });
+
+    HematoAI.openModal(overlay);
+  }
 
   // Função para buscar CEP na API ViaCEP
   async function buscarCEP(cep) {
@@ -1125,13 +1184,15 @@
     const q   = document.getElementById('searchMedico').value.toLowerCase().trim();
     const qNumerica = q.replace(/\D/g, '');
     const esp = document.getElementById('filterEsp').value;
+    const status = document.getElementById('filterStatus').value;
     const ordem = document.getElementById('sortMedico').value;
     const filtrados = medicos.filter(m =>
       (!q || (m.nome || '').toLowerCase().includes(q) ||
              (m.crm || '').toLowerCase().includes(q) ||
              (m.cpf || '').toLowerCase().includes(q) ||
              (qNumerica && String(m.cpf || '').replace(/\D/g, '').includes(qNumerica))) &&
-      (!esp || m.especialidade === esp)
+      (!esp || m.especialidade === esp) &&
+      (!status || m.status === status)
     );
     const comparar = (a, b) => String(a ?? '').localeCompare(String(b ?? ''), 'pt-BR', { sensitivity: 'base', numeric: true });
     filtrados.sort((a, b) => {
@@ -1194,7 +1255,7 @@
                O cadastro e o histórico serão mantidos no sistema.`
             : `Deseja ativar novamente o médico <strong>${m.nome}</strong>?`;
 
-    HematoAI.confirmDialog(
+    confirmarAcaoLocal(
         mensagem,
         async () => {
 
@@ -1241,56 +1302,11 @@
         }
     );
   };
- /*
-  window.deletarMedico = function (crm) {
-
-    const m = medicos.find(x => x.crm === crm);
-
-    HematoAI.confirmDialog(
-
-        `Deseja excluir o médico <strong>${m?.nome}</strong>?<br>Esta ação não pode ser desfeita.`,
-
-        async () => {
-
-            try {
-
-                const resposta = await del("/medicos/" + crm);
-
-                const dados = await resposta.json();
-
-                if (!resposta.ok) {
-
-                    HematoAI.showToast(
-                        dados.msg || "Erro ao excluir médico.",
-                        "error"
-                    );
-
-                    return;
-                }
-
-                await carregarMedicos();
-
-                HematoAI.showToast(
-                    "Médico excluído com sucesso.",
-                    "success"
-                );
-
-            } catch (erro) {
-
-                console.error(erro);
-
-                HematoAI.showToast(
-                    "Erro ao conectar com o servidor.",
-                    "error"
-                );
-            }
-        }
-    );
-  };*/
 
   // Event listeners
   document.getElementById('searchMedico').addEventListener('input', applyFilter);
   document.getElementById('filterEsp').addEventListener('change', applyFilter);
+  document.getElementById('filterStatus').addEventListener('change', applyFilter);
   document.getElementById('sortMedico').addEventListener('change', applyFilter);
   
   const modalEl = document.getElementById('modalMedico');
