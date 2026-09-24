@@ -5,7 +5,14 @@ create table login (
 	id_usuario int auto_increment primary key not null,
     email varchar (100) not null,
     senha varchar (255) not null,
-    tipo enum ("Médico", "Paciente", "Administrador") not null
+    tipo enum ("Médico", "Paciente", "Administrador") not null,
+    -- Lida pelo login e pelo JwtMiddleware em toda requisição autenticada
+    -- (LoginDAO, MedicosDAO, LoginService, JwtMiddleware): usuário com
+    -- statusu diferente de "Ativo" não consegue entrar nem manter sessão.
+    -- Default "Ativo" garante que todo usuário já cadastrado (inclusive os
+    -- INSERTs de exemplo abaixo, que não informam a coluna) continue
+    -- conseguindo logar.
+    statusu enum ("Ativo", "Desativado") not null default "Ativo"
 );
 
 create table enderecos (
@@ -138,8 +145,11 @@ create table anamnese (
 );
 
 
+-- Senhas de exemplo: hash MD5 de "123456" (mesmo valor usado pelos demais
+-- usuários abaixo). LoginService compara md5(senha digitada) com esta
+-- coluna; texto puro nunca autentica.
 INSERT INTO login (email, senha, tipo) VALUES
-('admin@hematoai.com', '123456', 'Administrador'),
+('admin@hematoai.com', 'e10adc3949ba59abbe56e057f20f883e', 'Administrador'),
 
 ('joao.silva@gmail.com', 'e10adc3949ba59abbe56e057f20f883e', 'Médico'),
 ('ana.costa@gmail.com', 'e10adc3949ba59abbe56e057f20f883e', 'Médico'),

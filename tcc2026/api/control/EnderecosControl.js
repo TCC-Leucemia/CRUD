@@ -44,7 +44,6 @@ module.exports = class EnderecosControl {
             });
 
         } catch (erro) {
-            console.log("ERRO REAL:", erro);
             next(erro);
         }
     }
@@ -65,17 +64,7 @@ module.exports = class EnderecosControl {
             }
             response.status(201).send(resposta);
 
-        }).catch(erro => {
-            console.log("ERRO REAL:", erro);
-            const resposta = {
-
-                status: false,
-                msg: 'Erro ao realizar ao cadastrar',
-                codigo: '003',
-                dados: {}
-            }
-            response.status(500).send(resposta);
-        });
+        }).catch(next);
     }
 
     show = async (request, response, next) => {

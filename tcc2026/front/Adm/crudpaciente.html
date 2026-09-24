@@ -26,6 +26,9 @@
       outline: none;
       cursor: pointer;
       transition: var(--transition);
+      line-height: 1;
+      text-align: center;
+      text-align-last: center;
     }
 
     .filter-select:focus {
@@ -473,6 +476,7 @@
 <script src="../JS/navbar.js"></script>
 <script src="../JS/auth.js"></script>
 <script src="../JS/api.js"></script>
+<script src="../JS/exportar.js"></script>
 <script>
   if (!localStorage.getItem('hematoai_session')) {
     HematoAI.setSession({ tipo: 'Administrador', nome: 'Admin HematoAI' });
@@ -480,6 +484,7 @@
   HematoAI.initSidebar('pacientes');
 
   let pacientes = [];
+  let listaExibida = []; // exatamente o que a tabela mostra, para a exportação
   let editingCpf = null;
   let pacienteEditando = null;
 
@@ -1304,6 +1309,7 @@
       if (ordem === 'nome_desc') return comparar(b.nome, a.nome);
       return 0;
     });
+    listaExibida = filtrados;
     renderTable(filtrados);
   }
 
@@ -1382,6 +1388,25 @@
   document.getElementById('searchPaciente').addEventListener('input', applyFilter);
   document.getElementById('filterSexo').addEventListener('change', applyFilter);
   document.getElementById('sortPaciente').addEventListener('change', applyFilter);
+
+  HematoExport.criarBotoes(document.querySelector('.page-body .card-header .filter-row'), {
+    titulo: 'Lista de Pacientes',
+    arquivo: 'pacientes',
+    obterLinhas: () => listaExibida,
+    filtros: [
+      { rotulo: 'Busca', id: 'searchPaciente' },
+      { rotulo: 'Sexo', id: 'filterSexo' },
+      { rotulo: 'Ordenação', id: 'sortPaciente' }
+    ],
+    colunas: [
+      { titulo: 'Nome', valor: p => p.nome, destaque: true },
+      { titulo: 'CPF', valor: p => p.cpf ? formatarCPF(p.cpf) : '' },
+      { titulo: 'Sexo', valor: p => p.sexo },
+      { titulo: 'Data Nasc.', valor: p => formatarData(p.data_nasc) },
+      { titulo: 'E-mail', valor: p => p.email },
+      { titulo: 'Telefone', valor: p => p.telefone }
+    ]
+  });
   
   const modalEl = document.getElementById('modalPaciente');
   document.getElementById('closeModalPaciente').addEventListener('click', () => HematoAI.closeModal(modalEl));

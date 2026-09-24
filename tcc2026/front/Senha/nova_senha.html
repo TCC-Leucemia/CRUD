@@ -441,6 +441,19 @@
                 }
 
                 const cpf = localStorage.getItem("cpfRecuperacao");
+                const token = sessionStorage.getItem("tokenRecuperacao");
+
+                // Sem código validado nesta aba não há como trocar a senha.
+                if (!cpf || !token) {
+                    mostrarAviso(
+                        "Para redefinir a senha, solicite um código e confirme-o antes de escolher a nova senha.",
+                        {
+                            titulo: "Verificação necessária",
+                            aoFechar: () => { window.location.href = "esqueci_senha.html"; }
+                        }
+                    );
+                    return;
+                }
 
                 fetch("http://localhost:3000/auth/alterar-senha-recuperacao", {
 
@@ -456,6 +469,8 @@
 
                         cpf: cpf,
 
+                        token: token,
+
                         novaSenha: novaSenha
 
                     })
@@ -469,6 +484,7 @@
                     if(dados.status){
 
                         localStorage.removeItem("cpfRecuperacao");
+                        sessionStorage.removeItem("tokenRecuperacao");
 
                         mostrarSucesso(
                             "Sua senha foi alterada. Entre novamente com a nova senha.",
@@ -480,7 +496,14 @@
 
                     }else{
 
-                        mostrarErro(dados.msg, { titulo: "Não foi possível alterar a senha" });
+                        // Token vencido/já usado: o único caminho é pedir outro código.
+                        const expirou = /verifica[çc][ãa]o do c[óo]digo expirou/i.test(dados.msg || "");
+                        if (expirou) sessionStorage.removeItem("tokenRecuperacao");
+
+                        mostrarErro(dados.msg, {
+                            titulo: "Não foi possível alterar a senha",
+                            aoFechar: expirou ? () => { window.location.href = "esqueci_senha.html"; } : undefined
+                        });
 
                     }
 

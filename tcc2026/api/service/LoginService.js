@@ -5,7 +5,42 @@ const md5 = require("md5");
 const crypto = require("crypto");
 const ErrorResponse = require("../utils/ErrorResponse");
 
+// Recuperação de senha em três passos, todos identificados pelo CPF:
+// 1) buscarEmailPorCpf envia um código de 6 dígitos ao e-mail da conta;
+// 2) validarCodigo troca o código por um token de uso único;
+// 3) alterarSenhaRecuperacao só troca a senha com esse token.
+// Nenhuma resposta revela se o CPF tem conta: CPF inexistente e código
+// errado, vencido ou nunca pedido recebem exatamente a mesma mensagem.
 const codigosRecuperacao = {};
+const DURACAO_CODIGO = 10 * 60 * 1000;
+const DURACAO_TOKEN_RECUPERACAO = 10 * 60 * 1000;
+const MAX_TENTATIVAS_CODIGO = 5;
+const INTERVALO_REENVIO = 60 * 1000;
+const MSG_CODIGO_ENVIADO = "Se o CPF estiver cadastrado, enviaremos um código de verificação para o e-mail vinculado a ele.";
+const MSG_CODIGO_INVALIDO = "Código inválido ou expirado. Confira o código recebido por e-mail ou solicite um novo.";
+const MSG_RECUPERACAO_EXPIRADA = "A verificação do código expirou ou não foi concluída. Solicite um novo código para redefinir a senha.";
+
+const somenteDigitosCpf = (cpf) => String(cpf || "").replace(/\D/g, "");
+
+const hashSha256 = (valor) =>
+    crypto.createHash("sha256").update(String(valor)).digest("hex");
+
+// Comparação em tempo constante: o tempo de resposta não indica quantos
+// caracteres do código/token estavam certos.
+const compararSeguro = (a, b) => {
+    const bufA = Buffer.from(String(a));
+    const bufB = Buffer.from(String(b));
+    return bufA.length === bufB.length && crypto.timingSafeEqual(bufA, bufB);
+};
+
+const limparRecuperacoesExpiradas = () => {
+    const agora = Date.now();
+    for (const cpf of Object.keys(codigosRecuperacao)) {
+        if (codigosRecuperacao[cpf].expira <= agora) {
+            delete codigosRecuperacao[cpf];
+        }
+    }
+};
 const selecoesPerfil = new Map();
 const duracaoSelecaoPerfil = 5 * 60 * 1000;
 
@@ -477,42 +512,62 @@ module.exports = class LoginService {
 
     async buscarEmailPorCpf(cpf) {
 
-        const usuario =
-            await this.#dao.buscarEmailPorCpf(cpf);
+        const cpfLimpo = somenteDigitosCpf(cpf);
 
-        if (!usuario) {
-
+        // Formato inválido não revela nada sobre contas existentes.
+        if (cpfLimpo.length !== 11) {
             throw new ErrorResponse(
-                404,
-                "CPF não encontrado."
+                400,
+                "Informe um CPF válido, com 11 dígitos."
             );
-
         }
 
-        const codigo =
-            this.gerarCodigo();
+        limparRecuperacoesExpiradas();
 
-        codigosRecuperacao[cpf] = {
-            email: usuario.email,
+        // Pedido repetido em menos de 1 minuto não dispara outro e-mail
+        // (evita encher a caixa de entrada de alguém); o código já enviado
+        // continua valendo.
+        const pendente = codigosRecuperacao[cpfLimpo];
+        if (pendente && pendente.codigo && Date.now() - pendente.enviadoEm < INTERVALO_REENVIO) {
+            return MSG_CODIGO_ENVIADO;
+        }
+
+        const usuario =
+            await this.#dao.buscarEmailPorCpf(cpfLimpo);
+
+        if (!usuario) {
+            return MSG_CODIGO_ENVIADO;
+        }
+
+        const codigo = this.gerarCodigo();
+
+        codigosRecuperacao[cpfLimpo] = {
+            id_usuario: usuario.id_usuario,
             codigo,
-            expira: Date.now() + 10 * 60 * 1000
+            tentativas: 0,
+            tokenHash: null,
+            enviadoEm: Date.now(),
+            expira: Date.now() + DURACAO_CODIGO
         };
 
-        await this.#email.enviarCodigo(
+        try {
+            await this.#email.enviarCodigo(usuario.email, codigo);
+        } catch (erro) {
+            delete codigosRecuperacao[cpfLimpo];
+            // Devolver erro aqui confirmaria que o CPF tem conta: a falha
+            // fica só no terminal de quem roda o servidor.
+            console.error(
+                `[ERRO] Falha ao enviar o código de recuperação por e-mail (${erro.code || erro.name}): ` +
+                `${erro.message}. Confira EMAIL_USER e EMAIL_PASS em tcc2026/.env.`
+            );
+        }
 
-            usuario.email,
-
-            codigo
-
-        );
-
-        return true;
-
+        return MSG_CODIGO_ENVIADO;
     }
+
     gerarCodigo() {
-        return Math.floor(
-            100000 + Math.random() * 900000
-        ).toString();
+        // Gerador criptográfico: Math.random é previsível.
+        return crypto.randomInt(100000, 1000000).toString();
     }
 
     validarAcessoLogin = async (id_usuario, user) => {
@@ -543,62 +598,84 @@ module.exports = class LoginService {
     }
     validarCodigo(dados) {
 
-        const registro = codigosRecuperacao[dados.cpf];
+        const cpfLimpo = somenteDigitosCpf(dados && dados.cpf);
+        const codigo = String((dados && dados.codigo) || "").trim();
+        const registro = codigosRecuperacao[cpfLimpo];
 
-        if (!registro) {
-
-            throw new ErrorResponse(
-                400,
-                "Nenhum código solicitado."
-            );
-
+        if (!registro || !registro.codigo || Date.now() > registro.expira) {
+            if (registro && Date.now() > registro.expira) {
+                delete codigosRecuperacao[cpfLimpo];
+            }
+            throw new ErrorResponse(400, MSG_CODIGO_INVALIDO);
         }
 
-        if (Date.now() > registro.expira) {
+        if (!compararSeguro(registro.codigo, codigo)) {
+            registro.tentativas += 1;
 
-            delete codigosRecuperacao[dados.cpf];
+            // Sem limite, os 900 mil códigos possíveis poderiam ser
+            // testados um a um. Esgotadas as tentativas, o código morre.
+            if (registro.tentativas >= MAX_TENTATIVAS_CODIGO) {
+                delete codigosRecuperacao[cpfLimpo];
+            }
 
-            throw new ErrorResponse(
-                400,
-                "Código expirado."
-            );
-
+            throw new ErrorResponse(400, MSG_CODIGO_INVALIDO);
         }
 
-        if (registro.codigo !== dados.codigo) {
+        // Código certo: vira um token de uso único, e o código não vale mais.
+        const token = crypto.randomBytes(32).toString("hex");
+        registro.codigo = null;
+        registro.tokenHash = hashSha256(token);
+        registro.expira = Date.now() + DURACAO_TOKEN_RECUPERACAO;
 
-            throw new ErrorResponse(
-                400,
-                "Código inválido."
-            );
-
-        }
-
-        return true;
-
+        return { token };
     }
-    alterarSenhaRecuperacao = async (cpf, novaSenha) => {
 
-        const usuario =
-            await this.#dao.buscarEmailPorCpf(cpf);
+    alterarSenhaRecuperacao = async (cpf, token, novaSenha) => {
 
-        if (!usuario) {
+        const cpfLimpo = somenteDigitosCpf(cpf);
+        const registro = codigosRecuperacao[cpfLimpo];
 
+        const autorizado =
+            registro &&
+            registro.tokenHash &&
+            typeof token === "string" &&
+            Date.now() <= registro.expira &&
+            compararSeguro(registro.tokenHash, hashSha256(token));
+
+        if (!autorizado) {
+            throw new ErrorResponse(400, MSG_RECUPERACAO_EXPIRADA);
+        }
+
+        // Senha fora da regra não consome o token: dá para corrigir e reenviar.
+        const senha = typeof novaSenha === "string" ? novaSenha.trim() : "";
+
+        if (senha.length < 8) {
             throw new ErrorResponse(
-                404,
-                "Usuário não encontrado."
+                400,
+                "A nova senha deve ter pelo menos 8 caracteres."
             );
+        }
 
+        if (senha.length > 255) {
+            throw new ErrorResponse(
+                400,
+                "A nova senha excede o tamanho permitido."
+            );
         }
 
         const login =
-            await this.#dao.findById(usuario.id_usuario);
+            await this.#dao.findById(registro.id_usuario);
 
-        login.senha = md5(novaSenha);
+        if (!login) {
+            delete codigosRecuperacao[cpfLimpo];
+            throw new ErrorResponse(400, MSG_RECUPERACAO_EXPIRADA);
+        }
+
+        login.senha = md5(senha);
 
         await this.#dao.update(login);
 
-        delete codigosRecuperacao[cpf];
+        delete codigosRecuperacao[cpfLimpo];
 
         return true;
 

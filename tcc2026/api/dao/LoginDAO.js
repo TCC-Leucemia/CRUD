@@ -236,9 +236,6 @@ module.exports = class LoginDAO {
             WHERE id_usuario=?
         `;
 
-        console.log("DADOS RECEBIDOS:");
-        console.log(login);
-
         return new Promise((resolve, reject) => {
             connection.query(
                 sql,
@@ -249,9 +246,6 @@ module.exports = class LoginDAO {
                         console.error(err);
                         return reject(err);
                     }
-
-                    console.log("RESULTADO DO UPDATE:");
-                    console.log(result);
 
                     resolve(result);
                 }

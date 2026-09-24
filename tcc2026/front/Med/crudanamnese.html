@@ -26,6 +26,9 @@
       outline: none;
       cursor: pointer;
       transition: var(--transition);
+      line-height: 1;
+      text-align: center;
+      text-align-last: center;
     }
     .filter-select:focus {
       border-color: var(--red);
@@ -406,6 +409,7 @@
 
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="../JS/navbar.js"></script>
+<script src="../JS/exportar.js"></script>
 <script>
   
   HematoAI.initSidebar('anamnese');
@@ -621,6 +625,22 @@
 
   document.getElementById('searchAnamnese').addEventListener('input', aplicarFiltros);
   document.getElementById('btnRecarregar').addEventListener('click', carregar);
+
+  HematoExport.criarBotoes(document.querySelector('.page-body .card-header .filter-row'), {
+    titulo: 'Lista de Anamneses',
+    arquivo: 'anamneses',
+    obterLinhas: () => filtrados,
+    filtros: [{ rotulo: 'Busca', id: 'searchAnamnese' }],
+    colunas: [
+      { titulo: 'ID', valor: a => '#' + a.id_anamnese, alinhar: 'center' },
+      { titulo: 'Paciente', valor: a => getNomePaciente(a.cpf), destaque: true },
+      { titulo: 'CPF', valor: a => formatarCPF(a.cpf) },
+      { titulo: 'Data Consulta', valor: a => formatarDataHora(getDataConsulta(a.id_consulta)) },
+      { titulo: 'Consulta', valor: a => '#' + a.id_consulta, alinhar: 'center' },
+      { titulo: 'Sintomas', valor: a => a.sintomas },
+      { titulo: 'Comorbidades', valor: a => a.comorbidades }
+    ]
+  });
 
   // ============================================
   // NOVA ANAMNESE

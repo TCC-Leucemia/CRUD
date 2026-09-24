@@ -30,7 +30,6 @@ module.exports = class LoginControl {
     #service;
 
     constructor(banco) {
-        console.log("LoginControl.constructor");
         this.#service = new LoginService(banco);
     }
 
@@ -171,14 +170,15 @@ module.exports = class LoginControl {
 
         try {
 
-            const usuario =
+            // Mesma resposta com ou sem conta para o CPF (ver LoginService).
+            const msg =
                 await this.#service.buscarEmailPorCpf(
-                    req.body.cpf
+                    (req.body || {}).cpf
                 );
 
             res.status(200).send({
                 status: true,
-                dados: usuario
+                msg
             });
 
         } catch (erro) {
@@ -211,11 +211,14 @@ module.exports = class LoginControl {
 
         try {
 
-            await this.#service.validarCodigo(req.body);
+            const { token } =
+                this.#service.validarCodigo(req.body || {});
 
+            // Token de uso único exigido pela troca de senha.
             res.status(200).send({
                 status: true,
-                msg: "Código válido."
+                msg: "Código válido.",
+                token
             });
 
         } catch (erro) {
@@ -228,10 +231,11 @@ module.exports = class LoginControl {
 
         try {
 
-            const { cpf, novaSenha } = req.body;
+            const { cpf, token, novaSenha } = req.body || {};
 
             await this.#service.alterarSenhaRecuperacao(
                 cpf,
+                token,
                 novaSenha
             );
 

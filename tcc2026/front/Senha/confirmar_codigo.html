@@ -565,8 +565,11 @@
 
                 })
 
-                .then(() => {
+                .then((dados) => {
 
+                    // Token de uso único: a troca de senha só é aceita com ele.
+                    // sessionStorage some quando a aba é fechada.
+                    sessionStorage.setItem("tokenRecuperacao", dados.token);
                     window.location.href = "nova_senha.html";
 
                 })

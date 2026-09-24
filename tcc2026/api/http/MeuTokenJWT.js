@@ -11,6 +11,7 @@ module.exports = class MeuTokenJWT {
     #sub;
     #duracaoToken;
     #payload;
+    #motivoFalha;
 
     constructor() {
 
@@ -82,6 +83,7 @@ module.exports = class MeuTokenJWT {
     validarToken = (tokenString) => {
 
         this.#payload = null;
+        this.#motivoFalha = "invalido";
 
         if (!tokenString) {
             return false;
@@ -114,8 +116,19 @@ module.exports = class MeuTokenJWT {
 
         } catch (err) {
 
+            // Vencido é diferente de adulterado: o usuário só precisa
+            // entrar de novo, e isso pode ser dito a ele sem risco.
+            if (err && err.name === "TokenExpiredError") {
+                this.#motivoFalha = "expirado";
+            }
+
             return false;
         }
+    }
+
+    // "expirado" ou "invalido": por que o último validarToken falhou.
+    get motivoFalha() {
+        return this.#motivoFalha;
     }
 
     get payload() {

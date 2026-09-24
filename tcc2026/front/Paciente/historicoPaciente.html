@@ -120,6 +120,22 @@
       box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.08);
     }
 
+    .lista-exportar {
+      padding: 10px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      background: var(--bg);
+      flex-shrink: 0;
+    }
+    .lista-exportar > span {
+      font-size: .8rem;
+      color: var(--text-2);
+      font-weight: 600;
+    }
+
     .lista-body {
       overflow-y: auto;
       flex: 1;
@@ -279,7 +295,7 @@
 
     /* Botão Exportar PDF */
     .btn-exportar-pdf {
-      background: var(--red);
+      background: var(--pdf);
       border: none;
       color: white;
       padding: 13px 28px;
@@ -291,14 +307,14 @@
       width: auto;
       margin-top: 4px;
       font-family: var(--font);
-      box-shadow: 0 2px 8px rgba(185,28,28,0.3);
+      box-shadow: 0 2px 8px var(--pdf-shadow);
       display: none;
       align-self: flex-end;
     }
     .btn-exportar-pdf:hover {
-      background: var(--red-dark);
+      background: var(--pdf-hover);
       transform: translateY(-2px);
-      box-shadow: 0 4px 16px rgba(185,28,28,0.4);
+      box-shadow: 0 4px 16px var(--pdf-shadow);
     }
     .btn-exportar-pdf:active { transform: translateY(0); }
 
@@ -354,6 +370,9 @@
               <label for="filtroData">📅 Filtrar por data:</label>
               <input type="date" id="filtroData">
             </div>
+            <div class="lista-exportar" id="listaExportar">
+              <span>Exportar lista</span>
+            </div>
             <div class="lista-body" id="listaBody"></div>
           </div>
 
@@ -383,6 +402,7 @@
 <script src="../JS/auth.js"></script>
 <script src="../JS/api.js"></script>
 <script src="../JS/navbar.js"></script>
+<script src="../JS/exportar.js"></script>
 <script>
 
 let CONSULTAS = [];
@@ -390,6 +410,7 @@ let EXAMES = [];
 
 let viewAtiva  = 'consultas';
 let idSelecionado = null;
+let listaExibida = []; // exatamente o que a lista lateral mostra, para a exportação
 
 // Inicializar sidebar
 if (typeof HematoAI !== 'undefined' && HematoAI.initSidebar) {
@@ -588,6 +609,7 @@ document.getElementById('filtroData').addEventListener('change', function() {
 ═══════════════════════════════════════════════════════ */
 function renderLista(dados, tipo) {
   const body = document.getElementById('listaBody');
+  listaExibida = dados;
   document.getElementById('listaContador').textContent = dados.length;
   body.innerHTML = '';
 
@@ -795,9 +817,78 @@ function formatarDataLonga(d) {
     });
 }
 
-// Botão Exportar PDF (simulação)
+/* ═══════════════════════════════════════════════════════
+   EXPORTAÇÃO
+═══════════════════════════════════════════════════════ */
+const COLUNAS_CONSULTAS = [
+  { titulo: 'Data', valor: c => formatarData(c.data) },
+  { titulo: 'Tipo', valor: c => c.tipo, destaque: true },
+  { titulo: 'Médico', valor: c => c.medico },
+  { titulo: 'CRM', valor: c => c.crm },
+  { titulo: 'Especialidade', valor: c => c.especialidade },
+  { titulo: 'Status', valor: c => c.status }
+];
+
+const COLUNAS_EXAMES = [
+  { titulo: 'Data', valor: e => formatarData(e.data) },
+  { titulo: 'Tipo', valor: e => e.tipo, destaque: true },
+  { titulo: 'Médico', valor: e => e.medico },
+  { titulo: 'Status', valor: e => e.status },
+  { titulo: 'Suspeita', valor: e => (e.diagnostico || {}).suspeita_leucemia },
+  { titulo: 'Data do Resultado', valor: e => formatarData((e.diagnostico || {}).data_resultado) }
+];
+
+HematoExport.criarBotoes('listaExportar', {
+  titulo: () => viewAtiva === 'consultas' ? 'Minhas Consultas' : 'Meus Exames',
+  arquivo: () => viewAtiva === 'consultas' ? 'minhas-consultas' : 'meus-exames',
+  colunas: () => viewAtiva === 'consultas' ? COLUNAS_CONSULTAS : COLUNAS_EXAMES,
+  obterLinhas: () => listaExibida,
+  filtros: [{ rotulo: 'Data', id: 'filtroData' }]
+});
+
+// Ficha em PDF do item aberto no painel de detalhes.
 document.getElementById('btnExportarPDF').addEventListener('click', function() {
-  HematoAI.showToast('PDF exportado com sucesso!', 'success');
+  if (viewAtiva === 'consultas') {
+    const c = CONSULTAS.find(x => x.id === idSelecionado);
+    if (!c) return;
+    HematoExport.exportarFichaPDF({
+      titulo: 'Ficha da Consulta',
+      arquivo: `consulta-${c.id}`,
+      subtitulo: `${c.tipo || 'Consulta'} · ${formatarDataLonga(c.data)}`,
+      secoes: [{ titulo: 'Dados da Consulta', campos: [
+        ['Médico', c.medico],
+        ['CRM', c.crm],
+        ['Especialidade', c.especialidade],
+        ['Data', formatarDataLonga(c.data)],
+        ['Tipo', c.tipo],
+        ['Status', c.status]
+      ] }]
+    }, this);
+    return;
+  }
+
+  const e = EXAMES.find(x => x.id === idSelecionado);
+  if (!e) return;
+  const d = e.diagnostico || {};
+  HematoExport.exportarFichaPDF({
+    titulo: 'Ficha do Exame',
+    arquivo: `exame-${e.id}`,
+    subtitulo: `${e.tipo || 'Exame'} · ${formatarDataLonga(e.data)}`,
+    secoes: [
+      { titulo: 'Informações do Exame', campos: [
+        ['Tipo', e.tipo],
+        ['Data', formatarDataLonga(e.data)],
+        ['Médico', e.medico],
+        ['Status', e.status]
+      ] },
+      { titulo: 'Diagnóstico do Médico', campos: [
+        ['Suspeita', d.suspeita_leucemia],
+        ['Tipo de leucemia', d.tipo_leucemia || 'Não identificado'],
+        ['Data do resultado', formatarData(d.data_resultado)]
+      ] }
+    ],
+    textos: [{ titulo: 'Resultado do Exame', conteudo: d.resultado_texto || 'Não informado' }]
+  }, this);
 });
 
 /* ═══════════════════════════════════════════════════════

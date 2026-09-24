@@ -46,11 +46,26 @@
       outline: none;
       transition: var(--transition);
       font-family: var(--font);
+      line-height: 1;
     }
     .filtros-bar select:focus,
     .filtros-bar input:focus {
       border-color: var(--red);
       box-shadow: 0 0 0 3px rgba(185,28,28,0.08);
+    }
+    /* Select de opção pré-definida (status): centralizado nos dois eixos.
+       Input de digitação (nome/CPF): à esquerda, já é o padrão do input. */
+    .filtros-bar select {
+      text-align: center;
+      text-align-last: center;
+    }
+    /* Os botões de PDF/Excel entram dentro desta mesma barra (ver
+       criarBotoes mais abaixo): usam a borda/padding menor daqui, em vez
+       do tamanho padrão do navbar.css, para ficar da altura dos outros
+       filtros da barra. */
+    .filtros-bar .btn-export {
+      padding: 6px 14px;
+      font-size: 0.83rem;
     }
     .filtros-bar .busca-paciente {
       flex: 1;
@@ -540,6 +555,7 @@
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="../JS/navbar.js"></script>
 <script src="../JS/auth.js"></script>
+<script src="../JS/exportar.js"></script>
 <script>
   let consultas = [];
   let mesAtual = new Date().getMonth();
@@ -1139,6 +1155,26 @@
 
   document.getElementById('filtroStatus').addEventListener('change', aplicarFiltros);
   document.getElementById('buscaPaciente').addEventListener('input', aplicarFiltros);
+
+  // Exporta as consultas do mês que está na tela, respeitando os filtros.
+  HematoExport.criarBotoes(document.querySelector('.filtros-bar'), {
+    titulo: () => `Consultas de ${document.getElementById('mesAnoDisplay').textContent}`,
+    arquivo: () => `agenda-${document.getElementById('mesAnoDisplay').textContent}`,
+    obterLinhas: () => consultasDoMes(anoAtual, mesAtual)
+      .sort((a, b) => new Date(a.data_consulta) - new Date(b.data_consulta)),
+    filtros: [
+      { rotulo: 'Status', id: 'filtroStatus' },
+      { rotulo: 'Paciente', id: 'buscaPaciente' }
+    ],
+    colunas: [
+      { titulo: 'Data', valor: c => formatarData(c.data_consulta) },
+      { titulo: 'Hora', valor: c => formatarHora(c.data_consulta), alinhar: 'center' },
+      { titulo: 'Paciente', valor: c => c.paciente, destaque: true },
+      { titulo: 'CPF', valor: c => formatarCPF(c.cpf) },
+      { titulo: 'Tipo', valor: c => c.tipo_consulta || 'Consulta' },
+      { titulo: 'Status', valor: c => c.statusc }
+    ]
+  });
   document.getElementById('inputBuscaData').addEventListener('input', function () {
 
       let valor = this.value.replace(/\D/g, '');

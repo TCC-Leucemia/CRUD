@@ -26,6 +26,14 @@
   --purple:      #7c3aed;
   --purple-light:#f5f3ff;
 
+  /* Exportação: vermelho do PDF e verde do Excel */
+  --pdf:          #d9261c;
+  --pdf-hover:    #b81f17;
+  --pdf-shadow:   rgba(217,38,28,0.28);
+  --excel:        #1d6f42;
+  --excel-hover:  #185c37;
+  --excel-shadow: rgba(29,111,66,0.28);
+
   /* Neutrals */
   --bg:          #f8fafc;
   --surface:     #ffffff;
@@ -523,6 +531,53 @@ input, select, textarea { font-family: var(--font); }
   line-height: 1;
 }
 
+/* ── Exportação (PDF / Excel) ────────────────────────────────── */
+.export-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+.btn-export {
+  color: #fff;
+  /* borda transparente em vez de "none": com box-sizing:border-box, o
+     botão fica exatamente da mesma altura do search-bar/select ao lado
+     (mesmo padding vertical, mesma borda de 1.5px, só que invisível). */
+  border: 1.5px solid transparent;
+  padding: 10px 16px;
+  /* Maior que a fonte de QUALQUER filtro do app: as páginas variam entre
+     0.8rem e 0.9rem para seus campos/selects, então 0.93rem garante que o
+     texto do botão sempre fique mais visível, em qualquer tela. */
+  font-size: 0.93rem;
+}
+.btn-export svg { flex-shrink: 0; }
+.btn-export:hover  { transform: translateY(-1px); }
+.btn-export:active { transform: translateY(0); }
+.btn-export:focus-visible {
+  outline: 2px solid var(--text-1);
+  outline-offset: 2px;
+}
+.btn-export[aria-busy="true"] { cursor: progress; }
+
+.btn-export-pdf {
+  background: var(--pdf);
+  box-shadow: 0 2px 8px var(--pdf-shadow);
+}
+.btn-export-pdf:hover {
+  background: var(--pdf-hover);
+  box-shadow: 0 4px 14px var(--pdf-shadow);
+}
+
+.btn-export-excel {
+  background: var(--excel);
+  box-shadow: 0 2px 8px var(--excel-shadow);
+}
+.btn-export-excel:hover {
+  background: var(--excel-hover);
+  box-shadow: 0 4px 14px var(--excel-shadow);
+}
+
 /* ── Search Bar ──────────────────────────────────────────────── */
 .search-bar {
   position: relative;
@@ -540,6 +595,14 @@ input, select, textarea { font-family: var(--font); }
   color: var(--text-1);
   outline: none;
   transition: var(--transition);
+  /* line-height:1 fixa a caixa de texto no tamanho da fonte: sem isso,
+     o line-height:1.5 herdado do body deixa o texto digitado um pouco
+     mais alto ou mais baixo que o dos selects ao lado, dependendo do
+     navegador. Com padding simétrico (10px em cima/embaixo) o texto
+     fica centralizado na vertical; text-align:left é o padrão, mas
+     deixamos explícito aqui. */
+  line-height: 1;
+  text-align: left;
 }
 
 .search-bar::before {
@@ -802,6 +865,13 @@ select {
   cursor: pointer;
   font-family: var(--font);
   transition: var(--transition);
+  /* Select de opção pré-definida (ordenação, status...): valor
+     centralizado nos dois eixos. text-align-last é quem realmente
+     centraliza o valor mostrado no <select> fechado; text-align sozinho
+     não é suficiente em todo navegador. */
+  line-height: 1;
+  text-align: center;
+  text-align-last: center;
 }
 
 select:focus {
@@ -980,6 +1050,13 @@ select:focus {
   --purple-light: #4c1d95;
   --yellow: #f59e0b;
   --yellow-light: #78350f;
+  /* Exportação: o mesmo par de cores, um tom mais claro para o fundo escuro */
+  --pdf: #e0342a;
+  --pdf-hover: #c92a21;
+  --pdf-shadow: rgba(224,52,42,0.32);
+  --excel: #23804c;
+  --excel-hover: #1d6d40;
+  --excel-shadow: rgba(35,128,76,0.32);
   --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
   --shadow-md: 0 4px 16px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.2);

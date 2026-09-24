@@ -26,6 +26,9 @@
       outline: none;
       cursor: pointer;
       transition: var(--transition);
+      line-height: 1;
+      text-align: center;
+      text-align-last: center;
     }
 
     .filter-select:focus {
@@ -462,6 +465,7 @@
 <script src="../JS/navbar.js"></script>
 <script src="../JS/auth.js"></script>
 <script src="../JS/api.js"></script>
+<script src="../JS/exportar.js"></script>
 <script>
   if (!localStorage.getItem('hematoai_session')) {
     HematoAI.setSession({ tipo: 'Administrador', nome: 'Admin HematoAI' });
@@ -469,6 +473,7 @@
   HematoAI.initSidebar('medicos');
 
   let medicos = [];
+  let listaExibida = []; // exatamente o que a tabela mostra, para a exportação
   let editingCrm = null;
   let medicoEditando = null;
 
@@ -1200,6 +1205,7 @@
       if (ordem === 'nome_desc') return comparar(b.nome, a.nome);
       return 0;
     });
+    listaExibida = filtrados;
     renderTable(filtrados);
   }
 
@@ -1308,6 +1314,31 @@
   document.getElementById('filterEsp').addEventListener('change', applyFilter);
   document.getElementById('filterStatus').addEventListener('change', applyFilter);
   document.getElementById('sortMedico').addEventListener('change', applyFilter);
+
+  HematoExport.criarBotoes(document.querySelector('.page-body .card-header .filter-row'), {
+    titulo: 'Lista de Médicos',
+    arquivo: 'medicos',
+    obterLinhas: () => listaExibida,
+    filtros: [
+      { rotulo: 'Busca', id: 'searchMedico' },
+      { rotulo: 'Especialidade', id: 'filterEsp' },
+      { rotulo: 'Status', id: 'filterStatus' },
+      { rotulo: 'Ordenação', id: 'sortMedico' }
+    ],
+    colunas: [
+      { titulo: 'Nome', valor: m => m.nome, destaque: true },
+      { titulo: 'CRM', valor: m => m.crm },
+      { titulo: 'CPF', valor: m => maskCPF(String(m.cpf || '')) },
+      { titulo: 'Especialidade', valor: m => m.especialidade, cor: () => HematoExport.cores.azul },
+      { titulo: 'E-mail', valor: m => m.email, cor: () => HematoExport.cores.azul },
+      { titulo: 'Telefone', valor: m => m.telefone },
+      {
+        titulo: 'Status',
+        valor: m => m.status === 'Ativo' ? 'Ativo' : 'Desativado',
+        cor: valor => valor === 'Ativo' ? HematoExport.cores.verde : HematoExport.cores.vermelho
+      }
+    ]
+  });
   
   const modalEl = document.getElementById('modalMedico');
   document.getElementById('closeModalMedico').addEventListener('click', () => HematoAI.closeModal(modalEl));

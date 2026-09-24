@@ -26,6 +26,9 @@
       outline: none;
       cursor: pointer;
       transition: var(--transition);
+      line-height: 1;
+      text-align: center;
+      text-align-last: center;
     }
 
     .filter-select:focus {
@@ -912,6 +915,7 @@
 <script src="../JS/api.js"></script>
 <script src="../JS/auth.js"></script>
 <script src="../JS/navbar.js"></script>
+<script src="../JS/exportar.js"></script>
 <script>
   // ============================================================
   //  SESSÃO E SIDEBAR
@@ -925,6 +929,7 @@
   //  ESTADO GLOBAL
   // ============================================================
   let consultas = [];
+  let listaExibida = []; // exatamente o que a tabela mostra, para a exportação
   let pacientes = [];
   let medicos = [];
   let modoEdicao = false;
@@ -1029,6 +1034,7 @@
       if (ordem === 'nome_desc') return comparar(b.paciente, a.paciente);
       return (Date.parse(b.data_consulta) || 0) - (Date.parse(a.data_consulta) || 0);
     });
+    listaExibida = filtradas;
     renderTabela(filtradas);
   }
 
@@ -1037,6 +1043,27 @@
   document.getElementById('filterTipo').addEventListener('change', aplicarFiltros);
   document.getElementById('sortConsulta').addEventListener('change', aplicarFiltros);
   document.getElementById('btnRecarregar').addEventListener('click', aplicarFiltros);
+
+  HematoExport.criarBotoes(document.querySelector('.page-body .card-header .filter-row'), {
+    titulo: 'Lista de Consultas',
+    arquivo: 'consultas',
+    obterLinhas: () => listaExibida,
+    filtros: [
+      { rotulo: 'Busca', id: 'searchConsulta' },
+      { rotulo: 'Status', id: 'filterStatus' },
+      { rotulo: 'Tipo', id: 'filterTipo' },
+      { rotulo: 'Ordenação', id: 'sortConsulta' }
+    ],
+    colunas: [
+      { titulo: 'Paciente', valor: c => c.paciente, destaque: true },
+      { titulo: 'CPF', valor: c => c.cpf ? formatarCPF(c.cpf) : '' },
+      { titulo: 'Médico', valor: c => c.medico },
+      { titulo: 'CRM', valor: c => c.crm },
+      { titulo: 'Data da Consulta', valor: c => formatarDataHora(c.data_consulta) },
+      { titulo: 'Tipo', valor: c => c.tipo_consulta },
+      { titulo: 'Status', valor: c => c.statusc }
+    ]
+  });
 
   // ============================================================
   //  CARREGAMENTO DE DADOS (API)

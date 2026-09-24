@@ -14,11 +14,6 @@ module.exports = class ExamesService {
     }
 
     create = async (dados, user) => {
-        console.log("================================");
-        console.log("CRIANDO EXAME");
-        console.log(dados);
-        console.log("================================");
-
         const consulta =
             await this.#consultasDAO.findById(
                 dados.id_consulta

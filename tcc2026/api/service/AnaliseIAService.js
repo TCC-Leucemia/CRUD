@@ -5,6 +5,15 @@ const AnaliseIA = require("../model/AnaliseIA");
 const Anamnese = require("../model/Anamnese");
 const ErrorResponse = require("../utils/ErrorResponse");
 
+// Falha da análise: o usuário vê o que deu errado; a orientação técnica
+// (caminhos, variáveis do .env, saída do Python) vai só para o terminal.
+const falhaAnalise = (status, mensagem, detalheTerminal) => {
+    if (detalheTerminal) {
+        console.error(`[ERRO ${status}] Análise IA: ${detalheTerminal}`);
+    }
+    return new ErrorResponse(status, mensagem);
+};
+
 const fs = require("fs");
 const path = require("path");
 const executar = require("util").promisify(require("child_process").execFile);
@@ -514,9 +523,10 @@ module.exports = class AnaliseIAService {
                 );
 
             if (!fs.existsSync(script)) {
-                throw new ErrorResponse(
+                throw falhaAnalise(
                     500,
-                    `Script de análise não encontrado em ${script}. Confira se a pasta backend foi movida.`
+                    "O módulo de análise por IA não está disponível no servidor. Avise o responsável técnico.",
+                    `script não encontrado em ${script}. Confira se a pasta backend foi movida.`
                 );
             }
 
@@ -559,9 +569,10 @@ module.exports = class AnaliseIAService {
                     `${erro.stderr || ""} ${erro.message || ""}`;
 
                 if (erro.code === "ENOENT") {
-                    throw new ErrorResponse(
+                    throw falhaAnalise(
                         500,
-                        "O interpretador 'python' não foi encontrado pelo servidor. Verifique se o Python está no PATH e reinicie o Node."
+                        "O módulo de análise por IA não pôde ser iniciado no servidor. Avise o responsável técnico.",
+                        "o interpretador 'python' não foi encontrado. Verifique se o Python está no PATH e reinicie o Node."
                     );
                 }
 
@@ -569,9 +580,10 @@ module.exports = class AnaliseIAService {
                     /OPENAI_API_KEY|credentials|api key/i
                         .test(detalhe)
                 ) {
-                    throw new ErrorResponse(
+                    throw falhaAnalise(
                         503,
-                        "Integração com a OpenAI não configurada. Defina OPENAI_API_KEY no arquivo .env de tcc2026."
+                        "A integração com a IA não está configurada no servidor. Avise o responsável técnico.",
+                        "OPENAI_API_KEY ausente ou inválida. Defina a chave em tcc2026/.env e reinicie o Node."
                     );
                 }
 
@@ -585,9 +597,10 @@ module.exports = class AnaliseIAService {
                             /No module named ['"]([^'"]+)['"]/i
                         );
 
-                    throw new ErrorResponse(
+                    throw falhaAnalise(
                         502,
-                        `Falta uma biblioteca Python${modulo ? `: ${modulo[1]}` : ""}. Instale-a e tente novamente.`
+                        "O módulo de análise por IA está com a instalação incompleta no servidor. Avise o responsável técnico.",
+                        `falta a biblioteca Python${modulo ? ` "${modulo[1]}"` : ""}. Instale com pip e tente novamente.`
                     );
                 }
 
@@ -600,9 +613,12 @@ module.exports = class AnaliseIAService {
                         .filter(Boolean)
                         .pop();
 
-                throw new ErrorResponse(
+                // A saída do Python pode conter caminhos e trechos de código:
+                // fica só no terminal (já registrada acima).
+                throw falhaAnalise(
                     502,
-                    `O processo Python não concluiu a análise${ultimaLinha ? `: ${ultimaLinha.slice(0, 200)}` : "."}`
+                    "A análise por IA não pôde ser concluída. Tente novamente em instantes.",
+                    `o processo Python terminou com erro${ultimaLinha ? `: ${ultimaLinha.slice(0, 300)}` : "."}`
                 );
             }
 
@@ -623,9 +639,10 @@ module.exports = class AnaliseIAService {
                     /401|incorrect api key|invalid_api_key|authentication/i
                         .test(laudo)
                 ) {
-                    throw new ErrorResponse(
+                    throw falhaAnalise(
                         502,
-                        "A OpenAI recusou a chave configurada. Atualize OPENAI_API_KEY no arquivo .env de tcc2026."
+                        "O serviço de IA recusou a credencial configurada no servidor. Avise o responsável técnico.",
+                        "a OpenAI recusou a chave. Atualize OPENAI_API_KEY em tcc2026/.env e reinicie o Node."
                     );
                 }
 
@@ -633,9 +650,10 @@ module.exports = class AnaliseIAService {
                     /429|quota|rate limit/i
                         .test(laudo)
                 ) {
-                    throw new ErrorResponse(
+                    throw falhaAnalise(
                         502,
-                        "A OpenAI recusou a análise por limite de uso. Verifique a conta e tente novamente."
+                        "O serviço de IA atingiu o limite de uso no momento. Tente novamente mais tarde.",
+                        "a OpenAI recusou por limite de uso (429/quota). Verifique o saldo e os limites da conta."
                     );
                 }
 
@@ -649,9 +667,10 @@ module.exports = class AnaliseIAService {
                     );
                 }
 
-                throw new ErrorResponse(
+                throw falhaAnalise(
                     502,
-                    "A IA não conseguiu analisar a imagem. Verifique a configuração e tente novamente."
+                    "A IA não conseguiu analisar a imagem. Tente novamente. Se continuar, avise o responsável técnico.",
+                    `o Python devolveu ERRO: ${String(laudo).slice(0, 300)}`
                 );
             }
 
@@ -661,9 +680,10 @@ module.exports = class AnaliseIAService {
                 || path.basename(pdf) !== pdf
                 || !pdf.toLowerCase().endsWith(".pdf")
             ) {
-                throw new ErrorResponse(
+                throw falhaAnalise(
                     502,
-                    "O Python devolveu uma resposta inválida para a análise."
+                    "A análise por IA devolveu uma resposta incompleta. Tente novamente.",
+                    `saída do Python fora do formato "<arquivo.pdf>|||<laudo>" (pdf=${JSON.stringify(String(pdf).slice(0, 80))}).`
                 );
             }
 

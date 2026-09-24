@@ -37,6 +37,9 @@
       outline: none;
       cursor: pointer;
       transition: var(--transition);
+      line-height: 1;
+      text-align: center;
+      text-align-last: center;
     }
     .filter-select:focus {
       border-color: var(--red);
@@ -61,6 +64,8 @@
       width: 100%;
       min-width: 200px;
       transition: var(--transition);
+      line-height: 1;
+      text-align: left;
     }
 
     .search-wrapper input:focus {
@@ -373,13 +378,14 @@
     <div class="modal-body" id="detalheBody"></div>
     <div class="modal-footer">
       <button class="btn btn-ghost" id="fecharDetalhes">Fechar</button>
-      <button class="btn btn-primary" id="btnBaixarPDFDetalhe">📄 Baixar relatório</button>
+      <button class="btn btn-export btn-export-pdf" id="btnBaixarPDFDetalhe"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>Baixar relatório</button>
     </div>
   </div>
 </div>
 
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="../JS/navbar.js"></script>
+<script src="../JS/exportar.js"></script>
 <script>
   
   HematoAI.initSidebar('analises-ia');
@@ -575,6 +581,27 @@
   document.getElementById('filterTipoLeucemia').addEventListener('change', aplicarFiltros);
   document.getElementById('btnRecarregar').addEventListener('click', carregar);
 
+  HematoExport.criarBotoes(document.querySelector('.page-body .card-header .filter-row'), {
+    titulo: 'Lista de Análises IA',
+    arquivo: 'analises-ia',
+    obterLinhas: () => filtrados,
+    filtros: [
+      { rotulo: 'Busca', id: 'searchAnalise' },
+      { rotulo: 'Suspeita', id: 'filterSuspeita' },
+      { rotulo: 'Tipo de exame', id: 'filterTipoExame' },
+      { rotulo: 'Tipo de leucemia', id: 'filterTipoLeucemia' }
+    ],
+    colunas: [
+      { titulo: 'Paciente', valor: a => a.nome, destaque: true },
+      { titulo: 'CPF', valor: a => formatarCPF(a.cpf) },
+      { titulo: 'Data Consulta', valor: a => formatarDataHora(a.data_consulta) },
+      { titulo: 'Tipo Leucemia', valor: a => a.tipo_leucemia_ia || 'Não identificado' },
+      { titulo: 'Tipo Exame', valor: a => a.tipo_exame },
+      { titulo: 'Suspeita', valor: a => a.suspeita_ia },
+      { titulo: 'Data da Análise', valor: a => formatarData(a.data_analise) }
+    ]
+  });
+
   // ============================================
   // REDIRECIONAR PARA NOVA ANÁLISE
   // ============================================
@@ -647,55 +674,45 @@
   // BAIXAR PDF
   // ============================================
   
-  document.getElementById('btnBaixarPDFDetalhe').addEventListener('click', async () => {
+  // O PDF é montado no navegador com os dados já carregados da análise
+  // (a API não guarda o arquivo do laudo, só o texto).
+  document.getElementById('btnBaixarPDFDetalhe').addEventListener('click', function () {
     const a = analises.find(x => x.id_analise === idDetalhe);
     if (!a) {
       HematoAI.showToast('Análise não encontrada.', 'error');
       return;
     }
 
-    try {
-      // Obtém token da sessão
-      const session = JSON.parse(localStorage.getItem("hematoai_session"));
-      const token = session?.token;
-
-      if (!token) {
-        HematoAI.showToast('Sessão expirada. Faça login novamente.', 'error');
-        return;
-      }
-
-      // Faz a requisição para o endpoint que gera o PDF via Python
-      // Substitua o endpoint abaixo pelo real do seu backend, se necessário
-      const response = await fetch(`http://localhost:3000/baixar-pdf-analise/${a.id_analise}`, {
-        method: 'GET', // ou POST, dependendo da implementação
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (!response.ok) {
-        const err = await response.json().catch(() => ({ msg: 'Erro ao baixar PDF' }));
-        throw new Error(err.msg || 'Erro ao baixar PDF');
-      }
-
-      // Converte a resposta em blob (PDF)
-      const blob = await response.blob();
-
-      // Cria um link temporário para download
-      const url = URL.createObjectURL(blob);
-      const aLink = document.createElement('a');
-      aLink.href = url;
-      aLink.download = `analise_ia_${a.id_analise}.pdf`;
-      document.body.appendChild(aLink);
-      aLink.click();
-      document.body.removeChild(aLink);
-      URL.revokeObjectURL(url);
-
-      HematoAI.showToast('PDF baixado com sucesso!', 'success');
-    } catch (erro) {
-      console.error(erro);
-      HematoAI.showToast(erro.message || 'Erro ao baixar PDF', 'error');
-    }
+    // Laudo no formato clínico: o título e as seções vêm do próprio texto
+    // da IA; o cabeçalho usa os dados do cadastro.
+    const dataExame = a.data_exame || a.data_consulta;
+    HematoExport.exportarLaudoPDF({
+      titulo: 'Laudo de Hematologia - Triagem morfológica por IA',
+      arquivo: `laudo-analise-ia-${a.id_analise}`,
+      paciente: a.nome,
+      campos: [
+        ['Paciente', a.nome],
+        ['Nascimento', a.data_nasc ? formatarData(a.data_nasc) : ''],
+        ['CPF', formatarCPF(a.cpf)],
+        ['Idade', HematoExport.idadeEm(a.data_nasc, dataExame)],
+        ['Sexo', a.sexo],
+        ['Exame', a.tipo_exame],
+        ['Médico responsável', a.nome_medico],
+        ['Data do exame', dataExame ? formatarDataHora(dataExame) : ''],
+        ['CRM', a.crm],
+        ['Data da análise', a.data_analise ? formatarData(a.data_analise) : '']
+      ],
+      // Idade e sexo do texto repetem o cabeçalho quando o cadastro os tem.
+      omitirSecoes: a.data_nasc ? ['IDENTIFICAÇÃO'] : [],
+      tituloAbertura: 'IMPRESSÃO DIAGNÓSTICA',
+      // Análises antigas sem "SUSPEITA DIAGNÓSTICA" no texto.
+      impressao: [
+        ['Classificação sugerida pela IA', a.tipo_leucemia_ia || 'Não identificado'],
+        ['Grau de suspeita', a.suspeita_ia]
+      ],
+      medico: { nome: a.nome_medico, crm: a.crm },
+      texto: a.resultado_ia
+    }, this);
   });
 
   // ============================================

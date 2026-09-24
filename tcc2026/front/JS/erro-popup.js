@@ -268,19 +268,35 @@
   const MENSAGEM_GENERICA = 'Não foi possível concluir a operação. Tente novamente em instantes e, se o problema continuar, entre em contato com o suporte.';
 
   // Situações que merecem título próprio em vez do título genérico do status.
+  // Sem `mensagem`, o texto exibido é o que a API mandou (ela já diz a causa
+  // exata); a entrada só define categoria e título.
   const CASOS_CONHECIDOS = [
     {
-      padrao: /banco de dados indispon/i,
+      // MySQL desligado ou inalcançável (api/utils/tratamentoErros.js)
+      padrao: /mysql n[aã]o est[aá] respondendo/i,
       categoria: 'Erro de conexão',
-      titulo: 'Banco de dados indisponível',
-      mensagem: 'Não foi possível conectar ao banco de dados no momento. Inicie o MySQL no painel do XAMPP e tente novamente.'
+      titulo: 'Banco de dados indisponível'
     },
     {
-      // "Token inválido" / "Token não informado" vêm do middleware da API.
-      padrao: /token (inv[aá]lido|expirado|n[aã]o informado)/i,
+      // MySQL de pé, mas recusou o usuário/senha configurados na API
+      padrao: /acesso ao banco de dados|acesso foi recusado pelo mysql/i,
+      categoria: 'Configuração do servidor',
+      titulo: 'Acesso ao banco de dados recusado'
+    },
+    {
+      padrao: /banco de dados do sistema n[aã]o foi encontrado/i,
+      categoria: 'Configuração do servidor',
+      titulo: 'Banco de dados não encontrado'
+    },
+    {
+      padrao: /sess[aã]o expirada/i,
       categoria: 'Sessão',
-      titulo: 'Sessão expirada',
-      mensagem: 'Sua sessão não está mais válida. Entre novamente para continuar.'
+      titulo: 'Sessão expirada'
+    },
+    {
+      padrao: /sess[aã]o (inv[aá]lida|n[aã]o iniciada)/i,
+      categoria: 'Sessão',
+      titulo: 'Sessão não reconhecida'
     }
   ];
 
@@ -296,7 +312,7 @@
     const caso = CASOS_CONHECIDOS.find((item) => item.padrao.test(texto));
 
     return caso
-      ? { categoria: caso.categoria, titulo: caso.titulo, mensagem: caso.mensagem }
+      ? { categoria: caso.categoria, titulo: caso.titulo, mensagem: caso.mensagem || texto }
       : null;
   }
 

@@ -234,9 +234,10 @@
     }
 
     .btn-pdf {
-      background: var(--surface);
-      border: 2px solid var(--red);
-      color: var(--red);
+      background: var(--pdf);
+      border: none;
+      color: white;
+      box-shadow: 0 2px 8px var(--pdf-shadow);
       padding: 14px 24px;
       border-radius: 40px;
       font-weight: 700;
@@ -249,9 +250,8 @@
     }
 
     .btn-pdf:hover {
-      background: var(--red);
-      color: white;
-      box-shadow: 0 4px 16px rgba(185,28,28,0.3);
+      background: var(--pdf-hover);
+      box-shadow: 0 4px 16px var(--pdf-shadow);
     }
 
     .loading-spinner {

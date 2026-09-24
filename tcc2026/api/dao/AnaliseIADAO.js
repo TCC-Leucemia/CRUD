@@ -85,11 +85,17 @@ module.exports = class AnaliseIADAO {
                 ai.*,
 
                 e.tipo_exame,
+                e.data_exame,
 
                 c.data_consulta,
+                c.crm,
 
                 p.nome,
-                p.cpf
+                p.cpf,
+                p.data_nasc,
+                p.sexo,
+
+                m.nome AS nome_medico
 
             FROM analise_ia ai
 
@@ -101,6 +107,9 @@ module.exports = class AnaliseIADAO {
 
             INNER JOIN pacientes p
                 ON p.cpf = c.cpf
+
+            INNER JOIN medicos m
+                ON m.crm = c.crm
 
             WHERE c.crm = ?
 

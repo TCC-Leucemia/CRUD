@@ -26,6 +26,9 @@
       outline: none;
       cursor: pointer;
       transition: var(--transition);
+      line-height: 1;
+      text-align: center;
+      text-align-last: center;
     }
     .filter-select:focus {
       border-color: var(--red);
@@ -50,6 +53,8 @@
       width: 100%;
       min-width: 200px;
       transition: var(--transition);
+      line-height: 1;
+      text-align: left;
     }
 
     .search-wrapper input:focus {
@@ -921,6 +926,7 @@
 
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="../JS/navbar.js"></script>
+<script src="../JS/exportar.js"></script>
 <script>
   // =============================================================
   //  TODO O JAVASCRIPT EXISTENTE PERMANECE INALTERADO
@@ -1172,6 +1178,26 @@
   document.getElementById('filterStatus').addEventListener('change', aplicarFiltros);
   document.getElementById('sortExame').addEventListener('change', aplicarFiltros);
   document.getElementById('btnRecarregar').addEventListener('click', carregarExames);
+
+  HematoExport.criarBotoes(document.querySelector('.page-body .card-header .filter-row'), {
+    titulo: 'Lista de Exames',
+    arquivo: 'exames',
+    obterLinhas: () => filtrados,
+    filtros: [
+      { rotulo: 'Busca', id: 'searchExame' },
+      { rotulo: 'Tipo', id: 'filterTipo' },
+      { rotulo: 'Status', id: 'filterStatus' },
+      { rotulo: 'Ordenação', id: 'sortExame' }
+    ],
+    colunas: [
+      { titulo: 'Paciente', valor: e => e.paciente, destaque: true },
+      { titulo: 'CPF', valor: e => formatarCPF(e.cpf) },
+      { titulo: 'Data Consulta', valor: e => formatarDataHora(e.data_consulta) },
+      { titulo: 'Data do Exame', valor: e => formatarDataHora(e.data_exame) },
+      { titulo: 'Tipo', valor: e => e.tipo_exame },
+      { titulo: 'Status', valor: e => e.statusc }
+    ]
+  });
 
   /* ── Abrir modal novo ── */
   document.getElementById('btnNovoExame').addEventListener('click', async () => {

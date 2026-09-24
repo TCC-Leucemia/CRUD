@@ -16,15 +16,12 @@ module.exports = class JwtMiddleware {
 
         try {
 
-            console.log("JWT EXECUTADO");
-            console.log(req.method, req.originalUrl);
-
             const authorization = req.headers.authorization;
 
             if (!authorization) {
                 throw new ErrorResponse(
                     401,
-                    "Token não informado"
+                    "Sessão não iniciada. Entre no sistema para continuar."
                 );
             }
 
@@ -36,7 +33,9 @@ module.exports = class JwtMiddleware {
             if (!autorizado) {
                 throw new ErrorResponse(
                     401,
-                    "Token inválido"
+                    jwt.motivoFalha === "expirado"
+                        ? "Sessão expirada. Entre novamente para continuar."
+                        : "Sessão inválida. Entre novamente para continuar."
                 );
             }
 
@@ -45,7 +44,7 @@ module.exports = class JwtMiddleware {
             if (!payload?.id_usuario) {
                 throw new ErrorResponse(
                     401,
-                    "Token inválido"
+                    "Sessão inválida. Entre novamente para continuar."
                 );
             }
             const login =
@@ -56,7 +55,7 @@ module.exports = class JwtMiddleware {
             if (!login) {
                 throw new ErrorResponse(
                     401,
-                    "Usuário não encontrado"
+                    "Sessão inválida. Entre novamente para continuar."
                 );
             }
 

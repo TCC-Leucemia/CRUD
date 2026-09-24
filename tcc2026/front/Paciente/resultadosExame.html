@@ -44,6 +44,8 @@
       color: var(--text-1);
       outline: none;
       transition: var(--transition);
+      line-height: 1;
+      text-align: left;
     }
 
     .filtros-area .search-wrapper input:focus {
@@ -79,11 +81,22 @@
       cursor: pointer;
       transition: var(--transition);
       min-width: 110px;
+      line-height: 1;
+      text-align: center;
+      text-align-last: center;
     }
 
     .filtros-area select:focus {
       border-color: var(--red);
       box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.08);
+    }
+
+    /* Os botões de PDF/Excel entram nesta mesma área (ver criarBotoes mais
+       abaixo): só o padding muda aqui, para ficar da altura dos outros
+       filtros da barra; a fonte fica a padrão do navbar.css (maior que a
+       de todos os filtros desta página, inclusive a busca a 0.85rem). */
+    .filtros-area .btn-export {
+      padding: 8px 14px;
     }
 
     /* ── Lista de resultados em cards ──────────────────── */
@@ -497,7 +510,7 @@
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" id="modalFecharBtn">Fechar</button>
-      <button class="btn btn-outline" id="modalExportarBtn">📄 Exportar PDF</button>
+      <button class="btn btn-export btn-export-pdf" id="modalExportarBtn"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>Exportar PDF</button>
     </div>
   </div>
 </div>
@@ -505,12 +518,14 @@
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="../JS/navbar.js"></script>
 <script src="../JS/auth.js"></script>
+<script src="../JS/exportar.js"></script>
 <script>
   // ============================================================
   //  CÓDIGO EXISTENTE (preservado, com ajustes solicitados)
   // ============================================================
 
   let EXAMES = [];
+  let listaExibida = []; // exatamente os cards na tela, para a exportação
 
   async function carregarExames() {
     try {
@@ -546,6 +561,7 @@
   function renderizarLista(dados) {
     const lista = document.getElementById("listaResultados");
     lista.innerHTML = "";
+    listaExibida = dados;
 
     if (dados.length === 0) {
       lista.innerHTML = `
@@ -690,11 +706,55 @@
     if (e.target === this) fecharModal();
   });
 
+  const formatarDataExport = (iso) => iso ? new Date(iso).toLocaleDateString('pt-BR') : 'Não disponível';
+
+  // Ficha em PDF do exame aberto no modal.
   document.getElementById('modalExportarBtn').addEventListener('click', function() {
-    const id = document.getElementById('modalDetalhes').dataset.exameId;
-    if (id) {
-      HematoAI.showToast('Exportando PDF do exame #' + id, 'info');
-    }
+    const id = Number(document.getElementById('modalDetalhes').dataset.exameId);
+    const exame = EXAMES.find(e => e.id_exame === id);
+    if (!exame) return;
+
+    HematoExport.exportarFichaPDF({
+      titulo: `Resultado de ${exame.tipo_exame || 'Exame'}`,
+      arquivo: `resultado-exame-${exame.id_exame}`,
+      subtitulo: `Exame realizado em ${formatarDataExport(exame.data_exame)}`,
+      secoes: [
+        { titulo: 'Médico responsável', campos: [
+          ['Médico', exame.medico || 'Não informado'],
+          ['CRM', exame.crm || 'Não informado'],
+          ['Especialidade', exame.especialidade || 'Não informado']
+        ] },
+        { titulo: 'Resultado', campos: [
+          ['Status', exame.statusc || 'Pendente'],
+          ['Suspeita', exame.suspeita_leucemia || 'Sem suspeita'],
+          ['Tipo de leucemia', exame.tipo_leucemia || 'Não identificado'],
+          ['Data do exame', formatarDataExport(exame.data_exame)],
+          ['Data do resultado', formatarDataExport(exame.data_resultado)]
+        ] }
+      ],
+      textos: [{ titulo: 'Resultado do exame', conteudo: exame.resultado_texto || 'Resultado ainda não disponível.' }]
+    }, this);
+  });
+
+  HematoExport.criarBotoes(document.querySelector('.filtros-area'), {
+    titulo: 'Resultados de Exames',
+    arquivo: 'resultados-exames',
+    obterLinhas: () => listaExibida,
+    filtros: [
+      { rotulo: 'Busca', id: 'searchInput' },
+      { rotulo: 'Tipo', id: 'filtroTipo' },
+      { rotulo: 'Status', id: 'filtroStatus' },
+      { rotulo: 'Ordenação', id: 'filtroOrdenacao' }
+    ],
+    colunas: [
+      { titulo: 'Exame', valor: e => e.tipo_exame || 'Exame', destaque: true },
+      { titulo: 'Data do Exame', valor: e => formatarDataExport(e.data_exame) },
+      { titulo: 'Status', valor: e => e.statusc || 'Pendente' },
+      { titulo: 'Suspeita', valor: e => e.suspeita_leucemia || 'Sem suspeita' },
+      { titulo: 'Tipo de Leucemia', valor: e => e.tipo_leucemia || 'Não identificado' },
+      { titulo: 'Médico', valor: e => e.medico },
+      { titulo: 'Data do Resultado', valor: e => formatarDataExport(e.data_resultado) }
+    ]
   });
 
   // ============================================================

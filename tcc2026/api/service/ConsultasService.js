@@ -17,10 +17,6 @@ module.exports = class ConsultasService {
     }
 
     create = async (dados, user) => {
-        console.log("DADOS RECEBIDOS:");
-        console.log(dados);
-        console.log("CPF:", dados.cpf);
-        console.log("CRM:", dados.crm);
         if (user.role === "Médico") {
             dados.crm = user.crm;
         }

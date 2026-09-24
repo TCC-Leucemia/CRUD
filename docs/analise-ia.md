@@ -24,4 +24,13 @@ Para medir acurácia real no TCC, é necessário um conjunto de teste separado, 
 
 ## Integração
 
+A API chama o executável `python` do PATH. Ele precisa das bibliotecas
+`openai`, `python-dotenv` e `reportlab` (esta última usada por
+`backend/hemoPDF.py`); sem elas a análise falha com "Falta uma biblioteca
+Python". Instalação: `python -m pip install openai python-dotenv reportlab`.
+
+O PDF do `hemoPDF.py` só existe logo após a análise, na tela Nova Análise. O PDF
+baixado depois, pela lista de análises, é outro: montado no navegador a partir
+do texto gravado (ver `docs/exportacao.md`, "Laudo clínico").
+
 O prompt preserva no começo da resposta os campos `SUSPEITA_PRINCIPAL` e `NÍVEL_CONFIANÇA`, usados por `tcc2026/api/service/AnaliseIAService.js`. Esses campos não aparecem no PDF nem no texto clínico mostrado ao médico; o restante da resposta segue como laudo estruturado. O código identifica corretamente JPEG e PNG antes de enviar a imagem ao modelo.

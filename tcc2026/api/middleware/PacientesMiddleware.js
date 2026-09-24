@@ -41,8 +41,6 @@ module.exports = class PacientesMiddleware {
             throw new ErrorResponse(400, "Caracteres inválidos detectados");
         }
 
-        console.log("CPF recebido:", cpf);
-        console.log("Body recebido:", req.body);
         if (!this.validarCPF(cpf)) {
             throw new ErrorResponse(400, "CPF inválido");
         }
