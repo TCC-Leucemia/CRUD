@@ -196,6 +196,34 @@ module.exports = class PacientesService {
         };
     }
 
+    updateStatus = async (cpf, status) => {
+
+        const paciente = await this.#dao.findById(cpf);
+
+        if (!paciente) {
+            throw new ErrorResponse(
+                404,
+                "Paciente não encontrado"
+            );
+        }
+
+        if (status !== "Ativo" && status !== "Desativado") {
+            throw new ErrorResponse(
+                400,
+                "Status inválido"
+            );
+        }
+
+        const result = await this.#dao.updateStatus(
+            cpf,
+            status
+        );
+
+        return {
+            atualizado: result.affectedRows > 0
+        };
+    }
+
     delete = async (cpf) => {
 
         const paciente = await this.#dao.findById(cpf);

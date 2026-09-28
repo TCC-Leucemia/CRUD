@@ -244,18 +244,38 @@
       box-shadow: 0 2px 8px rgba(185,28,28,0.3);
     }
 
-    /* Botão Excluir (estilo danger - fundo vermelho) */
-    .td-actions .btn-excluir {
+    /* Botão de status */
+    .td-actions .btn-status {
       background: var(--red);
       border: 1.5px solid var(--red);
       color: white;
     }
 
-    .td-actions .btn-excluir:hover {
+    .td-actions .btn-status:hover {
       background: var(--red-dark);
       border-color: var(--red-dark);
       transform: translateY(-1px);
       box-shadow: 0 2px 8px rgba(185,28,28,0.4);
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .status-ativo {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .status-desativado {
+      background: #fee2e2;
+      color: #b91c1c;
     }
   </style>
 </head>
@@ -270,7 +290,7 @@
     <div class="page-header">
       <div class="page-header-left">
         <h1>Gerenciar Pacientes</h1>
-        <p>Cadastro, edição e exclusão de pacientes do sistema</p>
+        <p>Cadastro, edição e gerenciamento de pacientes do sistema</p>
       </div>
       <div class="page-header-right">
         <button class="btn btn-primary" id="btnNovoPaciente"><span class="btn-plus">+</span>Novo Paciente</button>
@@ -307,7 +327,8 @@
                 <th>Sexo</th>
                 <th>Data Nasc.</th>
                 <th>E-mail</th>
-                <th>Telefone</th>
+                <th>Telefone</th>~
+                <th>Status</th>
                 <th>Ações</th>
               </tr>
             </thead>
@@ -1272,13 +1293,21 @@
         <td>${formatarData(p.data_nasc)}</td>
         <td style="font-size:0.82rem">${p.email}</td>
         <td style="font-size:0.82rem">${p.telefone || '—'}</td>
+        <td><span class="status-pill ${p.status === 'Ativo' ? 'status-ativo' : 'status-desativado'}">${p.status || 'Ativo'}</span></td>
         <td>
           <div class="td-actions">
             <button class="btn btn-editar" onclick="editarPaciente('${p.cpf}')">
               <i data-lucide="pencil"></i> Editar
             </button>
-            <button class="btn btn-excluir" onclick="deletarPaciente('${p.cpf}', '${p.nome.replace(/'/g, "\\'")}')">
-              <i data-lucide="trash-2"></i> Excluir
+            <button
+                class="btn btn-status"
+                onclick="alterarStatusPaciente('${p.cpf}')">
+                <i data-lucide="${p.status === 'Ativo'
+                    ? 'user-minus'
+                    : 'user-plus'}"></i>
+                ${p.status === 'Ativo'
+                    ? 'Desativar'
+                    : 'Ativar'}
             </button>
           </div>
         </td>
@@ -1343,6 +1372,98 @@
     document.getElementById('modalTitulo').textContent = `Editar Paciente - ${p.nome}`;
   };
 
+  window.alterarStatusPaciente = function (cpf) {
+
+    console.log("CLIQUE NO STATUS DO PACIENTE:", cpf);
+
+    const p = pacientes.find(x => x.cpf === cpf);
+
+    if (!p) {
+
+        console.log("Paciente não encontrado na lista:", cpf);
+
+        HematoAI.showToast(
+            "Paciente não encontrado.",
+            "error"
+        );
+
+        return;
+    }
+
+    console.log("PACIENTE SELECIONADO:", p);
+    console.log("STATUS ATUAL:", p.status);
+
+    const novoStatus =
+        p.status === "Ativo"
+            ? "Desativado"
+            : "Ativo";
+
+    const mensagem =
+        novoStatus === "Desativado"
+            ? `Deseja desativar o paciente <strong>${p.nome}</strong>?<br>
+               O cadastro e o histórico serão mantidos no sistema.`
+            : `Deseja ativar novamente o paciente <strong>${p.nome}</strong>?`;
+
+    HematoAI.confirmDialog(
+        mensagem,
+        async () => {
+
+            try {
+
+                console.log(
+                    "ENVIANDO ALTERAÇÃO DE STATUS:",
+                    cpf,
+                    novoStatus
+                );
+
+                const resposta = await put(
+                    "/pacientes/" + cpf + "/status",
+                    {
+                        status: novoStatus
+                    }
+                );
+
+                const dados = await resposta.json();
+
+                console.log("RESPOSTA STATUS PACIENTE:", dados);
+
+                if (!resposta.ok) {
+
+                    HematoAI.showToast(
+                        dados.msg ||
+                        "Erro ao alterar status do paciente.",
+                        "error"
+                    );
+
+                    return;
+                }
+
+                await carregarPacientes();
+
+                HematoAI.showToast(
+                    novoStatus === "Desativado"
+                        ? "Paciente desativado com sucesso."
+                        : "Paciente ativado com sucesso.",
+                    "success"
+                );
+
+            } catch (erro) {
+
+                console.error(
+                    "ERRO AO ALTERAR STATUS DO PACIENTE:",
+                    erro
+                );
+
+                HematoAI.showToast(
+                    "Erro ao conectar com o servidor.",
+                    "error"
+                );
+            }
+        }
+    );
+  };
+
+  /*
   window.deletarPaciente = function(cpf, nome) {
 
     HematoAI.confirmDialog(
@@ -1382,7 +1503,7 @@
 
         }
     );
-  };
+  };*/
 
   // Event listeners
   document.getElementById('searchPaciente').addEventListener('input', applyFilter);

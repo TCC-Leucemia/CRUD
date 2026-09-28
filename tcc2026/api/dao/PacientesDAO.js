@@ -37,6 +37,7 @@ module.exports = class PacientesDAO {
         const sql = `
             SELECT
                 p.*,
+                l.statusu AS status,
                 e.rua,
                 e.numero,
                 e.bairro,
@@ -44,6 +45,8 @@ module.exports = class PacientesDAO {
                 e.estado,
                 e.cep
             FROM pacientes p
+            INNER JOIN login l
+                ON p.id_usuario = l.id_usuario
             LEFT JOIN enderecos e
                 ON p.id_endereco = e.id_endereco
         `;
@@ -74,8 +77,8 @@ module.exports = class PacientesDAO {
             });
 
         });
-
     }
+
     findById = async (cpf) => {
         return new Promise((resolve, reject) => {
             this.#banco.query("SELECT * FROM pacientes WHERE cpf = ?", [cpf],
@@ -173,6 +176,32 @@ module.exports = class PacientesDAO {
                 if (err) return reject(err);
                 resolve(result);
             });
+        });
+    }
+
+    updateStatus = async (cpf, status) => {
+
+        const sql = `
+            UPDATE login l
+            INNER JOIN pacientes p
+                ON p.id_usuario = l.id_usuario
+            SET l.statusu = ?
+            WHERE p.cpf = ?
+        `;
+
+        return new Promise((resolve, reject) => {
+
+            this.#banco.query(
+                sql,
+                [status, cpf],
+                (err, result) => {
+
+                    if (err) return reject(err);
+
+                    resolve(result);
+                }
+            );
+
         });
     }
 

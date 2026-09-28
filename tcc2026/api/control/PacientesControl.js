@@ -72,6 +72,28 @@ module.exports = class PacientesControl {
         }
     }
 
+    updateStatus = async (req, res, next) => {
+
+        try {
+
+            const result = await this.#service.updateStatus(
+                req.params.cpf,
+                req.body.status
+            );
+
+            res.status(200).send({
+                status: true,
+                msg: result.atualizado
+                    ? "Status atualizado com sucesso."
+                    : "Nenhuma alteração realizada."
+            });
+
+        } catch (err) {
+
+            next(err);
+        }
+    }
+
     destroy = async (req, res, next) => {
         try {
             await this.#service.delete(req.params.cpf);

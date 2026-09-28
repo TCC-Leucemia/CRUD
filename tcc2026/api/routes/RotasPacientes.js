@@ -49,6 +49,13 @@ module.exports = (app, banco) => {
     );
 
     app.put(
+        "/pacientes/:cpf/status",
+        jwtMiddleware.validateToken,
+        roleMiddleware.authorize("Administrador"),
+        control.updateStatus
+    );
+
+    app.put(
         "/pacientes/:cpf",
         jwtMiddleware.validateToken,
         roleMiddleware.authorize("Administrador"),
