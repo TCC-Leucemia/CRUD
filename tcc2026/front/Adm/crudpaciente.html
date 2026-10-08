@@ -258,24 +258,205 @@
       box-shadow: 0 2px 8px rgba(185,28,28,0.4);
     }
 
-    .status-pill {
-      display: inline-flex;
+    /* ========== CALENDÁRIO PERSONALIZADO ========== */
+    .date-picker-wrapper {
+      position: relative;
+      width: 100%;
+    }
+
+    .date-picker-wrapper input {
+      padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: 0.875rem;
+      background: var(--bg);
+      color: var(--text-1);
+      font-family: var(--font);
+      outline: none;
+      transition: var(--transition);
+      width: 100%;
+      min-height: 48px;
+      cursor: pointer;
+    }
+
+    .date-picker-wrapper input:focus {
+      border-color: var(--red);
+      background: var(--surface);
+      box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.08);
+    }
+
+    .date-picker-wrapper input:hover {
+      border-color: var(--border-dark);
+    }
+
+    .date-picker-wrapper .date-icon {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.1rem;
+      pointer-events: none;
+      color: var(--text-3);
+      transition: color 0.2s ease;
+    }
+
+    .date-picker-wrapper:focus-within .date-icon {
+      color: var(--red);
+    }
+
+    .calendar-popup {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      z-index: 1000;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+      padding: 16px;
+      width: 320px;
+      max-width: 100%;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .calendar-popup.open {
+      display: block;
+    }
+
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
       align-items: center;
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 0.72rem;
+      margin-bottom: 12px;
+    }
+
+    .calendar-header .month-year {
       font-weight: 700;
-      white-space: nowrap;
+      font-size: 0.95rem;
+      color: var(--text-1);
+      cursor: pointer;
+      padding: 4px 10px;
+      border-radius: var(--radius-md);
+      transition: var(--transition);
     }
 
-    .status-ativo {
-      background: #dcfce7;
-      color: #15803d;
+    .calendar-header .month-year:hover {
+      background: var(--bg);
+      color: var(--red);
     }
 
-    .status-desativado {
-      background: #fee2e2;
-      color: #b91c1c;
+    .calendar-header .nav-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 40px;
+      padding: 4px 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      color: var(--text-2);
+      font-family: var(--font);
+    }
+
+    .calendar-header .nav-btn:hover {
+      background: var(--bg);
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    .calendar-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+
+    .calendar-weekdays span {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-3);
+      padding: 4px 0;
+    }
+
+    .calendar-days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+    }
+
+    .calendar-days .day {
+      padding: 8px 0;
+      text-align: center;
+      border-radius: var(--radius-md);
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-1);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .calendar-days .day:hover {
+      background: var(--red-light);
+      color: var(--red);
+    }
+
+    .calendar-days .day.other-month {
+      color: var(--text-3);
+      opacity: 0.5;
+    }
+
+    .calendar-days .day.selected {
+      background: var(--red);
+      color: white;
+      font-weight: 700;
+    }
+
+    .calendar-days .day.selected:hover {
+      background: var(--red-dark);
+    }
+
+    .calendar-days .day.today {
+      border: 2px solid var(--red);
+      font-weight: 700;
+    }
+
+    /* Modo escuro */
+    .dark-mode .calendar-popup {
+      background: var(--surface);
+      border-color: var(--border);
+    }
+
+    .dark-mode .calendar-days .day:hover {
+      background: var(--red-light);
+      color: var(--red);
+    }
+
+    .dark-mode .calendar-days .day.selected {
+      background: var(--red);
+      color: white;
+    }
+
+    .dark-mode .calendar-days .day.today {
+      border-color: var(--red);
+    }
+
+    /* Responsivo */
+    @media (max-width: 540px) {
+      .calendar-popup {
+        width: 280px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      .calendar-popup.open {
+        transform: translateX(-50%);
+      }
+      .calendar-days .day {
+        padding: 6px 0;
+        font-size: 0.75rem;
+      }
     }
   </style>
 </head>
@@ -311,6 +492,11 @@
               <option value="Masculino">Masculino</option>
               <option value="Feminino">Feminino</option>
             </select>
+            <select id="filterStatus" class="filter-select" aria-label="Filtrar por status">
+              <option value="">Todos os status</option>
+              <option value="Ativo">Ativo</option>
+              <option value="Desativado">Desativado</option>
+            </select>
             <select id="sortPaciente" class="filter-select" aria-label="Ordenar por">
               <option value="nome_asc">Nome A-Z</option>
               <option value="nome_desc">Nome Z-A</option>
@@ -327,7 +513,7 @@
                 <th>Sexo</th>
                 <th>Data Nasc.</th>
                 <th>E-mail</th>
-                <th>Telefone</th>~
+                <th>Telefone</th>
                 <th>Status</th>
                 <th>Ações</th>
               </tr>
@@ -396,7 +582,21 @@
           </div>
           <div class="form-group">
             <label>Data de Nascimento</label>
-            <input type="date" id="pDataNasc">
+            <div class="date-picker-wrapper">
+              <input type="text" id="pDataNasc" placeholder="Selecione a data" readonly>
+              <span class="date-icon">📅</span>
+              <div class="calendar-popup" id="calendarPopupNasc">
+                <div class="calendar-header">
+                  <button type="button" class="nav-btn" id="prevMonthNasc">◀</button>
+                  <span class="month-year" id="monthYearDisplayNasc">Janeiro 2026</span>
+                  <button type="button" class="nav-btn" id="nextMonthNasc">▶</button>
+                </div>
+                <div class="calendar-weekdays">
+                  <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
+                </div>
+                <div class="calendar-days" id="calendarDaysNasc"></div>
+              </div>
+            </div>
           </div>
           <div class="form-group">
             <label>Sexo *</label>
@@ -533,6 +733,240 @@
       tipo: "Paciente"
     }
   };
+
+  // ============================================
+  // CALENDÁRIO PERSONALIZADO - DATA DE NASCIMENTO
+  // ============================================
+  let dataNascSelecionada = null;
+  let mesNascAtual = new Date().getMonth();
+  let anoNascAtual = new Date().getFullYear();
+  const hojeNasc = new Date();
+
+  function renderCalendarNasc() {
+    const daysContainer = document.getElementById('calendarDaysNasc');
+    const monthYearDisplay = document.getElementById('monthYearDisplayNasc');
+    const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+      'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+
+    monthYearDisplay.textContent = `${meses[mesNascAtual]} ${anoNascAtual}`;
+
+    const firstDay = new Date(anoNascAtual, mesNascAtual, 1).getDay();
+    const daysInMonth = new Date(anoNascAtual, mesNascAtual + 1, 0).getDate();
+    const daysInPrevMonth = new Date(anoNascAtual, mesNascAtual, 0).getDate();
+
+    daysContainer.innerHTML = '';
+
+    // Dias do mês anterior
+    for (let i = firstDay - 1; i >= 0; i--) {
+      const day = daysInPrevMonth - i;
+      const div = document.createElement('div');
+      div.className = 'day other-month';
+      div.textContent = day;
+      daysContainer.appendChild(div);
+    }
+
+    // Dias do mês atual
+    for (let d = 1; d <= daysInMonth; d++) {
+      const div = document.createElement('div');
+      div.className = 'day';
+      div.textContent = d;
+
+      if (d === hojeNasc.getDate() && mesNascAtual === hojeNasc.getMonth() && anoNascAtual === hojeNasc.getFullYear()) {
+        div.classList.add('today');
+      }
+
+      if (dataNascSelecionada &&
+        d === dataNascSelecionada.getDate() &&
+        mesNascAtual === dataNascSelecionada.getMonth() &&
+        anoNascAtual === dataNascSelecionada.getFullYear()) {
+        div.classList.add('selected');
+      }
+
+      div.dataset.day = d;
+      div.addEventListener('click', () => selecionarDiaNasc(d));
+      daysContainer.appendChild(div);
+    }
+
+    // Dias do próximo mês para preencher o grid
+    const totalDays = firstDay + daysInMonth;
+    const remaining = (7 - (totalDays % 7)) % 7;
+    for (let d = 1; d <= remaining; d++) {
+      const div = document.createElement('div');
+      div.className = 'day other-month';
+      div.textContent = d;
+      daysContainer.appendChild(div);
+    }
+  }
+
+  function selecionarDiaNasc(dia) {
+    dataNascSelecionada = new Date(anoNascAtual, mesNascAtual, dia);
+    renderCalendarNasc();
+    atualizarCampoDataNasc();
+  }
+
+  function atualizarCampoDataNasc() {
+    const input = document.getElementById('pDataNasc');
+    if (dataNascSelecionada) {
+      const dia = String(dataNascSelecionada.getDate()).padStart(2, '0');
+      const mes = String(dataNascSelecionada.getMonth() + 1).padStart(2, '0');
+      const ano = dataNascSelecionada.getFullYear();
+      input.value = `${dia}/${mes}/${ano}`;
+      input.dataset.value = `${ano}-${mes}-${dia}`;
+    }
+  }
+
+  function abrirCalendarioNasc() {
+    const popup = document.getElementById('calendarPopupNasc');
+    if (popup.classList.contains('open')) {
+      popup.classList.remove('open');
+      return;
+    }
+    if (dataNascSelecionada) {
+      mesNascAtual = dataNascSelecionada.getMonth();
+      anoNascAtual = dataNascSelecionada.getFullYear();
+    } else {
+      mesNascAtual = hojeNasc.getMonth();
+      anoNascAtual = hojeNasc.getFullYear();
+    }
+    renderCalendarNasc();
+    popup.classList.add('open');
+  }
+
+  function abrirSelecionadorMesAnoNasc() {
+    const currentMonthYear = document.getElementById('monthYearDisplayNasc').textContent;
+    const [mesNome, anoStr] = currentMonthYear.split(' ');
+    const ano = parseInt(anoStr);
+    const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+      'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+    const mesIndex = meses.indexOf(mesNome);
+
+    const overlay = document.createElement('div');
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100%';
+    overlay.style.height = '100%';
+    overlay.style.backgroundColor = 'rgba(0,0,0,0.3)';
+    overlay.style.zIndex = '9999';
+    overlay.style.display = 'flex';
+    overlay.style.alignItems = 'center';
+    overlay.style.justifyContent = 'center';
+
+    const container = document.createElement('div');
+    container.style.backgroundColor = 'var(--surface)';
+    container.style.borderRadius = 'var(--radius-xl)';
+    container.style.padding = '24px';
+    container.style.boxShadow = 'var(--shadow-lg)';
+    container.style.maxWidth = '400px';
+    container.style.width = '90%';
+    container.style.color = 'var(--text-1)';
+
+    const title = document.createElement('h3');
+    title.textContent = 'Selecionar Mês/Ano';
+    title.style.marginBottom = '16px';
+    title.style.fontWeight = '700';
+    title.style.color = 'var(--text-1)';
+    container.appendChild(title);
+
+    const mesSelect = document.createElement('select');
+    mesSelect.style.width = '100%';
+    mesSelect.style.padding = '8px 12px';
+    mesSelect.style.marginBottom = '10px';
+    mesSelect.style.border = '1.5px solid var(--border)';
+    mesSelect.style.borderRadius = 'var(--radius-md)';
+    mesSelect.style.fontSize = '0.9rem';
+    mesSelect.style.fontFamily = 'var(--font)';
+    mesSelect.style.background = 'var(--bg)';
+    mesSelect.style.color = 'var(--text-1)';
+    meses.forEach((m, i) => {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = m;
+      if (i === mesIndex) opt.selected = true;
+      mesSelect.appendChild(opt);
+    });
+    container.appendChild(mesSelect);
+
+    const anoInput = document.createElement('input');
+    anoInput.type = 'number';
+    anoInput.value = ano;
+    anoInput.min = 1900;
+    anoInput.max = 2100;
+    anoInput.style.width = '100%';
+    anoInput.style.padding = '8px 12px';
+    anoInput.style.marginBottom = '16px';
+    anoInput.style.border = '1.5px solid var(--border)';
+    anoInput.style.borderRadius = 'var(--radius-md)';
+    anoInput.style.fontSize = '0.9rem';
+    anoInput.style.fontFamily = 'var(--font)';
+    anoInput.style.background = 'var(--bg)';
+    anoInput.style.color = 'var(--text-1)';
+    container.appendChild(anoInput);
+
+    const btnContainer = document.createElement('div');
+    btnContainer.style.display = 'flex';
+    btnContainer.style.gap = '10px';
+    btnContainer.style.justifyContent = 'flex-end';
+
+    const btnCancelar = document.createElement('button');
+    btnCancelar.textContent = 'Cancelar';
+    btnCancelar.className = 'btn btn-ghost';
+    btnCancelar.style.padding = '8px 20px';
+    btnCancelar.addEventListener('click', () => document.body.removeChild(overlay));
+
+    const btnConfirmar = document.createElement('button');
+    btnConfirmar.textContent = 'Confirmar';
+    btnConfirmar.className = 'btn btn-primary';
+    btnConfirmar.style.padding = '8px 20px';
+    btnConfirmar.addEventListener('click', () => {
+      const novoMes = parseInt(mesSelect.value);
+      const novoAno = parseInt(anoInput.value);
+      if (novoAno >= 1900 && novoAno <= 2100) {
+        mesNascAtual = novoMes;
+        anoNascAtual = novoAno;
+        renderCalendarNasc();
+      } else {
+        HematoAI.showToast('Informe um ano entre 1900 e 2100.', 'error');
+      }
+      document.body.removeChild(overlay);
+    });
+
+    btnContainer.appendChild(btnCancelar);
+    btnContainer.appendChild(btnConfirmar);
+    container.appendChild(btnContainer);
+
+    overlay.appendChild(container);
+    document.body.appendChild(overlay);
+
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) document.body.removeChild(overlay);
+    });
+  }
+
+  // Eventos do calendário de nascimento
+  document.getElementById('pDataNasc').addEventListener('click', abrirCalendarioNasc);
+
+  document.getElementById('prevMonthNasc').addEventListener('click', () => {
+    if (mesNascAtual === 0) { mesNascAtual = 11; anoNascAtual--; }
+    else { mesNascAtual--; }
+    renderCalendarNasc();
+  });
+
+  document.getElementById('nextMonthNasc').addEventListener('click', () => {
+    if (mesNascAtual === 11) { mesNascAtual = 0; anoNascAtual++; }
+    else { mesNascAtual++; }
+    renderCalendarNasc();
+  });
+
+  document.getElementById('monthYearDisplayNasc').addEventListener('click', abrirSelecionadorMesAnoNasc);
+
+  document.addEventListener('click', (e) => {
+    const wrapper = document.getElementById('pDataNasc')?.closest('.date-picker-wrapper');
+    const popup = document.getElementById('calendarPopupNasc');
+    if (wrapper && !wrapper.contains(e.target) && popup && popup.classList.contains('open')) {
+      popup.classList.remove('open');
+    }
+  });
 
   // Função para buscar CEP na API ViaCEP
   async function buscarCEP(cep) {
@@ -759,7 +1193,7 @@
     if (currentStep === 0) {
       wizardData.paciente.cpf = document.getElementById('pCpf').value.replace(/\D/g, '');
       wizardData.paciente.nome = document.getElementById('pNome').value;
-      wizardData.paciente.data_nasc = document.getElementById('pDataNasc').value;
+      wizardData.paciente.data_nasc = document.getElementById('pDataNasc').dataset.value || '';
       wizardData.paciente.sexo = document.getElementById('pSexo').value;
       wizardData.paciente.email = document.getElementById('pEmail').value;
       wizardData.paciente.telefone = document.getElementById('pTelefone').value;
@@ -780,10 +1214,23 @@
     if (currentStep === 0) {
       document.getElementById('pCpf').value = maskCPF(wizardData.paciente.cpf);
       document.getElementById('pNome').value = wizardData.paciente.nome;
-      document.getElementById("pDataNasc").value = wizardData.paciente.data_nasc ? wizardData.paciente.data_nasc.split("T")[0] : "";
       document.getElementById('pSexo').value = wizardData.paciente.sexo;
       document.getElementById('pEmail').value = wizardData.paciente.email;
       document.getElementById('pTelefone').value = wizardData.paciente.telefone;
+
+      // Reconstrói data de nascimento no formato visual e no dataset
+      const inputData = document.getElementById('pDataNasc');
+      if (wizardData.paciente.data_nasc) {
+        const dataNascStr = wizardData.paciente.data_nasc.split("T")[0]; // YYYY-MM-DD
+        const [ano, mes, dia] = dataNascStr.split('-');
+        inputData.value = `${dia}/${mes}/${ano}`;
+        inputData.dataset.value = dataNascStr;
+        dataNascSelecionada = new Date(parseInt(ano), parseInt(mes) - 1, parseInt(dia));
+      } else {
+        inputData.value = '';
+        inputData.dataset.value = '';
+        dataNascSelecionada = null;
+      }
     } else if (currentStep === 1) {
       document.getElementById('pCep').value = wizardData.endereco.cep;
       document.getElementById('pRua').value = wizardData.endereco.rua;
@@ -1261,8 +1708,15 @@
       const el = document.getElementById(id);
       if (el) el.value = '';
     });
+    document.getElementById('pDataNasc').dataset.value = '';
     document.getElementById('pSexo').value = '';
     document.getElementById('pEstado').value = 'SP';
+
+    // Reseta calendário de nascimento
+    dataNascSelecionada = null;
+    const hoje = new Date();
+    mesNascAtual = hoje.getMonth();
+    anoNascAtual = hoje.getFullYear();
     
     updateWizardUI();
   }
@@ -1285,6 +1739,8 @@
         ? `<span class="chip chip-m">${p.sexo}</span>`
         : `<span class="chip chip-f">${p.sexo}</span>`;
 
+      const statusTexto = p.status === 'Ativo' ? 'Ativo' : 'Desativado';
+
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td><strong>${p.nome}</strong></td>
@@ -1293,7 +1749,11 @@
         <td>${formatarData(p.data_nasc)}</td>
         <td style="font-size:0.82rem">${p.email}</td>
         <td style="font-size:0.82rem">${p.telefone || '—'}</td>
-        <td><span class="status-pill ${p.status === 'Ativo' ? 'status-ativo' : 'status-desativado'}">${p.status || 'Ativo'}</span></td>
+        <td>
+          <span class="badge ${p.status === 'Ativo' ? 'badge-blue' : 'badge-purple'}">
+            ${statusTexto}
+          </span>
+        </td>
         <td>
           <div class="td-actions">
             <button class="btn btn-editar" onclick="editarPaciente('${p.cpf}')">
@@ -1321,16 +1781,18 @@
     }
   }
 
-  // ALTERADO: applyFilter com busca apenas por nome e CPF, ordenação apenas alfabética
+  // applyFilter com busca por nome e CPF, filtro de sexo, filtro de status e ordenação alfabética
   function applyFilter() {
     const q = document.getElementById('searchPaciente').value.toLowerCase().trim();
     const sexo = document.getElementById('filterSexo').value;
+    const status = document.getElementById('filterStatus').value;
     const ordem = document.getElementById('sortPaciente').value;
     
     const filtrados = pacientes.filter(p =>
       (!q || (p.nome || '').toLowerCase().includes(q) ||
              (p.cpf || '').toLowerCase().includes(q)) &&
-      (!sexo || p.sexo === sexo)
+      (!sexo || p.sexo === sexo) &&
+      (!status || p.status === status)
     );
     const comparar = (a, b) => String(a ?? '').localeCompare(String(b ?? ''), 'pt-BR', { sensitivity: 'base', numeric: true });
     filtrados.sort((a, b) => {
@@ -1374,24 +1836,15 @@
 
   window.alterarStatusPaciente = function (cpf) {
 
-    console.log("CLIQUE NO STATUS DO PACIENTE:", cpf);
-
     const p = pacientes.find(x => x.cpf === cpf);
 
     if (!p) {
-
-        console.log("Paciente não encontrado na lista:", cpf);
-
         HematoAI.showToast(
             "Paciente não encontrado.",
             "error"
         );
-
         return;
     }
-
-    console.log("PACIENTE SELECIONADO:", p);
-    console.log("STATUS ATUAL:", p.status);
 
     const novoStatus =
         p.status === "Ativo"
@@ -1410,12 +1863,6 @@
 
             try {
 
-                console.log(
-                    "ENVIANDO ALTERAÇÃO DE STATUS:",
-                    cpf,
-                    novoStatus
-                );
-
                 const resposta = await put(
                     "/pacientes/" + cpf + "/status",
                     {
@@ -1424,8 +1871,6 @@
                 );
 
                 const dados = await resposta.json();
-
-                console.log("RESPOSTA STATUS PACIENTE:", dados);
 
                 if (!resposta.ok) {
 
@@ -1449,10 +1894,7 @@
 
             } catch (erro) {
 
-                console.error(
-                    "ERRO AO ALTERAR STATUS DO PACIENTE:",
-                    erro
-                );
+                console.error(erro);
 
                 HematoAI.showToast(
                     "Erro ao conectar com o servidor.",
@@ -1463,51 +1905,10 @@
     );
   };
 
-  /*
-  window.deletarPaciente = function(cpf, nome) {
-
-    HematoAI.confirmDialog(
-        `Deseja excluir permanentemente o paciente <strong>${nome}</strong>?<br>Esta ação não pode ser desfeita.`,
-        async () => {
-
-            try {
-
-                const resposta = await del("/pacientes/" + cpf);
-
-                const dados = await resposta.json();
-
-                if (!resposta.ok) {
-                    HematoAI.showToast(
-                        dados.msg || "Erro ao excluir paciente.",
-                        "error"
-                    );
-                    return;
-                }
-
-                HematoAI.showToast(
-                    "Paciente excluído com sucesso!",
-                    "success"
-                );
-
-                await carregarPacientes();
-
-            } catch (erro) {
-
-                console.error(erro);
-
-                HematoAI.showToast(
-                    "Erro ao conectar ao servidor.",
-                    "error"
-                );
-            }
-
-        }
-    );
-  };*/
-
   // Event listeners
   document.getElementById('searchPaciente').addEventListener('input', applyFilter);
   document.getElementById('filterSexo').addEventListener('change', applyFilter);
+  document.getElementById('filterStatus').addEventListener('change', applyFilter);
   document.getElementById('sortPaciente').addEventListener('change', applyFilter);
 
   HematoExport.criarBotoes(document.querySelector('.page-body .card-header .filter-row'), {
@@ -1517,6 +1918,7 @@
     filtros: [
       { rotulo: 'Busca', id: 'searchPaciente' },
       { rotulo: 'Sexo', id: 'filterSexo' },
+      { rotulo: 'Status', id: 'filterStatus' },
       { rotulo: 'Ordenação', id: 'sortPaciente' }
     ],
     colunas: [
@@ -1525,7 +1927,12 @@
       { titulo: 'Sexo', valor: p => p.sexo },
       { titulo: 'Data Nasc.', valor: p => formatarData(p.data_nasc) },
       { titulo: 'E-mail', valor: p => p.email },
-      { titulo: 'Telefone', valor: p => p.telefone }
+      { titulo: 'Telefone', valor: p => p.telefone },
+      {
+        titulo: 'Status',
+        valor: p => p.status === 'Ativo' ? 'Ativo' : 'Desativado',
+        cor: valor => valor === 'Ativo' ? HematoExport.cores.azul : HematoExport.cores.roxo
+      }
     ]
   });
   
@@ -1582,6 +1989,7 @@
   // Initial render
   carregarPacientes();
   updateWizardUI();
+  renderCalendarNasc();
   verificarPerfil("Administrador");
 </script>
 </body>
