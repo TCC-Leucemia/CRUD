@@ -927,6 +927,7 @@
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="../JS/navbar.js"></script>
 <script src="../JS/exportar.js"></script>
+<script src="../JS/auth.js"></script>
 <script>
   // =============================================================
   //  TODO O JAVASCRIPT EXISTENTE PERMANECE INALTERADO
@@ -1648,7 +1649,9 @@
       HematoAI.closeModal(document.getElementById('modalExame'));
   });
 
-  carregarExames();
+  // Mesmo padrão das outras telas do médico: sem login vai para o login;
+  // outro perfil recebe "Permissão insuficiente".
+  if (verificarPerfil("Médico")) carregarExames();
 </script>
 </body>
 </html>

@@ -272,6 +272,22 @@
   // exata); a entrada só define categoria e título.
   const CASOS_CONHECIDOS = [
     {
+      // Recusa de permissão da API (RoleMiddleware e serviços: sempre 403).
+      // Muitas telas repassam só a mensagem, sem o status; sem esta entrada
+      // o aviso saía com o título genérico "Não foi possível concluir".
+      padrao: /^acesso negado\.?$/i,
+      categoria: 'Acesso negado',
+      titulo: 'Permissão insuficiente',
+      mensagem: 'Permissão insuficiente para acessar este recurso com o perfil atual.'
+    },
+    {
+      // Requisição sem sessão válida (RoleMiddleware: 401).
+      padrao: /^usu[aá]rio n[aã]o autenticado\.?$/i,
+      categoria: 'Sessão',
+      titulo: 'Sessão não reconhecida',
+      mensagem: 'Sessão inválida. Entre novamente para continuar.'
+    },
+    {
       // MySQL desligado ou inalcançável (api/utils/tratamentoErros.js)
       padrao: /mysql n[aã]o est[aá] respondendo/i,
       categoria: 'Erro de conexão',

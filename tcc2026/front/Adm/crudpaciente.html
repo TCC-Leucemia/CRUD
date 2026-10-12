@@ -1013,6 +1013,9 @@
       if (i === currentStep) {
         stepDiv.classList.add('active');
         stepDiv.classList.remove('completed');
+        // A etapa atual mostra o número, mesmo que já tenha sido concluída antes.
+        if (stepCheck) stepCheck.style.display = 'none';
+        if (stepNumber) stepNumber.style.display = 'flex';
       } else if (isStepCompleted(i)) {
         stepDiv.classList.add('completed');
         stepDiv.classList.remove('active');

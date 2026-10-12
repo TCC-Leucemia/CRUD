@@ -463,6 +463,7 @@
 
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="../JS/navbar.js"></script>
+<script src="../JS/etapas-cadastro.js"></script>
 <script src="../JS/auth.js"></script>
 <script src="../JS/api.js"></script>
 <script src="../JS/exportar.js"></script>
@@ -668,6 +669,9 @@
       if (i === currentStep) {
         stepDiv.classList.add('active');
         stepDiv.classList.remove('completed');
+        // A etapa atual mostra o número, mesmo que já tenha sido concluída antes.
+        if (stepCheck) stepCheck.style.display = 'none';
+        if (stepNumber) stepNumber.style.display = 'flex';
       } else if (isStepCompleted(i)) {
         stepDiv.classList.add('completed');
         stepDiv.classList.remove('active');
@@ -705,7 +709,7 @@
     } else if (step === 1) {
       return wizardData.medico.nome && wizardData.medico.crm && wizardData.medico.cpf && wizardData.medico.especialidade;
     } else if (step === 2) {
-      return true;
+      return HematoEtapas.enderecoCompleto(wizardData.endereco);
     }
     return false;
   }

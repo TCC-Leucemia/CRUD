@@ -387,6 +387,8 @@
 
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="../JS/navbar.js"></script>
+<script src="../JS/texto-ia.js"></script>
+<script src="../JS/auth.js"></script>
 <script src="../JS/exportar.js"></script>
 <script>
   
@@ -669,7 +671,7 @@
         <!-- Painel: Resultado da IA -->
         <div class="detalhe-panel">
           <div class="panel-title">Resultado da IA</div>
-          <div class="resultado-texto">${HematoAI.escapeHtml(a.resultado_ia)}</div>
+          <div class="resultado-texto">${HematoTextoIA.paraHtml(a.resultado_ia)}</div>
         </div>
       `;
     }
@@ -729,7 +731,9 @@
   document.getElementById('closeModalDetalhes').addEventListener('click', () => HematoAI.closeModal(document.getElementById('modalDetalhes')));
   document.getElementById('fecharDetalhes').addEventListener('click', () => HematoAI.closeModal(document.getElementById('modalDetalhes')));
   
-  carregar();
+  // Mesmo padrão das outras telas do médico: sem login vai para o login;
+  // outro perfil recebe "Permissão insuficiente".
+  if (verificarPerfil("Médico")) carregar();
 </script>
 </body>
 </html>
