@@ -35,6 +35,10 @@
 
     .input-group.full-width { grid-column: span 2; }
 
+    /* Em telas estreitas, a coluna da grade pode encolher abaixo da largura
+       mínima da tabela de exames (que tem rolagem própria). */
+    .form-grid > .input-group { min-width: 0; }
+
     .input-group label {
       font-weight: 700;
       font-size: 0.9rem;
@@ -507,7 +511,7 @@
               <div class="exame-selector">
                 <div class="search-wrapper">
                   <span class="lupa">🔍</span>
-                  <input type="text" id="searchExame" placeholder="Pesquisar por paciente, CPF ou tipo de exame...">
+                  <input type="text" id="searchExame" placeholder="Pesquisar por paciente, CPF, tipo ou data do exame...">
                 </div>
                 <div class="exame-tabela-wrapper" id="exameTabelaWrapper">
                   <table>
@@ -629,6 +633,7 @@
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="../JS/navbar.js"></script>
+<script src="../JS/texto-ia.js"></script>
 <script src="../JS/auth.js"></script>
 <script>
 
@@ -702,7 +707,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     window.location.href =
-      `./crudconsulta_med.html?id_consulta=${exameSelecionado.id_consulta}`;
+      `./crudconsulta_med.html?id=${exameSelecionado.id_consulta}`;
   });
   function formatarData(iso) {
     if (!iso) return 'Data não informada';
@@ -1127,7 +1132,7 @@ document.addEventListener('DOMContentLoaded', function () {
       }
 
       if (data.laudo) {
-        laudoEl.textContent = data.laudo;
+        laudoEl.innerHTML = HematoTextoIA.paraHtml(data.laudo);
         pdfUrlAtual = data.pdfUrl;
         resultadosDiv.classList.remove('hidden');
         resultadosDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });

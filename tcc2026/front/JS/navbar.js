@@ -330,8 +330,28 @@
     overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
   }
 
+  /* ---------- Texto seguro e CPF ---------- */
+  // Texto livre (por exemplo, a análise devolvida pela IA) nunca entra no
+  // HTML sem escape.
+  function escapeHtml(valor) {
+    return String(valor ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function formatarCPF(cpf) {
+    const d = String(cpf ?? '').replace(/\D/g, '');
+    if (d.length !== 11) return cpf ? String(cpf) : '—';
+    return d.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+  }
+
   /* ---------- Expose ---------- */
   window.HematoAI = {
+    escapeHtml,
+    formatarCPF,
     initSidebar,
     getSession,
     setSession,

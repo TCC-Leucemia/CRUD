@@ -1,6 +1,12 @@
 const ErrorResponse = require("../utils/ErrorResponse");
+const { parseDataLocal } = require("../utils/datas");
 
 module.exports = class ExamesMiddleware {
+
+    validateBodyEdicao = (req, res, next) => {
+        req.edicaoExame = true;
+        return this.validateBody(req, res, next);
+    }
 
     validateBody = (req, res, next) => {
 
@@ -58,7 +64,7 @@ module.exports = class ExamesMiddleware {
 
         if (data_exame) {
 
-            const data = new Date(data_exame);
+            const data = parseDataLocal(data_exame);
 
             if (isNaN(data.getTime())) {
                 throw new ErrorResponse(400, "data_exame inválida");
@@ -66,7 +72,9 @@ module.exports = class ExamesMiddleware {
 
             const agora = new Date();
 
-            if (data < agora) {
+            // Na edição, a data antiga (já vencida) pode ser mantida; a regra
+            // de data futura vale para data nova (conferida no serviço).
+            if (data < agora && !req.edicaoExame) {
                 throw new ErrorResponse(
                     400,
                     "Não é permitido cadastrar exames no passado"

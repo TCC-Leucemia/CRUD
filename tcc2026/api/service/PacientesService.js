@@ -5,7 +5,7 @@ const ErrorResponse = require("../utils/ErrorResponse");
 const LoginDAO = require("../dao/LoginDAO");
 const EnderecosDAO = require("../dao/EnderecosDAO");
 
-const md5 = require("md5");
+const { gerarHash, verificarSenha } = require("../utils/senha");
 
 module.exports = class PacientesService {
 
@@ -124,9 +124,12 @@ module.exports = class PacientesService {
             );
 
         }
-        const senhaHash = md5(dados.senhaAtual);
+        const conferencia = await verificarSenha(
+            String(dados.senhaAtual ?? ""),
+            login.senha
+        );
 
-        if (senhaHash !== login.senha) {
+        if (!conferencia.valida) {
 
             throw new ErrorResponse(
                 400,
@@ -162,7 +165,9 @@ module.exports = class PacientesService {
 
         let senha = login.senha;
         if (dados.novaSenha) {
-            senha = md5(dados.novaSenha);
+            senha = await gerarHash(dados.novaSenha);
+        } else if (conferencia.precisaAtualizar) {
+            senha = await gerarHash(dados.senhaAtual);
         }
 
         await this.loginDAO.updateCredenciais(

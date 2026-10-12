@@ -45,6 +45,47 @@ arquivos e como adicionar a uma nova listagem: [docs/exportacao.md](docs/exporta
 
 ## Histórico de Alterações
 
+### 2026-10-11 — Auditoria final: correção de bugs e segurança
+- **Alteração:**
+  - CRM com regra única (`api/utils/crm.js`): formato `12345-SP` no cadastro e,
+    em consultas, também o formato antigo só com dígitos. A Nova Consulta
+    recusava todo médico com UF no CRM; as Configurações do Médico recusavam
+    qualquer salvamento ("CRM inválido.") e passaram a alterar só e-mail e
+    senha (nome, CRM, especialidade e telefone vêm do cadastro).
+  - Senhas com scrypt + salt (`api/utils/senha.js`). Contas com MD5 antigo
+    continuam entrando e são regravadas no formato novo no primeiro login.
+  - O hash da senha não sai mais da API (`/login`, `/login/:id`,
+    `/login/meu-login`); `GET /login/:id` só para o próprio usuário ou o
+    Administrador; `PUT /login/:id` só para o Administrador.
+  - Análise IA: nível de confiança só como categoria (Alto, Moderado, Baixo),
+    sem 85/60/0 nem percentual no texto; NORMAL e INDETERMINADO com rótulos
+    próprios (`api/utils/analiseIA.js`, `backend/normalizar_laudo.py`); filtro
+    "Suspeita" do histórico virou "Nível de confiança"; texto da IA com escape
+    contra XSS e separadores de largura fixa; a análise não duplica mais a
+    anamnese da consulta.
+  - Datas: resultado com data de amanhã era aceito (fuso UTC); editar exame
+    antigo sem mudar a data era recusado.
+  - Front: "Sair do Sistema" (Administrador e Paciente) apaga a sessão;
+    "Reenviar código" pede um código de verdade; link "Cadastrar anamnese"
+    abre a consulta certa; Calendário atualiza a lista ao filtrar; CPF com
+    máscara nas listas; textos que prometiam diagnóstico ou "acurácia
+    validada" trocados por "apoio ao pré-diagnóstico".
+  - CORS restrito às origens locais (ou `CORS_ORIGINS`); rota de teste
+    `/teste123456` removida; tipo "Consulta inicial" dos dados de exemplo
+    trocado por "Consulta clínica".
+- **Motivo:** auditoria final antes do Manual do Usuário. Relatório completo:
+  `Manual-TCC/auditoria-final-correcao-bugs.md` (fora do repositório).
+- **Arquivos/Módulos:** `api/utils/{crm,senha,analiseIA,datas}.js`,
+  serviços, middlewares e rotas de login, médicos, consultas, exames,
+  resultados e análise IA; `backend/analise_celular.py`, `hemoPDF.py`,
+  `normalizar_laudo.py`; páginas do front citadas acima.
+- **Validação:** `npm test` com 38 testes (22 anteriores + 16 de regressão em
+  `api/tests/auditoria-final.test.js`), todos aprovados; sintaxe dos 30 scripts
+  do front, da API e do Python conferida; API iniciada para conferir CORS,
+  rota removida e tela inicial. Sem teste com MySQL real (serviço parado) e
+  sem chamada à OpenAI.
+- **Status:** concluído.
+
 ### 2026-09-24 — Login falhando por coluna `statusu` ausente e senha de exemplo errada
 - **Alteração:** adicionada a coluna `login.statusu` (`ENUM('Ativo','Desativado')
   NOT NULL DEFAULT 'Ativo'`) em `api/database/banco.sql`, que faltava desde

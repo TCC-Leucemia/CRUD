@@ -571,23 +571,23 @@
             <small style="color: var(--text-3); font-size: 0.7rem; margin-top: 4px; display: block;">Digite o CEP e aguarde o preenchimento automático</small>
           </div>
           <div class="form-group col-span-2">
-            <label>Rua</label>
+            <label>Rua *</label>
             <input type="text" id="pRua" placeholder="Nome da rua ou avenida">
           </div>
           <div class="form-group">
-            <label>Número</label>
+            <label>Número *</label>
             <input type="number" id="pNumero" placeholder="123" min="1">
           </div>
           <div class="form-group">
-            <label>Bairro</label>
+            <label>Bairro *</label>
             <input type="text" id="pBairro" placeholder="Nome do bairro">
           </div>
           <div class="form-group">
-            <label>Cidade</label>
+            <label>Cidade *</label>
             <input type="text" id="pCidade" placeholder="Cidade">
           </div>
           <div class="form-group">
-            <label>Estado</label>
+            <label>Estado *</label>
             <select id="pEstado">
               <option value="">UF</option>
               <option>AC</option><option>AL</option><option>AP</option><option>AM</option>
@@ -638,6 +638,7 @@
 
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="../JS/navbar.js"></script>
+<script src="../JS/etapas-cadastro.js"></script>
 <script src="../JS/auth.js"></script>
 <script src="../JS/api.js"></script>
 <script src="../JS/exportar.js"></script>
@@ -1029,6 +1030,9 @@
       if (i === currentStep) {
         stepDiv.classList.add('active');
         stepDiv.classList.remove('completed');
+        // A etapa atual mostra o número, mesmo que já tenha sido concluída antes.
+        if (stepCheck) stepCheck.style.display = 'none';
+        if (stepNumber) stepNumber.style.display = 'flex';
       } else if (isStepCompleted(i)) {
         stepDiv.classList.add('completed');
         stepDiv.classList.remove('active');
@@ -1060,7 +1064,8 @@
     if (step === 0) {
       return wizardData.paciente.cpf && wizardData.paciente.nome && wizardData.paciente.sexo && wizardData.paciente.email;
     } else if (step === 1) {
-      return true;
+      // Endereço só conta como concluído quando preenchido (o CEP é opcional).
+      return HematoEtapas.enderecoCompleto(wizardData.endereco);
     } else if (step === 2) {
       return wizardData.login.email && wizardData.login.senha;
     }
@@ -1132,12 +1137,12 @@
       const email = document.getElementById('pEmail').value.trim();
 
       if (!cpf || cpf.length !== 11) { HematoAI.showToast('CPF inválido. Deve conter 11 dígitos.', 'error'); return false; }
-      if (!nome || nome.length < 8)  { HematoAI.showToast('Nome deve ter ao menos 7 caracteres.', 'error'); return false; }
-      if (!nome || nome.length >100)  { HematoAI.showToast('Nome muito grande.', 'error'); return false; }
+      if (!nome || nome.length < 8)  { HematoAI.showToast('O nome deve ter no mínimo 8 caracteres.', 'error'); return false; }
+      if (nome.length > 100)         { HematoAI.showToast('O nome deve ter no máximo 100 caracteres.', 'error'); return false; }
       if (!sexo)                     { HematoAI.showToast('Selecione o sexo.', 'error'); return false; }
       if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) { HematoAI.showToast('E-mail inválido.', 'error'); return false; }
     } else if (currentStep === 1) {
-      // Endereço agora é opcional no front
+      // Só o CEP é opcional (como na API); se informado, precisa ter 8 dígitos.
       const cep = document.getElementById('pCep').value.trim();
       const rua = document.getElementById('pRua').value.trim();
       const numero = document.getElementById('pNumero').value.trim();
@@ -1145,13 +1150,9 @@
       const cidade = document.getElementById('pCidade').value.trim();
       const estado = document.getElementById('pEstado').value.trim();
 
-      const algumCampoPreenchido = cep || rua || numero || bairro || cidade || estado;
-
-      if (algumCampoPreenchido) {
-        if (!rua || !numero || !bairro || !cidade || !estado) {
-          HematoAI.showToast('Preencha os campos de endereço (Rua, Número, Bairro, Cidade e Estado).', 'error');
-          return false;
-        }
+      if (!rua || !numero || !bairro || !cidade || !estado) {
+        HematoAI.showToast('Preencha os campos de endereço (Rua, Número, Bairro, Cidade e Estado).', 'error');
+        return false;
       }
 
       if (cep && cep.replace(/\D/g, '').length !== 8) {
@@ -1222,6 +1223,11 @@
     if (!wizardData.paciente.cpf || !wizardData.paciente.nome || !wizardData.paciente.sexo || !wizardData.paciente.email) {
       HematoAI.showToast("Complete os dados pessoais.", "error");
       currentStep = 0; loadStepData(); updateWizardUI();
+      return false;
+    }
+    if (!HematoEtapas.enderecoCompleto(wizardData.endereco)) {
+      HematoAI.showToast("Complete os dados de endereço (Rua, Número, Bairro, Cidade e Estado; o CEP é opcional).", "error");
+      currentStep = 1; loadStepData(); updateWizardUI();
       return false;
     }
     if (!wizardData.login.email || !wizardData.login.senha) {
@@ -1456,7 +1462,10 @@
       email: p.email,
       telefone: p.telefone || ""
     };
-    wizardData.endereco = p.endereco || { cep: "", rua: "", numero: "", bairro: "", cidade: "", estado: "" };
+    // CEP é opcional e pode vir nulo do banco (como no cadastro de médico).
+    wizardData.endereco = p.endereco
+      ? { ...p.endereco, cep: p.endereco.cep || "" }
+      : { cep: "", rua: "", numero: "", bairro: "", cidade: "", estado: "" };
     wizardData.login.email = p.email;
     wizardData.login.senha = '********';
     currentStep = 0;

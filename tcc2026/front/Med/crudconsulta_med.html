@@ -540,6 +540,7 @@
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="../JS/navbar.js"></script>
 <script src="../JS/exportar.js"></script>
+<script src="../JS/auth.js"></script>
 <script>
   
   HematoAI.initSidebar('consultas');
@@ -1003,11 +1004,13 @@
   // INICIALIZAÇÃO
   // ============================================
 
-  (async () => {
+  // Mesmo padrão das outras telas do médico: sem login vai para o login;
+  // outro perfil recebe "Permissão insuficiente".
+  if (verificarPerfil("Médico")) (async () => {
       await carregarConsultas();
 
       const params = new URLSearchParams(window.location.search);
-      const idConsultaURL = params.get("id");
+      const idConsultaURL = params.get("id") || params.get("id_consulta");
 
       if (idConsultaURL) {
           const idConsulta = Number(idConsultaURL);

@@ -72,13 +72,14 @@ module.exports = (app, banco) => {
         control.alterarCredenciais
     );
 
+    // Só o Administrador (telas de Médicos e Pacientes). Médico e Paciente
+    // trocam e-mail/senha pelas próprias Configurações, que exigem a senha
+    // atual; por aqui bastava o token para trocar a senha.
     app.put(
         "/login/:id",
         jwt.validateToken,
         role.authorize(
-            "Administrador",
-            "Médico",
-            "Paciente"
+            "Administrador"
         ),
         middleware.validateBody,
         control.update

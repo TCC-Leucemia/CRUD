@@ -145,9 +145,10 @@ create table anamnese (
 );
 
 
--- Senhas de exemplo: hash MD5 de "123456" (mesmo valor usado pelos demais
--- usuários abaixo). LoginService compara md5(senha digitada) com esta
--- coluna; texto puro nunca autentica.
+-- Senhas de exemplo em formato antigo (MD5 sem salt), só para os dados de
+-- demonstração. O login aceita esse formato e, no primeiro acesso, regrava a
+-- senha com scrypt + salt (api/utils/senha.js). Contas novas já nascem no
+-- formato seguro. Texto puro nunca autentica.
 INSERT INTO login (email, senha, tipo) VALUES
 ('admin@hematoai.com', 'e10adc3949ba59abbe56e057f20f883e', 'Administrador'),
 
@@ -321,27 +322,27 @@ INSERT INTO consultas
 (cpf, crm, data_consulta, tipo_consulta, statusc)
 VALUES
 
-('11122233344', '123456-SP', '2026-09-10 09:00:00', 'Consulta inicial', 'Finalizado'),
+('11122233344', '123456-SP', '2026-09-10 09:00:00', 'Consulta clínica', 'Finalizado'),
 ('22233344455', '234567-SP', '2026-09-12 10:00:00', 'Retorno', 'Finalizado'),
-('33344455566', '345678-SP', '2026-09-15 14:00:00', 'Consulta inicial', 'Finalizado'),
+('33344455566', '345678-SP', '2026-09-15 14:00:00', 'Consulta clínica', 'Finalizado'),
 ('44455566677', '456789-SP', '2026-09-18 09:30:00', 'Retorno', 'Pendente'),
-('55566677788', '567890-SP', '2026-09-20 11:00:00', 'Consulta inicial', 'Pendente'),
+('55566677788', '567890-SP', '2026-09-20 11:00:00', 'Consulta clínica', 'Pendente'),
 ('66677788899', '678901-SP', '2026-09-22 15:00:00', 'Retorno', 'Pendente'),
-('77788899900', '789012-SP', '2026-09-25 08:30:00', 'Consulta inicial', 'Pendente'),
+('77788899900', '789012-SP', '2026-09-25 08:30:00', 'Consulta clínica', 'Pendente'),
 ('88899900011', '890123-SP', '2026-09-28 13:00:00', 'Retorno', 'Pendente'),
-('99900011122', '901234-SP', '2026-10-02 10:30:00', 'Consulta inicial', 'Pendente'),
+('99900011122', '901234-SP', '2026-10-02 10:30:00', 'Consulta clínica', 'Pendente'),
 ('00011122233', '112233-SP', '2026-10-05 14:30:00', 'Retorno', 'Pendente'),
 
-('12312312312', '223344-SP', '2026-10-08 09:00:00', 'Consulta inicial', 'Pendente'),
+('12312312312', '223344-SP', '2026-10-08 09:00:00', 'Consulta clínica', 'Pendente'),
 ('23423423423', '334455-SP', '2026-10-10 11:30:00', 'Retorno', 'Pendente'),
-('34534534534', '445566-SP', '2026-10-12 16:00:00', 'Consulta inicial', 'Pendente'),
+('34534534534', '445566-SP', '2026-10-12 16:00:00', 'Consulta clínica', 'Pendente'),
 ('45645645645', '556677-SP', '2026-10-15 10:00:00', 'Retorno', 'Pendente'),
-('56756756756', '667788-SP', '2026-10-18 15:30:00', 'Consulta inicial', 'Pendente'),
+('56756756756', '667788-SP', '2026-10-18 15:30:00', 'Consulta clínica', 'Pendente'),
 
 ('11122233344', '123456-SP', '2026-08-15 10:00:00', 'Retorno', 'Finalizado'),
 ('22233344455', '234567-SP', '2026-08-20 14:00:00', 'Retorno', 'Finalizado'),
 ('33344455566', '345678-SP', '2026-08-25 09:30:00', 'Retorno', 'Finalizado'),
-('44455566677', '456789-SP', '2026-08-30 11:00:00', 'Consulta inicial', 'Finalizado'),
+('44455566677', '456789-SP', '2026-08-30 11:00:00', 'Consulta clínica', 'Finalizado'),
 ('55566677788', '567890-SP', '2026-09-01 13:30:00', 'Retorno', 'Finalizado');
 
 INSERT INTO exames

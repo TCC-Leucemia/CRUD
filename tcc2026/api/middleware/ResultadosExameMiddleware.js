@@ -1,4 +1,5 @@
 const ErrorResponse = require("../utils/ErrorResponse");
+const { parseDataLocal } = require("../utils/datas");
 
 module.exports = class ResultadosExameMiddleware {
 
@@ -119,7 +120,7 @@ module.exports = class ResultadosExameMiddleware {
             }
         }
 
-        const data = new Date(data_resultado);
+        const data = parseDataLocal(data_resultado);
 
         if (isNaN(data.getTime())) {
             throw new ErrorResponse(
@@ -249,7 +250,7 @@ module.exports = class ResultadosExameMiddleware {
 
         if (data_resultado) {
 
-            const data = new Date(data_resultado);
+            const data = parseDataLocal(data_resultado);
 
             if (isNaN(data.getTime())) {
                 throw new ErrorResponse(

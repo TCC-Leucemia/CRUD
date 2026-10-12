@@ -59,6 +59,8 @@ module.exports = class LoginControl {
 
     show = async (req, res, next) => {
         try {
+            // Médico e Paciente só podem ver o próprio login.
+            await this.#service.validarAcessoLogin(req.params.id, req.user);
             const result = await this.#service.findById(req.params.id);
             res.status(200).send({ status: true, dados: result });
         } catch (err) {

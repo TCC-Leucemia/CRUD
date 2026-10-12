@@ -731,6 +731,7 @@
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="../JS/navbar.js"></script>
 <script src="../JS/exportar.js"></script>
+<script src="../JS/auth.js"></script>
 <script>
 
   HematoAI.initSidebar('resultados');
@@ -1376,8 +1377,12 @@
   });
 
   /* ── Init ── */
-  carregarResultados();
-  carregarExames();
+  // Mesmo padrão das outras telas do médico: sem login vai para o login;
+  // outro perfil recebe "Permissão insuficiente".
+  if (verificarPerfil("Médico")) {
+    carregarResultados();
+    carregarExames();
+  }
 </script>
 </body>
 </html>

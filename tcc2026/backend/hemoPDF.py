@@ -5,7 +5,17 @@ from reportlab.pdfgen import canvas
 from reportlab.lib import colors
 from reportlab.lib.units import mm
 from datetime import datetime
-import textwrap
+from reportlab.lib.utils import simpleSplit
+
+
+def quebrar_linhas(texto, fonte, tamanho, largura):
+    """Quebra o texto pela largura real da fonte (pt), nunca além de `largura`.
+
+    Antes, títulos eram desenhados numa linha só e o corpo era quebrado por
+    número de caracteres: um título longo como "LAUDO DE HEMATOLOGIA - ANÁLISE
+    MORFOLÓGICA DE ESFREGAÇO DE SANGUE PERIFÉRICO" passava da margem direita.
+    """
+    return simpleSplit(str(texto), fonte, tamanho, largura) or ['']
 
 def gerar_laudo_pdf(texto_ai, dados_paciente, nome_saida):
     """
@@ -32,6 +42,7 @@ def gerar_laudo_pdf(texto_ai, dados_paciente, nome_saida):
         margem_esq = 70
         margem_dir = largura - 70
         margem_top = altura - 70
+        largura_util = margem_dir - margem_esq
         y_position = margem_top
         
         # ==================== CABEÇALHO ====================
@@ -41,7 +52,7 @@ def gerar_laudo_pdf(texto_ai, dados_paciente, nome_saida):
         
         c.setFont("Helvetica", 8)
         c.setFillColor(colors.HexColor('#666666'))
-        c.drawString(margem_esq, y_position + 5, "LAUDO HEMATOLÓGICO - SISTEMA DE APOIO DIAGNÓSTICO")
+        c.drawString(margem_esq, y_position + 5, "ANÁLISE PRELIMINAR POR IA - APOIO AO PRÉ-DIAGNÓSTICO")
         
         data_emissao = datetime.now().strftime("%d/%m/%Y")
         c.drawRightString(margem_dir, y_position + 5, f"Emissão: {data_emissao}")
@@ -78,7 +89,7 @@ def gerar_laudo_pdf(texto_ai, dados_paciente, nome_saida):
         y_position -= 14
         c.setFont("Helvetica", 9)
         historia = f"Histórico: {dados_paciente.get('historia', 'N/I')} | Sintomas: {dados_paciente.get('sintomas', 'N/I')}"
-        historia_lines = textwrap.wrap(historia, width=95)
+        historia_lines = quebrar_linhas(historia, "Helvetica", 9, largura_util)
         for line in historia_lines[:3]:
             c.drawString(margem_esq, y_position, line)
             y_position -= 14
@@ -123,16 +134,25 @@ def gerar_laudo_pdf(texto_ai, dados_paciente, nome_saida):
             if is_title:
                 c.setFont("Helvetica-Bold", 10)
                 c.setFillColor(colors.HexColor('#1a1a1a'))
-                c.drawString(margem_esq, y_position, linha_limpa.upper())
-                y_position -= 18
+                linhas_titulo = quebrar_linhas(linha_limpa.upper(), "Helvetica-Bold", 10, largura_util)
+                for k, parte in enumerate(linhas_titulo):
+                    if y_position < 80:
+                        c.showPage()
+                        y_position = margem_top
+                        c.setFont("Helvetica-Bold", 10)
+                        c.setFillColor(colors.HexColor('#1a1a1a'))
+                    c.drawString(margem_esq, y_position, parte)
+                    y_position -= 18 if k == len(linhas_titulo) - 1 else 13
             else:
                 c.setFont("Helvetica", 9)
                 c.setFillColor(colors.HexColor('#333333'))
-                wrapped_lines = textwrap.wrap(linha_limpa, width=90)
+                wrapped_lines = quebrar_linhas(linha_limpa, "Helvetica", 9, largura_util)
                 for wl in wrapped_lines:
                     if y_position < 80:
                         c.showPage()
                         y_position = margem_top
+                        c.setFont("Helvetica", 9)
+                        c.setFillColor(colors.HexColor('#333333'))
                     c.drawString(margem_esq, y_position, wl)
                     y_position -= 14
         
@@ -141,7 +161,7 @@ def gerar_laudo_pdf(texto_ai, dados_paciente, nome_saida):
         c.line(margem_esq, 50, margem_dir, 50)
         c.setFont("Helvetica-Oblique", 7)
         c.setFillColor(colors.HexColor('#888888'))
-        c.drawCentredString(largura/2, 40, "Documento gerado por IA para apoio diagnóstico. Deve ser validado por um profissional.")
+        c.drawCentredString(largura/2, 40, "Análise preliminar gerada por IA para apoio ao pré-diagnóstico. Deve ser validada por um profissional.")
         c.drawCentredString(largura/2, 30, f"Protocolo: {datetime.now().strftime('%Y%m%d%H%M%S')}")
         
         c.save()

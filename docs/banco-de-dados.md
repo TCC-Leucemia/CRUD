@@ -83,3 +83,17 @@ ALTER TABLE login ADD COLUMN statusu ENUM('Ativo','Desativado') NOT NULL DEFAULT
 
 O `DEFAULT 'Ativo'` garante que todo usuário já cadastrado continue
 conseguindo logar depois do `ALTER TABLE`.
+
+### Ajustes opcionais de outubro/2026 (não executados automaticamente)
+
+Os dados de exemplo antigos usavam o tipo de consulta "Consulta inicial", que
+não existe nos filtros (Hemograma, Mielograma, Consulta clínica, Retorno). O
+`banco.sql` já foi corrigido. Para padronizar um banco já criado, sem apagar
+nada:
+
+```sql
+UPDATE consultas SET tipo_consulta = 'Consulta clínica' WHERE tipo_consulta = 'Consulta inicial';
+```
+
+As senhas antigas em MD5 não precisam de comando: cada conta é regravada no
+formato novo (scrypt + salt) no primeiro login depois da atualização.

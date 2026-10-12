@@ -927,6 +927,7 @@
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="../JS/navbar.js"></script>
 <script src="../JS/exportar.js"></script>
+<script src="../JS/auth.js"></script>
 <script>
   // =============================================================
   //  TODO O JAVASCRIPT EXISTENTE PERMANECE INALTERADO
@@ -1121,7 +1122,7 @@
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td style="font-weight:600;font-size:0.95rem;">${e.paciente || '—'}</td>
-        <td style="font-family:var(--font-mono);font-size:0.9rem;">${e.cpf || '—'}</td>
+        <td style="font-family:var(--font-mono);font-size:0.9rem;">${e.cpf ? formatarCPF(e.cpf) : '—'}</td>
         <td style="font-size:0.9rem;">${e.data_consulta ? formatarDataHora(e.data_consulta) : '—'}</td>
         <td style="font-size:0.9rem;">
             ${formatarDataHora(e.data_exame)}
@@ -1648,7 +1649,9 @@
       HematoAI.closeModal(document.getElementById('modalExame'));
   });
 
-  carregarExames();
+  // Mesmo padrão das outras telas do médico: sem login vai para o login;
+  // outro perfil recebe "Permissão insuficiente".
+  if (verificarPerfil("Médico")) carregarExames();
 </script>
 </body>
 </html>

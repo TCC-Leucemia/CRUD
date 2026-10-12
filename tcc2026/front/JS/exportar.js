@@ -235,7 +235,7 @@
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7.5);
     doc.setTextColor(...COR.textoFraco);
-    doc.text('Diagnóstico assistido por IA', x + 12.5, y + 9.3);
+    doc.text('Apoio ao pré-diagnóstico por IA', x + 12.5, y + 9.3);
   }
 
   function desenharMarca(doc, emissao, tituloContinuacao) {
@@ -698,7 +698,10 @@
     let y = 36;
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(15);
-    doc.text(textoPDF(principal.toUpperCase()), largura / 2, y, { align: 'center' });
+    // Título longo quebra dentro da largura útil (nunca passa da margem).
+    const linhasTitulo = doc.splitTextToSize(textoPDF(principal.toUpperCase()), util);
+    doc.text(linhasTitulo, largura / 2, y, { align: 'center' });
+    y += (linhasTitulo.length - 1) * 6.2;
     if (complemento.length) {
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(9);
@@ -748,8 +751,9 @@
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(10.5);
         doc.setTextColor(...LAUDO.preto);
-        doc.text(textoPDF(secao.titulo.toUpperCase()), esquerda, y);
-        y += 5.6;
+        const linhasSecao = doc.splitTextToSize(textoPDF(secao.titulo.toUpperCase()), util);
+        doc.text(linhasSecao, esquerda, y);
+        y += 5.6 + (linhasSecao.length - 1) * 4.6;
       }
 
       secao.linhas.forEach((linha) => {

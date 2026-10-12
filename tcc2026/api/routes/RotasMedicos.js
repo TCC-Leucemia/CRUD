@@ -2,7 +2,6 @@ const MedicosControl = require("../control/MedicosControl");
 const MedicosMiddleware = require("../middleware/MedicosMiddleware");
 const JwtMiddleware = require("../middleware/JwtMiddleware");
 const RoleMiddleware = require("../middleware/RoleMiddleware");
-console.log("ROTAS MÉDICOS CARREGADAS");
 module.exports = (app, banco) => {
 
     const control = new MedicosControl(banco);
@@ -13,9 +12,6 @@ module.exports = (app, banco) => {
 
     const roleMiddleware = new RoleMiddleware();
 
-    app.get("/teste123456", (req, res) => {
-        res.send("FUNCIONOU");
-    });
     app.post(
         "/medicos",
         jwtMiddleware.validateToken,

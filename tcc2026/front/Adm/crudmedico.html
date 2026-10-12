@@ -413,6 +413,8 @@
 
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="../JS/navbar.js"></script>
+<script src="../JS/etapas-cadastro.js"></script>
+<script src="../JS/crm.js"></script>
 <script src="../JS/auth.js"></script>
 <script src="../JS/api.js"></script>
 <script src="../JS/exportar.js"></script>
@@ -588,6 +590,9 @@
       if (i === currentStep) {
         stepDiv.classList.add('active');
         stepDiv.classList.remove('completed');
+        // A etapa atual mostra o número, mesmo que já tenha sido concluída antes.
+        if (stepCheck) stepCheck.style.display = 'none';
+        if (stepNumber) stepNumber.style.display = 'flex';
       } else if (isStepCompleted(i)) {
         stepDiv.classList.add('completed');
         stepDiv.classList.remove('active');
@@ -621,7 +626,7 @@
     } else if (step === 1) {
       return wizardData.medico.nome && wizardData.medico.crm && wizardData.medico.cpf && wizardData.medico.especialidade;
     } else if (step === 2) {
-      return true;
+      return HematoEtapas.enderecoCompleto(wizardData.endereco);
     }
     return false;
   }
@@ -692,17 +697,22 @@
         HematoAI.showToast('Preencha todos os campos obrigatórios.', 'error');
         return false;
       }
-      if (crm.length < 5) {
-        HematoAI.showToast('CRM inválido. Use o formato: 12345-SP', 'error');
-        return false;
+      // Mesma regra da API para CRM novo (12345-SP). Na edição o CRM fica
+      // travado e não é reenviado; registros antigos só com dígitos seguem editáveis.
+      if (!editingCrm) {
+        if (!HematoCrm.crmValidoParaCadastro(crm)) {
+          HematoAI.showToast(HematoCrm.MSG_CRM_INVALIDO, 'error');
+          return false;
+        }
+        document.getElementById('fCrm').value = HematoCrm.normalizarCrm(crm);
+        wizardData.medico.crm = HematoCrm.normalizarCrm(crm);
       }
       if (cpf.replace(/\D/g, '').length !== 11) {
         HematoAI.showToast('CPF inválido. Deve conter 11 dígitos.', 'error');
         return false;
       }
     } else if (currentStep === 2) {
-      // CEP é opcional. Se algum campo de endereço for preenchido,
-      // então os demais (exceto CEP) devem estar completos.
+      // Só o CEP é opcional (como na API); se informado, precisa ter 8 dígitos.
       const cep = document.getElementById('fCep').value.trim();
       const rua = document.getElementById('fRua').value.trim();
       const numero = document.getElementById('fNumero').value.trim();
@@ -710,13 +720,9 @@
       const cidade = document.getElementById('fCidade').value.trim();
       const estado = document.getElementById('fEstado').value.trim();
 
-      const algumCampoPreenchido = cep || rua || numero || bairro || cidade || estado;
-
-      if (algumCampoPreenchido) {
-        if (!rua || !numero || !bairro || !cidade || !estado) {
-          HematoAI.showToast('Preencha os campos de endereço (Rua, Número, Bairro, Cidade e Estado).', 'error');
-          return false;
-        }
+      if (!rua || !numero || !bairro || !cidade || !estado) {
+        HematoAI.showToast('Preencha os campos de endereço (Rua, Número, Bairro, Cidade e Estado).', 'error');
+        return false;
       }
 
       // Valida o formato do CEP apenas se ele foi informado
@@ -771,6 +777,14 @@
 
   async function finalizeCadastro() {
     saveCurrentStepData();
+    // Endereço é a última etapa: valida antes de enviar (antes, só a API recusava).
+    if (!validateCurrentStep()) return;
+    // O indicador de etapas permite voltar à etapa 2 e pular de volta sem "Próximo".
+    if (!editingCrm && !HematoCrm.crmValidoParaCadastro(wizardData.medico.crm)) {
+      HematoAI.showToast(HematoCrm.MSG_CRM_INVALIDO, 'error');
+      currentStep = 1; loadStepData(); updateWizardUI();
+      return;
+    }
     let id_usuario = null;
     let id_endereco = null;
 
@@ -930,7 +944,7 @@
       tr.innerHTML = `
         <td><strong>${m.nome}</strong></td>
         <td><span class="badge badge-blue">${m.crm}</span></td>
-        <td style="font-family:var(--font-mono);font-size:0.8rem">${m.cpf}</td>
+        <td style="font-family:var(--font-mono);font-size:0.8rem">${HematoAI.formatarCPF(m.cpf)}</td>
         <td><span class="badge badge-purple">${m.especialidade}</span></td>
         <td style="font-size:0.82rem">${m.email}</td>
         <td style="font-size:0.82rem">${m.telefone || '—'}</td>
