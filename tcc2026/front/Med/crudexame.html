@@ -1121,7 +1121,7 @@
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td style="font-weight:600;font-size:0.95rem;">${e.paciente || '—'}</td>
-        <td style="font-family:var(--font-mono);font-size:0.9rem;">${e.cpf || '—'}</td>
+        <td style="font-family:var(--font-mono);font-size:0.9rem;">${e.cpf ? formatarCPF(e.cpf) : '—'}</td>
         <td style="font-size:0.9rem;">${e.data_consulta ? formatarDataHora(e.data_consulta) : '—'}</td>
         <td style="font-size:0.9rem;">
             ${formatarDataHora(e.data_exame)}

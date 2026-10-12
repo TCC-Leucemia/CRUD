@@ -252,6 +252,16 @@ module.exports = class LoginDAO {
             );
         });
     }
+    atualizarSenha = async (id_usuario, senha, connection = this.#banco) => {
+        return new Promise((resolve, reject) => {
+            connection.query(
+                "UPDATE login SET senha = ? WHERE id_usuario = ?",
+                [senha, id_usuario],
+                (err, result) => (err ? reject(err) : resolve(result))
+            );
+        });
+    }
+
     updateCredenciais = async (id_usuario, email, senha, connection = this.#banco) => {
 
         const sql = `

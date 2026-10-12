@@ -203,7 +203,7 @@ def gerar_pdf_laudo(dados, nome_arquivo=None):
     # Título e subtítulo (à esquerda)
     cabecalho_esquerdo = [
         Paragraph("<b>HEMATOAI</b>", estilo_titulo_principal),
-        Paragraph("Sistema Inteligente de Apoio ao Diagnóstico Hematológico", estilo_subtitulo)
+        Paragraph("Sistema de Apoio ao Pré-Diagnóstico Hematológico", estilo_subtitulo)
     ]
     
     # Data de emissão (à direita)

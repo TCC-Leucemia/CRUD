@@ -4,6 +4,7 @@ const AnamneseDAO = require("../dao/AnamneseDAO");
 const AnaliseIA = require("../model/AnaliseIA");
 const Anamnese = require("../model/Anamnese");
 const ErrorResponse = require("../utils/ErrorResponse");
+const { extrairDiagnostico, normalizarTextoIA, apresentarAnalise } = require("../utils/analiseIA");
 
 // Falha da análise: o usuário vê o que deu errado; a orientação técnica
 // (caminhos, variáveis do .env, saída do Python) vai só para o terminal.
@@ -21,67 +22,16 @@ const executar = require("util").promisify(require("child_process").execFile);
 const ImagensExameDAO = require("../dao/ImagensExameDAO");
 const ImagensExame = require("../model/ImagensExame");
 
-const extrairDiagnostico = (laudo) => {
-    const texto = String(laudo || "")
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/[*`]/g, "");
-
-    const principal = texto.match(
-        /^\s*[-\u2022]?\s*SUSPEITA(?:_|\s+)PRINCIPAL\s*:\s*\[?\s*(LMA|LLA|LMC|LLC|NORMAL|INDETERMINADO)\b\s*\]?/im
-    );
-
-    const nivel = texto.match(
-        /^\s*[-\u2022]?\s*NIVEL(?:_|\s+)CONFIANCA\s*:\s*\[?\s*(ALTO|MODERADO|BAIXO)\b\s*(?:\([^)\r\n]*\))?\s*\]?/im
-    );
-
-    if (!principal || !nivel) {
-        throw new ErrorResponse(
-            502,
-            "A IA devolveu um laudo sem os campos diagnósticos esperados. Tente novamente."
-        );
-    }
-
-    const tipoDetectado = principal[1].toUpperCase();
-    const tiposLeucemia = ["LMA", "LLA", "LMC", "LLC"];
-
-    const tipo_leucemia_ia = tiposLeucemia.includes(tipoDetectado)
-        ? tipoDetectado
-        : "Não identificado";
-
-    const niveis = {
-        ALTO: { suspeita: "Alta", confianca: 85 },
-        MODERADO: { suspeita: "Moderada", confianca: 60 },
-        BAIXO: { suspeita: "Baixa", confianca: 0 }
-    };
-
-    const nivelDetectado = niveis[nivel[1].toUpperCase()];
-    const confianca = nivelDetectado.confianca;
-
-    if (!Number.isFinite(confianca) || confianca < 0 || confianca > 100) {
-        throw new ErrorResponse(
-            502,
-            "A IA devolveu uma confiança inválida. Tente novamente."
-        );
-    }
-
-    return {
-        suspeita_ia: tipo_leucemia_ia === "Não identificado"
-            ? "Sem suspeita"
-            : nivelDetectado.suspeita,
-        tipo_leucemia_ia,
-        confianca: Number(confianca.toFixed(2))
-    };
-};
-
 const extrairRelatorioClinico = (laudo) => {
     const texto = String(laudo || "");
 
     const separador = texto.match(/={10,}/);
 
-    return separador
-        ? texto.slice(separador.index).trim()
-        : texto.trim();
+    return normalizarTextoIA(
+        separador
+            ? texto.slice(separador.index).trim()
+            : texto.trim()
+    );
 };
 
 const validarAssinaturaImagem = (arquivo) => {
@@ -329,7 +279,7 @@ module.exports = class AnaliseIAService {
             );
         }
 
-        return result;
+        return result.map(apresentarAnalise);
     };
 
     findById = async (id) => {
@@ -344,11 +294,12 @@ module.exports = class AnaliseIAService {
             );
         }
 
-        return result;
+        return apresentarAnalise(result);
     };
 
     findByCrm = async (crm) => {
-        return await this.#dao.findByCrm(crm);
+        const lista = await this.#dao.findByCrm(crm);
+        return Array.isArray(lista) ? lista.map(apresentarAnalise) : lista;
     };
 
     validarAcessoAnalise = async (
@@ -839,11 +790,27 @@ module.exports = class AnaliseIAService {
                                 conexao
                             );
 
-                        const insercaoAnamnese =
-                            await this.#anamneseDAO.create(
-                                anamnese,
-                                conexao
+                        // A consulta já tem anamnese (é pré-requisito na
+                        // tela): ela não é duplicada a cada análise. Só se
+                        // não houver nenhuma, a anamnese enviada é gravada.
+                        const anamneseExistente =
+                            await this.#anamneseDAO.findByConsulta(
+                                ownerAtual.id_consulta
                             );
+
+                        let id_anamnese =
+                            anamneseExistente
+                                ? anamneseExistente.id_anamnese
+                                : null;
+
+                        if (!anamneseExistente) {
+                            const insercaoAnamnese =
+                                await this.#anamneseDAO.create(
+                                    anamnese,
+                                    conexao
+                                );
+                            id_anamnese = insercaoAnamnese.insertId;
+                        }
 
                         return {
                             id_analise:
@@ -852,8 +819,7 @@ module.exports = class AnaliseIAService {
                             id_imagem:
                                 insercaoImagem.insertId,
 
-                            id_anamnese:
-                                insercaoAnamnese.insertId
+                            id_anamnese
                         };
                     }
                 );

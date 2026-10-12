@@ -1,3 +1,4 @@
+const { apresentarAnalise } = require("../utils/analiseIA");
 const AnaliseIAService = require("../service/AnaliseIAService");
 
 module.exports = class AnaliseIAControl {
@@ -65,7 +66,7 @@ module.exports = class AnaliseIAControl {
 
             return res.status(200).send({
                 status: true,
-                dados: result
+                dados: apresentarAnalise(result)
             });
 
         } catch (erro) {

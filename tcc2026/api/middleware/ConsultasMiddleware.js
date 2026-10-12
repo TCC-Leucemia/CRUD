@@ -1,4 +1,5 @@
 const ErrorResponse = require("../utils/ErrorResponse");
+const { normalizarCrm, crmValidoParaVinculo } = require("../utils/crm");
 
 module.exports = class ConsultasMiddleware {
 
@@ -58,7 +59,8 @@ module.exports = class ConsultasMiddleware {
         }
 
         cpf = cpf.replace(/\D/g, '');
-        crm = crm.toString().trim();
+        crm = normalizarCrm(crm);
+        req.body.crm = crm;
 
         if (tipo_consulta) {
             tipo_consulta = tipo_consulta.trim();
@@ -80,9 +82,10 @@ module.exports = class ConsultasMiddleware {
             throw new ErrorResponse(400, "CPF inválido");
         }
 
-        const crmRegex = /^\d{4,11}$/;
-        console.log("CRM recebido:", JSON.stringify(crm), "tipo:", typeof crm);
-        if (!crmRegex.test(crm)) {
+        // Mesma regra de CRM do cadastro de médico (12345-SP), aceitando
+        // também CRMs antigos só com dígitos. Antes só dígitos eram aceitos
+        // e nenhuma consulta podia ser agendada para médicos com UF no CRM.
+        if (!crmValidoParaVinculo(crm)) {
             throw new ErrorResponse(400, "CRM inválido");
         }
 
@@ -155,15 +158,10 @@ module.exports = class ConsultasMiddleware {
 
         if (crm) {
 
-            crm = crm.toString().trim();
+            crm = normalizarCrm(crm);
+            req.body.crm = crm;
 
-            if (xssRegex.test(crm)) {
-                throw new ErrorResponse(400, "CRM inválido");
-            }
-
-            const crmRegex = /^\d{4,11}$/;
-
-            if (!crmRegex.test(crm)) {
+            if (xssRegex.test(crm) || !crmValidoParaVinculo(crm)) {
                 throw new ErrorResponse(400, "CRM inválido");
             }
         }

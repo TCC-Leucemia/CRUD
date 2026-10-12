@@ -1130,6 +1130,19 @@
   }
 
   renderizarCalendario();
+
+  // Atualiza "Consultas do dia" na hora (antes só mudava ao clicar num dia).
+  if (resultados.length > 0 && diaSelecionado) {
+    selecionarDia(diaSelecionado);
+  } else {
+    document.getElementById('diaSelecionadoLabel').textContent = '—';
+    document.getElementById('consultasLista').innerHTML = `
+      <div class="sem-consultas">
+        <span class="icone">📅</span>
+        Nenhuma consulta encontrada com os filtros aplicados.
+      </div>
+    `;
+  }
 }
 
   // =============================================================

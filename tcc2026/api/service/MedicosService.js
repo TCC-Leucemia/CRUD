@@ -3,7 +3,7 @@ const LoginDAO = require("../dao/LoginDAO");
 const EnderecosDAO = require("../dao/EnderecosDAO");
 const Medicos = require("../model/Medicos");
 const ErrorResponse = require("../utils/ErrorResponse");
-const md5 = require("md5");
+const { gerarHash, verificarSenha } = require("../utils/senha");
 
 const executarMetodo = (connection, metodo) => new Promise((resolve, reject) => {
     connection[metodo]((erro) => erro ? reject(erro) : resolve());
@@ -132,6 +132,17 @@ module.exports = class MedicosService {
                     throw new ErrorResponse(404, "Conta do médico não encontrada.");
                 }
 
+                // Nome, CRM, especialidade e telefone são somente leitura
+                // nesta tela (só o Administrador altera). O médico muda
+                // apenas e-mail e senha; o resto vem do cadastro atual.
+                dados = {
+                    ...dados,
+                    crm: medicoAtual.crm,
+                    nome: medicoAtual.nome,
+                    especialidade: medicoAtual.especialidade,
+                    telefone: medicoAtual.telefone
+                };
+
                 const alteracaoSensivel =
                     dados.email !== loginAtual.email ||
                     Boolean(dados.senha);
@@ -145,20 +156,13 @@ module.exports = class MedicosService {
                 }
                 if (
                     alteracaoSensivel &&
-                    md5(dados.senhaAtual) !== loginAtual.senha
+                    !(await verificarSenha(dados.senhaAtual, loginAtual.senha)).valida
                 ) {
                     throw new ErrorResponse(
                         400,
                         "Senha atual incorreta.",
                         { codigo: "SENHA_ATUAL_INCORRETA" }
                     );
-                }
-
-                if (dados.crm !== crmAtual) {
-                    const crmEmUso = await this.#dao.findByCRM(dados.crm, connection);
-                    if (crmEmUso) {
-                        throw new ErrorResponse(400, "CRM já está em uso.");
-                    }
                 }
 
                 if (dados.email !== loginAtual.email) {
@@ -182,7 +186,7 @@ module.exports = class MedicosService {
                     throw new ErrorResponse(404, "Médico não encontrado.");
                 }
 
-                const senha = dados.senha ? md5(dados.senha) : loginAtual.senha;
+                const senha = dados.senha ? await gerarHash(dados.senha) : loginAtual.senha;
                 await this.#loginDAO.updateCredenciais(
                     idUsuario,
                     dados.email,

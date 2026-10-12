@@ -1007,7 +1007,7 @@
       await carregarConsultas();
 
       const params = new URLSearchParams(window.location.search);
-      const idConsultaURL = params.get("id");
+      const idConsultaURL = params.get("id") || params.get("id_consulta");
 
       if (idConsultaURL) {
           const idConsulta = Number(idConsultaURL);

@@ -1,3 +1,4 @@
+const { parseDataLocal, mesmoMinuto } = require("../utils/datas");
 const ExamesDAO = require("../dao/ExamesDAO");
 const Exames = require("../model/Exames");
 const ConsultasDAO = require("../dao/ConsultasDAO");
@@ -171,6 +172,19 @@ module.exports = class ExamesService {
                     "Acesso negado"
                 );
             }
+        }
+
+        // Editar só o status de um exame antigo não pode ser recusado pela
+        // data dele; uma data NOVA continua precisando ser futura.
+        if (
+            dados.data_exame &&
+            !mesmoMinuto(dados.data_exame, exame.data_exame) &&
+            parseDataLocal(dados.data_exame) < new Date()
+        ) {
+            throw new ErrorResponse(
+                400,
+                "Não é permitido cadastrar exames no passado"
+            );
         }
 
         const novoExame = new Exames();

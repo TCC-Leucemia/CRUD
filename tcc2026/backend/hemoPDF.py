@@ -41,7 +41,7 @@ def gerar_laudo_pdf(texto_ai, dados_paciente, nome_saida):
         
         c.setFont("Helvetica", 8)
         c.setFillColor(colors.HexColor('#666666'))
-        c.drawString(margem_esq, y_position + 5, "LAUDO HEMATOLÓGICO - SISTEMA DE APOIO DIAGNÓSTICO")
+        c.drawString(margem_esq, y_position + 5, "ANÁLISE PRELIMINAR POR IA - APOIO AO PRÉ-DIAGNÓSTICO")
         
         data_emissao = datetime.now().strftime("%d/%m/%Y")
         c.drawRightString(margem_dir, y_position + 5, f"Emissão: {data_emissao}")
@@ -141,7 +141,7 @@ def gerar_laudo_pdf(texto_ai, dados_paciente, nome_saida):
         c.line(margem_esq, 50, margem_dir, 50)
         c.setFont("Helvetica-Oblique", 7)
         c.setFillColor(colors.HexColor('#888888'))
-        c.drawCentredString(largura/2, 40, "Documento gerado por IA para apoio diagnóstico. Deve ser validado por um profissional.")
+        c.drawCentredString(largura/2, 40, "Análise preliminar gerada por IA para apoio ao pré-diagnóstico. Deve ser validada por um profissional.")
         c.drawCentredString(largura/2, 30, f"Protocolo: {datetime.now().strftime('%Y%m%d%H%M%S')}")
         
         c.save()

@@ -1,10 +1,9 @@
 const ErrorResponse = require("../utils/ErrorResponse");
+const { normalizarCrm, crmValidoParaCadastro, MSG_CRM_INVALIDO } = require("../utils/crm");
 
 module.exports = class MedicosMiddleware {
 
     validateBody = (req, res, next) => {
-
-        console.log("🔷 MedicosMiddleware.validateBody()");
 
         let {
             crm,
@@ -31,7 +30,8 @@ module.exports = class MedicosMiddleware {
         }
 
 
-        crm = crm.toString().trim();
+        crm = normalizarCrm(crm);
+        req.body.crm = crm;
         nome = nome.trim();
         email = email.trim().toLowerCase();
         cpf = cpf.replace(/\D/g, '');
@@ -48,11 +48,8 @@ module.exports = class MedicosMiddleware {
             throw new ErrorResponse(400, "Caracteres inválidos detectados");
         }
 
-        console.log("CRM recebido:", JSON.stringify(crm), "tipo:", typeof crm);
-        const crmRegex = /^\d{4,11}-[A-Z]{2}$/;
-
-        if (!crmRegex.test(crm)) {
-            throw new ErrorResponse(400, "CRM inválido");
+        if (!crmValidoParaCadastro(crm)) {
+            throw new ErrorResponse(400, MSG_CRM_INVALIDO);
         }
 
 
@@ -126,8 +123,6 @@ module.exports = class MedicosMiddleware {
     }
 
     validateUpdate = (req, res, next) => {
-
-        console.log("🔷 MedicosMiddleware.validateUpdate()");
 
         let {
             nome,
@@ -216,44 +211,23 @@ module.exports = class MedicosMiddleware {
         next();
     }
 
+    // Configurações do próprio médico: só e-mail e senha podem mudar.
+    // Nome, CRM, especialidade e telefone são somente leitura nesta tela
+    // (o serviço usa os valores do cadastro); por isso não são validados
+    // aqui. Antes, o CRM 12345-SP do cadastro era recusado por uma regra
+    // diferente e nenhuma alteração podia ser salva.
     validateSelfUpdate = (req, res, next) => {
-        const nome = String(req.body?.nome || "").trim();
-        const crm = String(req.body?.crm || "").trim().toUpperCase();
-        const especialidade = String(req.body?.especialidade || "").trim();
         const email = String(req.body?.email || "").trim().toLowerCase();
-        const telefone = String(req.body?.telefone || "").trim();
         const senha = String(req.body?.senha || "").trim();
         const senhaAtual = String(req.body?.senhaAtual || "").trim();
         const caracteresInvalidos = /[<>]/;
 
-        if (nome.length < 3 || nome.length > 200 || caracteresInvalidos.test(nome)) {
-            throw new ErrorResponse(400, "Nome inválido.");
-        }
-        if (!/^[A-Z0-9]{4,11}$/.test(crm)) {
-            throw new ErrorResponse(400, "CRM inválido.");
-        }
-        if (
-            especialidade.length < 3 ||
-            especialidade.length > 50 ||
-            caracteresInvalidos.test(especialidade)
-        ) {
-            throw new ErrorResponse(400, "Especialidade inválida.");
-        }
         if (
             email.length > 100 ||
             !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
             caracteresInvalidos.test(email)
         ) {
             throw new ErrorResponse(400, "E-mail inválido.");
-        }
-        if (
-            telefone &&
-            (
-                telefone.length > 20 ||
-                !/^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$/.test(telefone)
-            )
-        ) {
-            throw new ErrorResponse(400, "Telefone inválido.");
         }
         if (senha && (senha.length < 8 || senha.length > 72)) {
             throw new ErrorResponse(400, "A nova senha deve possuir entre 8 e 72 caracteres.");
@@ -262,7 +236,7 @@ module.exports = class MedicosMiddleware {
             throw new ErrorResponse(400, "Senha atual inválida.");
         }
 
-        req.body = { nome, crm, especialidade, email, telefone, senha, senhaAtual };
+        req.body = { email, senha, senhaAtual };
         next();
     }
 

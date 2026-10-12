@@ -735,7 +735,8 @@
     HematoAI.confirmDialog(
       'Tem certeza que deseja sair do sistema?',
       () => {
-        localStorage.removeItem('hematoai_session');
+        // Apaga a sessão inteira (token incluído) e volta ao login.
+        HematoAI.clearSession();
         window.location.href = '../login.html';
       }
     );

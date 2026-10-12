@@ -47,7 +47,7 @@ module.exports = class EmailService {
 
                     <hr>
 
-                    <small>HematoAI - Sistema de apoio ao diagnóstico hematológico</small>
+                    <small>HematoAI - Sistema de apoio ao pré-diagnóstico hematológico</small>
 
                 </div>
 

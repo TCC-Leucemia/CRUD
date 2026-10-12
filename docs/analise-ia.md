@@ -22,6 +22,20 @@ Os níveis alto, moderado e baixo descrevem somente a confiança da triagem morf
 
 Para medir acurácia real no TCC, é necessário um conjunto de teste separado, rotulado por hematopatologista e nunca usado para ajustar o prompt. A avaliação deve reportar, por classe e com intervalos de confiança, sensibilidade, especificidade, precisão, revocação, F1, matriz de confusão e taxa de casos `INDETERMINADO`. Casos indeterminados não podem ser removidos da análise: eles representam o comportamento de segurança em imagens insuficientes ou ambíguas.
 
+## Apresentação na tela e no PDF
+
+- O nível de confiança aparece só como categoria: Alto, Moderado ou Baixo. Nenhum percentual é gravado
+  (`analise_ia.confianca` fica vazio nas análises novas) nem mostrado. Registros antigos com 85/60/0 são
+  convertidos para a categoria pela API (`nivel_confianca`) e o número não sai mais da API.
+- A coluna `analise_ia.suspeita_ia` guarda esse nível (Alta/Moderada/Baixa). A classificação sugerida
+  (`classificacao_ia`) é LMA, LLA, LMC, LLC, "Sem evidência de leucemia" (NORMAL) ou "Indeterminado".
+  INDETERMINADO nunca é mostrado como "sem suspeita".
+- O prompt pede a linha `GRAU DE CERTEZA` só com a categoria; `backend/normalizar_laudo.py` (antes do PDF)
+  e `api/utils/analiseIA.js` (ao gravar e ao ler) removem qualquer percentual dessa linha e deixam os
+  separadores com largura fixa.
+- A análise usa a anamnese já registrada na consulta; uma anamnese nova só é gravada se a consulta não
+  tiver nenhuma.
+
 ## Integração
 
 A API chama o executável `python` do PATH. Ele precisa das bibliotecas

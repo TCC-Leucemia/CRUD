@@ -17,6 +17,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 
 import hemoPDF as hemoPDF
+from normalizar_laudo import normalizar_texto
 
 load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -28,8 +29,8 @@ def extrair_relatorio_clinico(texto_completo):
     """Remove os campos técnicos que o backend usa para persistir a análise."""
     separador = re.search(r"={10,}", texto_completo)
     if not separador:
-        return texto_completo
-    return texto_completo[separador.start():].strip()
+        return normalizar_texto(texto_completo)
+    return normalizar_texto(texto_completo[separador.start():].strip())
 
 
 def analisar_celula(caminho_da_imagem, idade, sexo, sintomas, historia):
@@ -258,7 +259,7 @@ LAUDO DE HEMATOLOGIA - ANÁLISE MORFOLÓGICA DE ESFREGAÇO DE SANGUE PERIFÉRICO
 ================================================================
 
 SUSPEITA DIAGNÓSTICA: [diagnóstico completo em português + abreviação]
-GRAU DE CERTEZA: [Alto / Moderado / Baixo] ([percentual])
+GRAU DE CERTEZA: [Alto / Moderado / Baixo]
 
 IDENTIFICAÇÃO
 ----------------------------------------------------------------
@@ -281,8 +282,8 @@ CONCLUSÃO
 [Resumo objetivo da conclusão e da suspeita diagnóstica.]
 
 ================================================================
-Laudo gerado por sistema de apoio diagnóstico por Inteligência Artificial.
-Requer revisão e validação por médico hematologista responsável.
+Análise preliminar gerada por Inteligência Artificial para apoio ao pré-diagnóstico.
+Não é diagnóstico definitivo. Requer revisão e validação por médico hematologista responsável.
 ================================================================
 
 REGRAS:
@@ -304,6 +305,7 @@ REGRAS:
     SUSPEITA DIAGNÓSTICA: Indeterminado
 12. Não inclua recomendações de tratamento.
 13. Não inclua texto antes ou depois do relatório.
+14. Não escreva percentuais de certeza ou de probabilidade. O GRAU DE CERTEZA deve conter somente Alto, Moderado ou Baixo.
 ```
 """
 

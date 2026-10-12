@@ -20,7 +20,18 @@ const rotasAnamnese = require("./routes/RotasAnamnese");
 
 const app = express();
 
-app.use(cors());
+// CORS: o front é servido por este mesmo servidor (mesma origem). Só as
+// origens locais do projeto, ou as listadas em CORS_ORIGINS (separadas por
+// vírgula), podem chamar a API de outro endereço.
+const origensPermitidas = (process.env.CORS_ORIGINS ||
+    "http://localhost:3000,http://127.0.0.1:3000")
+    .split(",")
+    .map((origem) => origem.trim())
+    .filter(Boolean);
+
+app.use(cors({
+    origin: (origem, cb) => cb(null, !origem || origensPermitidas.includes(origem))
+}));
 
 app.use(express.json());
 
@@ -69,7 +80,6 @@ rotas_login(app, banco);
 rotas_enderecos(app, banco);
 rotas_pacientes(app, banco);
 rotas_medicos(app, banco);
-console.log("ROTAS MÉDICOS REGISTRADAS");
 rotas_consultas(app, banco);
 rotas_exames(app, banco);
 rotas_resultados_exame(app, banco);

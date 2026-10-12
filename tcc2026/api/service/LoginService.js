@@ -1,7 +1,7 @@
 const LoginDAO = require("../dao/LoginDAO");
 const EmailService = require("./EmailService");
 const Login = require("../model/Login");
-const md5 = require("md5");
+const { gerarHash, verificarSenha } = require("../utils/senha");
 const crypto = require("crypto");
 const ErrorResponse = require("../utils/ErrorResponse");
 
@@ -19,6 +19,13 @@ const INTERVALO_REENVIO = 60 * 1000;
 const MSG_CODIGO_ENVIADO = "Se o CPF estiver cadastrado, enviaremos um código de verificação para o e-mail vinculado a ele.";
 const MSG_CODIGO_INVALIDO = "Código inválido ou expirado. Confira o código recebido por e-mail ou solicite um novo.";
 const MSG_RECUPERACAO_EXPIRADA = "A verificação do código expirou ou não foi concluída. Solicite um novo código para redefinir a senha.";
+
+// O hash da senha nunca sai da API (nem para o próprio usuário).
+const semSenha = (registro) => {
+    if (!registro || typeof registro !== "object") return registro;
+    const { senha, ...resto } = registro;
+    return resto;
+};
 
 const somenteDigitosCpf = (cpf) => String(cpf || "").replace(/\D/g, "");
 
@@ -108,7 +115,7 @@ module.exports = class LoginService {
         const login = new Login();
 
         login.email = dados.email;
-        login.senha = md5(dados.senha);
+        login.senha = await gerarHash(dados.senha);
         login.tipo = dados.tipo;
 
         return await this.#dao.create(login);
@@ -130,7 +137,7 @@ module.exports = class LoginService {
                         usuario.id_usuario
                     );
 
-                resultado.push(paciente);
+                resultado.push(semSenha(paciente));
             }
             else if (usuario.tipo === "Médico") {
 
@@ -139,11 +146,11 @@ module.exports = class LoginService {
                         usuario.id_usuario
                     );
 
-                resultado.push(medico);
+                resultado.push(semSenha(medico));
             }
             else {
 
-                resultado.push(usuario);
+                resultado.push(semSenha(usuario));
             }
         }
 
@@ -168,7 +175,7 @@ module.exports = class LoginService {
             const paciente =
                 await this.#dao.findPacienteByIdUsuario(id);
 
-            return paciente;
+            return semSenha(paciente);
         }
 
         if (login.tipo === "Médico") {
@@ -176,10 +183,10 @@ module.exports = class LoginService {
             const medico =
                 await this.#dao.findMedicoByIdUsuario(id);
 
-            return medico;
+            return semSenha(medico);
         }
 
-        return login;
+        return semSenha(login);
     }
 
     alterarCredenciais = async (id_usuario, dados) => {
@@ -195,10 +202,10 @@ module.exports = class LoginService {
             );
         }
 
-        const senhaHash =
-            md5(dados.senhaAtual);
+        const conferencia =
+            await verificarSenha(dados.senhaAtual, usuario.senha);
 
-        if (senhaHash !== usuario.senha) {
+        if (!conferencia.valida) {
 
             throw new ErrorResponse(
                 401,
@@ -238,10 +245,10 @@ module.exports = class LoginService {
         }
 
         if (dados.novaSenha) {
-            usuario.senha = md5(dados.novaSenha);
+            usuario.senha = await gerarHash(dados.novaSenha);
+        } else if (conferencia.precisaAtualizar) {
+            usuario.senha = await gerarHash(dados.senhaAtual);
         }
-        console.log("USUÁRIO ANTES DO UPDATE:");
-        console.log(usuario);
 
         await this.#dao.update(usuario);
 
@@ -301,7 +308,7 @@ module.exports = class LoginService {
         login.id_usuario = id;
         login.email = dados.email;
         if (dados.senha) {
-            login.senha = md5(dados.senha);
+            login.senha = await gerarHash(dados.senha);
         } else {
             login.senha = existente.senha;
         }
@@ -373,13 +380,33 @@ module.exports = class LoginService {
             this.#dao.findAdministradorByEmail(dados.email)
         ]);
 
-        const senhaHash = md5(dados.senha);
-
-        const candidatos = [
+        const todos = [
             { tipo: "Médico", user: medico },
             { tipo: "Paciente", user: paciente },
             { tipo: "Administrador", user: administrador }
-        ].filter(({ user }) => user && user.senha === senhaHash);
+        ].filter(({ user }) => user);
+
+        const candidatos = [];
+        for (const candidato of todos) {
+            const conferencia = await verificarSenha(
+                String(dados.senha ?? ""),
+                candidato.user.senha
+            );
+            if (!conferencia.valida) continue;
+            candidatos.push(candidato);
+
+            // Conta com hash antigo (MD5): regrava no formato novo.
+            if (conferencia.precisaAtualizar) {
+                try {
+                    await this.#dao.atualizarSenha(
+                        candidato.user.id_usuario,
+                        await gerarHash(String(dados.senha))
+                    );
+                } catch (erro) {
+                    console.error(`[AVISO] Não foi possível atualizar o hash da senha (${erro.code || erro.name}).`);
+                }
+            }
+        }
 
         // E-mail ou senha incorretos
         if (candidatos.length === 0) {
@@ -671,7 +698,7 @@ module.exports = class LoginService {
             throw new ErrorResponse(400, MSG_RECUPERACAO_EXPIRADA);
         }
 
-        login.senha = md5(senha);
+        login.senha = await gerarHash(senha);
 
         await this.#dao.update(login);
 

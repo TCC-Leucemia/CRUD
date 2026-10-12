@@ -235,7 +235,7 @@
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7.5);
     doc.setTextColor(...COR.textoFraco);
-    doc.text('Diagnóstico assistido por IA', x + 12.5, y + 9.3);
+    doc.text('Apoio ao pré-diagnóstico por IA', x + 12.5, y + 9.3);
   }
 
   function desenharMarca(doc, emissao, tituloContinuacao) {

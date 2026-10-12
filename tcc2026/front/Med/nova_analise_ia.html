@@ -507,7 +507,7 @@
               <div class="exame-selector">
                 <div class="search-wrapper">
                   <span class="lupa">🔍</span>
-                  <input type="text" id="searchExame" placeholder="Pesquisar por paciente, CPF ou tipo de exame...">
+                  <input type="text" id="searchExame" placeholder="Pesquisar por paciente, CPF, tipo ou data do exame...">
                 </div>
                 <div class="exame-tabela-wrapper" id="exameTabelaWrapper">
                   <table>
@@ -702,7 +702,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     window.location.href =
-      `./crudconsulta_med.html?id_consulta=${exameSelecionado.id_consulta}`;
+      `./crudconsulta_med.html?id=${exameSelecionado.id_consulta}`;
   });
   function formatarData(iso) {
     if (!iso) return 'Data não informada';
