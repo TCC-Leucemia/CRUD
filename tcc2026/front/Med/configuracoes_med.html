@@ -13,26 +13,55 @@
       min-width: 0;
     }
 
-    .settings-grid {
+    .settings-layout {
       display: grid;
-      grid-template-columns: minmax(210px, 0.72fr) minmax(0, 1.28fr);
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+      grid-template-areas:
+        "aparencia  dados"
+        "seguranca  seguranca";
       gap: 20px;
-      align-items: start;
+      align-items: stretch;
     }
+
+    .card-aparencia  { grid-area: aparencia; }
+    .card-dados      { grid-area: dados; }
+    .card-seguranca  { grid-area: seguranca; }
 
     .settings-card {
       min-width: 0;
       margin: 0;
+      display: flex;
+      flex-direction: column;
     }
 
     .settings-card .card-header {
-      padding: 14px 18px;
+      padding: 16px 22px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .settings-card .card-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      letter-spacing: -0.2px;
+    }
+
+    .settings-card .card-title svg {
+      width: 16px;
+      height: 16px;
+      stroke: var(--red);
+      flex-shrink: 0;
     }
 
     .settings-card .card-body {
-      padding: 18px;
+      padding: 22px;
+      flex: 1;
     }
 
+    /* ── Aparência ── */
     .theme-options {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -41,85 +70,114 @@
 
     .theme-option {
       min-width: 0;
-      min-height: 112px;
-      padding: 16px 10px;
-      border: 2px solid var(--border);
+      padding: 20px 12px;
+      border: 1.5px solid var(--border);
       border-radius: var(--radius-lg);
       background: var(--bg);
       color: var(--text-1);
       text-align: center;
       transition: var(--transition);
+      cursor: pointer;
+      font-family: var(--font);
     }
 
     .theme-option:hover {
       border-color: var(--red);
-      transform: translateY(-1px);
+      transform: translateY(-2px);
       box-shadow: var(--shadow-sm);
     }
 
     .theme-option.active {
       border-color: var(--red);
+      background: var(--surface);
       box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.08);
     }
 
     .theme-icon {
       display: block;
-      margin-bottom: 7px;
-      font-size: 1.8rem;
+      margin-bottom: 10px;
+      font-size: 1.6rem;
       line-height: 1;
     }
 
     .theme-name {
       display: block;
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       font-weight: 700;
-    }
-
-    .theme-description,
-    .theme-note,
-    .field-hint {
-      color: var(--text-3);
-      font-size: 0.7rem;
-      line-height: 1.4;
     }
 
     .theme-description {
       display: block;
-      margin-top: 3px;
+      margin-top: 4px;
+      font-size: 0.7rem;
+      color: var(--text-3);
+      line-height: 1.4;
     }
 
     .theme-note {
-      margin-top: 12px;
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      font-size: 0.72rem;
+      color: var(--text-3);
+      line-height: 1.5;
     }
 
-    .profile-form-grid {
+    /* ── Formulários ── */
+    .profile-form-grid,
+    .security-form-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px 14px;
+      gap: 14px 16px;
     }
 
-    .profile-form-grid .form-group {
+    .profile-form-grid .form-group,
+    .security-form-grid .form-group {
       min-width: 0;
-      gap: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
     }
 
-    .profile-form-grid .form-group input {
+    .profile-form-grid .form-group label,
+    .security-form-grid .form-group label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-2);
+    }
+
+    .profile-form-grid .form-group input,
+    .security-form-grid .form-group input {
       min-width: 0;
-      padding: 9px 12px;
+      padding: 10px 13px;
+      font-size: 0.875rem;
     }
 
+    .security-form-grid .col-span-2 {
+      grid-column: 1 / -1;
+    }
+
+    .field-hint {
+      font-size: 0.7rem;
+      color: var(--text-3);
+      line-height: 1.4;
+      margin-top: 2px;
+    }
+
+    /* ── Password field ── */
     .password-field {
       position: relative;
     }
 
     .password-field input {
       padding-right: 42px !important;
+      width: 100%;
     }
 
     .password-toggle {
       position: absolute;
       top: 50%;
-      right: 7px;
+      right: 8px;
       width: 30px;
       height: 30px;
       padding: 0;
@@ -131,13 +189,14 @@
       align-items: center;
       justify-content: center;
       transform: translateY(-50%);
+      cursor: pointer;
+      transition: var(--transition);
     }
 
     .password-toggle:hover,
     .password-toggle:focus-visible {
-      background: var(--surface);
+      background: var(--bg);
       color: var(--text-1);
-      outline: 2px solid var(--border);
     }
 
     .password-toggle svg {
@@ -150,19 +209,22 @@
       stroke-linejoin: round;
     }
 
+    /* ── Ações do form ── */
     .profile-actions {
       display: flex;
       justify-content: flex-end;
       gap: 10px;
-      margin-top: 14px;
+      margin-top: 20px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
     }
 
-    /* Estilo para campos não editáveis */
+    /* ── Input readonly ── */
     input[readonly] {
       background: var(--bg);
       color: var(--text-1);
       cursor: not-allowed;
-      opacity: 0.8;
+      opacity: 0.75;
     }
 
     input[readonly]:focus {
@@ -170,25 +232,91 @@
       box-shadow: none;
     }
 
-    @media (max-width: 700px) {
-      .settings-grid {
-        grid-template-columns: 1fr;
-      }
+    /* ── Força de senha ── */
+    .password-strength {
+      margin-top: 6px;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
 
-      .profile-form-grid {
+    .password-strength-bar {
+      height: 100%;
+      width: 0%;
+      transition: width 0.3s ease;
+      border-radius: 2px;
+      background: var(--border);
+    }
+
+    .strength-weak   { background: #dc2626; width: 33%; }
+    .strength-medium { background: #f59e0b; width: 66%; }
+    .strength-strong { background: #10b981; width: 100%; }
+
+    .strength-text {
+      font-size: 0.7rem;
+      margin-top: 5px;
+      color: var(--text-3);
+    }
+
+    /* ── Aviso dentro do card de segurança ── */
+    .security-hint {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 20px;
+      padding: 12px 14px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--red);
+      border-radius: var(--radius-md);
+      font-size: 0.78rem;
+      line-height: 1.55;
+      color: var(--text-2);
+    }
+
+    .security-hint svg {
+      width: 16px;
+      height: 16px;
+      stroke: var(--red);
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .security-hint strong {
+      color: var(--text-1);
+      font-weight: 600;
+    }
+
+    /* ── Destaque temporário em campo ── */
+    .field-flash {
+      animation: fieldFlash 1s ease;
+    }
+
+    @keyframes fieldFlash {
+      0%, 100% { box-shadow: none; }
+      50%      { box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.25); }
+    }
+
+    /* ── Responsivo ── */
+    @media (max-width: 900px) {
+      .settings-layout {
         grid-template-columns: 1fr;
+        grid-template-areas:
+          "aparencia"
+          "dados"
+          "seguranca";
       }
     }
 
-    @media (max-width: 420px) {
-      .theme-options {
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
+    @media (max-width: 600px) {
+      .profile-form-grid,
+      .security-form-grid {
+        grid-template-columns: 1fr;
       }
 
-      .theme-option {
-        min-height: 104px;
-        padding-inline: 6px;
+      .settings-card .card-body {
+        padding: 18px;
       }
 
       .profile-actions {
@@ -221,10 +349,18 @@
     </div>
 
     <div class="page-body">
-      <div class="settings-grid">
-        <section class="card settings-card" aria-labelledby="tituloAparencia">
+      <div class="settings-layout">
+
+        <!-- ─── CARD: Aparência ─── -->
+        <section class="card settings-card card-aparencia" aria-labelledby="tituloAparencia">
           <div class="card-header">
-            <span class="card-title" id="tituloAparencia">🎨 Aparência</span>
+            <span class="card-title" id="tituloAparencia">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="5"/>
+                <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+              </svg>
+              Aparência
+            </span>
           </div>
           <div class="card-body">
             <div class="theme-options" role="group" aria-label="Tema do sistema">
@@ -239,13 +375,20 @@
                 <span class="theme-description">Menos brilho</span>
               </button>
             </div>
-            <p class="theme-note">A preferência é salva automaticamente neste dispositivo.</p>
+            <p class="theme-note">A preferência de tema é salva automaticamente neste dispositivo.</p>
           </div>
         </section>
 
-        <section class="card settings-card" aria-labelledby="tituloDadosPessoais">
+        <!-- ─── CARD: Dados pessoais ─── -->
+        <section class="card settings-card card-dados" aria-labelledby="tituloDadosPessoais">
           <div class="card-header">
-            <span class="card-title" id="tituloDadosPessoais">👤 Dados pessoais</span>
+            <span class="card-title" id="tituloDadosPessoais">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+              Dados pessoais
+            </span>
           </div>
           <div class="card-body">
             <form id="formDadosPessoais">
@@ -263,45 +406,141 @@
                   <input id="especialidade" name="especialidade" type="text" maxlength="50" required readonly>
                 </div>
                 <div class="form-group">
-                  <label for="email">E-mail</label>
-                  <input id="email" name="email" type="email" maxlength="100" autocomplete="email" required>
-                </div>
-                <div class="form-group">
                   <label for="telefone">Telefone</label>
                   <input id="telefone" name="telefone" type="tel" maxlength="20" autocomplete="tel" readonly>
                 </div>
+                <div class="form-group" style="grid-column:1/-1">
+                  <label for="email">E-mail</label>
+                  <input id="email" name="email" type="email" maxlength="100" autocomplete="email" required readonly>
+                </div>
+              </div>
+              <p class="field-hint" style="margin-top:14px">
+                Estes dados não podem ser alterados por aqui. Para modificar o e-mail ou a senha, utilize o card <strong>Segurança da conta</strong>.
+              </p>
+            </form>
+          </div>
+        </section>
+
+        <!-- ─── CARD: Segurança da conta ─── -->
+        <section class="card settings-card card-seguranca" aria-labelledby="tituloSeguranca">
+          <div class="card-header">
+            <span class="card-title" id="tituloSeguranca">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+              Segurança da conta
+            </span>
+          </div>
+          <div class="card-body">
+            <div class="security-hint">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              <span>
+                Para alterar apenas o e-mail, informe a <strong>senha atual</strong> e o <strong>novo e-mail</strong>.
+                Para alterar a senha, preencha também <strong>nova senha</strong> e <strong>confirmação</strong>.
+              </span>
+            </div>
+
+            <form id="formCredenciais" novalidate>
+              <div class="security-form-grid">
                 <div class="form-group">
-                  <label for="senha">Senha</label>
+                  <label for="senhaAtual">Senha atual *</label>
                   <div class="password-field">
                     <input
-                      id="senha"
-                      name="senha"
+                      id="senhaAtual"
+                      name="senhaAtual"
+                      type="password"
+                      maxlength="72"
+                      autocomplete="current-password"
+                      placeholder="••••••••"
+                    >
+                    <button
+                      class="password-toggle"
+                      id="toggleSenhaAtual"
+                      type="button"
+                      aria-label="Mostrar senha atual"
+                      aria-controls="senhaAtual"
+                    ></button>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="novoEmail">Novo e-mail <span style="color:var(--text-3);font-weight:500">(opcional)</span></label>
+                  <input
+                    id="novoEmail"
+                    name="novoEmail"
+                    type="email"
+                    maxlength="100"
+                    autocomplete="email"
+                    placeholder="novo@email.com"
+                  >
+                  <span class="field-hint">Deixe em branco para manter o e-mail atual.</span>
+                </div>
+
+                <div class="form-group">
+                  <label for="novaSenha">Nova senha <span style="color:var(--text-3);font-weight:500">(opcional)</span></label>
+                  <div class="password-field">
+                    <input
+                      id="novaSenha"
+                      name="novaSenha"
                       type="password"
                       minlength="8"
                       maxlength="72"
                       autocomplete="new-password"
-                      placeholder="••••••••"
-                      aria-describedby="senhaHint"
+                      placeholder="Mínimo 8 caracteres"
                     >
                     <button
                       class="password-toggle"
-                      id="toggleSenha"
+                      id="toggleNovaSenha"
                       type="button"
-                      aria-label="Mostrar senha digitada"
-                      aria-controls="senha"
+                      aria-label="Mostrar nova senha"
+                      aria-controls="novaSenha"
                     ></button>
                   </div>
-                  <span class="field-hint" id="senhaHint">Vazio mantém a senha atual.</span>
+                </div>
+
+                <div class="form-group">
+                  <label for="confirmarNovaSenha">Confirmar nova senha</label>
+                  <div class="password-field">
+                    <input
+                      id="confirmarNovaSenha"
+                      name="confirmarNovaSenha"
+                      type="password"
+                      minlength="8"
+                      maxlength="72"
+                      autocomplete="new-password"
+                      placeholder="Repita a nova senha"
+                    >
+                    <button
+                      class="password-toggle"
+                      id="toggleConfirmarNovaSenha"
+                      type="button"
+                      aria-label="Mostrar confirmação de senha"
+                      aria-controls="confirmarNovaSenha"
+                    ></button>
+                  </div>
+                </div>
+
+                <div class="form-group col-span-2" id="senhaStrengthContainer" style="display:none">
+                  <div class="password-strength">
+                    <div class="password-strength-bar" id="strengthBar"></div>
+                  </div>
+                  <div class="strength-text" id="strengthText"></div>
                 </div>
               </div>
 
               <div class="profile-actions">
-                <button class="btn btn-ghost" id="btnCancelar" type="button">Cancelar</button>
-                <button class="btn btn-primary" id="btnSalvar" type="submit">Salvar alterações</button>
+                <button class="btn btn-ghost" id="btnCancelarCredenciais" type="button">Cancelar</button>
+                <button class="btn btn-primary" id="btnSalvarCredenciais" type="submit">Salvar alterações</button>
               </div>
             </form>
           </div>
         </section>
+
       </div>
     </div>
   </main>
@@ -311,6 +550,33 @@
 <script src="../JS/navbar.js"></script>
 <script src="../JS/auth.js"></script>
 <script>
+  // ============================================================
+  //  HELPER: toast padronizado
+  // ============================================================
+  function toast(mensagem, tipo = "error") {
+    const tipoSuportado = (tipo === "info" || tipo === "warning") ? "success" : tipo;
+    if (typeof HematoAI !== "undefined" && typeof HematoAI.showToast === "function") {
+      HematoAI.showToast(mensagem, tipoSuportado);
+      return;
+    }
+    console.warn("[toast]", tipo, mensagem);
+  }
+
+  // ============================================================
+  //  HELPER: destaque temporário
+  // ============================================================
+  function destacarCampo(input) {
+    if (!input) return;
+    input.classList.remove("field-flash");
+    void input.offsetWidth;
+    input.classList.add("field-flash");
+    input.focus();
+    setTimeout(() => input.classList.remove("field-flash"), 1100);
+  }
+
+  // ============================================================
+  //  ÍCONES DE OLHO
+  // ============================================================
   const iconeOlho = `
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"></path>
@@ -326,21 +592,43 @@
     </svg>
   `;
 
+  // ============================================================
+  //  CAMPOS
+  // ============================================================
   const campos = {
-    nome: document.getElementById("nomeCompleto"),
-    crm: document.getElementById("crm"),
+    nome:          document.getElementById("nomeCompleto"),
+    crm:           document.getElementById("crm"),
     especialidade: document.getElementById("especialidade"),
-    email: document.getElementById("email"),
-    telefone: document.getElementById("telefone"),
-    senha: document.getElementById("senha")
+    email:         document.getElementById("email"),
+    telefone:      document.getElementById("telefone")
   };
-  const form = document.getElementById("formDadosPessoais");
-  const btnSalvar = document.getElementById("btnSalvar");
-  const toggleSenha = document.getElementById("toggleSenha");
+
+  const camposCred = {
+    senhaAtual:         document.getElementById("senhaAtual"),
+    novoEmail:          document.getElementById("novoEmail"),
+    novaSenha:          document.getElementById("novaSenha"),
+    confirmarNovaSenha: document.getElementById("confirmarNovaSenha")
+  };
+
+  const formCredenciais = document.getElementById("formCredenciais");
+  const btnSalvarCred   = document.getElementById("btnSalvarCredenciais");
+  const btnCancelarCred = document.getElementById("btnCancelarCredenciais");
+
+  const toggleSenhaAtual = document.getElementById("toggleSenhaAtual");
+  const toggleNovaSenha  = document.getElementById("toggleNovaSenha");
+  const toggleConfirmar  = document.getElementById("toggleConfirmarNovaSenha");
+
+  const strengthContainer = document.getElementById("senhaStrengthContainer");
+  const strengthBar       = document.getElementById("strengthBar");
+  const strengthText      = document.getElementById("strengthText");
+
   let medicoDados = {};
 
+  // ============================================================
+  //  TEMA
+  // ============================================================
   function atualizarTemaSelecionado(tema) {
-    const claro = document.getElementById("themeLight");
+    const claro  = document.getElementById("themeLight");
     const escuro = document.getElementById("themeDark");
     claro.classList.toggle("active", tema === "light");
     escuro.classList.toggle("active", tema === "dark");
@@ -353,18 +641,46 @@
     atualizarTemaSelecionado(tema);
   }
 
+  // ============================================================
+  //  PREENCHIMENTO
+  // ============================================================
   function preencherFormulario() {
-    campos.nome.value = medicoDados.nome || "";
-    campos.crm.value = medicoDados.crm || "";
+    campos.nome.value          = medicoDados.nome || "";
+    campos.crm.value           = medicoDados.crm || "";
     campos.especialidade.value = medicoDados.especialidade || "";
-    campos.email.value = medicoDados.email || "";
-    campos.telefone.value = medicoDados.telefone || "";
-    campos.senha.value = "";
-    campos.senha.type = "password";
-    toggleSenha.innerHTML = iconeOlho;
-    toggleSenha.setAttribute("aria-label", "Mostrar senha digitada");
+    campos.email.value         = medicoDados.email || "";
+    campos.telefone.value      = medicoDados.telefone || "";
   }
 
+  function preencherEmailAtualNoNovoEmail() {
+    camposCred.novoEmail.value = medicoDados.email || "";
+  }
+
+  function limparCamposCredenciais() {
+    camposCred.senhaAtual.value = "";
+    camposCred.novaSenha.value = "";
+    camposCred.confirmarNovaSenha.value = "";
+
+    camposCred.senhaAtual.type = "password";
+    camposCred.novaSenha.type = "password";
+    camposCred.confirmarNovaSenha.type = "password";
+
+    toggleSenhaAtual.innerHTML = iconeOlho;
+    toggleNovaSenha.innerHTML = iconeOlho;
+    toggleConfirmar.innerHTML = iconeOlho;
+
+    toggleSenhaAtual.setAttribute("aria-label", "Mostrar senha atual");
+    toggleNovaSenha.setAttribute("aria-label", "Mostrar nova senha");
+    toggleConfirmar.setAttribute("aria-label", "Mostrar confirmação de senha");
+
+    strengthContainer.style.display = "none";
+    strengthBar.className = "password-strength-bar";
+    strengthText.textContent = "";
+  }
+
+  // ============================================================
+  //  CARREGAR DADOS
+  // ============================================================
   async function carregarDadosMedico() {
     try {
       const response = await apiFetch("/medicos/meus-dados");
@@ -374,11 +690,15 @@
       }
       medicoDados = dados.dados;
       preencherFormulario();
+      preencherEmailAtualNoNovoEmail();
     } catch (erro) {
-      HematoAI.showToast(erro.message || "Erro ao conectar com o servidor.", "error");
+      toast(erro.message || "Erro ao conectar com o servidor.", "error");
     }
   }
 
+  // ============================================================
+  //  SESSÃO
+  // ============================================================
   function atualizarSessao(dados) {
     localStorage.setItem("token", dados.token);
     localStorage.setItem("usuario", JSON.stringify(dados.usuario));
@@ -393,6 +713,9 @@
     });
   }
 
+  // ============================================================
+  //  MODAL DE REAUTENTICAÇÃO
+  // ============================================================
   function solicitarSenhaAtual(mensagem) {
     return new Promise((resolve) => {
       const overlay = document.createElement("div");
@@ -457,15 +780,28 @@
     });
   }
 
+  // ============================================================
+  //  ENVIO AO BACKEND (rota existente)
+  // ============================================================
   async function enviarDados(senhaAtual = "") {
     const payload = {
-      nome: campos.nome.value,
-      crm: campos.crm.value,
-      especialidade: campos.especialidade.value,
-      email: campos.email.value,
-      telefone: campos.telefone.value,
-      senha: campos.senha.value
+      nome: medicoDados.nome,
+      crm: medicoDados.crm,
+      especialidade: medicoDados.especialidade,
+      email: medicoDados.email,
+      telefone: medicoDados.telefone,
+      senha: ""
     };
+
+    const novoEmail = camposCred.novoEmail.value.trim();
+    if (novoEmail && novoEmail !== medicoDados.email) {
+      payload.email = novoEmail;
+    }
+
+    if (camposCred.novaSenha.value) {
+      payload.senha = camposCred.novaSenha.value;
+    }
+
     if (senhaAtual) payload.senhaAtual = senhaAtual;
 
     const response = await apiFetch("/medicos/meus-dados", {
@@ -476,24 +812,101 @@
     return { response, dados };
   }
 
-  async function salvarDados(event) {
-    event.preventDefault();
-    btnSalvar.disabled = true;
-    const textoOriginal = btnSalvar.textContent;
-    btnSalvar.textContent = "Salvando...";
+  // ============================================================
+  //  VALIDAÇÃO
+  // ============================================================
+  function validarCredenciais() {
+    const senhaAtual = camposCred.senhaAtual.value;
+    const novoEmail  = camposCred.novoEmail.value.trim();
+    const novaSenha  = camposCred.novaSenha.value;
+    const confirma   = camposCred.confirmarNovaSenha.value;
+
+    const emailMudou        = novoEmail && novoEmail !== medicoDados.email;
+    const senhaPreenchida   = !!novaSenha;
+    const confirmaPreenchida= !!confirma;
+
+    // 1) Nada preenchido (nem senha atual, nem e-mail, nem senha)
+    if (!senhaAtual && !emailMudou && !senhaPreenchida) {
+      toast("Informe a senha atual e altere pelo menos o e-mail ou a senha.", "error");
+      destacarCampo(camposCred.senhaAtual);
+      return false;
+    }
+
+    // 2) Faltou a senha atual
+    if (!senhaAtual) {
+      toast("Informe a senha atual para confirmar a alteração.", "error");
+      destacarCampo(camposCred.senhaAtual);
+      return false;
+    }
+
+    // 3) Nova senha sem confirmação
+    if (senhaPreenchida && !confirmaPreenchida) {
+      toast("Confirme a nova senha no campo 'Confirmar nova senha'.", "error");
+      destacarCampo(camposCred.confirmarNovaSenha);
+      return false;
+    }
+
+    // 4) Confirmação sem nova senha
+    if (!senhaPreenchida && confirmaPreenchida) {
+      toast("O campo 'Nova senha' está vazio, mas a confirmação foi preenchida.", "error");
+      destacarCampo(camposCred.novaSenha);
+      return false;
+    }
+
+    // 5) Senhas diferentes
+    if (senhaPreenchida && confirmaPreenchida && novaSenha !== confirma) {
+      toast("As senhas não coincidem.", "error");
+      destacarCampo(camposCred.confirmarNovaSenha);
+      return false;
+    }
+
+    // 6) Tamanho mínimo
+    if (senhaPreenchida && novaSenha.length < 8) {
+      toast("A nova senha deve ter no mínimo 8 caracteres.", "error");
+      destacarCampo(camposCred.novaSenha);
+      return false;
+    }
+
+    // 7) Formato do e-mail
+    if (novoEmail && !novoEmail.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+      toast("E-mail inválido.", "error");
+      destacarCampo(camposCred.novoEmail);
+      return false;
+    }
+
+    // 8) Senha atual informada, mas NADA mais foi alterado.
+    //    (e-mail em branco/igual ao atual E nenhuma nova senha)
+    if (!emailMudou && !senhaPreenchida) {
+      toast("Não foi possível concluir: altere pelo menos o e-mail ou a senha.", "error");
+      destacarCampo(camposCred.novoEmail);
+      return false;
+    }
+
+    return true;
+  }
+
+  // ============================================================
+  //  SALVAR
+  // ============================================================
+  async function salvarCredenciais(event) {
+    if (event) event.preventDefault();
+    if (!validarCredenciais()) return;
+
+    btnSalvarCred.disabled = true;
+    const textoOriginal = btnSalvarCred.textContent;
+    btnSalvarCred.textContent = "Salvando...";
 
     try {
-      let { response, dados } = await enviarDados();
+      let { response, dados } = await enviarDados(camposCred.senhaAtual.value);
       let codigo = dados?.detalhes?.codigo;
 
       while (
         codigo === "REAUTENTICACAO_NECESSARIA" ||
         codigo === "SENHA_ATUAL_INCORRETA"
       ) {
-        let senhaAtual = await solicitarSenhaAtual(dados.msg);
+        const senhaAtual = await solicitarSenhaAtual(dados.msg);
         if (senhaAtual === null) return;
         ({ response, dados } = await enviarDados(senhaAtual));
-        senhaAtual = "";
         codigo = dados?.detalhes?.codigo;
       }
 
@@ -504,40 +917,108 @@
       medicoDados = dados.dados;
       atualizarSessao(dados);
       preencherFormulario();
+      limparCamposCredenciais();
+      preencherEmailAtualNoNovoEmail();
       HematoAI.initSidebar("config");
-      HematoAI.showToast(dados.msg, "success");
+      toast(dados.msg || "Credenciais atualizadas com sucesso!", "success");
     } catch (erro) {
-      HematoAI.showToast(erro.message || "Erro ao comunicar com o servidor.", "error");
+      toast(erro.message || "Erro ao comunicar com o servidor.", "error");
     } finally {
-      btnSalvar.disabled = false;
-      btnSalvar.textContent = textoOriginal;
+      btnSalvarCred.disabled = false;
+      btnSalvarCred.textContent = textoOriginal;
     }
   }
 
+  // ============================================================
+  //  CANCELAR
+  // ============================================================
+  function cancelarCredenciais() {
+    limparCamposCredenciais();
+    preencherEmailAtualNoNovoEmail();
+  }
+
+  // ============================================================
+  //  FORÇA DE SENHA
+  // ============================================================
+  function verificarForcaSenha(senha) {
+    if (!senha || senha.length === 0) {
+      strengthContainer.style.display = "none";
+      return;
+    }
+    strengthContainer.style.display = "block";
+
+    let forca = 0;
+    if (senha.length >= 8) forca++;
+    if (/[a-z]/.test(senha) && /[A-Z]/.test(senha)) forca++;
+    if (/[0-9]/.test(senha)) forca++;
+    if (/[^a-zA-Z0-9]/.test(senha)) forca++;
+
+    if (forca <= 1) {
+      strengthBar.className = "password-strength-bar strength-weak";
+      strengthText.textContent = "Força: Fraca — use letras, números e símbolos.";
+      strengthText.style.color = "#dc2626";
+    } else if (forca === 2) {
+      strengthBar.className = "password-strength-bar strength-medium";
+      strengthText.textContent = "Força: Média — boa, mas pode melhorar.";
+      strengthText.style.color = "#f59e0b";
+    } else {
+      strengthBar.className = "password-strength-bar strength-strong";
+      strengthText.textContent = "Força: Forte — excelente senha!";
+      strengthText.style.color = "#10b981";
+    }
+  }
+
+  // ============================================================
+  //  TOGGLE DE SENHA
+  // ============================================================
+  function configurarToggle(input, botao, textoMostrar, textoOcultar) {
+    botao.innerHTML = iconeOlho;
+    botao.setAttribute("aria-label", textoMostrar);
+
+    botao.addEventListener("click", () => {
+      const visivel = input.type === "text";
+      input.type = visivel ? "password" : "text";
+      botao.innerHTML = visivel ? iconeOlho : iconeOlhoFechado;
+      botao.setAttribute("aria-label", visivel ? textoMostrar : textoOcultar);
+      input.focus();
+    });
+  }
+
+  // ============================================================
+  //  EVENT LISTENERS
+  // ============================================================
   document.getElementById("themeLight").addEventListener("click", () => selecionarTema("light"));
   document.getElementById("themeDark").addEventListener("click", () => selecionarTema("dark"));
-  document.getElementById("btnCancelar").addEventListener("click", preencherFormulario);
-  form.addEventListener("submit", salvarDados);
+
   campos.crm.addEventListener("input", () => {
     campos.crm.value = campos.crm.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
   });
-  toggleSenha.addEventListener("click", () => {
-    const visivel = campos.senha.type === "text";
-    campos.senha.type = visivel ? "password" : "text";
-    toggleSenha.innerHTML = visivel ? iconeOlho : iconeOlhoFechado;
-    toggleSenha.setAttribute(
-      "aria-label",
-      visivel ? "Mostrar senha digitada" : "Ocultar senha digitada"
-    );
-    campos.senha.focus();
+
+  configurarToggle(camposCred.senhaAtual,         toggleSenhaAtual, "Mostrar senha atual",          "Ocultar senha atual");
+  configurarToggle(camposCred.novaSenha,          toggleNovaSenha,  "Mostrar nova senha",           "Ocultar nova senha");
+  configurarToggle(camposCred.confirmarNovaSenha, toggleConfirmar,  "Mostrar confirmação de senha", "Ocultar confirmação de senha");
+
+  camposCred.novaSenha.addEventListener("input", (e) => {
+    verificarForcaSenha(e.target.value);
   });
 
+  formCredenciais.addEventListener("submit", salvarCredenciais);
+  btnCancelarCred.addEventListener("click", cancelarCredenciais);
+
+  // ============================================================
+  //  INICIALIZAÇÃO
+  // ============================================================
   window.addEventListener("DOMContentLoaded", async () => {
     verificarPerfil("Médico");
     HematoAI.initSidebar("config");
+
     const tema = localStorage.getItem("hematoai_theme") || "light";
     atualizarTemaSelecionado(tema);
-    toggleSenha.innerHTML = iconeOlho;
+
+    toggleSenhaAtual.innerHTML = iconeOlho;
+    toggleNovaSenha.innerHTML = iconeOlho;
+    toggleConfirmar.innerHTML = iconeOlho;
+
     await carregarDadosMedico();
   });
 </script>

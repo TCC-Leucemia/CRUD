@@ -32,6 +32,12 @@ module.exports = class ConsultasService {
                 "Médico não encontrado"
             );
         }
+        if (medico.status !== "Ativo") {
+            throw new ErrorResponse(
+                400,
+                "Não é possível agendar uma consulta com um médico desativado."
+            );
+        }    
 
         const paciente = await this.#pacientesDAO.findByCPF(
             dados.cpf
@@ -42,6 +48,13 @@ module.exports = class ConsultasService {
             throw new ErrorResponse(
                 404,
                 "Paciente não encontrado"
+            );
+        }
+
+        if (paciente.status !== "Ativo") {
+            throw new ErrorResponse(
+                400,
+                "Não é possível agendar uma consulta com um paciente desativado."
             );
         }
 

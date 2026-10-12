@@ -139,19 +139,25 @@ module.exports = class PacientesDAO {
     }
 
     findByCPF(cpf) {
-        return new Promise((resolve, reject) => {
+        const sql = `
+            SELECT
+                p.*,
+                l.statusu AS status
+            FROM pacientes p
+            INNER JOIN login l
+                ON l.id_usuario = p.id_usuario
+            WHERE p.cpf = ?
+        `;
 
+        return new Promise((resolve, reject) => {
             this.#banco.query(
-                "SELECT * FROM pacientes WHERE cpf = ?",
+                sql,
                 [cpf],
                 (err, result) => {
-
                     if (err) return reject(err);
-
                     resolve(result[0] || null);
                 }
             );
-
         });
     }
 

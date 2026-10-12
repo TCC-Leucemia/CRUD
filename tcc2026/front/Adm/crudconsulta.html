@@ -1107,7 +1107,9 @@
       HematoAI.showToast(dados.msg || "Erro ao carregar pacientes.", "error");
       return;
     }
-    pacientes = dados.dados || [];
+    pacientes = (dados.dados || []).filter(
+      p => p.status === "Ativo"
+    );
     renderizarListaPacientes();
   }
 
@@ -1118,7 +1120,9 @@
       HematoAI.showToast(dados.msg || "Erro ao carregar médicos.", "error");
       return;
     }
-    medicos = dados.dados || [];
+    medicos = (dados.dados || []).filter(
+      m => m.status === "Ativo"
+    );
     renderizarListaMedicos();
   }
 

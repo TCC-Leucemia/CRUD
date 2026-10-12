@@ -239,7 +239,7 @@ module.exports = class MedicosMiddleware {
         if (nome.length < 3 || nome.length > 200 || caracteresInvalidos.test(nome)) {
             throw new ErrorResponse(400, "Nome inválido.");
         }
-        if (!/^[A-Z0-9]{4,11}$/.test(crm)) {
+        if (!/^\d{4,11}-[A-Z]{2}$/.test(crm)) {
             throw new ErrorResponse(400, "CRM inválido.");
         }
         if (
