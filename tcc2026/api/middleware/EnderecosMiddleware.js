@@ -18,8 +18,7 @@ module.exports = class EnderecosMiddleware {
             !numero ||
             !bairro ||
             !cidade ||
-            !estado ||
-            !cep
+            !estado
         ) {
             throw new ErrorResponse(
                 400,
@@ -31,112 +30,73 @@ module.exports = class EnderecosMiddleware {
         bairro = bairro.toString().trim();
         cidade = cidade.toString().trim();
         estado = estado.toString().trim().toUpperCase();
-        cep = cep.toString().trim();
 
         const xssRegex = /[<>]/;
 
         if (xssRegex.test(rua)) {
-            throw new ErrorResponse(
-                400,
-                "Rua inválida"
-            );
+            throw new ErrorResponse(400, "Rua inválida");
         }
 
         if (xssRegex.test(bairro)) {
-            throw new ErrorResponse(
-                400,
-                "Bairro inválido"
-            );
+            throw new ErrorResponse(400, "Bairro inválido");
         }
 
         if (xssRegex.test(cidade)) {
-            throw new ErrorResponse(
-                400,
-                "Cidade inválida"
-            );
+            throw new ErrorResponse(400, "Cidade inválida");
         }
 
         if (xssRegex.test(estado)) {
-            throw new ErrorResponse(
-                400,
-                "Estado inválido"
-            );
+            throw new ErrorResponse(400, "Estado inválido");
         }
 
         const textoRegex = /^[A-Za-zÀ-ÿ0-9\s.,\-ºª]+$/;
 
         if (!textoRegex.test(rua)) {
-            throw new ErrorResponse(
-                400,
-                "Rua inválida"
-            );
+            throw new ErrorResponse(400, "Rua inválida");
         }
 
         if (!textoRegex.test(bairro)) {
-            throw new ErrorResponse(
-                400,
-                "Bairro inválido"
-            );
+            throw new ErrorResponse(400, "Bairro inválido");
         }
 
         if (!textoRegex.test(cidade)) {
-            throw new ErrorResponse(
-                400,
-                "Cidade inválida"
-            );
+            throw new ErrorResponse(400, "Cidade inválida");
         }
 
         if (rua.length < 3 || rua.length > 255) {
-            throw new ErrorResponse(
-                400,
-                "Rua inválida"
-            );
+            throw new ErrorResponse(400, "Rua inválida");
         }
 
         if (bairro.length < 2 || bairro.length > 100) {
-            throw new ErrorResponse(
-                400,
-                "Bairro inválido"
-            );
+            throw new ErrorResponse(400, "Bairro inválido");
         }
 
         if (cidade.length < 2 || cidade.length > 100) {
-            throw new ErrorResponse(
-                400,
-                "Cidade inválida"
-            );
+            throw new ErrorResponse(400, "Cidade inválida");
         }
 
         if (isNaN(numero)) {
-            throw new ErrorResponse(
-                400,
-                "Número inválido"
-            );
+            throw new ErrorResponse(400, "Número inválido");
         }
 
         numero = Number(numero);
 
         if (!Number.isInteger(numero)) {
-            throw new ErrorResponse(
-                400,
-                "Número inválido"
-            );
+            throw new ErrorResponse(400, "Número inválido");
         }
 
         if (numero <= 0 || numero > 999999) {
-            throw new ErrorResponse(
-                400,
-                "Número inválido"
-            );
+            throw new ErrorResponse(400, "Número inválido");
         }
 
-        cep = cep.replace(/\D/g, "");
-
-        if (!/^\d{8}$/.test(cep)) {
-            throw new ErrorResponse(
-                400,
-                "CEP inválido"
-            );
+        // CEP: validado apenas se foi informado
+        if (cep !== undefined && cep !== null && cep !== "") {
+            cep = cep.toString().trim().replace(/\D/g, "");
+            if (!/^\d{8}$/.test(cep)) {
+                throw new ErrorResponse(400, "CEP inválido");
+            }
+        } else {
+            cep = null;
         }
 
         const estadosValidos = [
@@ -148,11 +108,10 @@ module.exports = class EnderecosMiddleware {
         ];
 
         if (!estadosValidos.includes(estado)) {
-            throw new ErrorResponse(
-                400,
-                "Estado inválido"
-            );
+            throw new ErrorResponse(400, "Estado inválido");
         }
+
+        request.body.cep = cep;
 
         next();
     }
@@ -169,12 +128,12 @@ module.exports = class EnderecosMiddleware {
         } = request.body;
 
         if (
-            !rua &&
-            !numero &&
-            !bairro &&
-            !cidade &&
-            !estado &&
-            !cep
+            rua === undefined &&
+            numero === undefined &&
+            bairro === undefined &&
+            cidade === undefined &&
+            estado === undefined &&
+            cep === undefined
         ) {
             throw new ErrorResponse(
                 400,
@@ -190,17 +149,11 @@ module.exports = class EnderecosMiddleware {
             rua = rua.toString().trim();
 
             if (xssRegex.test(rua) || !textoRegex.test(rua)) {
-                throw new ErrorResponse(
-                    400,
-                    "Rua inválida"
-                );
+                throw new ErrorResponse(400, "Rua inválida");
             }
 
             if (rua.length < 3 || rua.length > 255) {
-                throw new ErrorResponse(
-                    400,
-                    "Rua inválida"
-                );
+                throw new ErrorResponse(400, "Rua inválida");
             }
         }
 
@@ -209,17 +162,11 @@ module.exports = class EnderecosMiddleware {
             bairro = bairro.toString().trim();
 
             if (xssRegex.test(bairro) || !textoRegex.test(bairro)) {
-                throw new ErrorResponse(
-                    400,
-                    "Bairro inválido"
-                );
+                throw new ErrorResponse(400, "Bairro inválido");
             }
 
             if (bairro.length < 2 || bairro.length > 100) {
-                throw new ErrorResponse(
-                    400,
-                    "Bairro inválido"
-                );
+                throw new ErrorResponse(400, "Bairro inválido");
             }
         }
 
@@ -228,17 +175,11 @@ module.exports = class EnderecosMiddleware {
             cidade = cidade.toString().trim();
 
             if (xssRegex.test(cidade) || !textoRegex.test(cidade)) {
-                throw new ErrorResponse(
-                    400,
-                    "Cidade inválida"
-                );
+                throw new ErrorResponse(400, "Cidade inválida");
             }
 
             if (cidade.length < 2 || cidade.length > 100) {
-                throw new ErrorResponse(
-                    400,
-                    "Cidade inválida"
-                );
+                throw new ErrorResponse(400, "Cidade inválida");
             }
         }
 
@@ -255,48 +196,36 @@ module.exports = class EnderecosMiddleware {
             ];
 
             if (!estadosValidos.includes(estado)) {
-                throw new ErrorResponse(
-                    400,
-                    "Estado inválido"
-                );
+                throw new ErrorResponse(400, "Estado inválido");
             }
         }
 
         if (numero !== undefined) {
 
             if (isNaN(numero)) {
-                throw new ErrorResponse(
-                    400,
-                    "Número inválido"
-                );
+                throw new ErrorResponse(400, "Número inválido");
             }
 
             numero = Number(numero);
 
             if (!Number.isInteger(numero)) {
-                throw new ErrorResponse(
-                    400,
-                    "Número inválido"
-                );
+                throw new ErrorResponse(400, "Número inválido");
             }
 
             if (numero <= 0 || numero > 999999) {
-                throw new ErrorResponse(
-                    400,
-                    "Número inválido"
-                );
+                throw new ErrorResponse(400, "Número inválido");
             }
         }
 
         if (cep !== undefined) {
-
-            cep = cep.toString().trim().replace(/\D/g, "");
-
-            if (!/^\d{8}$/.test(cep)) {
-                throw new ErrorResponse(
-                    400,
-                    "CEP inválido"
-                );
+            if (cep === null || cep === "") {
+                request.body.cep = null;
+            } else {
+                const cepLimpo = cep.toString().trim().replace(/\D/g, "");
+                if (!/^\d{8}$/.test(cepLimpo)) {
+                    throw new ErrorResponse(400, "CEP inválido");
+                }
+                request.body.cep = cepLimpo;
             }
         }
 
@@ -308,17 +237,11 @@ module.exports = class EnderecosMiddleware {
         const { id_endereco } = request.params;
 
         if (!id_endereco || isNaN(id_endereco)) {
-            throw new ErrorResponse(
-                400,
-                "ID inválido"
-            );
+            throw new ErrorResponse(400, "ID inválido");
         }
 
         if (Number(id_endereco) <= 0) {
-            throw new ErrorResponse(
-                400,
-                "ID inválido"
-            );
+            throw new ErrorResponse(400, "ID inválido");
         }
 
         next();

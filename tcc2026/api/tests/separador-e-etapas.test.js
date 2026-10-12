@@ -85,10 +85,17 @@ test("endereço parcial não é etapa concluída", () => {
     assert.equal(enderecoCompleto({ ...completo, numero: "" }), false);
     assert.equal(enderecoCompleto({ ...completo, bairro: "   " }), false, "só espaços não conta");
     assert.equal(enderecoCompleto({ ...completo, cep: "12245" }), false, "CEP incompleto");
+    assert.equal(enderecoCompleto({ ...vazio, cep: "12245-020" }), false, "só o CEP não basta");
 });
 
 test("endereço completo é etapa concluída", () => {
     assert.equal(enderecoCompleto(completo), true);
+});
+
+test("CEP é opcional (c9f912f): sem CEP o endereço completo conta como concluído", () => {
+    assert.equal(enderecoCompleto({ ...completo, cep: "" }), true);
+    assert.equal(enderecoCompleto({ ...completo, cep: null }), true, "endereço do banco sem CEP");
+    assert.equal(enderecoCompleto({ ...completo, cep: "   " }), true);
 });
 
 test("edição: endereço vindo do banco (CEP sem máscara, número numérico) é concluído", () => {
@@ -101,6 +108,20 @@ test("cadastro de médico: a etapa Endereço não é mais concluída sempre", ()
     assert.doesNotMatch(funcao, /step === 2\)\s*\{\s*return true;/);
     assert.match(funcao, /HematoEtapas\.enderecoCompleto\(wizardData\.endereco\)/);
     assert.match(html, /<script src="\.\.\/JS\/etapas-cadastro\.js"><\/script>/);
+});
+
+test("cadastro de paciente: a etapa Endereço não é concluída sempre", () => {
+    const html = ler("Adm/crudpaciente.html");
+    const funcao = html.slice(html.indexOf("function isStepCompleted"), html.indexOf("function saveCurrentStepData"));
+    assert.doesNotMatch(funcao, /step === 1\)\s*\{\s*return true;/);
+    assert.match(funcao, /HematoEtapas\.enderecoCompleto\(wizardData\.endereco\)/);
+    assert.match(html, /<script src="\.\.\/JS\/etapas-cadastro\.js"><\/script>/);
+});
+
+test("edição de paciente: CEP nulo do banco vira texto vazio (evita cep.replace em null)", () => {
+    const html = ler("Adm/crudpaciente.html");
+    const funcao = html.slice(html.indexOf("window.editarPaciente"), html.indexOf("wizardData.login.email = p.email"));
+    assert.match(funcao, /cep: p\.endereco\.cep \|\| ""/);
 });
 
 test("cadastro de médico e de paciente: a etapa atual mostra o número, não o ✓", () => {

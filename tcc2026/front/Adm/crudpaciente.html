@@ -211,11 +211,11 @@
       box-shadow: 0 2px 8px rgba(185,28,28,0.4);
     }
 
-    /* ========== CALENDÁRIO ========== */
+    /* ========== CALENDÁRIO REFORMULADO ========== */
     .date-picker-wrapper { position: relative; width: 100%; }
 
     .date-picker-wrapper input {
-      padding: 10px 14px;
+      padding: 10px 42px 10px 14px;
       border: 1.5px solid var(--border);
       border-radius: var(--radius-md);
       font-size: 0.875rem;
@@ -261,12 +261,44 @@
       border-radius: var(--radius-xl);
       box-shadow: var(--shadow-lg);
       padding: 16px;
-      width: 320px;
+      width: 340px;
       max-width: 100%;
     }
 
     .calendar-popup.open { display: block; }
 
+    /* Cabeçalho com 3 seletores: Dia | Mês | Ano */
+    .cal-selectors {
+      display: grid;
+      grid-template-columns: 70px 1fr 90px;
+      gap: 6px;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .cal-selectors select {
+      padding: 8px 6px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: 0.85rem;
+      font-family: var(--font);
+      font-weight: 600;
+      background: var(--bg);
+      color: var(--text-1);
+      outline: none;
+      cursor: pointer;
+      text-align: center;
+      text-align-last: center;
+      transition: var(--transition);
+    }
+
+    .cal-selectors select:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(185,28,28,0.08);
+    }
+
+    /* Cabeçalho do mês com setas */
     .calendar-header {
       display: flex;
       justify-content: space-between;
@@ -278,28 +310,21 @@
       font-weight: 700;
       font-size: 0.95rem;
       color: var(--text-1);
-      cursor: pointer;
       padding: 4px 10px;
-      border-radius: var(--radius-md);
-      transition: var(--transition);
-    }
-
-    .calendar-header .month-year:hover {
-      background: var(--bg);
-      color: var(--red);
     }
 
     .calendar-header .nav-btn {
       background: transparent;
       border: 1px solid var(--border);
       border-radius: 40px;
-      padding: 4px 12px;
+      padding: 6px 12px;
       font-size: 0.8rem;
       font-weight: 600;
       cursor: pointer;
       transition: var(--transition);
       color: var(--text-2);
       font-family: var(--font);
+      min-width: 36px;
     }
 
     .calendar-header .nav-btn:hover {
@@ -346,7 +371,7 @@
       color: var(--red);
     }
 
-    .calendar-days .day.other-month { color: var(--text-3); opacity: 0.5; }
+    .calendar-days .day.other-month { color: var(--text-3); opacity: 0.4; }
 
     .calendar-days .day.selected {
       background: var(--red);
@@ -362,14 +387,16 @@
     }
 
     .dark-mode .calendar-popup { background: var(--surface); border-color: var(--border); }
+    .dark-mode .cal-selectors select { background: var(--bg); border-color: var(--border); color: var(--text-1); }
     .dark-mode .calendar-days .day:hover { background: var(--red-light); color: var(--red); }
     .dark-mode .calendar-days .day.selected { background: var(--red); color: white; }
     .dark-mode .calendar-days .day.today { border-color: var(--red); }
 
     @media (max-width: 540px) {
-      .calendar-popup { width: 280px; left: 50%; transform: translateX(-50%); }
+      .calendar-popup { width: 300px; left: 50%; transform: translateX(-50%); }
       .calendar-popup.open { transform: translateX(-50%); }
       .calendar-days .day { padding: 6px 0; font-size: 0.75rem; }
+      .cal-selectors { grid-template-columns: 1fr 1.5fr 1.2fr; }
     }
   </style>
 </head>
@@ -492,14 +519,24 @@
           <div class="form-group">
             <label>Data de Nascimento</label>
             <div class="date-picker-wrapper">
-              <input type="text" id="pDataNasc" placeholder="Selecione a data" readonly>
+              <input type="text" id="pDataNasc" placeholder="DD/MM/AAAA" readonly>
               <span class="date-icon">📅</span>
               <div class="calendar-popup" id="calendarPopupNasc">
+
+                <!-- Seletores Dia | Mês | Ano -->
+                <div class="cal-selectors">
+                  <select id="calDia" aria-label="Dia"></select>
+                  <select id="calMes" aria-label="Mês"></select>
+                  <select id="calAno" aria-label="Ano"></select>
+                </div>
+
+                <!-- Cabeçalho com navegação de mês -->
                 <div class="calendar-header">
                   <button type="button" class="nav-btn" id="prevMonthNasc">◀</button>
-                  <span class="month-year" id="monthYearDisplayNasc">Janeiro 2026</span>
+                  <span class="month-year" id="monthYearDisplayNasc">—</span>
                   <button type="button" class="nav-btn" id="nextMonthNasc">▶</button>
                 </div>
+
                 <div class="calendar-weekdays">
                   <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
                 </div>
@@ -529,28 +566,28 @@
       <div id="step2Content" class="wizard-step-content" style="display:none;">
         <div class="form-grid">
           <div class="form-group col-span-2">
-            <label>CEP *</label>
+            <label>CEP</label>
             <input type="text" id="pCep" placeholder="00000-000" maxlength="9">
             <small style="color: var(--text-3); font-size: 0.7rem; margin-top: 4px; display: block;">Digite o CEP e aguarde o preenchimento automático</small>
           </div>
           <div class="form-group col-span-2">
-            <label>Rua *</label>
+            <label>Rua</label>
             <input type="text" id="pRua" placeholder="Nome da rua ou avenida">
           </div>
           <div class="form-group">
-            <label>Número *</label>
+            <label>Número</label>
             <input type="number" id="pNumero" placeholder="123" min="1">
           </div>
           <div class="form-group">
-            <label>Bairro *</label>
+            <label>Bairro</label>
             <input type="text" id="pBairro" placeholder="Nome do bairro">
           </div>
           <div class="form-group">
-            <label>Cidade *</label>
+            <label>Cidade</label>
             <input type="text" id="pCidade" placeholder="Cidade">
           </div>
           <div class="form-group">
-            <label>Estado *</label>
+            <label>Estado</label>
             <select id="pEstado">
               <option value="">UF</option>
               <option>AC</option><option>AL</option><option>AP</option><option>AM</option>
@@ -601,6 +638,7 @@
 
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="../JS/navbar.js"></script>
+<script src="../JS/etapas-cadastro.js"></script>
 <script src="../JS/auth.js"></script>
 <script src="../JS/api.js"></script>
 <script src="../JS/exportar.js"></script>
@@ -623,7 +661,10 @@
   };
 
   // ============================================
-  // CALENDÁRIO - DATA DE NASCIMENTO
+  // CALENDÁRIO — DATA DE NASCIMENTO
+  // Reformulado: 3 selects (Dia | Mês | Ano) no topo,
+  // permitindo ao usuário escolher direto o ano/mês/dia
+  // sem precisar abrir outro popup.
   // ============================================
   let dataNascSelecionada = null;
   let mesNascAtual = new Date().getMonth();
@@ -632,6 +673,67 @@
 
   const mesesNomes = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
     'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+
+  const ANO_MIN = 1900;
+  const ANO_MAX = new Date().getFullYear();
+
+  // Preenche os 3 selects uma única vez
+  function inicializarSelects() {
+    const selDia = document.getElementById('calDia');
+    const selMes = document.getElementById('calMes');
+    const selAno = document.getElementById('calAno');
+
+    // Dia 1-31
+    selDia.innerHTML = '';
+    for (let d = 1; d <= 31; d++) {
+      const opt = document.createElement('option');
+      opt.value = d;
+      opt.textContent = String(d).padStart(2, '0');
+      selDia.appendChild(opt);
+    }
+
+    // Mês
+    selMes.innerHTML = '';
+    mesesNomes.forEach((nome, i) => {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = nome;
+      selMes.appendChild(opt);
+    });
+
+    // Ano (do mais recente para o mais antigo)
+    selAno.innerHTML = '';
+    for (let a = ANO_MAX; a >= ANO_MIN; a--) {
+      const opt = document.createElement('option');
+      opt.value = a;
+      opt.textContent = a;
+      selAno.appendChild(opt);
+    }
+  }
+
+  // Sincroniza os selects com o estado atual
+  function sincronizarSelects() {
+    document.getElementById('calMes').value = String(mesNascAtual);
+    document.getElementById('calAno').value = String(anoNascAtual);
+
+    const selDia = document.getElementById('calDia');
+    // Ajusta o número de dias do mês
+    const diasNoMes = new Date(anoNascAtual, mesNascAtual + 1, 0).getDate();
+    // Reabilita/desabilita as opções de dia conforme o mês
+    Array.from(selDia.options).forEach(opt => {
+      const dia = parseInt(opt.value);
+      opt.disabled = dia > diasNoMes;
+    });
+
+    // Seleciona o dia se houver data escolhida
+    if (dataNascSelecionada &&
+        dataNascSelecionada.getMonth() === mesNascAtual &&
+        dataNascSelecionada.getFullYear() === anoNascAtual) {
+      selDia.value = String(dataNascSelecionada.getDate());
+    } else if (parseInt(selDia.value) > diasNoMes) {
+      selDia.value = String(diasNoMes);
+    }
+  }
 
   function renderCalendarNasc() {
     const daysContainer = document.getElementById('calendarDaysNasc');
@@ -682,6 +784,8 @@
       div.textContent = d;
       daysContainer.appendChild(div);
     }
+
+    sincronizarSelects();
   }
 
   function selecionarDiaNasc(dia) {
@@ -718,124 +822,46 @@
     popup.classList.add('open');
   }
 
-  function abrirSelecionadorMesAnoNasc() {
-    const overlay = document.createElement('div');
-    overlay.className = 'seletor-mes-ano-overlay';
-    overlay.style.position = 'fixed';
-    overlay.style.top = '0';
-    overlay.style.left = '0';
-    overlay.style.width = '100%';
-    overlay.style.height = '100%';
-    overlay.style.backgroundColor = 'rgba(0,0,0,0.3)';
-    overlay.style.zIndex = '9999';
-    overlay.style.display = 'flex';
-    overlay.style.alignItems = 'center';
-    overlay.style.justifyContent = 'center';
+  // ============================================
+  // LISTENERS DOS SELECTS DO CABEÇALHO
+  // ============================================
+  document.getElementById('calDia').addEventListener('change', function(e) {
+    e.stopPropagation();
+    const dia = parseInt(this.value);
+    dataNascSelecionada = new Date(anoNascAtual, mesNascAtual, dia);
+    renderCalendarNasc();
+    atualizarCampoDataNasc();
+  });
 
-    const container = document.createElement('div');
-    container.className = 'seletor-mes-ano-container';
-    container.style.backgroundColor = 'var(--surface)';
-    container.style.borderRadius = 'var(--radius-xl)';
-    container.style.padding = '24px';
-    container.style.boxShadow = 'var(--shadow-lg)';
-    container.style.maxWidth = '400px';
-    container.style.width = '90%';
-    container.style.color = 'var(--text-1)';
+  document.getElementById('calMes').addEventListener('change', function(e) {
+    e.stopPropagation();
+    mesNascAtual = parseInt(this.value);
+    renderCalendarNasc();
+  });
 
-    const title = document.createElement('h3');
-    title.textContent = 'Selecionar Mês/Ano';
-    title.style.marginBottom = '16px';
-    title.style.fontWeight = '700';
-    container.appendChild(title);
+  document.getElementById('calAno').addEventListener('change', function(e) {
+    e.stopPropagation();
+    anoNascAtual = parseInt(this.value);
+    renderCalendarNasc();
+  });
 
-    const mesSelect = document.createElement('select');
-    mesSelect.style.width = '100%';
-    mesSelect.style.padding = '8px 12px';
-    mesSelect.style.marginBottom = '10px';
-    mesSelect.style.border = '1.5px solid var(--border)';
-    mesSelect.style.borderRadius = 'var(--radius-md)';
-    mesSelect.style.fontSize = '0.9rem';
-    mesSelect.style.fontFamily = 'var(--font)';
-    mesSelect.style.background = 'var(--bg)';
-    mesSelect.style.color = 'var(--text-1)';
-    mesesNomes.forEach((m, i) => {
-      const opt = document.createElement('option');
-      opt.value = i;
-      opt.textContent = m;
-      if (i === mesNascAtual) opt.selected = true;
-      mesSelect.appendChild(opt);
-    });
-    container.appendChild(mesSelect);
-
-    const anoInput = document.createElement('input');
-    anoInput.type = 'number';
-    anoInput.value = anoNascAtual;
-    anoInput.min = 1900;
-    anoInput.max = 2100;
-    anoInput.style.width = '100%';
-    anoInput.style.padding = '8px 12px';
-    anoInput.style.marginBottom = '16px';
-    anoInput.style.border = '1.5px solid var(--border)';
-    anoInput.style.borderRadius = 'var(--radius-md)';
-    anoInput.style.fontSize = '0.9rem';
-    anoInput.style.fontFamily = 'var(--font)';
-    anoInput.style.background = 'var(--bg)';
-    anoInput.style.color = 'var(--text-1)';
-    container.appendChild(anoInput);
-
-    const btnContainer = document.createElement('div');
-    btnContainer.style.display = 'flex';
-    btnContainer.style.gap = '10px';
-    btnContainer.style.justifyContent = 'flex-end';
-
-    const btnCancelar = document.createElement('button');
-    btnCancelar.textContent = 'Cancelar';
-    btnCancelar.className = 'btn btn-ghost';
-    btnCancelar.style.padding = '8px 20px';
-    btnCancelar.addEventListener('click', function(e) {
+  // Impede que os cliques nos selects propaguem e fechem o popup
+  ['calDia', 'calMes', 'calAno'].forEach(id => {
+    document.getElementById(id).addEventListener('click', function(e) {
       e.stopPropagation();
-      document.body.removeChild(overlay);
     });
-
-    const btnConfirmar = document.createElement('button');
-    btnConfirmar.textContent = 'Confirmar';
-    btnConfirmar.className = 'btn btn-primary';
-    btnConfirmar.style.padding = '8px 20px';
-    btnConfirmar.addEventListener('click', function(e) {
-      e.stopPropagation();
-      const novoMes = parseInt(mesSelect.value);
-      const novoAno = parseInt(anoInput.value);
-      if (novoAno >= 1900 && novoAno <= 2100) {
-        mesNascAtual = novoMes;
-        anoNascAtual = novoAno;
-        renderCalendarNasc();
-      } else {
-        HematoAI.showToast('Informe um ano entre 1900 e 2100.', 'error');
-      }
-      document.body.removeChild(overlay);
-    });
-
-    btnContainer.appendChild(btnCancelar);
-    btnContainer.appendChild(btnConfirmar);
-    container.appendChild(btnContainer);
-
-    overlay.appendChild(container);
-    document.body.appendChild(overlay);
-
-    // Fecha clicando no fundo do overlay
-    overlay.addEventListener('click', function(e) {
-      if (e.target === overlay) document.body.removeChild(overlay);
-    });
-  }
+  });
 
   // ============================================
-  // LISTENERS DOS BOTÕES DO CALENDÁRIO
+  // LISTENERS DOS BOTÕES DE NAVEGAÇÃO
   // ============================================
   document.getElementById('prevMonthNasc').addEventListener('click', function(e) {
     e.preventDefault();
     e.stopPropagation();
     if (mesNascAtual === 0) { mesNascAtual = 11; anoNascAtual--; }
     else { mesNascAtual--; }
+    // Garante que o ano não saia do intervalo
+    if (anoNascAtual < ANO_MIN) { anoNascAtual = ANO_MIN; mesNascAtual = 0; }
     renderCalendarNasc();
   });
 
@@ -844,13 +870,8 @@
     e.stopPropagation();
     if (mesNascAtual === 11) { mesNascAtual = 0; anoNascAtual++; }
     else { mesNascAtual++; }
+    if (anoNascAtual > ANO_MAX) { anoNascAtual = ANO_MAX; mesNascAtual = 11; }
     renderCalendarNasc();
-  });
-
-  document.getElementById('monthYearDisplayNasc').addEventListener('click', function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    abrirSelecionadorMesAnoNasc();
   });
 
   document.getElementById('pDataNasc').addEventListener('click', function(e) {
@@ -861,10 +882,6 @@
 
   // Handler global para fechar o calendário ao clicar fora
   document.addEventListener('click', function(e) {
-    // Se o clique for dentro do overlay do seletor de mês/ano, não fazer nada
-    if (e.target.closest && e.target.closest('.seletor-mes-ano-overlay')) {
-      return;
-    }
     const popup = document.getElementById('calendarPopupNasc');
     if (!popup || !popup.classList.contains('open')) return;
     const wrapper = popup.closest('.date-picker-wrapper');
@@ -1047,7 +1064,8 @@
     if (step === 0) {
       return wizardData.paciente.cpf && wizardData.paciente.nome && wizardData.paciente.sexo && wizardData.paciente.email;
     } else if (step === 1) {
-      return wizardData.endereco.cep && wizardData.endereco.rua && wizardData.endereco.numero && wizardData.endereco.bairro && wizardData.endereco.cidade && wizardData.endereco.estado;
+      // Endereço só conta como concluído quando preenchido (o CEP é opcional).
+      return HematoEtapas.enderecoCompleto(wizardData.endereco);
     } else if (step === 2) {
       return wizardData.login.email && wizardData.login.senha;
     }
@@ -1119,19 +1137,32 @@
       const email = document.getElementById('pEmail').value.trim();
 
       if (!cpf || cpf.length !== 11) { HematoAI.showToast('CPF inválido. Deve conter 11 dígitos.', 'error'); return false; }
-      if (!nome || nome.length < 3)  { HematoAI.showToast('Nome deve ter ao menos 3 caracteres.', 'error'); return false; }
+      if (!nome || nome.length < 8)  { HematoAI.showToast('Nome deve ter ao menos 7 caracteres.', 'error'); return false; }
+      if (!nome || nome.length >100)  { HematoAI.showToast('Nome muito grande.', 'error'); return false; }
       if (!sexo)                     { HematoAI.showToast('Selecione o sexo.', 'error'); return false; }
       if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) { HematoAI.showToast('E-mail inválido.', 'error'); return false; }
     } else if (currentStep === 1) {
-      const cep = document.getElementById('pCep').value.replace(/\D/g, '');
+      // Endereço agora é opcional no front
+      const cep = document.getElementById('pCep').value.trim();
       const rua = document.getElementById('pRua').value.trim();
-      const numero = document.getElementById('pNumero').value;
+      const numero = document.getElementById('pNumero').value.trim();
       const bairro = document.getElementById('pBairro').value.trim();
       const cidade = document.getElementById('pCidade').value.trim();
-      const estado = document.getElementById('pEstado').value;
+      const estado = document.getElementById('pEstado').value.trim();
 
-      if (!cep || cep.length !== 8) { HematoAI.showToast('CEP inválido.', 'error'); return false; }
-      if (!rua || !numero || !bairro || !cidade || !estado) { HematoAI.showToast('Preencha todos os campos obrigatórios do endereço.', 'error'); return false; }
+      const algumCampoPreenchido = cep || rua || numero || bairro || cidade || estado;
+
+      if (algumCampoPreenchido) {
+        if (!rua || !numero || !bairro || !cidade || !estado) {
+          HematoAI.showToast('Preencha os campos de endereço (Rua, Número, Bairro, Cidade e Estado).', 'error');
+          return false;
+        }
+      }
+
+      if (cep && cep.replace(/\D/g, '').length !== 8) {
+        HematoAI.showToast('CEP inválido.', 'error');
+        return false;
+      }
     } else if (currentStep === 2) {
       const email = document.getElementById('pLoginEmail').value.trim();
       const senha = document.getElementById('pSenha').value;
@@ -1155,20 +1186,40 @@
     if (currentStep > 0) { currentStep--; loadStepData(); updateWizardUI(); }
   }
 
+  
   async function finalizeCadastro() {
     saveCurrentStepData();
+
     if (!validateCurrentStep()) return;
     if (!validarWizard()) return;
 
     try {
-      if (editingCpf) { await atualizarPacienteCompleto(); }
-      else            { await cadastrarPacienteCompleto(); }
+      if (editingCpf) {
+        await atualizarPacienteCompleto();
+      } else {
+        await cadastrarPacienteCompleto();
+      }
+
       HematoAI.closeModal(modalEl);
       await carregarPacientes();
       resetWizard();
+
     } catch (erro) {
-      console.error(erro);
-      HematoAI.showToast("Erro ao conectar ao servidor.", "error");
+      console.error("Erro ao finalizar cadastro de paciente:", erro);
+
+      // Não exibe erro de conexão para falhas de validação
+      if (
+        erro.message &&
+        erro.message !== "Failed to fetch" &&
+        erro.message !== "NetworkError"
+      ) {
+        return;
+      }
+
+      HematoAI.showToast(
+        "Falha de comunicação com o servidor. Verifique sua conexão.",
+        "error"
+      );
     }
   }
 
@@ -1176,11 +1227,6 @@
     if (!wizardData.paciente.cpf || !wizardData.paciente.nome || !wizardData.paciente.sexo || !wizardData.paciente.email) {
       HematoAI.showToast("Complete os dados pessoais.", "error");
       currentStep = 0; loadStepData(); updateWizardUI();
-      return false;
-    }
-    if (!wizardData.endereco.cep || !wizardData.endereco.rua || !wizardData.endereco.numero || !wizardData.endereco.bairro || !wizardData.endereco.cidade || !wizardData.endereco.estado) {
-      HematoAI.showToast("Complete os dados de endereço.", "error");
-      currentStep = 1; loadStepData(); updateWizardUI();
       return false;
     }
     if (!wizardData.login.email || !wizardData.login.senha) {
@@ -1415,7 +1461,10 @@
       email: p.email,
       telefone: p.telefone || ""
     };
-    wizardData.endereco = p.endereco || { cep: "", rua: "", numero: "", bairro: "", cidade: "", estado: "" };
+    // CEP é opcional e pode vir nulo do banco (como no cadastro de médico).
+    wizardData.endereco = p.endereco
+      ? { ...p.endereco, cep: p.endereco.cep || "" }
+      : { cep: "", rua: "", numero: "", bairro: "", cidade: "", estado: "" };
     wizardData.login.email = p.email;
     wizardData.login.senha = '********';
     currentStep = 0;
@@ -1507,6 +1556,8 @@
     }
   });
 
+  // Inicialização do calendário (selects e render)
+  inicializarSelects();
   carregarPacientes();
   updateWizardUI();
   renderCalendarNasc();

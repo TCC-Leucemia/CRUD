@@ -1,5 +1,5 @@
 const ErrorResponse = require("../utils/ErrorResponse");
-const { normalizarCrm, crmValidoParaVinculo } = require("../utils/crm");
+const { normalizarCrm, crmValidoParaVinculo, MSG_CRM_INVALIDO } = require("../utils/crm");
 
 module.exports = class ConsultasMiddleware {
 
@@ -86,7 +86,7 @@ module.exports = class ConsultasMiddleware {
         // também CRMs antigos só com dígitos. Antes só dígitos eram aceitos
         // e nenhuma consulta podia ser agendada para médicos com UF no CRM.
         if (!crmValidoParaVinculo(crm)) {
-            throw new ErrorResponse(400, "CRM inválido");
+            throw new ErrorResponse(400, MSG_CRM_INVALIDO);
         }
 
         const data = new Date(data_consulta);
@@ -162,7 +162,7 @@ module.exports = class ConsultasMiddleware {
             req.body.crm = crm;
 
             if (xssRegex.test(crm) || !crmValidoParaVinculo(crm)) {
-                throw new ErrorResponse(400, "CRM inválido");
+                throw new ErrorResponse(400, MSG_CRM_INVALIDO);
             }
         }
 
