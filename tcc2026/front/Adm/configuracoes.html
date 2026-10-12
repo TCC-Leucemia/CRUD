@@ -573,16 +573,18 @@
   }
 
   function sairSistema() {
-    if (typeof HematoAI !== 'undefined') {
-      HematoAI.confirmDialog(
-        'Tem certeza que deseja sair do sistema?',
-        () => {
-          localStorage.removeItem('hematoai_session');
-          window.location.href = 'login.html';
-        }
-      );
-    }
+  if (typeof HematoAI !== 'undefined') {
+    HematoAI.confirmDialog(
+      'Tem certeza que deseja sair do sistema?',
+      () => {
+        localStorage.removeItem('hematoai_session');
+        localStorage.removeItem('token');
+        localStorage.removeItem('usuario');
+        window.location.href = '../login.html';
+      }
+    );
   }
+}
 
   // Event listeners
   document.getElementById('btnSalvarCredenciais').addEventListener('click', salvarCredenciais);

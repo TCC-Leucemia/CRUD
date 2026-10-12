@@ -109,14 +109,14 @@
       margin-top: 3px;
     }
 
-    /* ========== CALENDÁRIO PERSONALIZADO ========== */
+    /* ========== CALENDÁRIO REFORMULADO ========== */
     .date-picker-wrapper {
       position: relative;
       width: 100%;
     }
 
     .date-picker-wrapper input {
-      padding: 10px 14px;
+      padding: 10px 42px 10px 14px;
       border: 1.5px solid var(--border);
       border-radius: var(--radius-md);
       font-size: 0.875rem;
@@ -166,18 +166,43 @@
       border-radius: var(--radius-xl);
       box-shadow: var(--shadow-lg);
       padding: 16px;
-      width: 320px;
+      width: 340px;
       max-width: 100%;
-      animation: fadeIn 0.2s ease;
     }
 
     .calendar-popup.open {
       display: block;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-8px); }
-      to { opacity: 1; transform: translateY(0); }
+    /* Cabeçalho com 3 seletores: Dia | Mês | Ano */
+    .cal-selectors {
+      display: grid;
+      grid-template-columns: 70px 1fr 90px;
+      gap: 6px;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .cal-selectors select {
+      padding: 8px 6px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      font-size: 0.85rem;
+      font-family: var(--font);
+      font-weight: 600;
+      background: var(--bg);
+      color: var(--text-1);
+      outline: none;
+      cursor: pointer;
+      text-align: center;
+      text-align-last: center;
+      transition: var(--transition);
+    }
+
+    .cal-selectors select:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(185,28,28,0.08);
     }
 
     .calendar-header {
@@ -191,28 +216,21 @@
       font-weight: 700;
       font-size: 0.95rem;
       color: var(--text-1);
-      cursor: pointer;
       padding: 4px 10px;
-      border-radius: var(--radius-md);
-      transition: var(--transition);
-    }
-
-    .calendar-header .month-year:hover {
-      background: var(--bg);
-      color: var(--red);
     }
 
     .calendar-header .nav-btn {
       background: transparent;
       border: 1px solid var(--border);
       border-radius: 40px;
-      padding: 4px 12px;
+      padding: 6px 12px;
       font-size: 0.8rem;
       font-weight: 600;
       cursor: pointer;
       transition: var(--transition);
       color: var(--text-2);
       font-family: var(--font);
+      min-width: 36px;
     }
 
     .calendar-header .nav-btn:hover {
@@ -261,7 +279,7 @@
 
     .calendar-days .day.other-month {
       color: var(--text-3);
-      opacity: 0.5;
+      opacity: 0.4;
     }
 
     .calendar-days .day.selected {
@@ -279,6 +297,7 @@
       font-weight: 700;
     }
 
+    /* Seletor de Hora (mantido) */
     .time-selector {
       display: flex;
       align-items: center;
@@ -484,7 +503,7 @@
       display: none !important;
     }
 
-    /* ── Botões de ação na tabela (estilo padrão das outras páginas) ── */
+    /* ── Botões de ação na tabela ── */
     .td-actions {
       display: flex;
       flex-wrap: wrap;
@@ -508,7 +527,6 @@
       height: 14px;
     }
 
-    /* Botão Ver (estilo ghost, sem ícone) */
     .td-actions .btn-ver {
       background: transparent;
       border: 1.5px solid var(--border);
@@ -521,7 +539,6 @@
       background: var(--red-light);
     }
 
-    /* Botão Editar (estilo outline) */
     .td-actions .btn-editar {
       background: transparent;
       border: 1.5px solid var(--red);
@@ -535,7 +552,6 @@
       box-shadow: 0 2px 8px rgba(185,28,28,0.3);
     }
 
-    /* Botão Excluir (estilo danger - fundo vermelho) */
     .td-actions .btn-excluir {
       background: var(--red);
       border: 1.5px solid var(--red);
@@ -553,6 +569,12 @@
     .dark-mode .calendar-popup {
       background: var(--surface);
       border-color: var(--border);
+    }
+
+    .dark-mode .cal-selectors select {
+      background: var(--bg);
+      border-color: var(--border);
+      color: var(--text-1);
     }
 
     .dark-mode .calendar-days .day:hover {
@@ -606,7 +628,7 @@
     /* Responsivo */
     @media (max-width: 540px) {
       .calendar-popup {
-        width: 280px;
+        width: 300px;
         left: 50%;
         transform: translateX(-50%);
       }
@@ -616,6 +638,9 @@
       .calendar-days .day {
         padding: 6px 0;
         font-size: 0.75rem;
+      }
+      .cal-selectors {
+        grid-template-columns: 1fr 1.5fr 1.2fr;
       }
       .time-selector {
         flex-wrap: wrap;
@@ -833,15 +858,26 @@
             <input type="text" id="cData" placeholder="Selecione a data e hora" readonly>
             <span class="date-icon">📅</span>
             <div class="calendar-popup" id="calendarPopup">
+
+              <!-- Seletores Dia | Mês | Ano -->
+              <div class="cal-selectors">
+                <select id="calDia" aria-label="Dia"></select>
+                <select id="calMes" aria-label="Mês"></select>
+                <select id="calAno" aria-label="Ano"></select>
+              </div>
+
               <div class="calendar-header">
                 <button type="button" class="nav-btn" id="prevMonth">◀</button>
-                <span class="month-year" id="monthYearDisplay">Janeiro 2026</span>
+                <span class="month-year" id="monthYearDisplay">—</span>
                 <button type="button" class="nav-btn" id="nextMonth">▶</button>
               </div>
+
               <div class="calendar-weekdays">
                 <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
               </div>
               <div class="calendar-days" id="calendarDays"></div>
+
+              <!-- Seletor de Hora (mantido) -->
               <div class="time-selector">
                 <label for="horaSelect">Hora</label>
                 <select id="horaSelect">
@@ -929,14 +965,13 @@
   //  ESTADO GLOBAL
   // ============================================================
   let consultas = [];
-  let listaExibida = []; // exatamente o que a tabela mostra, para a exportação
+  let listaExibida = [];
   let pacientes = [];
   let medicos = [];
   let modoEdicao = false;
   let idEdicao = null;
   let idDetalhe = null;
 
-  // Estado para seletores
   let pacienteSelecionado = null;
   let medicoSelecionado = null;
 
@@ -1002,10 +1037,7 @@
       tbody.appendChild(tr);
     });
 
-    // Inicializa ícones Lucide após renderizar a tabela
-    if (window.lucide) {
-      lucide.createIcons();
-    }
+    if (window.lucide) lucide.createIcons();
   }
 
   // ============================================================
@@ -1161,7 +1193,6 @@
     pacienteSelecionado = paciente;
     document.getElementById('cCpf').value = paciente.cpf;
 
-    // Atualiza resumo
     document.getElementById('resumoPacienteNome').textContent = paciente.nome;
     document.getElementById('resumoPacienteCpf').textContent = formatarCPF(paciente.cpf);
     document.getElementById('resumoPaciente').classList.add('ativo');
@@ -1230,7 +1261,6 @@
     medicoSelecionado = medico;
     document.getElementById('cCrm').value = medico.crm;
 
-    // Atualiza resumo
     document.getElementById('resumoMedicoNome').textContent = medico.nome;
     document.getElementById('resumoMedicoCrm').textContent = medico.crm;
     document.getElementById('resumoMedicoEsp').textContent = medico.especialidade || '—';
@@ -1240,7 +1270,6 @@
     renderizarListaMedicos(search);
   }
 
-  // Event listeners dos campos de pesquisa
   document.getElementById('searchPacienteSelect').addEventListener('input', function() {
     renderizarListaPacientes(this.value);
   });
@@ -1250,20 +1279,75 @@
   });
 
   // ============================================================
-  //  CALENDÁRIO PERSONALIZADO
+  //  CALENDÁRIO REFORMULADO (Dia | Mês | Ano + Hora)
   // ============================================================
   let selectedDate = null;
   let currentMonth = new Date().getMonth();
   let currentYear = new Date().getFullYear();
   const today = new Date();
 
+  const mesesNomes = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+
+  const ANO_MIN = new Date().getFullYear();
+  const ANO_MAX = new Date().getFullYear() + 10;
+
+  function inicializarSelects() {
+    const selDia = document.getElementById('calDia');
+    const selMes = document.getElementById('calMes');
+    const selAno = document.getElementById('calAno');
+
+    selDia.innerHTML = '';
+    for (let d = 1; d <= 31; d++) {
+      const opt = document.createElement('option');
+      opt.value = d;
+      opt.textContent = String(d).padStart(2, '0');
+      selDia.appendChild(opt);
+    }
+
+    selMes.innerHTML = '';
+    mesesNomes.forEach((nome, i) => {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = nome;
+      selMes.appendChild(opt);
+    });
+
+    // Para consultas, o ano vai do atual até 10 anos à frente
+    selAno.innerHTML = '';
+    for (let a = ANO_MIN; a <= ANO_MAX; a++) {
+      const opt = document.createElement('option');
+      opt.value = a;
+      opt.textContent = a;
+      selAno.appendChild(opt);
+    }
+  }
+
+  function sincronizarSelects() {
+    document.getElementById('calMes').value = String(currentMonth);
+    document.getElementById('calAno').value = String(currentYear);
+
+    const selDia = document.getElementById('calDia');
+    const diasNoMes = new Date(currentYear, currentMonth + 1, 0).getDate();
+    Array.from(selDia.options).forEach(opt => {
+      const dia = parseInt(opt.value);
+      opt.disabled = dia > diasNoMes;
+    });
+
+    if (selectedDate &&
+        selectedDate.getMonth() === currentMonth &&
+        selectedDate.getFullYear() === currentYear) {
+      selDia.value = String(selectedDate.getDate());
+    } else if (parseInt(selDia.value) > diasNoMes) {
+      selDia.value = String(diasNoMes);
+    }
+  }
+
   function renderCalendar() {
     const daysContainer = document.getElementById('calendarDays');
     const monthYearDisplay = document.getElementById('monthYearDisplay');
-    const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-      'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
-    monthYearDisplay.textContent = `${meses[currentMonth]} ${currentYear}`;
+    monthYearDisplay.textContent = `${mesesNomes[currentMonth]} ${currentYear}`;
 
     const firstDay = new Date(currentYear, currentMonth, 1).getDay();
     const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
@@ -1271,7 +1355,6 @@
 
     daysContainer.innerHTML = '';
 
-    // Dias do mês anterior
     for (let i = firstDay - 1; i >= 0; i--) {
       const day = daysInPrevMonth - i;
       const div = document.createElement('div');
@@ -1280,7 +1363,6 @@
       daysContainer.appendChild(div);
     }
 
-    // Dias do mês atual
     for (let d = 1; d <= daysInMonth; d++) {
       const div = document.createElement('div');
       div.className = 'day';
@@ -1302,7 +1384,6 @@
       daysContainer.appendChild(div);
     }
 
-    // Dias do próximo mês para preencher o grid
     const totalDays = firstDay + daysInMonth;
     const remaining = (7 - (totalDays % 7)) % 7;
     for (let d = 1; d <= remaining; d++) {
@@ -1311,6 +1392,8 @@
       div.textContent = d;
       daysContainer.appendChild(div);
     }
+
+    sincronizarSelects();
   }
 
   function selecionarDia(dia) {
@@ -1354,145 +1437,67 @@
   }
 
   // ============================================================
-  //  SELETOR DE MÊS E ANO
+  //  LISTENERS DOS SELECTS E NAVEGAÇÃO
   // ============================================================
-  function abrirSelecionadorMesAno() {
-    const currentMonthYear = document.getElementById('monthYearDisplay').textContent;
-    const [mesNome, anoStr] = currentMonthYear.split(' ');
-    const ano = parseInt(anoStr);
-    const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-      'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-    const mesIndex = meses.indexOf(mesNome);
+  document.getElementById('calDia').addEventListener('change', function(e) {
+    e.stopPropagation();
+    const dia = parseInt(this.value);
+    selectedDate = new Date(currentYear, currentMonth, dia);
+    renderCalendar();
+    atualizarCampoData();
+  });
 
-    const overlay = document.createElement('div');
-    overlay.style.position = 'fixed';
-    overlay.style.top = '0';
-    overlay.style.left = '0';
-    overlay.style.width = '100%';
-    overlay.style.height = '100%';
-    overlay.style.backgroundColor = 'rgba(0,0,0,0.3)';
-    overlay.style.zIndex = '9999';
-    overlay.style.display = 'flex';
-    overlay.style.alignItems = 'center';
-    overlay.style.justifyContent = 'center';
+  document.getElementById('calMes').addEventListener('change', function(e) {
+    e.stopPropagation();
+    currentMonth = parseInt(this.value);
+    renderCalendar();
+  });
 
-    const container = document.createElement('div');
-    container.style.backgroundColor = 'var(--surface)';
-    container.style.borderRadius = 'var(--radius-xl)';
-    container.style.padding = '24px';
-    container.style.boxShadow = 'var(--shadow-lg)';
-    container.style.maxWidth = '400px';
-    container.style.width = '90%';
-    container.style.color = 'var(--text-1)';
+  document.getElementById('calAno').addEventListener('change', function(e) {
+    e.stopPropagation();
+    currentYear = parseInt(this.value);
+    renderCalendar();
+  });
 
-    const title = document.createElement('h3');
-    title.textContent = 'Selecionar Mês/Ano';
-    title.style.marginBottom = '16px';
-    title.style.fontWeight = '700';
-    title.style.color = 'var(--text-1)';
-    container.appendChild(title);
-
-    const mesSelect = document.createElement('select');
-    mesSelect.style.width = '100%';
-    mesSelect.style.padding = '8px 12px';
-    mesSelect.style.marginBottom = '10px';
-    mesSelect.style.border = '1.5px solid var(--border)';
-    mesSelect.style.borderRadius = 'var(--radius-md)';
-    mesSelect.style.fontSize = '0.9rem';
-    mesSelect.style.fontFamily = 'var(--font)';
-    mesSelect.style.background = 'var(--bg)';
-    mesSelect.style.color = 'var(--text-1)';
-    meses.forEach((m, i) => {
-      const opt = document.createElement('option');
-      opt.value = i;
-      opt.textContent = m;
-      if (i === mesIndex) opt.selected = true;
-      mesSelect.appendChild(opt);
+  ['calDia', 'calMes', 'calAno'].forEach(id => {
+    document.getElementById(id).addEventListener('click', function(e) {
+      e.stopPropagation();
     });
-    container.appendChild(mesSelect);
+  });
 
-    const anoInput = document.createElement('input');
-    anoInput.type = 'number';
-    anoInput.value = ano;
-    anoInput.min = 2000;
-    anoInput.max = 2100;
-    anoInput.style.width = '100%';
-    anoInput.style.padding = '8px 12px';
-    anoInput.style.marginBottom = '16px';
-    anoInput.style.border = '1.5px solid var(--border)';
-    anoInput.style.borderRadius = 'var(--radius-md)';
-    anoInput.style.fontSize = '0.9rem';
-    anoInput.style.fontFamily = 'var(--font)';
-    anoInput.style.background = 'var(--bg)';
-    anoInput.style.color = 'var(--text-1)';
-    container.appendChild(anoInput);
-
-    const btnContainer = document.createElement('div');
-    btnContainer.style.display = 'flex';
-    btnContainer.style.gap = '10px';
-    btnContainer.style.justifyContent = 'flex-end';
-
-    const btnCancelar = document.createElement('button');
-    btnCancelar.textContent = 'Cancelar';
-    btnCancelar.className = 'btn btn-ghost';
-    btnCancelar.style.padding = '8px 20px';
-    btnCancelar.addEventListener('click', () => document.body.removeChild(overlay));
-
-    const btnConfirmar = document.createElement('button');
-    btnConfirmar.textContent = 'Confirmar';
-    btnConfirmar.className = 'btn btn-primary';
-    btnConfirmar.style.padding = '8px 20px';
-    btnConfirmar.addEventListener('click', () => {
-      const novoMes = parseInt(mesSelect.value);
-      const novoAno = parseInt(anoInput.value);
-      if (novoAno >= 2000 && novoAno <= 2100) {
-        currentMonth = novoMes;
-        currentYear = novoAno;
-        renderCalendar();
-      } else {
-        mostrarAviso('Informe um ano entre 2000 e 2100.', { titulo: 'Ano inválido' });
-      }
-      document.body.removeChild(overlay);
-    });
-
-    btnContainer.appendChild(btnCancelar);
-    btnContainer.appendChild(btnConfirmar);
-    container.appendChild(btnContainer);
-
-    overlay.appendChild(container);
-    document.body.appendChild(overlay);
-
-    overlay.addEventListener('click', (e) => {
-      if (e.target === overlay) document.body.removeChild(overlay);
-    });
-  }
-
-  // Eventos do calendário
-  document.getElementById('cData').addEventListener('click', abrirCalendario);
-
-  document.getElementById('prevMonth').addEventListener('click', () => {
+  document.getElementById('prevMonth').addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
     if (currentMonth === 0) { currentMonth = 11; currentYear--; }
     else { currentMonth--; }
+    if (currentYear < ANO_MIN) { currentYear = ANO_MIN; currentMonth = 0; }
     renderCalendar();
   });
 
-  document.getElementById('nextMonth').addEventListener('click', () => {
+  document.getElementById('nextMonth').addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
     if (currentMonth === 11) { currentMonth = 0; currentYear++; }
     else { currentMonth++; }
+    if (currentYear > ANO_MAX) { currentYear = ANO_MAX; currentMonth = 11; }
     renderCalendar();
   });
 
-  document.getElementById('monthYearDisplay').addEventListener('click', abrirSelecionadorMesAno);
+  document.getElementById('cData').addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    abrirCalendario();
+  });
 
   document.getElementById('horaSelect').addEventListener('change', atualizarCampoData);
   document.getElementById('minutoSelect').addEventListener('change', atualizarCampoData);
 
-  document.addEventListener('click', (e) => {
-    const wrapper = document.querySelector('.date-picker-wrapper');
+  document.addEventListener('click', function(e) {
     const popup = document.getElementById('calendarPopup');
-    if (wrapper && !wrapper.contains(e.target) && popup.classList.contains('open')) {
-      popup.classList.remove('open');
-    }
+    if (!popup || !popup.classList.contains('open')) return;
+    const wrapper = popup.closest('.date-picker-wrapper');
+    if (wrapper && wrapper.contains(e.target)) return;
+    popup.classList.remove('open');
   });
 
   // ============================================================
@@ -1507,14 +1512,12 @@
     document.getElementById('modalTitulo').textContent = 'Nova Consulta';
     document.getElementById('infoBox').style.display = '';
 
-    // Limpa campos
     document.getElementById('cCpf').value = '';
     document.getElementById('cCrm').value = '';
     document.getElementById('cData').value = '';
     document.getElementById('cTipo').value = '';
     document.getElementById('cStatus').value = 'Pendente';
 
-    // Reseta seletores
     document.getElementById('pacienteSelector').classList.remove('hidden');
     document.getElementById('pacienteInfoPanel').classList.add('hidden');
     document.getElementById('medicoSelector').classList.remove('hidden');
@@ -1529,7 +1532,6 @@
     renderizarListaPacientes();
     renderizarListaMedicos();
 
-    // Reseta calendário
     selectedDate = null;
     const hoje = new Date();
     currentMonth = hoje.getMonth();
@@ -1575,6 +1577,7 @@
       tipo_consulta: tipo || null,
       statusc: status
     };
+    console.log('DADOS ENVIADOS PARA CRIAR CONSULTA:', body);
 
     try {
       let resp;
@@ -1607,7 +1610,6 @@
     modoEdicao = true;
     idEdicao = id;
 
-    // Pré-selecionar paciente e médico
     const paciente = pacientes.find(p => p.cpf === c.cpf);
     const medico = medicos.find(m => m.crm === c.crm);
 
@@ -1617,13 +1619,11 @@
     document.getElementById('modalTitulo').textContent = `Editar Consulta #${id}`;
     document.getElementById('infoBox').style.display = 'none';
 
-    // Esconde seletores, mostra painéis informativos
     document.getElementById('pacienteSelector').classList.add('hidden');
     document.getElementById('pacienteInfoPanel').classList.remove('hidden');
     document.getElementById('medicoSelector').classList.add('hidden');
     document.getElementById('medicoInfoPanel').classList.remove('hidden');
 
-    // Preenche painéis
     document.getElementById('infoPacienteNome').textContent = paciente?.nome || c.paciente || '—';
     document.getElementById('infoPacienteCpf').textContent = formatarCPF(c.cpf || '');
     document.getElementById('cCpf').value = c.cpf || '';
@@ -1739,6 +1739,7 @@
   });
 
   window.addEventListener('DOMContentLoaded', async () => {
+    inicializarSelects();
     await carregarPacientes();
     await carregarMedicos();
     await carregarConsultas();

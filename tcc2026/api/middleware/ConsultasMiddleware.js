@@ -80,7 +80,7 @@ module.exports = class ConsultasMiddleware {
             throw new ErrorResponse(400, "CPF inválido");
         }
 
-        const crmRegex = /^\d{4,11}$/;
+        const crmRegex = /^\d{4,11}-[A-Z]{2}$/;
         console.log("CRM recebido:", JSON.stringify(crm), "tipo:", typeof crm);
         if (!crmRegex.test(crm)) {
             throw new ErrorResponse(400, "CRM inválido");
@@ -155,16 +155,12 @@ module.exports = class ConsultasMiddleware {
 
         if (crm) {
 
-            crm = crm.toString().trim();
+            crm = crm.toString().trim().toUpperCase();
 
-            if (xssRegex.test(crm)) {
-                throw new ErrorResponse(400, "CRM inválido");
-            }
-
-            const crmRegex = /^\d{4,11}$/;
+            const crmRegex = /^\d{4,11}-[A-Z]{2}$/;
 
             if (!crmRegex.test(crm)) {
-                throw new ErrorResponse(400, "CRM inválido");
+                throw new ErrorResponse(400, "CRM inválido. Use o formato 52658-SP");
             }
         }
 

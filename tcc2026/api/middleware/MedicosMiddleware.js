@@ -56,11 +56,11 @@ module.exports = class MedicosMiddleware {
         }
 
 
-        if (nome.length < 3) {
+        if (nome.length < 8) {
             throw new ErrorResponse(400, "Nome muito curto");
         }
 
-        if (nome.length > 200) {
+        if (nome.length > 100) {
             throw new ErrorResponse(400, "Nome muito grande");
         }
 
@@ -150,9 +150,19 @@ module.exports = class MedicosMiddleware {
         const xssRegex = /[<>]/;
 
 
-        if (nome) {
-
+        if (nome !== undefined && nome !== null) {
             nome = nome.trim();
+
+            if (nome.length < 8) {
+                throw new ErrorResponse(
+                    400,
+                    "O nome completo deve possuir no mínimo 8 caracteres."
+                );
+            }
+
+            if (nome.length > 100) {
+                throw new ErrorResponse(400, "Nome muito grande");
+            }
 
             if (xssRegex.test(nome)) {
                 throw new ErrorResponse(400, "Nome inválido");

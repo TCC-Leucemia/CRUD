@@ -45,11 +45,11 @@ module.exports = class PacientesMiddleware {
             throw new ErrorResponse(400, "CPF inválido");
         }
 
-        if (nome.length < 3) {
+        if (nome.length < 8) {
             throw new ErrorResponse(400, "Nome muito curto");
         }
 
-        if (nome.length > 200) {
+        if (nome.length > 100) {
             throw new ErrorResponse(400, "Nome muito grande");
         }
 
@@ -85,17 +85,41 @@ module.exports = class PacientesMiddleware {
                 throw new ErrorResponse(400, "Telefone inválido");
             }
         }
+
         if (data_nasc) {
 
-            const data = new Date(data_nasc);
-            const hoje = new Date();
+            const dataTexto = String(data_nasc).split("T")[0];
+            const partes = dataTexto.split("-");
 
-            if (isNaN(data.getTime())) {
-                throw new ErrorResponse(400, "Data inválida");
+            if (partes.length !== 3) {
+                throw new ErrorResponse(400, "Data de nascimento inválida");
             }
 
-            if (data > hoje) {
+            const ano = Number(partes[0]);
+            const mes = Number(partes[1]);
+            const dia = Number(partes[2]);
+
+            const data = new Date(ano, mes - 1, dia);
+
+            if (
+                isNaN(data.getTime()) ||
+                data.getFullYear() !== ano ||
+                data.getMonth() !== mes - 1 ||
+                data.getDate() !== dia
+            ) {
                 throw new ErrorResponse(400, "Data de nascimento inválida");
+            }
+
+            const hoje = new Date();
+            hoje.setHours(0, 0, 0, 0);
+
+            data.setHours(0, 0, 0, 0);
+
+            if (data > hoje) {
+                throw new ErrorResponse(
+                    400,
+                    "A data de nascimento não pode ser futura"
+                );
             }
         }
 

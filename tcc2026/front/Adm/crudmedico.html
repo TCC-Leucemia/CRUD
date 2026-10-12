@@ -36,7 +36,6 @@
       box-shadow: 0 0 0 3px rgba(185,28,28,0.08);
     }
 
-    /* Wizard Progress Bar */
     .wizard-progress {
       margin-bottom: 28px;
       padding-bottom: 8px;
@@ -96,42 +95,16 @@
       color: white;
     }
 
-    .step-info {
-      flex: 1;
-    }
+    .step-info { flex: 1; }
+    .step-title { font-weight: 700; font-size: 0.85rem; color: var(--text-1); margin-bottom: 2px; }
+    .step-desc { font-size: 0.72rem; color: var(--text-3); }
+    .step-check { color: #15803d; font-size: 1.1rem; font-weight: 700; }
 
-    .step-title {
-      font-weight: 700;
-      font-size: 0.85rem;
-      color: var(--text-1);
-      margin-bottom: 2px;
-    }
-
-    .step-desc {
-      font-size: 0.72rem;
-      color: var(--text-3);
-    }
-
-    .step-check {
-      color: #15803d;
-      font-size: 1.1rem;
-      font-weight: 700;
-    }
-
-    /* Wizard Content */
-    .wizard-step-content {
-      animation: fadeIn 0.3s ease;
-    }
+    .wizard-step-content { animation: fadeIn 0.3s ease; }
 
     @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateX(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
+      from { opacity: 0; transform: translateX(10px); }
+      to { opacity: 1; transform: translateX(0); }
     }
 
     .form-section-label {
@@ -155,15 +128,9 @@
       border-top: 1px solid var(--border);
     }
 
-    .btn-group-right {
-      display: flex;
-      gap: 12px;
-    }
+    .btn-group-right { display: flex; gap: 12px; }
 
-    .form-group.disabled {
-      opacity: 0.5;
-      pointer-events: none;
-    }
+    .form-group.disabled { opacity: 0.5; pointer-events: none; }
 
     .field-static {
       background: var(--bg);
@@ -175,10 +142,7 @@
       cursor: not-allowed;
     }
 
-    /* Loading state for CEP */
-    .cep-loading {
-      position: relative;
-    }
+    .cep-loading { position: relative; }
     .cep-loading::after {
       content: "⏳";
       position: absolute;
@@ -188,7 +152,6 @@
       font-size: 1rem;
     }
 
-    /* ── Botões de ação na tabela (estilo da página de exames) ── */
     .td-actions {
       display: flex;
       flex-wrap: wrap;
@@ -207,12 +170,8 @@
       transition: var(--transition);
     }
 
-    .td-actions .btn i {
-      width: 14px;
-      height: 14px;
-    }
+    .td-actions .btn i { width: 14px; height: 14px; }
 
-    /* Botão Ver (estilo ghost) */
     .td-actions .btn-ver {
       background: transparent;
       border: 1.5px solid var(--border);
@@ -225,7 +184,6 @@
       background: var(--red-light);
     }
 
-    /* Botão Editar (estilo outline) */
     .td-actions .btn-editar {
       background: transparent;
       border: 1.5px solid var(--red);
@@ -239,7 +197,6 @@
       box-shadow: 0 2px 8px rgba(185,28,28,0.3);
     }
 
-    /* Botão Excluir (estilo danger - fundo vermelho) */
     .td-actions .btn-excluir {
       background: var(--red);
       border: 1.5px solid var(--red);
@@ -273,7 +230,6 @@
     </div>
 
     <div class="page-body">
-      <!-- Tabela -->
       <div class="card">
         <div class="card-header">
           <span class="card-title">Lista de Médicos</span>
@@ -328,7 +284,6 @@
   </div>
 </div>
 
-<!-- Modal Wizard -->
 <div class="modal-overlay" id="modalMedico">
   <div class="modal modal-lg">
     <div class="modal-header">
@@ -336,7 +291,6 @@
       <button class="btn-close-modal" id="closeModalMedico">✕</button>
     </div>
     <div class="modal-body">
-      <!-- Wizard Progress -->
       <div class="wizard-progress">
         <div class="wizard-steps">
           <div class="wizard-step" data-step="0" id="step1Indicator">
@@ -366,7 +320,6 @@
         </div>
       </div>
 
-      <!-- Step 1: Credenciais -->
       <div id="step1Content" class="wizard-step-content">
         <div class="form-grid">
           <div class="form-group col-span-2">
@@ -384,7 +337,6 @@
         </div>
       </div>
 
-      <!-- Step 2: Dados do Médico -->
       <div id="step2Content" class="wizard-step-content" style="display:none;">
         <div class="form-grid">
           <div class="form-group col-span-2">
@@ -417,11 +369,10 @@
         </div>
       </div>
 
-      <!-- Step 3: Endereço -->
       <div id="step3Content" class="wizard-step-content" style="display:none;">
         <div class="form-grid">
           <div class="form-group col-span-2">
-            <label>CEP *</label>
+            <label>CEP</label>
             <input type="text" id="fCep" placeholder="00000-000" maxlength="9">
             <small style="color: var(--text-3); font-size: 0.7rem; margin-top: 4px; display: block;">Digite o CEP e aguarde o preenchimento automático</small>
           </div>
@@ -448,7 +399,6 @@
         </div>
       </div>
 
-      <!-- Wizard Buttons -->
       <div class="wizard-buttons">
         <button class="btn btn-ghost" id="btnVoltar" style="display:none;">← Voltar</button>
         <div class="btn-group-right">
@@ -473,38 +423,17 @@
   HematoAI.initSidebar('medicos');
 
   let medicos = [];
-  let listaExibida = []; // exatamente o que a tabela mostra, para a exportação
+  let listaExibida = [];
   let editingCrm = null;
   let medicoEditando = null;
 
   let currentStep = 0;
   let wizardData = {
-    login: {
-      email: "",
-      senha: "",
-      tipo: "Médico"
-    },
-    medico: {
-      crm: "",
-      nome: "",
-      cpf: "",
-      telefone: "",
-      especialidade: ""
-    },
-    endereco: {
-      rua: "",
-      numero: "",
-      bairro: "",
-      cidade: "",
-      estado: "",
-      cep: ""
-    }
+    login: { email: "", senha: "", tipo: "Médico" },
+    medico: { crm: "", nome: "", cpf: "", telefone: "", especialidade: "" },
+    endereco: { rua: "", numero: "", bairro: "", cidade: "", estado: "", cep: "" }
   };
 
-  // ============================================
-  // DIÁLOGO DE CONFIRMAÇÃO PERSONALIZADO
-  // (com ícone Lucide no padrão dos botões)
-  // ============================================
   function confirmarAcaoLocal(mensagemHTML, callback) {
     const overlay = document.createElement("div");
     overlay.className = "modal-overlay";
@@ -530,10 +459,7 @@
     `;
     document.body.appendChild(overlay);
 
-    // Inicializa o ícone Lucide dentro do overlay
-    if (window.lucide) {
-      lucide.createIcons();
-    }
+    if (window.lucide) lucide.createIcons();
 
     let finalizado = false;
     const finalizar = (confirmado) => {
@@ -555,43 +481,40 @@
     HematoAI.openModal(overlay);
   }
 
-  // Função para buscar CEP na API ViaCEP
   async function buscarCEP(cep) {
     cep = cep.replace(/\D/g, '');
     if (cep.length !== 8) return;
-    
+
     const cepField = document.getElementById('fCep');
     const originalPlaceholder = cepField.placeholder;
-    
+
     cepField.classList.add('cep-loading');
     cepField.placeholder = 'Buscando...';
-    
+
     try {
       const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
       const data = await response.json();
-      
+
       if (!data.erro) {
         document.getElementById('fRua').value = data.logradouro || '';
         document.getElementById('fBairro').value = data.bairro || '';
         document.getElementById('fCidade').value = data.localidade || '';
         document.getElementById('fEstado').value = data.uf || '';
-        
+
         wizardData.endereco.rua = data.logradouro || '';
         wizardData.endereco.bairro = data.bairro || '';
         wizardData.endereco.cidade = data.localidade || '';
         wizardData.endereco.estado = data.uf || '';
         wizardData.endereco.cep = cepField.value;
-        
+
         HematoAI.showToast('Endereço preenchido automaticamente!', 'success');
-        
+
         ['fRua', 'fBairro', 'fCidade', 'fEstado'].forEach(campoId => {
           const campo = document.getElementById(campoId);
           if (campo && campo.value) {
             campo.style.transition = 'all 0.3s ease';
             campo.style.backgroundColor = 'rgba(21, 128, 61, 0.1)';
-            setTimeout(() => {
-              campo.style.backgroundColor = '';
-            }, 1000);
+            setTimeout(() => { campo.style.backgroundColor = ''; }, 1000);
           }
         });
       } else {
@@ -613,9 +536,7 @@
   let debounceTimeout;
   function debounceBuscarCEP(cep) {
     clearTimeout(debounceTimeout);
-    debounceTimeout = setTimeout(() => {
-      buscarCEP(cep);
-    }, 800);
+    debounceTimeout = setTimeout(() => { buscarCEP(cep); }, 800);
   }
 
   function maskCPF(cpf) {
@@ -648,7 +569,6 @@
   document.getElementById('fCep')?.addEventListener('input', function(e) {
     const maskedValue = maskCEP(e.target.value);
     e.target.value = maskedValue;
-    
     const cepNumeros = maskedValue.replace(/\D/g, '');
     if (cepNumeros.length === 8) {
       debounceBuscarCEP(maskedValue);
@@ -664,7 +584,7 @@
       const stepDiv = document.getElementById(`step${i+1}Indicator`);
       const stepNumber = document.getElementById(`step${i+1}Number`);
       const stepCheck = document.getElementById(`step${i+1}Check`);
-      
+
       if (i === currentStep) {
         stepDiv.classList.add('active');
         stepDiv.classList.remove('completed');
@@ -684,11 +604,7 @@
     const btnProximo = document.getElementById('btnProximo');
     const btnFinalizar = document.getElementById('btnFinalizar');
 
-    if (currentStep === 0) {
-      btnVoltar.style.display = 'none';
-    } else {
-      btnVoltar.style.display = 'block';
-    }
+    btnVoltar.style.display = currentStep === 0 ? 'none' : 'block';
 
     if (currentStep === 2) {
       btnProximo.style.display = 'none';
@@ -771,7 +687,7 @@
       const crm = document.getElementById('fCrm').value;
       const cpf = document.getElementById('fCpf').value;
       const esp = document.getElementById('fEsp').value;
-      
+
       if (!nome || !crm || !cpf || !esp) {
         HematoAI.showToast('Preencha todos os campos obrigatórios.', 'error');
         return false;
@@ -785,18 +701,26 @@
         return false;
       }
     } else if (currentStep === 2) {
-      const cep = document.getElementById('fCep').value;
-      const rua = document.getElementById('fRua').value;
-      const numero = document.getElementById('fNumero').value;
-      const bairro = document.getElementById('fBairro').value;
-      const cidade = document.getElementById('fCidade').value;
-      const estado = document.getElementById('fEstado').value;
-      
-      if (!cep || !rua || !numero || !bairro || !cidade || !estado) {
-        HematoAI.showToast('Preencha todos os campos de endereço.', 'error');
-        return false;
+      // CEP é opcional. Se algum campo de endereço for preenchido,
+      // então os demais (exceto CEP) devem estar completos.
+      const cep = document.getElementById('fCep').value.trim();
+      const rua = document.getElementById('fRua').value.trim();
+      const numero = document.getElementById('fNumero').value.trim();
+      const bairro = document.getElementById('fBairro').value.trim();
+      const cidade = document.getElementById('fCidade').value.trim();
+      const estado = document.getElementById('fEstado').value.trim();
+
+      const algumCampoPreenchido = cep || rua || numero || bairro || cidade || estado;
+
+      if (algumCampoPreenchido) {
+        if (!rua || !numero || !bairro || !cidade || !estado) {
+          HematoAI.showToast('Preencha os campos de endereço (Rua, Número, Bairro, Cidade e Estado).', 'error');
+          return false;
+        }
       }
-      if (cep.replace(/\D/g, '').length !== 8) {
+
+      // Valida o formato do CEP apenas se ele foi informado
+      if (cep && cep.replace(/\D/g, '').length !== 8) {
         HematoAI.showToast('CEP inválido.', 'error');
         return false;
       }
@@ -807,182 +731,128 @@
   function nextStep() {
     saveCurrentStepData();
     if (!validateCurrentStep()) return;
-    
-    if (currentStep < 2) {
-      currentStep++;
-      loadStepData();
-      updateWizardUI();
-    }
+    if (currentStep < 2) { currentStep++; loadStepData(); updateWizardUI(); }
   }
 
   function prevStep() {
     saveCurrentStepData();
-    if (currentStep > 0) {
-      currentStep--;
-      loadStepData();
-      updateWizardUI();
-    }
+    if (currentStep > 0) { currentStep--; loadStepData(); updateWizardUI(); }
   }
 
   async function rollbackCadastro(id_usuario, id_endereco) {
     try {
-        if (id_endereco !== null) {
-            await del("/enderecos/" + id_endereco);
-        }
-        if (id_usuario !== null) {
-            await del("/login/" + id_usuario);
-        }
+      if (id_endereco !== null) await del("/enderecos/" + id_endereco);
+      if (id_usuario !== null) await del("/login/" + id_usuario);
     } catch (erro) {
-        console.error("Erro no rollback:", erro);
+      console.error("Erro no rollback:", erro);
     }
   }
 
-  async function finalizeCadastro() {
+  /**
+   * Monta o body de endereço para envio.
+   * O campo "cep" é incluído APENAS se o usuário tiver informado.
+   * Assim, quando o CEP estiver vazio, o backend não recebe o campo
+   * e não dispara a validação de "Campos obrigatórios não informados".
+   */
+  function montarBodyEndereco() {
+    const body = {
+      rua: wizardData.endereco.rua,
+      numero: wizardData.endereco.numero,
+      bairro: wizardData.endereco.bairro,
+      cidade: wizardData.endereco.cidade,
+      estado: wizardData.endereco.estado
+    };
+    const cepNumeros = (wizardData.endereco.cep || "").replace(/\D/g, "");
+    if (cepNumeros) {
+      body.cep = cepNumeros;
+    }
+    return body;
+  }
 
+  async function finalizeCadastro() {
     saveCurrentStepData();
     let id_usuario = null;
     let id_endereco = null;
 
     try {
-
       if (editingCrm) {
         const respEndereco = await put(
-            "/enderecos/" + medicoEditando.id_endereco,
-            {
-                rua: wizardData.endereco.rua,
-                numero: wizardData.endereco.numero,
-                bairro: wizardData.endereco.bairro,
-                cidade: wizardData.endereco.cidade,
-                estado: wizardData.endereco.estado,
-                cep: wizardData.endereco.cep.replace(/\D/g, "")
-            }
+          "/enderecos/" + medicoEditando.id_endereco,
+          montarBodyEndereco()
         );
 
         const dadosEndereco = await respEndereco.json();
-
         if (!respEndereco.ok) {
-            HematoAI.showToast(
-                dadosEndereco.msg || "Erro ao atualizar endereço",
-                "error"
-            );
-            return;
-        }
-
-        console.log("Endereço atualizado.");
-
-        const bodyLogin = {
-            email: wizardData.login.email,
-            tipo: "Médico"
-        };
-
-        if (
-            wizardData.login.senha &&
-            wizardData.login.senha !== "********"
-        ) {
-            bodyLogin.senha = wizardData.login.senha;
-        }
-
-        const respLogin = await put(
-            "/login/" + medicoEditando.id_usuario,
-            bodyLogin
-        );
-
-        const dadosLogin = await respLogin.json();
-
-        if (!respLogin.ok) {
-
-          HematoAI.showToast(
-            dadosLogin.msg || "Erro ao atualizar login",
-            "error"
-          );
+          HematoAI.showToast(dadosEndereco.msg || "Erro ao atualizar endereço", "error");
           return;
         }
 
-        console.log("Login atualizado.");
+        const bodyLogin = { email: wizardData.login.email, tipo: "Médico" };
+        if (wizardData.login.senha && wizardData.login.senha !== "********") {
+          bodyLogin.senha = wizardData.login.senha;
+        }
+
+        const respLogin = await put("/login/" + medicoEditando.id_usuario, bodyLogin);
+        const dadosLogin = await respLogin.json();
+        if (!respLogin.ok) {
+          HematoAI.showToast(dadosLogin.msg || "Erro ao atualizar login", "error");
+          return;
+        }
 
         const respMedico = await put(
-            "/medicos/" + medicoEditando.crm,
-            {
-                nome: wizardData.medico.nome,
-                email: wizardData.login.email,
-                cpf: wizardData.medico.cpf.replace(/\D/g, ""),
-                telefone: wizardData.medico.telefone,
-                especialidade: wizardData.medico.especialidade,
-                id_usuario: medicoEditando.id_usuario,
-                id_endereco: medicoEditando.id_endereco
-            }
+          "/medicos/" + medicoEditando.crm,
+          {
+            nome: wizardData.medico.nome,
+            email: wizardData.login.email,
+            cpf: wizardData.medico.cpf.replace(/\D/g, ""),
+            telefone: wizardData.medico.telefone,
+            especialidade: wizardData.medico.especialidade,
+            id_usuario: medicoEditando.id_usuario,
+            id_endereco: medicoEditando.id_endereco
+          }
         );
 
         const dadosMedico = await respMedico.json();
-
         if (!respMedico.ok) {
-            HematoAI.showToast(
-                dadosMedico.msg || "Erro ao atualizar médico",
-                "error"
-            );
-            return;
+          HematoAI.showToast(dadosMedico.msg || "Erro ao atualizar médico", "error");
+          return;
         }
 
-        console.log("Médico atualizado.");
-
-        HematoAI.showToast(
-            "Médico atualizado com sucesso!",
-            "success"
-        );
-
+        HematoAI.showToast("Médico atualizado com sucesso!", "success");
         HematoAI.closeModal(modalEl);
-
         await carregarMedicos();
-
         resetWizard();
-
         editingCrm = null;
         medicoEditando = null;
-
         return;
-    }
+      }
 
-      const respEndereco = await post("/enderecos",{
-        rua: wizardData.endereco.rua,
-        numero: wizardData.endereco.numero,
-        bairro: wizardData.endereco.bairro,
-        cidade: wizardData.endereco.cidade,
-        estado: wizardData.endereco.estado,
-        cep: wizardData.endereco.cep.replace(/\D/g, "")
-      });
+      const respEndereco = await post("/enderecos", montarBodyEndereco());
 
       const dadosEndereco = await respEndereco.json();
-
       if (!respEndereco.ok) {
-        HematoAI.showToast(
-          dadosEndereco.msg || "Erro ao cadastrar endereço",
-          "error"
-        );
+        HematoAI.showToast(dadosEndereco.msg || "Erro ao cadastrar endereço", "error");
         return;
       }
 
       id_endereco = dadosEndereco.dados.id_endereco;
 
-      const respLogin = await post("/login",{
+      const respLogin = await post("/login", {
         email: wizardData.login.email,
         senha: wizardData.login.senha,
         tipo: "Médico"
       });
 
       const dadosLogin = await respLogin.json();
-
       if (!respLogin.ok) {
         await rollbackCadastro(null, id_endereco);
-        HematoAI.showToast(
-          dadosLogin.msg || "Erro ao criar login",
-          "error"
-        );
+        HematoAI.showToast(dadosLogin.msg || "Erro ao criar login", "error");
         return;
       }
 
       id_usuario = dadosLogin.dados.insertId;
 
-      const respMedico = await post("/medicos",{
+      const respMedico = await post("/medicos", {
         crm: wizardData.medico.crm,
         nome: wizardData.medico.nome,
         email: wizardData.login.email,
@@ -994,34 +864,23 @@
       });
 
       const dadosMedico = await respMedico.json();
-
       if (!respMedico.ok) {
         await rollbackCadastro(id_usuario, id_endereco);
-        HematoAI.showToast(
-            dadosMedico.msg || "Erro ao cadastrar médico",
-            "error"
-        );
+        HematoAI.showToast(dadosMedico.msg || "Erro ao cadastrar médico", "error");
         return;
       }
 
-      HematoAI.showToast(
-        "Médico cadastrado com sucesso!",
-        "success"
-      );
+      HematoAI.showToast("Médico cadastrado com sucesso!", "success");
       id_usuario = null;
       id_endereco = null;
 
       HematoAI.closeModal(modalEl);
       await carregarMedicos();
       resetWizard();
-
     } catch (erro) {
       console.error(erro);
       await rollbackCadastro(id_usuario, id_endereco);
-      HematoAI.showToast(
-          "Erro ao conectar com o servidor",
-          "error"
-      );
+      HematoAI.showToast("Erro ao conectar com o servidor", "error");
     }
   }
 
@@ -1035,157 +894,67 @@
       endereco: { rua: "", numero: "", bairro: "", cidade: "", estado: "", cep: "" }
     };
     editingCrm = null;
-    document.getElementById('fEmail').value = '';
-    document.getElementById('fSenha').value = '';
-    document.getElementById('fNome').value = '';
-    document.getElementById('fCrm').value = '';
-    document.getElementById('fCpf').value = '';
-    document.getElementById('fEsp').value = '';
-    document.getElementById('fTelefone').value = '';
-    document.getElementById('fCep').value = '';
-    document.getElementById('fRua').value = '';
-    document.getElementById('fNumero').value = '';
-    document.getElementById('fBairro').value = '';
-    document.getElementById('fCidade').value = '';
-    document.getElementById('fEstado').value = '';
+    ['fEmail','fSenha','fNome','fCrm','fCpf','fEsp','fTelefone','fCep','fRua','fNumero','fBairro','fCidade','fEstado']
+      .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
     updateWizardUI();
   }
 
   async function carregarMedicos() {
-
     try {
-        const resposta = await get("/medicos");
-
-        const dados = await resposta.json();
-
-        if (!resposta.ok) {
-
-            HematoAI.showToast(
-                dados.msg || "Erro ao carregar médicos.",
-                "error"
-            );
-
-            return;
-        }
-
-        medicos = dados.dados;
-
-        applyFilter();
-
+      const resposta = await get("/medicos");
+      const dados = await resposta.json();
+      if (!resposta.ok) {
+        HematoAI.showToast(dados.msg || "Erro ao carregar médicos.", "error");
+        return;
+      }
+      medicos = dados.dados;
+      applyFilter();
     } catch (erro) {
-
-        console.error(erro);
-
-        HematoAI.showToast(
-            "Erro ao conectar ao servidor.",
-            "error"
-        );
+      console.error(erro);
+      HematoAI.showToast("Erro ao conectar ao servidor.", "error");
     }
   }
-
 
   function renderTable(data) {
     const tbody = document.getElementById('tbodyMedicos');
     const empty = document.getElementById('emptyMedicos');
-
     tbody.innerHTML = '';
 
-    if (!data.length) {
-        empty.style.display = '';
-        return;
-    }
-
+    if (!data.length) { empty.style.display = ''; return; }
     empty.style.display = 'none';
 
     data.forEach(m => {
+      const tr = document.createElement('tr');
+      const statusTexto = m.status === 'Ativo' ? 'Ativo' : 'Desativado';
 
-        const tr = document.createElement('tr');
-
-        const statusTexto =
-            m.status === 'Ativo'
-                ? 'Ativo'
-                : 'Desativado';
-
-        tr.innerHTML = `
-            <td>
-                <strong>${m.nome}</strong>
-            </td>
-
-            <td>
-                <span class="badge badge-blue">${m.crm}</span>
-            </td>
-
-            <td style="font-family:var(--font-mono);font-size:0.8rem">
-                ${m.cpf}
-            </td>
-
-            <td>
-                <span class="badge badge-purple">
-                    ${m.especialidade}
-                </span>
-            </td>
-
-            <td style="font-size:0.82rem">
-                ${m.email}
-            </td>
-
-            <td style="font-size:0.82rem">
-                ${m.telefone || '—'}
-            </td>
-
-            <td>
-                <span class="badge ${
-                    m.status === 'Ativo'
-                        ? 'badge-blue'
-                        : 'badge-purple'
-                }">
-                    ${statusTexto}
-                </span>
-            </td>
-
-            <td>
-                <div class="td-actions">
-
-                    <button
-                        class="btn btn-editar"
-                        onclick="editarMedico('${m.crm}')">
-
-                        <i data-lucide="pencil"></i>
-                        Editar
-                    </button>
-
-                    <button
-                        class="btn btn-excluir"
-                        onclick="alterarStatusMedico('${m.crm}')">
-
-                        <i data-lucide="${
-                            m.status === 'Ativo'
-                                ? 'user-minus'
-                                : 'user-plus'
-                        }"></i>
-
-                        ${
-                            m.status === 'Ativo'
-                                ? 'Desativar'
-                                : 'Ativar'
-                        }
-
-                    </button>
-
-                </div>
-            </td>
-        `;
-
-        tbody.appendChild(tr);
+      tr.innerHTML = `
+        <td><strong>${m.nome}</strong></td>
+        <td><span class="badge badge-blue">${m.crm}</span></td>
+        <td style="font-family:var(--font-mono);font-size:0.8rem">${m.cpf}</td>
+        <td><span class="badge badge-purple">${m.especialidade}</span></td>
+        <td style="font-size:0.82rem">${m.email}</td>
+        <td style="font-size:0.82rem">${m.telefone || '—'}</td>
+        <td><span class="badge ${m.status === 'Ativo' ? 'badge-blue' : 'badge-purple'}">${statusTexto}</span></td>
+        <td>
+          <div class="td-actions">
+            <button class="btn btn-editar" onclick="editarMedico('${m.crm}')">
+              <i data-lucide="pencil"></i> Editar
+            </button>
+            <button class="btn btn-excluir" onclick="alterarStatusMedico('${m.crm}')">
+              <i data-lucide="${m.status === 'Ativo' ? 'user-minus' : 'user-plus'}"></i>
+              ${m.status === 'Ativo' ? 'Desativar' : 'Ativar'}
+            </button>
+          </div>
+        </td>
+      `;
+      tbody.appendChild(tr);
     });
 
-    if (window.lucide) {
-        lucide.createIcons();
-    }
+    if (window.lucide) lucide.createIcons();
   }
 
   function applyFilter() {
-    const q   = document.getElementById('searchMedico').value.toLowerCase().trim();
+    const q = document.getElementById('searchMedico').value.toLowerCase().trim();
     const qNumerica = q.replace(/\D/g, '');
     const esp = document.getElementById('filterEsp').value;
     const status = document.getElementById('filterStatus').value;
@@ -1214,9 +983,8 @@
     editingCrm = crm;
     const m = medicos.find(x => x.crm === crm);
     medicoEditando = m;
-    console.log(m);
     if (!m) return;
-    
+
     wizardData.login.email = m.email;
     wizardData.login.senha = '********';
     wizardData.medico.nome = m.nome;
@@ -1224,45 +992,26 @@
     wizardData.medico.cpf = m.cpf;
     wizardData.medico.especialidade = m.especialidade;
     wizardData.medico.telefone = m.telefone || '';
+
     const estadosUF = {
-      "Acre": "AC",
-      "Alagoas": "AL",
-      "Amapá": "AP",
-      "Amazonas": "AM",
-      "Bahia": "BA",
-      "Ceará": "CE",
-      "Distrito Federal": "DF",
-      "Espírito Santo": "ES",
-      "Goiás": "GO",
-      "Maranhão": "MA",
-      "Mato Grosso": "MT",
-      "Mato Grosso do Sul": "MS",
-      "Minas Gerais": "MG",
-      "Pará": "PA",
-      "Paraíba": "PB",
-      "Paraná": "PR",
-      "Pernambuco": "PE",
-      "Piauí": "PI",
-      "Rio de Janeiro": "RJ",
-      "Rio Grande do Norte": "RN",
-      "Rio Grande do Sul": "RS",
-      "Rondônia": "RO",
-      "Roraima": "RR",
-      "Santa Catarina": "SC",
-      "São Paulo": "SP",
-      "Sergipe": "SE",
-      "Tocantins": "TO"
+      "Acre":"AC","Alagoas":"AL","Amapá":"AP","Amazonas":"AM","Bahia":"BA","Ceará":"CE",
+      "Distrito Federal":"DF","Espírito Santo":"ES","Goiás":"GO","Maranhão":"MA",
+      "Mato Grosso":"MT","Mato Grosso do Sul":"MS","Minas Gerais":"MG","Pará":"PA",
+      "Paraíba":"PB","Paraná":"PR","Pernambuco":"PE","Piauí":"PI","Rio de Janeiro":"RJ",
+      "Rio Grande do Norte":"RN","Rio Grande do Sul":"RS","Rondônia":"RO","Roraima":"RR",
+      "Santa Catarina":"SC","São Paulo":"SP","Sergipe":"SE","Tocantins":"TO"
     };
 
     if (m.endereco) {
       wizardData.endereco = {
         ...m.endereco,
-        estado: estadosUF[m.endereco.estado] || m.endereco.estado
+        estado: estadosUF[m.endereco.estado] || m.endereco.estado,
+        cep: m.endereco.cep || ""
       };
     } else {
       wizardData.endereco = { rua: "", numero: "", bairro: "", cidade: "", estado: "", cep: "" };
     }
-    
+
     currentStep = 0;
     loadStepData();
     updateWizardUI();
@@ -1271,77 +1020,34 @@
   };
 
   window.alterarStatusMedico = function (crm) {
-
     const m = medicos.find(x => x.crm === crm);
+    if (!m) { HematoAI.showToast("Médico não encontrado.", "error"); return; }
 
-    if (!m) {
-        HematoAI.showToast(
-            "Médico não encontrado.",
-            "error"
-        );
-        return;
-    }
+    const novoStatus = m.status === "Ativo" ? "Desativado" : "Ativo";
+    const mensagem = novoStatus === "Desativado"
+      ? `Deseja desativar o médico <strong>${m.nome}</strong>?<br>O cadastro e o histórico serão mantidos no sistema.`
+      : `Deseja ativar novamente o médico <strong>${m.nome}</strong>?`;
 
-    const novoStatus =
-        m.status === "Ativo"
-            ? "Desativado"
-            : "Ativo";
-
-    const mensagem =
-        novoStatus === "Desativado"
-            ? `Deseja desativar o médico <strong>${m.nome}</strong>?<br>
-               O cadastro e o histórico serão mantidos no sistema.`
-            : `Deseja ativar novamente o médico <strong>${m.nome}</strong>?`;
-
-    confirmarAcaoLocal(
-        mensagem,
-        async () => {
-
-            try {
-
-                const resposta = await put(
-                    "/medicos/" + crm + "/status",
-                    {
-                        status: novoStatus
-                    }
-                );
-
-                const dados = await resposta.json();
-
-                if (!resposta.ok) {
-
-                    HematoAI.showToast(
-                        dados.msg ||
-                        "Erro ao alterar status do médico.",
-                        "error"
-                    );
-
-                    return;
-                }
-
-                await carregarMedicos();
-
-                HematoAI.showToast(
-                    novoStatus === "Desativado"
-                        ? "Médico desativado com sucesso."
-                        : "Médico ativado com sucesso.",
-                    "success"
-                );
-
-            } catch (erro) {
-
-                console.error(erro);
-
-                HematoAI.showToast(
-                    "Erro ao conectar com o servidor.",
-                    "error"
-                );
-            }
+    confirmarAcaoLocal(mensagem, async () => {
+      try {
+        const resposta = await put("/medicos/" + crm + "/status", { status: novoStatus });
+        const dados = await resposta.json();
+        if (!resposta.ok) {
+          HematoAI.showToast(dados.msg || "Erro ao alterar status do médico.", "error");
+          return;
         }
-    );
+        await carregarMedicos();
+        HematoAI.showToast(
+          novoStatus === "Desativado" ? "Médico desativado com sucesso." : "Médico ativado com sucesso.",
+          "success"
+        );
+      } catch (erro) {
+        console.error(erro);
+        HematoAI.showToast("Erro ao conectar com o servidor.", "error");
+      }
+    });
   };
 
-  // Event listeners
   document.getElementById('searchMedico').addEventListener('input', applyFilter);
   document.getElementById('filterEsp').addEventListener('change', applyFilter);
   document.getElementById('filterStatus').addEventListener('change', applyFilter);
@@ -1371,54 +1077,38 @@
       }
     ]
   });
-  
+
   const modalEl = document.getElementById('modalMedico');
   document.getElementById('closeModalMedico').addEventListener('click', () => HematoAI.closeModal(modalEl));
   document.getElementById('cancelModalMedico').addEventListener('click', () => HematoAI.closeModal(modalEl));
   modalEl.addEventListener('click', e => { if (e.target === modalEl) HematoAI.closeModal(modalEl); });
-  
+
   document.getElementById('btnNovoMedico').addEventListener('click', () => {
     resetWizard();
     editingCrm = null;
     document.getElementById('modalMedicoTitulo').textContent = 'Cadastro de Médico';
     HematoAI.openModal(modalEl);
   });
-  
+
   document.getElementById('btnProximo').addEventListener('click', nextStep);
   document.getElementById('btnVoltar').addEventListener('click', prevStep);
   document.getElementById('btnFinalizar').addEventListener('click', finalizeCadastro);
-  
-  // Click on step indicators to navigate
+
   document.getElementById('step1Indicator').addEventListener('click', () => {
-    if (currentStep > 0) {
-      saveCurrentStepData();
-      currentStep = 0;
-      loadStepData();
-      updateWizardUI();
-    }
+    if (currentStep > 0) { saveCurrentStepData(); currentStep = 0; loadStepData(); updateWizardUI(); }
   });
   document.getElementById('step2Indicator').addEventListener('click', () => {
     if (currentStep !== 1) {
       saveCurrentStepData();
-      if (isStepCompleted(0)) {
-        currentStep = 1;
-        loadStepData();
-        updateWizardUI();
-      } else {
-        HematoAI.showToast('Complete as credenciais primeiro.', 'error');
-      }
+      if (isStepCompleted(0)) { currentStep = 1; loadStepData(); updateWizardUI(); }
+      else HematoAI.showToast('Complete as credenciais primeiro.', 'error');
     }
   });
   document.getElementById('step3Indicator').addEventListener('click', () => {
     if (currentStep !== 2) {
       saveCurrentStepData();
-      if (isStepCompleted(0) && isStepCompleted(1)) {
-        currentStep = 2;
-        loadStepData();
-        updateWizardUI();
-      } else {
-        HematoAI.showToast('Complete as etapas anteriores primeiro.', 'error');
-      }
+      if (isStepCompleted(0) && isStepCompleted(1)) { currentStep = 2; loadStepData(); updateWizardUI(); }
+      else HematoAI.showToast('Complete as etapas anteriores primeiro.', 'error');
     }
   });
 
