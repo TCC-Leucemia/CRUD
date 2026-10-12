@@ -132,3 +132,64 @@ test("cadastro de médico e de paciente: a etapa atual mostra o número, não o 
         assert.match(ramo, /stepNumber\.style\.display = 'flex'/, pagina);
     }
 });
+
+// ------------------------------------------- paciente: nome e endereço
+test("paciente: nome com a mesma regra da API (8 a 100) e mensagem correspondente", () => {
+    const html = ler("Adm/crudpaciente.html");
+    const api = fs.readFileSync(path.join(__dirname, "..", "middleware", "PacientesMiddleware.js"), "utf8");
+    assert.match(api, /nome\.length < 8/);
+    assert.match(api, /nome\.length > 100/);
+    assert.match(html, /nome\.length < 8\)\s*\{ HematoAI\.showToast\('O nome deve ter no mínimo 8 caracteres\.'/);
+    assert.match(html, /nome\.length > 100\)\s*\{ HematoAI\.showToast\('O nome deve ter no máximo 100 caracteres\.'/);
+    assert.doesNotMatch(html, /ao menos 7 caracteres/);
+});
+
+test("paciente: só o CEP é opcional no endereço (etapa e conferência antes do envio)", () => {
+    const html = ler("Adm/crudpaciente.html");
+    const etapa = html.slice(html.indexOf("} else if (currentStep === 1) {", html.indexOf("function validateCurrentStep")), html.indexOf("} else if (currentStep === 2) {", html.indexOf("function validateCurrentStep")));
+    assert.doesNotMatch(etapa, /algumCampoPreenchido/, "endereço vazio não pode passar");
+    assert.match(etapa, /if \(!rua \|\| !numero \|\| !bairro \|\| !cidade \|\| !estado\)/);
+    assert.match(etapa, /if \(cep && cep\.replace\(\/\\D\/g, ''\)\.length !== 8\)/);
+    const conferencia = html.slice(html.indexOf("function validarWizard"), html.indexOf("Complete as credenciais"));
+    assert.match(conferencia, /HematoEtapas\.enderecoCompleto\(wizardData\.endereco\)/);
+    for (const campo of ["Rua", "Número", "Bairro", "Cidade", "Estado"]) assert.match(html, new RegExp(`<label>${campo} \\*</label>`), campo);
+    assert.match(html, /<label>CEP<\/label>/);
+});
+
+test("médico: CRM da tela segue exatamente a regra de cadastro da API", () => {
+    const tela = require("../../front/JS/crm");
+    const apiCrm = require("../utils/crm");
+    const casos = ["12345", "12345-SP", "12345-sp", " 12345 - sp ", "1234-RJ", "12345678-SP", "123456789-SP", "123-SP",
+        "ABCDE-SP", "12345-S", "12345-SPX", "12345SP", "<b>12345-SP</b>", "12345-SP<script>", "", null, undefined];
+    for (const crm of casos) {
+        assert.equal(tela.crmValidoParaCadastro(crm), apiCrm.crmValidoParaCadastro(crm), `CRM ${JSON.stringify(crm)}`);
+        assert.equal(tela.normalizarCrm(crm), apiCrm.normalizarCrm(crm), `normalização ${JSON.stringify(crm)}`);
+    }
+    assert.equal(tela.MSG_CRM_INVALIDO, apiCrm.MSG_CRM_INVALIDO);
+    assert.equal(tela.crmValidoParaCadastro("12345"), false, "só dígitos não é CRM novo");
+    assert.equal(tela.normalizarCrm("12345-sp"), "12345-SP");
+
+    const html = ler("Adm/crudmedico.html");
+    assert.match(html, /<script src="\.\.\/JS\/crm\.js"><\/script>/);
+    assert.doesNotMatch(html, /crm\.length < 5/, "regra antiga de 5 caracteres");
+    const etapa = html.slice(html.indexOf("} else if (currentStep === 1) {", html.indexOf("function validateCurrentStep")));
+    assert.match(etapa, /if \(!editingCrm\) \{\s*if \(!HematoCrm\.crmValidoParaCadastro\(crm\)\)/, "edição (CRM travado) não revalida");
+    const finalizar = html.slice(html.indexOf("async function finalizeCadastro"));
+    const guarda = finalizar.indexOf("HematoCrm.crmValidoParaCadastro(wizardData.medico.crm)");
+    assert.ok(guarda > -1 && guarda < finalizar.indexOf("await "), "Finalizar confere o CRM antes de qualquer requisição");
+});
+
+test("médico: endereço vazio não passa e Finalizar valida antes de enviar", () => {
+    const html = ler("Adm/crudmedico.html");
+    const validar = html.slice(html.indexOf("function validateCurrentStep"), html.indexOf("function nextStep"));
+    const etapa = validar.slice(validar.indexOf("} else if (currentStep === 2) {"));
+    assert.doesNotMatch(etapa, /algumCampoPreenchido/, "endereço vazio não pode passar");
+    assert.match(etapa, /if \(!rua \|\| !numero \|\| !bairro \|\| !cidade \|\| !estado\)/);
+    assert.match(etapa, /if \(cep && cep\.replace\(\/\\D\/g, ''\)\.length !== 8\)/);
+    // Endereço é a última etapa: sem esta chamada o Finalizar enviava sem validar nada.
+    const finalizar = html.slice(html.indexOf("async function finalizeCadastro"));
+    assert.ok(finalizar.indexOf("if (!validateCurrentStep()) return;") > -1, "Finalizar precisa validar");
+    assert.ok(finalizar.indexOf("if (!validateCurrentStep()) return;") < finalizar.indexOf("await "), "validação antes de qualquer requisição");
+    for (const campo of ["Rua", "Número", "Bairro", "Cidade", "Estado"]) assert.match(html, new RegExp(`<label>${campo} \\*</label>`), campo);
+    assert.match(html, /<label>CEP<\/label>/);
+});
