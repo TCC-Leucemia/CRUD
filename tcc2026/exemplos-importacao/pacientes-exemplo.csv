@@ -1,0 +1,4 @@
+nome;cpf;email;senha;data_nasc;sexo;telefone;rua;numero;bairro;cidade;estado;cep
+João Pedro Almeida;39156284764;joao.almeida.teste@hematoai.local;Teste2026D;1993-04-18;Masculino;(12) 97722-3401;Rua das Palmeiras;310;Santana;São José dos Campos;SP;12211030
+Fernanda Costa Martins;84621759337;fernanda.martins.teste@hematoai.local;Teste2026E;1987-09-26;Feminino;(12) 97722-3402;Avenida Andrômeda;891;Jardim Satélite;São José dos Campos;SP;12230000
+Ricardo Henrique Souza;15793648291;ricardo.souza.teste@hematoai.local;Teste2026F;2001-01-12;Masculino;(12) 97722-3403;Rua Paraibuna;55;Jardim São Dimas;São José dos Campos;SP;12245021

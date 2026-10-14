@@ -17,6 +17,7 @@ const rotas_resultados_exame = require("./routes/RotasResultadosExame");
 const rotas_analise_ia = require("./routes/RotasAnaliseIA");
 const rotasImagensExame = require("./routes/RotasImagensExame")
 const rotasAnamnese = require("./routes/RotasAnamnese");
+const rotasImportacaoAdmin = require("./routes/RotasImportacaoAdmin");
 
 const app = express();
 
@@ -86,6 +87,7 @@ rotas_resultados_exame(app, banco);
 rotas_analise_ia(app, banco);
 rotasImagensExame(app, banco);
 rotasAnamnese(app, banco);
+rotasImportacaoAdmin(app, banco);
 
 // Qualquer caminho que nenhuma rota nem arquivo estático atendeu.
 app.use(middlewareRotaInexistente);

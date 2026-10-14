@@ -172,6 +172,68 @@
 
     .td-actions .btn i { width: 14px; height: 14px; }
 
+    .modal-header-main {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-importar-modal {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 11px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .btn-importar-modal i { width: 15px; height: 15px; }
+
+    .btn-importar-modal::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      z-index: 5;
+      top: calc(100% + 10px);
+      left: 50%;
+      width: 320px;
+      max-width: calc(100vw - 40px);
+      padding: 9px 11px;
+      border-radius: 8px;
+      background: #1f2937;
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 500;
+      line-height: 1.35;
+      text-align: left;
+      white-space: normal;
+      pointer-events: none;
+      opacity: 0;
+      transform: translate(-50%, -4px);
+      transition: opacity .18s ease, transform .18s ease;
+    }
+
+    .btn-importar-modal::before {
+      content: "";
+      position: absolute;
+      z-index: 6;
+      top: calc(100% + 4px);
+      left: 50%;
+      border: 6px solid transparent;
+      border-bottom-color: #1f2937;
+      opacity: 0;
+      transform: translate(-50%, -4px);
+      transition: opacity .18s ease, transform .18s ease;
+    }
+
+    .btn-importar-modal:hover::after,
+    .btn-importar-modal:hover::before,
+    .btn-importar-modal:focus::after,
+    .btn-importar-modal:focus::before {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
     .td-actions .btn-ver {
       background: transparent;
       border: 1.5px solid var(--border);
@@ -287,7 +349,15 @@
 <div class="modal-overlay" id="modalMedico">
   <div class="modal modal-lg">
     <div class="modal-header">
-      <h2 id="modalMedicoTitulo">Cadastro de Médico</h2>
+      <div class="modal-header-main">
+        <h2 id="modalMedicoTitulo">Cadastro de Médico</h2>
+        <button type="button" class="btn btn-ghost btn-importar-modal" id="btnImportarMedicos"
+          data-tooltip="Importe um arquivo XML, CSV ou PDF para cadastrar vários médicos de uma vez.">
+          <i data-lucide="download"></i> Importar
+        </button>
+        <input id="importarMedicos" type="file"
+          accept=".csv,.xml,.pdf,text/csv,application/xml,text/xml,application/pdf" hidden>
+      </div>
       <button class="btn-close-modal" id="closeModalMedico">✕</button>
     </div>
     <div class="modal-body">
@@ -418,6 +488,7 @@
 <script src="../JS/auth.js"></script>
 <script src="../JS/api.js"></script>
 <script src="../JS/exportar.js"></script>
+<script src="../JS/importacao-admin.js"></script>
 <script>
   if (!localStorage.getItem('hematoai_session')) {
     HematoAI.setSession({ tipo: 'Administrador', nome: 'Admin HematoAI' });
@@ -428,6 +499,35 @@
   let listaExibida = [];
   let editingCrm = null;
   let medicoEditando = null;
+  const inputImportarMedicos = document.getElementById('importarMedicos');
+  document.getElementById('btnImportarMedicos').addEventListener('click', async () => {
+    if (!window.showOpenFilePicker) {
+      inputImportarMedicos.click();
+      return;
+    }
+
+    try {
+      const [arquivoSelecionado] = await window.showOpenFilePicker({
+        multiple: false,
+        excludeAcceptAllOption: true,
+        types: [{
+          description: 'Arquivos CSV, XML ou PDF',
+          accept: {
+            'text/csv': ['.csv'],
+            'application/xml': ['.xml'],
+            'text/xml': ['.xml'],
+            'application/pdf': ['.pdf']
+          }
+        }]
+      });
+      await importarCadastroAdmin('medicos', await arquivoSelecionado.getFile(), carregarMedicos);
+    } catch (erro) {
+      if (erro.name !== 'AbortError') {
+        HematoAI.showToast('Não foi possível abrir o seletor de arquivos.', 'error');
+      }
+    }
+  });
+  inputImportarMedicos.addEventListener('change', (event) => importarCadastroAdmin('medicos', event.target, carregarMedicos));
 
   let currentStep = 0;
   let wizardData = {
@@ -992,6 +1092,7 @@
   }
 
   window.editarMedico = function(crm) {
+    document.getElementById('btnImportarMedicos').style.display = 'none';
     document.getElementById("fCrm").disabled = true;
     document.getElementById("fCpf").disabled = true;
     editingCrm = crm;
@@ -1100,6 +1201,7 @@
   document.getElementById('btnNovoMedico').addEventListener('click', () => {
     resetWizard();
     editingCrm = null;
+    document.getElementById('btnImportarMedicos').style.display = 'inline-flex';
     document.getElementById('modalMedicoTitulo').textContent = 'Cadastro de Médico';
     HematoAI.openModal(modalEl);
   });

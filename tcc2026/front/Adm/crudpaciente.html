@@ -415,6 +415,8 @@
       </div>
       <div class="page-header-right">
         <button class="btn btn-primary" id="btnNovoPaciente"><span class="btn-plus">+</span>Novo Paciente</button>
+        <label class="btn btn-ghost" for="importarPacientes">Importar CSV/XML/PDF</label>
+        <input id="importarPacientes" type="file" accept=".csv,.xml,.pdf" hidden>
       </div>
     </div>
 
@@ -642,6 +644,7 @@
 <script src="../JS/auth.js"></script>
 <script src="../JS/api.js"></script>
 <script src="../JS/exportar.js"></script>
+<script src="../JS/importacao-admin.js"></script>
 <script>
   if (!localStorage.getItem('hematoai_session')) {
     HematoAI.setSession({ tipo: 'Administrador', nome: 'Admin HematoAI' });
@@ -652,6 +655,7 @@
   let listaExibida = [];
   let editingCpf = null;
   let pacienteEditando = null;
+  document.getElementById('importarPacientes').addEventListener('change', (event) => importarCadastroAdmin('pacientes', event.target, carregarPacientes));
 
   let currentStep = 0;
   let wizardData = {

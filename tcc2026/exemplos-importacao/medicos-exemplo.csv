@@ -1,0 +1,4 @@
+nome;cpf;email;senha;crm;especialidade;telefone;rua;numero;bairro;cidade;estado;cep
+Ana Beatriz Nogueira;48276531946;ana.nogueira.teste@hematoai.local;Teste2026A;12345-SP;Hematologia;(12) 98811-1201;Rua das Acácias;120;Centro;São José dos Campos;SP;12245000
+Carlos Eduardo Farias;70458312690;carlos.farias.teste@hematoai.local;Teste2026B;23456-SP;Oncologia; (12) 98811-1202;Avenida Nove de Julho;245;Jardim Paulista;São José dos Campos;SP;12243000
+Mariana Lopes Ribeiro;26894175373;mariana.ribeiro.teste@hematoai.local;Teste2026C;34567-SP;Patologia; (12) 98811-1203;Rua dos Ipês;78;Vila Ema;São José dos Campos;SP;12243120
