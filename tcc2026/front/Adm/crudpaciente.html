@@ -173,6 +173,69 @@
 
     .td-actions .btn i { width: 14px; height: 14px; }
 
+    /* ── Botão de Importar dentro do modal (padrão do crud de médicos) ── */
+    .modal-header-main {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-importar-modal {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 11px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .btn-importar-modal i { width: 15px; height: 15px; }
+
+    .btn-importar-modal::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      z-index: 5;
+      top: calc(100% + 10px);
+      left: 50%;
+      width: 320px;
+      max-width: calc(100vw - 40px);
+      padding: 9px 11px;
+      border-radius: 8px;
+      background: #1f2937;
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 500;
+      line-height: 1.35;
+      text-align: left;
+      white-space: normal;
+      pointer-events: none;
+      opacity: 0;
+      transform: translate(-50%, -4px);
+      transition: opacity .18s ease, transform .18s ease;
+    }
+
+    .btn-importar-modal::before {
+      content: "";
+      position: absolute;
+      z-index: 6;
+      top: calc(100% + 4px);
+      left: 50%;
+      border: 6px solid transparent;
+      border-bottom-color: #1f2937;
+      opacity: 0;
+      transform: translate(-50%, -4px);
+      transition: opacity .18s ease, transform .18s ease;
+    }
+
+    .btn-importar-modal:hover::after,
+    .btn-importar-modal:hover::before,
+    .btn-importar-modal:focus::after,
+    .btn-importar-modal:focus::before {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
     .td-actions .btn-ver {
       background: transparent;
       border: 1.5px solid var(--border);
@@ -267,7 +330,6 @@
 
     .calendar-popup.open { display: block; }
 
-    /* Cabeçalho com 3 seletores: Dia | Mês | Ano */
     .cal-selectors {
       display: grid;
       grid-template-columns: 70px 1fr 90px;
@@ -298,7 +360,6 @@
       box-shadow: 0 0 0 3px rgba(185,28,28,0.08);
     }
 
-    /* Cabeçalho do mês com setas */
     .calendar-header {
       display: flex;
       justify-content: space-between;
@@ -415,8 +476,6 @@
       </div>
       <div class="page-header-right">
         <button class="btn btn-primary" id="btnNovoPaciente"><span class="btn-plus">+</span>Novo Paciente</button>
-        <label class="btn btn-ghost" for="importarPacientes">Importar CSV/XML/PDF</label>
-        <input id="importarPacientes" type="file" accept=".csv,.xml,.pdf" hidden>
       </div>
     </div>
 
@@ -475,7 +534,15 @@
 <div class="modal-overlay" id="modalPaciente">
   <div class="modal modal-lg">
     <div class="modal-header">
-      <h2 id="modalTitulo">Cadastro de Paciente</h2>
+      <div class="modal-header-main">
+        <h2 id="modalTitulo">Cadastro de Paciente</h2>
+        <button type="button" class="btn btn-ghost btn-importar-modal" id="btnImportarPacientes"
+          data-tooltip="Importe um arquivo XML, CSV, PDF ou Excel para cadastrar vários pacientes de uma vez.">
+          <i data-lucide="download"></i> Importar
+        </button>
+        <input id="importarPacientes" type="file"
+       accept=".csv,.xml,.pdf,.xlsx,text/csv,application/xml,text/xml,application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden>
+      </div>
       <button class="btn-close-modal" id="closeModalPaciente">✕</button>
     </div>
     <div class="modal-body">
@@ -525,14 +592,12 @@
               <span class="date-icon">📅</span>
               <div class="calendar-popup" id="calendarPopupNasc">
 
-                <!-- Seletores Dia | Mês | Ano -->
                 <div class="cal-selectors">
                   <select id="calDia" aria-label="Dia"></select>
                   <select id="calMes" aria-label="Mês"></select>
                   <select id="calAno" aria-label="Ano"></select>
                 </div>
 
-                <!-- Cabeçalho com navegação de mês -->
                 <div class="calendar-header">
                   <button type="button" class="nav-btn" id="prevMonthNasc">◀</button>
                   <span class="month-year" id="monthYearDisplayNasc">—</span>
@@ -655,7 +720,36 @@
   let listaExibida = [];
   let editingCpf = null;
   let pacienteEditando = null;
-  document.getElementById('importarPacientes').addEventListener('change', (event) => importarCadastroAdmin('pacientes', event.target, carregarPacientes));
+  const inputImportarPacientes = document.getElementById('importarPacientes');
+  document.getElementById('btnImportarPacientes').addEventListener('click', async () => {
+    if (!window.showOpenFilePicker) {
+      inputImportarPacientes.click();
+      return;
+    }
+
+    try {
+      const [arquivoSelecionado] = await window.showOpenFilePicker({
+        multiple: false,
+        excludeAcceptAllOption: true,
+        types: [{
+          description: 'Arquivos Excel, CSV, XML ou PDF',
+          accept: {
+            'text/csv': ['.csv'],
+            'application/xml': ['.xml'],
+            'text/xml': ['.xml'],
+            'application/pdf': ['.pdf'],
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx']
+          }
+        }]
+      });
+      await importarCadastroAdmin('pacientes', await arquivoSelecionado.getFile(), carregarPacientes);
+    } catch (erro) {
+      if (erro.name !== 'AbortError') {
+        HematoAI.showToast('Não foi possível abrir o seletor de arquivos.', 'error');
+      }
+    }
+  });
+  inputImportarPacientes.addEventListener('change', (event) => importarCadastroAdmin('pacientes', event.target, carregarPacientes));
 
   let currentStep = 0;
   let wizardData = {
@@ -666,9 +760,6 @@
 
   // ============================================
   // CALENDÁRIO — DATA DE NASCIMENTO
-  // Reformulado: 3 selects (Dia | Mês | Ano) no topo,
-  // permitindo ao usuário escolher direto o ano/mês/dia
-  // sem precisar abrir outro popup.
   // ============================================
   let dataNascSelecionada = null;
   let mesNascAtual = new Date().getMonth();
@@ -681,13 +772,11 @@
   const ANO_MIN = 1900;
   const ANO_MAX = new Date().getFullYear();
 
-  // Preenche os 3 selects uma única vez
   function inicializarSelects() {
     const selDia = document.getElementById('calDia');
     const selMes = document.getElementById('calMes');
     const selAno = document.getElementById('calAno');
 
-    // Dia 1-31
     selDia.innerHTML = '';
     for (let d = 1; d <= 31; d++) {
       const opt = document.createElement('option');
@@ -696,7 +785,6 @@
       selDia.appendChild(opt);
     }
 
-    // Mês
     selMes.innerHTML = '';
     mesesNomes.forEach((nome, i) => {
       const opt = document.createElement('option');
@@ -705,7 +793,6 @@
       selMes.appendChild(opt);
     });
 
-    // Ano (do mais recente para o mais antigo)
     selAno.innerHTML = '';
     for (let a = ANO_MAX; a >= ANO_MIN; a--) {
       const opt = document.createElement('option');
@@ -715,21 +802,17 @@
     }
   }
 
-  // Sincroniza os selects com o estado atual
   function sincronizarSelects() {
     document.getElementById('calMes').value = String(mesNascAtual);
     document.getElementById('calAno').value = String(anoNascAtual);
 
     const selDia = document.getElementById('calDia');
-    // Ajusta o número de dias do mês
     const diasNoMes = new Date(anoNascAtual, mesNascAtual + 1, 0).getDate();
-    // Reabilita/desabilita as opções de dia conforme o mês
     Array.from(selDia.options).forEach(opt => {
       const dia = parseInt(opt.value);
       opt.disabled = dia > diasNoMes;
     });
 
-    // Seleciona o dia se houver data escolhida
     if (dataNascSelecionada &&
         dataNascSelecionada.getMonth() === mesNascAtual &&
         dataNascSelecionada.getFullYear() === anoNascAtual) {
@@ -826,9 +909,6 @@
     popup.classList.add('open');
   }
 
-  // ============================================
-  // LISTENERS DOS SELECTS DO CABEÇALHO
-  // ============================================
   document.getElementById('calDia').addEventListener('change', function(e) {
     e.stopPropagation();
     const dia = parseInt(this.value);
@@ -849,22 +929,17 @@
     renderCalendarNasc();
   });
 
-  // Impede que os cliques nos selects propaguem e fechem o popup
   ['calDia', 'calMes', 'calAno'].forEach(id => {
     document.getElementById(id).addEventListener('click', function(e) {
       e.stopPropagation();
     });
   });
 
-  // ============================================
-  // LISTENERS DOS BOTÕES DE NAVEGAÇÃO
-  // ============================================
   document.getElementById('prevMonthNasc').addEventListener('click', function(e) {
     e.preventDefault();
     e.stopPropagation();
     if (mesNascAtual === 0) { mesNascAtual = 11; anoNascAtual--; }
     else { mesNascAtual--; }
-    // Garante que o ano não saia do intervalo
     if (anoNascAtual < ANO_MIN) { anoNascAtual = ANO_MIN; mesNascAtual = 0; }
     renderCalendarNasc();
   });
@@ -884,7 +959,6 @@
     abrirCalendarioNasc();
   });
 
-  // Handler global para fechar o calendário ao clicar fora
   document.addEventListener('click', function(e) {
     const popup = document.getElementById('calendarPopupNasc');
     if (!popup || !popup.classList.contains('open')) return;
@@ -1034,7 +1108,6 @@
       if (i === currentStep) {
         stepDiv.classList.add('active');
         stepDiv.classList.remove('completed');
-        // A etapa atual mostra o número, mesmo que já tenha sido concluída antes.
         if (stepCheck) stepCheck.style.display = 'none';
         if (stepNumber) stepNumber.style.display = 'flex';
       } else if (isStepCompleted(i)) {
@@ -1068,7 +1141,6 @@
     if (step === 0) {
       return wizardData.paciente.cpf && wizardData.paciente.nome && wizardData.paciente.sexo && wizardData.paciente.email;
     } else if (step === 1) {
-      // Endereço só conta como concluído quando preenchido (o CEP é opcional).
       return HematoEtapas.enderecoCompleto(wizardData.endereco);
     } else if (step === 2) {
       return wizardData.login.email && wizardData.login.senha;
@@ -1146,7 +1218,6 @@
       if (!sexo)                     { HematoAI.showToast('Selecione o sexo.', 'error'); return false; }
       if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) { HematoAI.showToast('E-mail inválido.', 'error'); return false; }
     } else if (currentStep === 1) {
-      // Só o CEP é opcional (como na API); se informado, precisa ter 8 dígitos.
       const cep = document.getElementById('pCep').value.trim();
       const rua = document.getElementById('pRua').value.trim();
       const numero = document.getElementById('pNumero').value.trim();
@@ -1186,7 +1257,6 @@
     if (currentStep > 0) { currentStep--; loadStepData(); updateWizardUI(); }
   }
 
-  
   async function finalizeCadastro() {
     saveCurrentStepData();
 
@@ -1207,7 +1277,6 @@
     } catch (erro) {
       console.error("Erro ao finalizar cadastro de paciente:", erro);
 
-      // Não exibe erro de conexão para falhas de validação
       if (
         erro.message &&
         erro.message !== "Failed to fetch" &&
@@ -1453,6 +1522,7 @@
   }
 
   window.editarPaciente = function(cpf) {
+    document.getElementById('btnImportarPacientes').style.display = 'none';
     editingCpf = cpf;
     document.getElementById("pCpf").disabled = true;
     const p = pacientes.find(x => x.cpf === cpf);
@@ -1466,7 +1536,6 @@
       email: p.email,
       telefone: p.telefone || ""
     };
-    // CEP é opcional e pode vir nulo do banco (como no cadastro de médico).
     wizardData.endereco = p.endereco
       ? { ...p.endereco, cep: p.endereco.cep || "" }
       : { cep: "", rua: "", numero: "", bairro: "", cidade: "", estado: "" };
@@ -1535,6 +1604,7 @@
   document.getElementById('btnNovoPaciente').addEventListener('click', () => {
     resetWizard();
     editingCpf = null;
+    document.getElementById('btnImportarPacientes').style.display = 'inline-flex';
     document.getElementById('modalTitulo').textContent = 'Cadastro de Paciente';
     HematoAI.openModal(modalEl);
   });
@@ -1561,7 +1631,6 @@
     }
   });
 
-  // Inicialização do calendário (selects e render)
   inicializarSelects();
   carregarPacientes();
   updateWizardUI();

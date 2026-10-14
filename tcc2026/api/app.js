@@ -21,11 +21,10 @@ const rotasImportacaoAdmin = require("./routes/RotasImportacaoAdmin");
 
 const app = express();
 
-// CORS: o front é servido por este mesmo servidor (mesma origem). Só as
-// origens locais do projeto, ou as listadas em CORS_ORIGINS (separadas por
-// vírgula), podem chamar a API de outro endereço.
-const origensPermitidas = (process.env.CORS_ORIGINS ||
-    "http://localhost:3000,http://127.0.0.1:3000")
+const origensPermitidas = (
+    process.env.CORS_ORIGINS ||
+    "http://localhost:5500,http://127.0.0.1:5500,http://localhost:3000,http://127.0.0.1:3000"
+)
     .split(",")
     .map((origem) => origem.trim())
     .filter(Boolean);

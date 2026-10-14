@@ -356,7 +356,8 @@
           <i data-lucide="download"></i> Importar
         </button>
         <input id="importarMedicos" type="file"
-          accept=".csv,.xml,.pdf,text/csv,application/xml,text/xml,application/pdf" hidden>
+       accept=".csv,.xml,.pdf,.xlsx,text/csv,application/xml,text/xml,application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+       hidden>
       </div>
       <button class="btn-close-modal" id="closeModalMedico">✕</button>
     </div>
@@ -507,16 +508,18 @@
     }
 
     try {
+      
       const [arquivoSelecionado] = await window.showOpenFilePicker({
         multiple: false,
         excludeAcceptAllOption: true,
         types: [{
-          description: 'Arquivos CSV, XML ou PDF',
+          description: 'Arquivos CSV, XML, PDF ou Excel',
           accept: {
             'text/csv': ['.csv'],
             'application/xml': ['.xml'],
             'text/xml': ['.xml'],
-            'application/pdf': ['.pdf']
+            'application/pdf': ['.pdf'],
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx']
           }
         }]
       });

@@ -9,7 +9,7 @@ const upload = multer({
     storage: multer.memoryStorage(),
     limits: { fileSize: 10 * 1024 * 1024 },
     fileFilter: (_req, file, cb) => {
-        const aceitos = [".csv", ".xml", ".pdf"];
+        const aceitos = [".csv", ".xml", ".pdf", ".xlsx"];
         const extensao = String(file.originalname || "").toLowerCase().slice(String(file.originalname || "").lastIndexOf("."));
         cb(null, aceitos.includes(extensao));
     }
@@ -49,8 +49,18 @@ module.exports = (app, banco) => {
                 res.status(201).send({ status: true, tipo: req.params.tipo, total: criados.length, cadastrados: criados });
             } catch (erroBanco) {
                 try { await query("ROLLBACK"); } catch (_rollback) { /* mantém o erro original */ }
-                if (erroBanco.code === "ER_DUP_ENTRY") throw new ErrorResponse(409, "Importação cancelada: há CPF, CRM ou e-mail duplicado.");
-                throw erroBanco;
+                if (erroBanco.code === "ER_DUP_ENTRY") {
+                    console.error("Erro de duplicidade na importação:", {
+                        mensagem: erroBanco.message,
+                        codigo: erroBanco.code,
+                        sqlMessage: erroBanco.sqlMessage
+                    });
+
+                    throw new ErrorResponse(
+                        409,
+                        `Importação cancelada por duplicidade. Detalhes: ${erroBanco.sqlMessage || erroBanco.message}`
+                    );
+                }
             } finally { conexao.release(); }
         } catch (erro) { next(erro); }
     });
