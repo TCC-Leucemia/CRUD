@@ -75,8 +75,16 @@
       transform: translateY(-50%);
       color: var(--text-3);
       pointer-events: none;
-      font-size: 1rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       line-height: 1;
+    }
+
+    .search-wrapper .search-icon svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
     }
 
     /* Badges de suspeita */
@@ -236,8 +244,16 @@
       left: 14px;
       top: 50%;
       transform: translateY(-50%);
-      font-size: 1rem;
       color: var(--text-3);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+    .exame-selector .search-wrapper .lupa svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
     }
 
     .exame-tabela-wrapper {
@@ -554,7 +570,12 @@
           <span class="card-title">Lista de Resultados</span>
           <div class="filter-row">
             <div class="search-wrapper">
-              <span class="search-icon">🔍</span>
+              <span class="search-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8"/>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+              </span>
               <input type="text" id="searchResultado" placeholder="Buscar por paciente, CPF ou data...">
             </div>
             <select id="filterSuspeita" class="filter-select">
@@ -617,7 +638,12 @@
           <label>Exame *</label>
           <div class="exame-selector">
             <div class="search-wrapper">
-              <span class="lupa">🔍</span>
+              <span class="lupa" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8"/>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+              </span>
               <input type="text" id="searchExameSelect" placeholder="Pesquisar por paciente, CPF, tipo ou data...">
             </div>
             <div class="exame-tabela-wrapper">

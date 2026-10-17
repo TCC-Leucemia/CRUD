@@ -317,16 +317,6 @@
                 </div>
               </div>
             </div>
-            <div>
-              <button class="btn btn-outline" id="btnSairSistema">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline; margin-right: 6px;">
-                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                  <polyline points="16 17 21 12 16 7"/>
-                  <line x1="21" y1="12" x2="9" y2="12"/>
-                </svg>
-                Sair do Sistema
-              </button>
-            </div>
           </div>
         </div>
       </div>
@@ -572,23 +562,11 @@
     if (typeof HematoAI !== 'undefined') HematoAI.showToast('Alterações canceladas.', 'info');
   }
 
-  function sairSistema() {
-    if (typeof HematoAI !== 'undefined') {
-      HematoAI.confirmDialog(
-        'Tem certeza que deseja sair do sistema?',
-        () => {
-          // Apaga a sessão inteira (token incluído) e volta ao login.
-          HematoAI.clearSession();
-          window.location.href = '../login.html';
-        }
-      );
-    }
-  }
+  
 
   // Event listeners
   document.getElementById('btnSalvarCredenciais').addEventListener('click', salvarCredenciais);
   document.getElementById('btnCancelarAlteracao').addEventListener('click', cancelarAlteracao);
-  document.getElementById('btnSairSistema').addEventListener('click', sairSistema);
 
   carregarUsuario();
   

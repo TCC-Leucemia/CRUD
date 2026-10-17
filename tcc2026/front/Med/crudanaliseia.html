@@ -85,8 +85,16 @@
       transform: translateY(-50%);
       color: var(--text-3);
       pointer-events: none;
-      font-size: 1rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       line-height: 1;
+    }
+
+    .search-wrapper .search-icon svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
     }
 
     .suspeita-badge {
@@ -311,7 +319,12 @@
           <span class="card-title">Lista de Análises</span>
           <div class="filter-row">
             <div class="search-wrapper">
-              <span class="search-icon">🔍</span>
+              <span class="search-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8"/>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+              </span>
               <input type="text" id="searchAnalise" placeholder="Buscar por paciente ou CPF...">
             </div>
             <select id="filterSuspeita" class="filter-select" aria-label="Nível de confiança">
@@ -731,8 +744,6 @@
   document.getElementById('closeModalDetalhes').addEventListener('click', () => HematoAI.closeModal(document.getElementById('modalDetalhes')));
   document.getElementById('fecharDetalhes').addEventListener('click', () => HematoAI.closeModal(document.getElementById('modalDetalhes')));
   
-  // Mesmo padrão das outras telas do médico: sem login vai para o login;
-  // outro perfil recebe "Permissão insuficiente".
   if (verificarPerfil("Médico")) carregar();
 </script>
 </body>

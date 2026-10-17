@@ -58,8 +58,19 @@
       left: 12px;
       top: 50%;
       transform: translateY(-50%);
-      font-size: 0.95rem;
-      color: var(--text-3);
+      width: 16px;
+      height: 16px;
+      stroke: var(--text-3);
+      pointer-events: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .filtros-area .search-wrapper .lupa svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
     }
 
     .filtros-area .filter-group {
@@ -91,10 +102,6 @@
       box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.08);
     }
 
-    /* Os botões de PDF/Excel entram nesta mesma área (ver criarBotoes mais
-       abaixo): só o padding muda aqui, para ficar da altura dos outros
-       filtros da barra; a fonte fica a padrão do navbar.css (maior que a
-       de todos os filtros desta página, inclusive a busca a 0.85rem). */
     .filtros-area .btn-export {
       padding: 8px 14px;
     }
@@ -141,9 +148,16 @@
     .resultado-card .info-principal .data {
       font-size: 0.8rem;
       color: var(--text-3);
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: 5px;
+    }
+
+    .resultado-card .info-principal .data svg {
+      width: 13px;
+      height: 13px;
+      stroke: var(--text-3);
+      flex-shrink: 0;
     }
 
     .resultado-card .badges {
@@ -192,9 +206,20 @@
       text-align: center;
     }
     .nenhum-resultado .icone {
-      font-size: 3.5rem;
-      margin-bottom: 12px;
-      opacity: 0.5;
+      width: 64px;
+      height: 64px;
+      margin-bottom: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+    }
+    .nenhum-resultado .icone svg {
+      width: 30px;
+      height: 30px;
+      stroke: var(--text-3);
     }
     .nenhum-resultado h3 {
       font-size: 1.1rem;
@@ -396,6 +421,13 @@
       background: var(--surface);
       border-color: var(--border);
     }
+    .dark-mode .nenhum-resultado .icone {
+      background: var(--surface);
+      border-color: var(--border);
+    }
+    .dark-mode .nenhum-resultado .icone svg {
+      stroke: var(--text-3);
+    }
 
     /* ── Responsividade ────────────────────────────────── */
     @media (max-width: 768px) {
@@ -465,7 +497,12 @@
         <!-- ─── ÁREA DE PESQUISA E FILTROS ────────────────── -->
         <div class="filtros-area">
           <div class="search-wrapper">
-            <span class="lupa">🔍</span>
+            <span class="lupa" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+            </span>
             <input type="text" id="searchInput" placeholder="Buscar por tipo de exame ou data...">
           </div>
           <div class="filter-group">
@@ -566,7 +603,12 @@
     if (dados.length === 0) {
       lista.innerHTML = `
         <div class="nenhum-resultado">
-          <div class="icone">📂</div>
+          <div class="icone" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+            </svg>
+          </div>
           <h3>Nenhum resultado disponível</h3>
           <p>Assim que um exame for finalizado, ele aparecerá aqui.</p>
         </div>
@@ -594,7 +636,15 @@
       card.innerHTML = `
         <div class="info-principal">
           <span class="tipo">${exame.tipo_exame || "Exame"}</span>
-          <span class="data">📅 ${dataExame}</span>
+          <span class="data">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            ${dataExame}
+          </span>
         </div>
         <div class="badges">
           <span class="badge-status ${classeStatus(exame.statusc)}">${exame.statusc || "Pendente"}</span>
@@ -818,13 +868,42 @@
 
     await carregarExames();
 
-    const todosResultados = EXAMES.filter(e => e.resultado_texto);
+    const todosResultados = EXAMES.filter(e =>
+      e.resultado_texto && e.resultado_texto.trim()
+    );
+
     renderizarLista(todosResultados);
 
-    document.getElementById('searchInput').addEventListener('input', filtrarResultados);
-    document.getElementById('filtroTipo').addEventListener('change', filtrarResultados);
-    document.getElementById('filtroStatus').addEventListener('change', filtrarResultados);
-    document.getElementById('filtroOrdenacao').addEventListener('change', filtrarResultados);
+    document.getElementById('searchInput')
+      .addEventListener('input', filtrarResultados);
+
+    document.getElementById('filtroTipo')
+      .addEventListener('change', filtrarResultados);
+
+    document.getElementById('filtroStatus')
+      .addEventListener('change', filtrarResultados);
+
+    document.getElementById('filtroOrdenacao')
+      .addEventListener('change', filtrarResultados);
+    const parametros = new URLSearchParams(window.location.search);
+    const idExameParam = parametros.get('exameId');
+
+    if (idExameParam) {
+      const idExame = Number(idExameParam);
+
+      const exameExiste = todosResultados.some(
+        e => Number(e.id_exame) === idExame
+      );
+
+      if (exameExiste) {
+        abrirModal(idExame);
+      } else {
+        HematoAI.showToast(
+          "O resultado deste exame não está disponível.",
+          "error"
+        );
+      }
+    }
   };
 </script>
 </body>

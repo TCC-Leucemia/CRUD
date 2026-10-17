@@ -295,7 +295,7 @@
         <!-- ─── Card 1: Dados Pessoais ─── -->
         <div class="card">
           <div class="card-header">
-            <span class="card-title">👤 Dados Pessoais</span>
+            <span class="card-title">Dados Pessoais</span>
           </div>
           <div class="card-body">
             <div class="settings-section">
@@ -332,7 +332,7 @@
         <!-- ─── Card 2: Segurança da Conta ─── -->
         <div class="card">
           <div class="card-header">
-            <span class="card-title">🔒 Segurança da Conta</span>
+            <span class="card-title">Segurança da Conta</span>
           </div>
           <div class="card-body">
             <div class="settings-section">
@@ -372,20 +372,19 @@
           </div>
         </div>
 
-        <!-- ─── Card 3: Aparência ─── -->
+        <!-- ─── Card 3: Tema do Sistema (com ícone de sol no header) ─── -->
         <div class="card">
           <div class="card-header">
-            <span class="card-title">🎨 Aparência</span>
+            <span class="card-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;stroke:var(--red);vertical-align:-3px;margin-right:6px;">
+                <circle cx="12" cy="12" r="5"/>
+                <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+              </svg>
+              Tema do Sistema
+            </span>
           </div>
           <div class="card-body">
             <div class="settings-section">
-              <div class="settings-section-title">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="12" cy="12" r="5"/>
-                  <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
-                </svg>
-                Tema do Sistema
-              </div>
               <div class="theme-toggle-container">
                 <div class="theme-option" id="themeLight">
                   <div class="theme-icon">☀️</div>
@@ -414,7 +413,7 @@
         <!-- ─── Card 4: Sessão Atual ─── -->
         <div class="card">
           <div class="card-header">
-            <span class="card-title">💻 Sessão Atual</span>
+            <span class="card-title">Sessão Atual</span>
           </div>
           <div class="card-body">
             <div class="settings-section">
@@ -550,16 +549,6 @@
 
   }
 
-  // Futuramente, esta função será substituída por uma chamada à API:
-  // async function carregarDadosPaciente() {
-  //   const resp = await get('/pacientes/meus-dados');
-  //   const dados = await resp.json();
-  //   if (resp.ok) {
-  //     pacienteDados = dados.dados;
-  //     // Atualiza a tela...
-  //   }
-  // }
-
   // ---- 3. Força da senha ----
   function verificarForcaSenha(senha) {
     const container = document.getElementById('senhaStrengthContainer');
@@ -601,9 +590,6 @@
   });
 
   // ---- 4. Validar e salvar credenciais ----
-  // (mantendo a lógica do código original, ajustada para a nova estrutura)
-  
-
   function validarCredenciais() {
     const senhaAtual = document.getElementById('senhaAtual')?.value || '';
     const novoEmail = document.getElementById('novoEmail')?.value.trim() || '';

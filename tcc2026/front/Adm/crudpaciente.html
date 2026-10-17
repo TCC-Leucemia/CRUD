@@ -36,6 +36,55 @@
       box-shadow: 0 0 0 3px rgba(185,28,28,0.08);
     }
 
+    /* ── Lupa da listagem (mesmo estilo de Nova Consulta) ── */
+    .card-header .search-wrapper {
+      position: relative;
+      flex: 1 1 200px;
+      max-width: 280px;
+      min-width: 180px;
+    }
+
+    .card-header .search-wrapper input {
+      width: 100%;
+      padding: 10px 14px 10px 36px;
+      border: 1.5px solid var(--border);
+      border-radius: 40px;
+      font-size: 0.85rem;
+      background: var(--surface);
+      color: var(--text-1);
+      font-family: var(--font);
+      outline: none;
+      transition: var(--transition);
+      line-height: 1;
+    }
+
+    .card-header .search-wrapper input::placeholder {
+      color: var(--text-3);
+    }
+
+    .card-header .search-wrapper input:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(185,28,28,0.08);
+    }
+
+    .card-header .search-wrapper .lupa {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-3);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .card-header .search-wrapper .lupa svg {
+      width: 15px;
+      height: 15px;
+      stroke: currentColor;
+    }
+
     .wizard-progress {
       margin-bottom: 28px;
       padding-bottom: 8px;
@@ -300,15 +349,24 @@
 
     .date-picker-wrapper input:hover { border-color: var(--border-dark); }
 
+    /* Ícone do calendário em SVG (mesmo padrão de Nova Consulta) */
     .date-picker-wrapper .date-icon {
       position: absolute;
       right: 14px;
       top: 50%;
       transform: translateY(-50%);
-      font-size: 1.1rem;
       pointer-events: none;
       color: var(--text-3);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       transition: color 0.2s ease;
+    }
+
+    .date-picker-wrapper .date-icon svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
     }
 
     .date-picker-wrapper:focus-within .date-icon { color: var(--red); }
@@ -484,9 +542,17 @@
         <div class="card-header">
           <span class="card-title">Lista de Pacientes</span>
           <div class="filter-row">
-            <div class="search-bar" style="max-width:280px">
+            <!-- ▼▼▼ ALTERADO: lupa no mesmo estilo de Nova Consulta ▼▼▼ -->
+            <div class="search-wrapper">
+              <span class="lupa" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8"/>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+              </span>
               <input type="text" id="searchPaciente" placeholder="Buscar por nome ou CPF...">
             </div>
+            <!-- ▲▲▲ FIM DA ALTERAÇÃO ▲▲▲ -->
             <select id="filterSexo" class="filter-select">
               <option value="">Todos os sexos</option>
               <option value="Masculino">Masculino</option>
@@ -589,7 +655,16 @@
             <label>Data de Nascimento</label>
             <div class="date-picker-wrapper">
               <input type="text" id="pDataNasc" placeholder="DD/MM/AAAA" readonly>
-              <span class="date-icon">📅</span>
+              <!-- ▼▼▼ ALTERADO: ícone do calendário em SVG ▼▼▼ -->
+              <span class="date-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                  <line x1="16" y1="2" x2="16" y2="6"/>
+                  <line x1="8" y1="2" x2="8" y2="6"/>
+                  <line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+              </span>
+              <!-- ▲▲▲ FIM DA ALTERAÇÃO ▲▲▲ -->
               <div class="calendar-popup" id="calendarPopupNasc">
 
                 <div class="cal-selectors">
@@ -1212,7 +1287,14 @@
       const sexo = document.getElementById('pSexo').value;
       const email = document.getElementById('pEmail').value.trim();
 
-      if (!cpf || cpf.length !== 11) { HematoAI.showToast('CPF inválido. Deve conter 11 dígitos.', 'error'); return false; }
+      if (!cpfValido(cpf)) {
+          HematoAI.showToast(
+              'CPF inválido. Verifique os números digitados.',
+              'error'
+          );
+          document.getElementById('pCpf').focus();
+          return false;
+      }
       if (!nome || nome.length < 8)  { HematoAI.showToast('O nome deve ter no mínimo 8 caracteres.', 'error'); return false; }
       if (nome.length > 100)         { HematoAI.showToast('O nome deve ter no máximo 100 caracteres.', 'error'); return false; }
       if (!sexo)                     { HematoAI.showToast('Selecione o sexo.', 'error'); return false; }
@@ -1245,6 +1327,39 @@
     }
     return true;
   }
+
+  
+function cpfValido(cpf) {
+    const numeros = String(cpf).replace(/\D/g, '');
+
+    if (numeros.length !== 11) return false;
+
+    // Rejeita CPFs com todos os dígitos iguais
+    if (/^(\d)\1{10}$/.test(numeros)) return false;
+
+    let soma = 0;
+
+    for (let i = 0; i < 9; i++) {
+        soma += Number(numeros[i]) * (10 - i);
+    }
+
+    let digito1 = (soma * 10) % 11;
+    if (digito1 === 10) digito1 = 0;
+
+    if (digito1 !== Number(numeros[9])) return false;
+
+    soma = 0;
+
+    for (let i = 0; i < 10; i++) {
+        soma += Number(numeros[i]) * (11 - i);
+    }
+
+    let digito2 = (soma * 10) % 11;
+    if (digito2 === 10) digito2 = 0;
+
+    return digito2 === Number(numeros[10]);
+  }
+
 
   function nextStep() {
     saveCurrentStepData();

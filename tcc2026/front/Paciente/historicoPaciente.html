@@ -11,30 +11,30 @@
     body { background: var(--bg); }
 
     .pac-wrap {
-      max-width: 1100px;
+      max-width: 1680px;
       margin: 0 auto;
-      padding: 0 0 48px;
+      padding: 0 0 56px;
     }
 
     /* ── Navegação ────────────────────────────────────── */
     .pac-nav {
       display: flex;
-      gap: 10px;
-      margin-bottom: 28px;
+      gap: 12px;
+      margin-bottom: 34px;
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius-xl);
-      padding: 6px;
+      padding: 10px;
       box-shadow: var(--shadow-sm);
-      max-width: 540px;
+      max-width: 780px;
     }
 
     .pac-nav-btn {
       flex: 1;
-      padding: 12px 20px;
+      padding: 20px 34px;
       border: none;
       border-radius: var(--radius-lg);
-      font-size: .9rem;
+      font-size: 1.18rem;
       font-weight: 700;
       font-family: var(--font);
       cursor: pointer;
@@ -44,7 +44,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 10px;
     }
     .pac-nav-btn:hover { background: var(--bg); color: var(--text-1); }
     .pac-nav-btn.ativo {
@@ -56,8 +56,8 @@
     /* ── Grid principal (lateral + detalhes) ───────────── */
     .pac-grid {
       display: grid;
-      grid-template-columns: 340px 1fr;
-      gap: 20px;
+      grid-template-columns: 520px 1fr;
+      gap: 32px;
       align-items: start;
     }
 
@@ -72,42 +72,51 @@
       top: 20px;
       display: flex;
       flex-direction: column;
-      max-height: calc(100vh - 200px);
+      max-height: calc(100vh - 180px);
     }
 
     .lista-header {
-      padding: 15px 20px;
+      padding: 24px 30px;
       border-bottom: 1px solid var(--border);
       font-weight: 700;
-      font-size: .875rem;
+      font-size: 1.18rem;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 12px;
       background: var(--bg);
       flex-shrink: 0;
     }
 
     /* Campo de filtro por data */
     .filtro-data {
-      padding: 10px 20px;
+      padding: 18px 30px;
       border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 12px;
       background: var(--bg);
       flex-shrink: 0;
     }
     .filtro-data label {
-      font-size: .8rem;
+      font-size: 1rem;
       color: var(--text-2);
       font-weight: 600;
       white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .filtro-data label svg {
+      width: 18px;
+      height: 18px;
+      stroke: var(--text-2);
+      flex-shrink: 0;
     }
     .filtro-data input[type="date"] {
-      padding: 6px 10px;
+      padding: 10px 14px;
       border: 1px solid var(--border);
       border-radius: var(--radius-md);
-      font-size: .8rem;
+      font-size: 1rem;
       background: var(--surface);
       color: var(--text-1);
       outline: none;
@@ -121,17 +130,17 @@
     }
 
     .lista-exportar {
-      padding: 10px 20px;
+      padding: 18px 30px;
       border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 8px;
+      gap: 10px;
       background: var(--bg);
       flex-shrink: 0;
     }
     .lista-exportar > span {
-      font-size: .8rem;
+      font-size: 1rem;
       color: var(--text-2);
       font-weight: 600;
     }
@@ -140,11 +149,11 @@
       overflow-y: auto;
       flex: 1;
     }
-    .lista-body::-webkit-scrollbar { width: 4px; }
-    .lista-body::-webkit-scrollbar-thumb { background: var(--border-dark); border-radius: 2px; }
+    .lista-body::-webkit-scrollbar { width: 6px; }
+    .lista-body::-webkit-scrollbar-thumb { background: var(--border-dark); border-radius: 3px; }
 
     .lista-item {
-      padding: 15px 20px;
+      padding: 22px 30px;
       border-bottom: 1px solid var(--border);
       cursor: pointer;
       transition: background .15s;
@@ -153,20 +162,21 @@
     .lista-item:hover { background: var(--bg); }
     .lista-item.selecionado {
       background: var(--red-light);
-      border-left: 3px solid var(--red);
-      padding-left: 17px;
+      border-left: 4px solid var(--red);
+      padding-left: 26px;
     }
 
     .item-topo {
       display: flex; align-items: center;
-      justify-content: space-between; margin-bottom: 4px;
+      justify-content: space-between; margin-bottom: 8px;
+      gap: 12px;
     }
-    .item-titulo { font-weight: 700; font-size: .875rem; color: var(--text-1); }
-    .item-data   { font-size: .72rem; color: var(--text-3); }
-    .item-sub    { font-size: .78rem; color: var(--text-2); margin-bottom: 6px; }
+    .item-titulo { font-weight: 700; font-size: 1.15rem; color: var(--text-1); }
+    .item-data   { font-size: 0.95rem; color: var(--text-3); white-space: nowrap; }
+    .item-sub    { font-size: 1rem; color: var(--text-2); margin-bottom: 10px; }
 
     /* Painel de detalhe */
-    .detalhe-panel { display: flex; flex-direction: column; gap: 14px; }
+    .detalhe-panel { display: flex; flex-direction: column; gap: 20px; }
 
     .detalhe-vazio {
       background: var(--surface);
@@ -174,10 +184,11 @@
       border-radius: var(--radius-xl);
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
-      padding: 70px 20px;
+      padding: 200px 40px;
       color: var(--text-3);
       text-align: center;
       box-shadow: var(--shadow-sm);
+      min-height: 640px;
     }
 
     .detalhe-secao {
@@ -191,25 +202,25 @@
     @keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
 
     .detalhe-secao-header {
-      padding: 13px 22px;
+      padding: 22px 38px;
       background: var(--bg);
       border-bottom: 1px solid var(--border);
-      font-weight: 700; font-size: .875rem;
-      display: flex; align-items: center; gap: 8px;
+      font-weight: 700; font-size: 1.22rem;
+      display: flex; align-items: center; gap: 10px;
       color: var(--text-1);
     }
 
-    .detalhe-secao-body { padding: 20px 22px; }
+    .detalhe-secao-body { padding: 38px 42px; }
 
     .detalhe-linha {
       display: grid;
-      grid-template-columns: 160px 1fr;
-      gap: 6px 14px;
-      margin-bottom: 10px;
-      font-size: .875rem;
+      grid-template-columns: 240px 1fr;
+      gap: 14px 28px;
+      margin-bottom: 22px;
+      font-size: 1.12rem;
     }
     .detalhe-linha:last-child { margin-bottom: 0; }
-    .detalhe-label { color: var(--text-2); font-weight: 600; font-size: .82rem; }
+    .detalhe-label { color: var(--text-2); font-weight: 600; font-size: 1.04rem; }
     .detalhe-valor { color: var(--text-1); }
 
     /* Diagnóstico do médico */
@@ -217,24 +228,24 @@
       background: var(--blue-light);
       border: 1px solid #bfdbfe;
       border-radius: var(--radius-lg);
-      padding: 18px 20px;
+      padding: 26px 30px;
     }
     .diagnostico-label {
-      font-size: .68rem; font-weight: 700;
+      font-size: 0.82rem; font-weight: 700;
       text-transform: uppercase; letter-spacing: 1px;
-      color: var(--blue); margin-bottom: 8px;
+      color: var(--blue); margin-bottom: 12px;
     }
     .diagnostico-texto {
-      font-size: .875rem;
-      line-height: 1.75;
+      font-size: 1.06rem;
+      line-height: 1.85;
       color: var(--text-1);
       white-space: pre-wrap;
     }
     .badge-diagnostico {
       display: inline-block;
-      padding: 5px 14px;
+      padding: 7px 18px;
       border-radius: 20px;
-      font-size: .78rem;
+      font-size: 0.9rem;
       font-weight: 700;
     }
     .diag-alta     { background: var(--red-mid);      color: var(--red);    }
@@ -292,16 +303,17 @@
     .dark-mode .pac-nav { background: var(--surface); border-color: var(--border); }
     .dark-mode .pac-nav-btn { color: var(--text-2); }
     .dark-mode .pac-nav-btn:hover { background: var(--bg); color: var(--text-1); }
+    .dark-mode .filtro-data label svg { stroke: var(--text-2); }
 
     /* Botão Exportar PDF */
     .btn-exportar-pdf {
       background: var(--pdf);
       border: none;
       color: white;
-      padding: 13px 28px;
+      padding: 18px 42px;
       border-radius: 40px;
       font-weight: 700;
-      font-size: 0.95rem;
+      font-size: 1.12rem;
       cursor: pointer;
       transition: var(--transition);
       width: auto;
@@ -318,14 +330,26 @@
     }
     .btn-exportar-pdf:active { transform: translateY(0); }
 
+    @media (max-width: 1280px) {
+      .pac-grid { grid-template-columns: 460px 1fr; }
+    }
+    @media (max-width: 1100px) {
+      .pac-grid { grid-template-columns: 400px 1fr; }
+    }
     @media (max-width: 900px) {
       .pac-grid { grid-template-columns: 1fr; }
-      .lista-panel { position: static; max-height: 340px; }
+      .lista-panel { position: static; max-height: 460px; }
+      .detalhe-vazio { min-height: 420px; padding: 140px 30px; }
     }
     @media (max-width: 540px) {
       .pac-nav { max-width: 100%; }
+      .pac-nav-btn { padding: 16px 20px; font-size: 1.02rem; }
       .filtro-data { flex-direction: column; align-items: stretch; }
-      .detalhe-linha { grid-template-columns: 1fr; gap: 4px; }
+      .detalhe-linha { grid-template-columns: 1fr; gap: 6px; }
+      .detalhe-secao-header { padding: 18px 22px; font-size: 1.08rem; }
+      .detalhe-secao-body { padding: 24px 22px; }
+      .detalhe-linha { font-size: 1rem; margin-bottom: 16px; }
+      .detalhe-label { font-size: .94rem; }
     }
   </style>
 </head>
@@ -367,7 +391,15 @@
             </div>
             <!-- Campo de filtro por data -->
             <div class="filtro-data">
-              <label for="filtroData">📅 Filtrar por data:</label>
+              <label for="filtroData">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                  <line x1="16" y1="2" x2="16" y2="6"/>
+                  <line x1="8" y1="2" x2="8" y2="6"/>
+                  <line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+                Filtrar por data:
+              </label>
               <input type="date" id="filtroData">
             </div>
             <div class="lista-exportar" id="listaExportar">
@@ -377,13 +409,13 @@
           </div>
 
           <!-- Detalhe + Botão Exportar PDF -->
-          <div style="display:flex;flex-direction:column;gap:14px;">
+          <div style="display:flex;flex-direction:column;gap:20px;">
             <div class="detalhe-panel" id="detalhePanel" style="width:100%;">
               <div class="detalhe-vazio">
-                <p style="font-size:.95rem;font-weight:700;color:var(--text-2);margin-bottom:8px;">
+                <p style="font-size:1.35rem;font-weight:700;color:var(--text-2);margin-bottom:14px;">
                   Selecione um item
                 </p>
-                <p style="font-size:.82rem;">
+                <p style="font-size:1.08rem;">
                   Clique em um registro à esquerda para ver os detalhes completos.
                 </p>
               </div>
@@ -563,8 +595,8 @@ function setView(view) {
 
   document.getElementById('detalhePanel').innerHTML = `
     <div class="detalhe-vazio">
-      <p style="font-size:.95rem;font-weight:700;color:var(--text-2);margin-bottom:8px;">Selecione um item</p>
-      <p style="font-size:.82rem;">Clique em um registro à esquerda para ver os detalhes completos.</p>
+      <p style="font-size:1.35rem;font-weight:700;color:var(--text-2);margin-bottom:14px;">Selecione um item</p>
+      <p style="font-size:1.08rem;">Clique em um registro à esquerda para ver os detalhes completos.</p>
     </div>`;
   document.getElementById('btnExportarPDF').style.display = 'none';
 }
@@ -584,8 +616,8 @@ document.getElementById('filtroData').addEventListener('change', function() {
     idSelecionado = null;
     document.getElementById('detalhePanel').innerHTML = `
       <div class="detalhe-vazio">
-        <p style="font-size:.95rem;font-weight:700;color:var(--text-2);margin-bottom:8px;">Selecione um item</p>
-        <p style="font-size:.82rem;">Clique em um registro à esquerda para ver os detalhes completos.</p>
+        <p style="font-size:1.35rem;font-weight:700;color:var(--text-2);margin-bottom:14px;">Selecione um item</p>
+        <p style="font-size:1.08rem;">Clique em um registro à esquerda para ver os detalhes completos.</p>
       </div>`;
     document.getElementById('btnExportarPDF').style.display = 'none';
   } else {
@@ -597,8 +629,8 @@ document.getElementById('filtroData').addEventListener('change', function() {
     idSelecionado = null;
     document.getElementById('detalhePanel').innerHTML = `
       <div class="detalhe-vazio">
-        <p style="font-size:.95rem;font-weight:700;color:var(--text-2);margin-bottom:8px;">Selecione um item</p>
-        <p style="font-size:.82rem;">Clique em um registro à esquerda para ver os detalhes completos.</p>
+        <p style="font-size:1.35rem;font-weight:700;color:var(--text-2);margin-bottom:14px;">Selecione um item</p>
+        <p style="font-size:1.08rem;">Clique em um registro à esquerda para ver os detalhes completos.</p>
       </div>`;
     document.getElementById('btnExportarPDF').style.display = 'none';
   }
@@ -614,7 +646,7 @@ function renderLista(dados, tipo) {
   body.innerHTML = '';
 
   if (!dados.length) {
-    body.innerHTML = `<div class="empty-state" style="padding:40px 20px">
+    body.innerHTML = `<div class="empty-state" style="padding:50px 20px">
       <p>Nenhum registro encontrado.</p></div>`;
     return;
   }
@@ -630,7 +662,7 @@ function renderLista(dados, tipo) {
           <span class="item-data">${formatarData(item.data)}</span>
         </div>
         <div class="item-sub">${item.medico} · ${item.especialidade}</div>
-        <span class="badge badge-${corStatus(item.status)}" style="font-size:.68rem">${item.status}</span>`;
+        <span class="badge badge-${corStatus(item.status)}" style="font-size:.86rem">${item.status}</span>`;
       div.addEventListener('click', () => {
         selecionarConsulta(item);
       });
@@ -643,7 +675,7 @@ function renderLista(dados, tipo) {
           <span class="item-data">${formatarData(item.data)}</span>
         </div>
         <div class="item-sub">${item.medico}</div>
-        <span class="badge badge-${corStatus(item.status)}" style="font-size:.68rem">${item.status}</span>`;
+        <span class="badge badge-${corStatus(item.status)}" style="font-size:.86rem">${item.status}</span>`;
       div.addEventListener('click', () => {
         idSelecionado = item.id;
         renderLista(EXAMES, 'exame');
@@ -708,7 +740,7 @@ function renderDetalheConsulta(c) {
         </div>
         <div class="detalhe-linha">
           <span class="detalhe-label">CRM</span>
-          <span class="detalhe-valor" style="font-family:var(--font-mono);font-size:.82rem">${c.crm}</span>
+          <span class="detalhe-valor" style="font-family:var(--font-mono);font-size:1.04rem">${c.crm}</span>
         </div>
         <div class="detalhe-linha">
           <span class="detalhe-label">Especialidade</span>
@@ -769,22 +801,35 @@ function renderDetalheExame(e) {
     <div class="detalhe-secao">
       <div class="detalhe-secao-header">Diagnóstico do Médico</div>
       <div class="detalhe-secao-body">
-        <div class="diagnostico-box">
-          <div class="diagnostico-label">Resultado do Exame</div>
-          <div class="diagnostico-texto">${d.resultado_texto || 'Não informado'}</div>
-          <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
-            <span class="badge-diagnostico ${classeSuspeita}">${d.suspeita_leucemia || '—'}</span>
-            ${d.tipo_leucemia && d.tipo_leucemia !== 'Não identificado'
-              ? `<span class="badge badge-purple">Tipo: ${d.tipo_leucemia}</span>`
-              : ''}
-          </div>
-          <div style="margin-top:10px;font-size:.78rem;color:var(--text-3);">
-            Data do resultado: ${formatarData(d.data_resultado) || '—'}
-          </div>
-        </div>
+        ${
+          d.resultado_texto && d.resultado_texto.trim()
+            ? `
+              <p style="margin-bottom:22px;color:var(--text-2);font-size:1.08rem;">
+                O resultado deste exame está disponível.
+              </p>
+              <button
+                type="button"
+                class="btn btn-primary"
+                style="padding:14px 28px;font-size:1.04rem;"
+                onclick="irParaResultado(${Number(e.id)})"
+              >
+                Ver Resultado →
+              </button>
+            `
+            : `
+              <p style="color:var(--text-3);font-size:1.04rem;">
+                Sem resultado
+              </p>
+            `
+        }
       </div>
     </div>
   `;
+}
+
+function irParaResultado(idExame) {
+  window.location.href =
+    `resultadosExame.html?exameId=${encodeURIComponent(idExame)}`;
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -908,8 +953,8 @@ document.getElementById('btnExportarPDF').addEventListener('click', function() {
     // Detalhe vazio inicial
     document.getElementById('detalhePanel').innerHTML = `
       <div class="detalhe-vazio">
-        <p style="font-size:.95rem;font-weight:700;color:var(--text-2);margin-bottom:8px;">Selecione um item</p>
-        <p style="font-size:.82rem;">Clique em um registro à esquerda para ver os detalhes completos.</p>
+        <p style="font-size:1.35rem;font-weight:700;color:var(--text-2);margin-bottom:14px;">Selecione um item</p>
+        <p style="font-size:1.08rem;">Clique em um registro à esquerda para ver os detalhes completos.</p>
       </div>`;
     document.getElementById('btnExportarPDF').style.display = 'none';
 

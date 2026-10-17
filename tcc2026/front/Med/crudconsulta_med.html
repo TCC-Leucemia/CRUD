@@ -75,8 +75,16 @@
       transform: translateY(-50%);
       color: var(--text-3);
       pointer-events: none;
-      font-size: 1rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       line-height: 1;
+    }
+
+    .search-wrapper .search-icon svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
     }
 
     /* Estilo dos botões de ação na tabela no mesmo padrão */
@@ -178,6 +186,23 @@
       color: #d97706;
       line-height: 1.6;
       margin-bottom: 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .info-box .info-icon {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      margin-top: 2px;
+    }
+    .info-box .info-icon svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
     }
 
     /* ── Grid de detalhes ── */
@@ -224,9 +249,18 @@
       align-items: center;
       gap: 8px;
     }
-    .alert-warning::before {
-      content: '⚠️';
-      font-size: 1.1rem;
+    .alert-warning .alert-icon {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+    }
+    .alert-warning .alert-icon svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
     }
 
     /* ── Campos de anamnese ── */
@@ -353,7 +387,6 @@
       }
       .search-wrapper .search-icon {
         left: 12px;
-        font-size: 0.9rem;
       }
     }
   </style>
@@ -380,9 +413,18 @@
 
     <div class="page-body">
       <div class="info-box">
-        ℹ️ Você pode visualizar suas consultas, atualizar o
-        <strong>status</strong> e cadastrar ou editar a
-        <strong>anamnese</strong> de cada consulta.
+        <span class="info-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="16" x2="12" y2="12"/>
+            <line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+        </span>
+        <span>
+          Você pode visualizar suas consultas, atualizar o
+          <strong>status</strong> e cadastrar ou editar a
+          <strong>anamnese</strong> de cada consulta.
+        </span>
       </div>
 
       <div class="card">
@@ -390,7 +432,12 @@
           <span class="card-title">Lista de Consultas</span>
           <div class="filter-row">
             <div class="search-wrapper">
-              <span class="search-icon">🔍</span>
+              <span class="search-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8"/>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+              </span>
               <input type="text" id="searchConsulta" placeholder="Buscar por nome, CPF ou data...">
             </div>
             <select id="filterStatus" class="filter-select">
@@ -483,7 +530,14 @@
         <div class="detalhe-secao-header">Anamnese</div>
         <div class="detalhe-secao-body">
           <div class="alert-warning" id="alertAnamneseNaoCadastrada">
-            Esta consulta ainda não possui anamnese cadastrada.
+            <span class="alert-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/>
+                <line x1="12" y1="17" x2="12.01" y2="17"/>
+              </svg>
+            </span>
+            <span>Esta consulta ainda não possui anamnese cadastrada.</span>
           </div>
 
           <div class="anamnese-campo">

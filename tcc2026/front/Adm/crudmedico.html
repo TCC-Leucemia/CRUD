@@ -36,6 +36,55 @@
       box-shadow: 0 0 0 3px rgba(185,28,28,0.08);
     }
 
+    /* ── Lupa da listagem (mesmo estilo de Nova Consulta) ── */
+    .card-header .search-wrapper {
+      position: relative;
+      flex: 1 1 200px;
+      max-width: 280px;
+      min-width: 180px;
+    }
+
+    .card-header .search-wrapper input {
+      width: 100%;
+      padding: 10px 14px 10px 36px;
+      border: 1.5px solid var(--border);
+      border-radius: 40px;
+      font-size: 0.85rem;
+      background: var(--surface);
+      color: var(--text-1);
+      font-family: var(--font);
+      outline: none;
+      transition: var(--transition);
+      line-height: 1;
+    }
+
+    .card-header .search-wrapper input::placeholder {
+      color: var(--text-3);
+    }
+
+    .card-header .search-wrapper input:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(185,28,28,0.08);
+    }
+
+    .card-header .search-wrapper .lupa {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-3);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .card-header .search-wrapper .lupa svg {
+      width: 15px;
+      height: 15px;
+      stroke: currentColor;
+    }
+
     .wizard-progress {
       margin-bottom: 28px;
       padding-bottom: 8px;
@@ -296,9 +345,17 @@
         <div class="card-header">
           <span class="card-title">Lista de Médicos</span>
           <div class="filter-row">
-            <div class="search-bar" style="max-width:280px">
+            <!-- ▼▼▼ ALTERADO: lupa no mesmo estilo de Nova Consulta ▼▼▼ -->
+            <div class="search-wrapper">
+              <span class="lupa" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8"/>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+              </span>
               <input type="text" id="searchMedico" placeholder="Buscar por nome, CRM ou CPF...">
             </div>
+            <!-- ▲▲▲ FIM DA ALTERAÇÃO ▲▲▲ -->
             <select id="filterEsp" class="filter-select">
               <option value="">Todas especialidades</option>
               <option>Hematologia</option>
@@ -786,35 +843,61 @@
         HematoAI.showToast('A senha deve ter no mínimo 8 caracteres.', 'error');
         return false;
       }
-      if (!email.includes('@') || !email.includes('.')) {
-        HematoAI.showToast('Digite um e-mail válido.', 'error');
-        return false;
-      }
-    } else if (currentStep === 1) {
-      const nome = document.getElementById('fNome').value;
-      const crm = document.getElementById('fCrm').value;
-      const cpf = document.getElementById('fCpf').value;
-      const esp = document.getElementById('fEsp').value;
+      const emailNormalizado = email.trim();
+      const formatoEmailValido = /^[^\s@]+@[^\s@.]+(?:\.[^\s@.]+)+$/.test(emailNormalizado);
 
-      if (!nome || !crm || !cpf || !esp) {
-        HematoAI.showToast('Preencha todos os campos obrigatórios.', 'error');
+      if (!formatoEmailValido) {
+        HematoAI.showToast('Digite um e-mail válido, como exemplo@email.com.', 'error');
+        document.getElementById('fEmail').focus();
         return false;
       }
-      // Mesma regra da API para CRM novo (12345-SP). Na edição o CRM fica
-      // travado e não é reenviado; registros antigos só com dígitos seguem editáveis.
-      if (!editingCrm) {
+    
+} else if (currentStep === 1) {
+    const nome = document.getElementById('fNome').value.trim();
+    const crm = document.getElementById('fCrm').value.trim();
+    const cpf = document.getElementById('fCpf').value;
+    const cpfNumeros = cpf.replace(/\D/g, '');
+    const esp = document.getElementById('fEsp').value.trim();
+
+    if (!nome || !crm || !cpf.trim() || !esp) {
+        HematoAI.showToast(
+            'Preencha todos os campos obrigatórios.',
+            'error'
+        );
+        return false;
+    }
+
+    // Valida o nome
+    if (nome.length < 3 || /^\d+$/.test(nome)) {
+        HematoAI.showToast(
+            'Digite um nome válido.',
+            'error'
+        );
+        document.getElementById('fNome').focus();
+        return false;
+    }
+
+    // Valida o CRM somente no cadastro de um novo médico
+    if (!editingCrm) {
         if (!HematoCrm.crmValidoParaCadastro(crm)) {
-          HematoAI.showToast(HematoCrm.MSG_CRM_INVALIDO, 'error');
-          return false;
+            HematoAI.showToast(HematoCrm.MSG_CRM_INVALIDO, 'error');
+            document.getElementById('fCrm').focus();
+            return false;
         }
-        document.getElementById('fCrm').value = HematoCrm.normalizarCrm(crm);
-        wizardData.medico.crm = HematoCrm.normalizarCrm(crm);
-      }
-      if (cpf.replace(/\D/g, '').length !== 11) {
-        HematoAI.showToast('CPF inválido. Deve conter 11 dígitos.', 'error');
+
+        document.getElementById('fCrm').value =
+            HematoCrm.normalizarCrm(crm);
+
+        wizardData.medico.crm =
+            HematoCrm.normalizarCrm(crm);
+    }
+
+    if (!cpfValido(cpf)) {
+        HematoAI.showToast('CPF inválido. Verifique os números digitados.', 'error');
+        document.getElementById('fCpf').focus();
         return false;
-      }
-    } else if (currentStep === 2) {
+    }
+   } else if (currentStep === 2) {
       // Só o CEP é opcional (como na API); se informado, precisa ter 8 dígitos.
       const cep = document.getElementById('fCep').value.trim();
       const rua = document.getElementById('fRua').value.trim();
@@ -836,6 +919,38 @@
     }
     return true;
   }
+  
+function cpfValido(cpf) {
+    const numeros = cpf.replace(/\D/g, '');
+
+    if (numeros.length !== 11) return false;
+
+    // Rejeita CPFs com todos os dígitos iguais
+    if (/^(\d)\1{10}$/.test(numeros)) return false;
+
+    let soma = 0;
+
+    for (let i = 0; i < 9; i++) {
+        soma += Number(numeros[i]) * (10 - i);
+    }
+
+    let digito1 = (soma * 10) % 11;
+    if (digito1 === 10) digito1 = 0;
+
+    if (digito1 !== Number(numeros[9])) return false;
+
+    soma = 0;
+
+    for (let i = 0; i < 10; i++) {
+        soma += Number(numeros[i]) * (11 - i);
+    }
+
+    let digito2 = (soma * 10) % 11;
+    if (digito2 === 10) digito2 = 0;
+
+    return digito2 === Number(numeros[10]);
+  }
+
 
   function nextStep() {
     saveCurrentStepData();
