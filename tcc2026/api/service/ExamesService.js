@@ -2,45 +2,46 @@ const { parseDataLocal, mesmoMinuto } = require("../utils/datas");
 const ExamesDAO = require("../dao/ExamesDAO");
 const Exames = require("../model/Exames");
 const ConsultasDAO = require("../dao/ConsultasDAO");
+const PacientesDAO = require("../dao/PacientesDAO");
 const ErrorResponse = require("../utils/ErrorResponse");
 
 module.exports = class ExamesService {
 
     #dao;
     #consultasDAO;
+    #pacientesDAO;
 
     constructor(banco) {
         this.#dao = new ExamesDAO(banco);
         this.#consultasDAO = new ConsultasDAO(banco);
+        this.#pacientesDAO = new PacientesDAO(banco);
     }
 
     create = async (dados, user) => {
-        const consulta =
-            await this.#consultasDAO.findById(
-                dados.id_consulta
-            );
+        const consulta = await this.#consultasDAO.findById(dados.id_consulta);
 
         if (!consulta) {
-
-            throw new ErrorResponse(
-                404,
-                "Consulta não encontrada"
-            );
+            throw new ErrorResponse(404, "Consulta não encontrada");
         }
 
-        if (
-            user.role === "Médico" &&
-            consulta.crm !== user.crm
-        ) {
+        if (user.role === "Médico" && consulta.crm !== user.crm) {
+            throw new ErrorResponse(403, "Acesso negado");
+        }
 
+        const paciente = await this.#pacientesDAO.findByCPF(consulta.cpf);
+
+        if (!paciente) {
+            throw new ErrorResponse(404, "Paciente não encontrado");
+        }
+
+        if (paciente.status !== "Ativo") {
             throw new ErrorResponse(
                 403,
-                "Acesso negado"
+                "Não é possível criar exames para pacientes inativos"
             );
         }
 
         const exame = new Exames();
-
         Object.assign(exame, dados);
 
         return await this.#dao.create(exame);

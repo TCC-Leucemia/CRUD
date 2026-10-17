@@ -119,57 +119,58 @@ module.exports = class ConsultasDAO {
 
     }
 
+
     findByMedico(crm) {
 
         const sql = `
             SELECT
-            c.*,
-            p.nome AS paciente,
-            p.data_nasc,
-            p.sexo,
-            m.nome AS medico,
-            m.especialidade,
-            a.id_anamnese,
-            a.sintomas,
-            a.comorbidades
+                c.*,
+                p.nome AS paciente,
+                p.data_nasc,
+                p.sexo,
+                m.nome AS medico,
+                m.especialidade,
+                a.id_anamnese,
+                a.sintomas,
+                a.comorbidades
 
-        FROM consultas c
+            FROM consultas c
 
-        INNER JOIN pacientes p
-            ON p.cpf = c.cpf
+            INNER JOIN pacientes p
+                ON p.cpf = c.cpf
 
-        INNER JOIN medicos m
-            ON m.crm = c.crm
+            INNER JOIN login l
+                ON l.id_usuario = p.id_usuario
 
-        LEFT JOIN anamnese a
-            ON a.id_anamnese = (
-                SELECT MAX(a2.id_anamnese)
-                FROM anamnese a2
-                WHERE a2.id_consulta = c.id_consulta
-            )
+            INNER JOIN medicos m
+                ON m.crm = c.crm
 
-        WHERE c.crm = ?
+            LEFT JOIN anamnese a
+                ON a.id_anamnese = (
+                    SELECT MAX(a2.id_anamnese)
+                    FROM anamnese a2
+                    WHERE a2.id_consulta = c.id_consulta
+                )
 
-        ORDER BY c.data_consulta DESC;
+            WHERE c.crm = ?
+            AND l.statusu = 'Ativo'
+
+            ORDER BY c.data_consulta DESC;
         `;
 
         return new Promise((resolve, reject) => {
-
             this.#banco.query(
                 sql,
                 [crm],
                 (err, result) => {
-
                     if (err) return reject(err);
-
                     resolve(result);
-
                 }
             );
-
         });
 
     }
+
 
     update(consulta) {
         const sql = `
