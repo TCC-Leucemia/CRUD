@@ -1,6 +1,15 @@
 # CRUD
 Envio do CRUD
 
+## Triagem hematológica por IA
+
+O prompt ativo, com critérios morfológicos e referências científicas, está em
+[`tcc2026/backend/prompts/triagem_hematologica.md`](tcc2026/backend/prompts/triagem_hematologica.md).
+Fluxo e limites: [docs/analise-ia.md](docs/analise-ia.md). A revisão de 18/10/2026
+encontrou 8 conteúdos diferentes entre 249 arquivos de amostra; a avaliação real
+de acurácia ficou pendente por credencial OpenAI recusada (401). Inventário e
+procedimento: [docs/validacao-hematologia/README.md](docs/validacao-hematologia/README.md).
+
 ## Banco de dados
 
 A API se conecta ao MySQL local via `mysql2`, configurado por variáveis de

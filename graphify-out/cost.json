@@ -1,0 +1,16 @@
+{
+  "runs": [
+    {
+      "date": "2026-10-18",
+      "files": 249,
+      "unique_contents": 8,
+      "input_tokens": null,
+      "output_tokens": null,
+      "measurement_available": false
+    }
+  ],
+  "total_input_tokens": 0,
+  "total_output_tokens": 0,
+  "unmeasured_runs": 1,
+  "note": "Totais não incluem tokens não disponibilizados pelo ambiente."
+}
