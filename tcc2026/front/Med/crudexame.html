@@ -1256,6 +1256,7 @@
 
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="../JS/navbar.js"></script>
+<script src="../JS/formatacao.js"></script>
 <script src="../JS/exportar.js"></script>
 <script src="../JS/auth.js"></script>
 <script>
@@ -1285,22 +1286,10 @@
     return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
   }
 
-  function formatarData(iso) {
-    if (!iso) return '—';
-    const d = new Date(iso);
-    return d.toLocaleDateString('pt-BR');
-  }
-
   function formatarDataBusca(iso) {
     if (!iso) return '';
     const d = new Date(iso);
     return d.toLocaleDateString('pt-BR');
-  }
-
-  function formatarCPF(cpf) {
-    if (!cpf) return '—';
-    const c = String(cpf).replace(/\D/g, '').padStart(11, '0');
-    return c.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
   }
 
   function statusPill(s) {

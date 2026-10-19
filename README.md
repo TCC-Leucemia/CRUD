@@ -45,6 +45,44 @@ arquivos e como adicionar a uma nova listagem: [docs/exportacao.md](docs/exporta
 
 ## Histórico de Alterações
 
+### 2026-10-19 — Prompt do laudo de leucemia reescrito e validado
+- **Alteração:** o prompt de `backend/analise_celular.py` ganhou critérios por
+  classe (LMA, LLA, LMC, LLC, normal), lista de artefatos que não são achados
+  (marca d'água, célula rompida, mitose, plaquetas), roteiro de decisão pelo
+  citoplasma das células intactas e regras de desempate para os pares que o
+  modelo confundia. O formato do laudo (Parte 1 + Parte 2) não mudou. Modelo
+  via `OPENAI_MODEL` (padrão `gpt-6-sol`), até 6000 tokens de saída, texto lido
+  por `response.output_text`.
+- **Motivo:** LMC saía como LMA, LLC como LLA e LLA dava erro; o prompt anterior
+  proibia usar a frequência de leucócitos no campo e mandava LLA/LLC para
+  indeterminado.
+- **Arquivos/Módulos:** `backend/analise_celular.py`, `docs/analise-ia.md`.
+- **Validação:** 24/24 acertos com `gpt-6-sol` nas 6 imagens de teste (duas
+  rodadas) e em duas versões transformadas delas (rotação/redução e cor);
+  laudos conferidos sem código interno, percentual ou grau Alto; análise de
+  ponta a ponta gerou PDF. Detalhes em [docs/analise-ia.md](docs/analise-ia.md).
+- **Status:** concluído. Falta validar num conjunto maior de imagens (P-011).
+
+### 2026-10-19 — Funções repetidas do front reunidas em `formatacao.js`
+- **Alteração:** `maskCPF`, `maskTelefone`, `maskCEP`, `cpfValido`,
+  `formatarCPF`, `formatarData`, `buscarCEP` e `debounceBuscarCEP` saíram de 13
+  telas (34 cópias, algumas já divergentes) para `front/JS/formatacao.js`;
+  `rollbackCadastro` foi para `front/JS/etapas-cadastro.js`
+  (`HematoEtapas.rollbackCadastro`); `HematoAI.formatarCPF` (navbar.js) usa a
+  versão única. Regra única de `formatarCPF`: vazio/nulo mostra "—", CPF sem
+  zero inicial é completado. `formatarData` passou a mostrar "—" também para
+  data inválida.
+- **Motivo:** pedido de remover a redundância de código do front.
+- **Arquivos/Módulos:** `front/JS/formatacao.js` (novo),
+  `front/JS/etapas-cadastro.js`, `front/JS/navbar.js`, 14 telas de
+  `front/Adm`, `front/Med` e `front/Paciente`, `api/tests/formatacao.test.js`
+  (novo).
+- **Validação:** `npm test` 71/71 (7 testes novos, incluindo `cpfValido`
+  idêntico ao antigo em 20 mil CPFs e verificação de que nenhuma tela voltou a
+  ter cópia própria); `node --check` nos scripts inline das 14 telas e nos JS
+  compartilhados. Telas não abertas no navegador (dependem da API e do MySQL).
+- **Status:** concluído.
+
 ### 2026-10-11 — Auditoria final: correção de bugs e segurança
 - **Alteração:**
   - CRM com regra única (`api/utils/crm.js`): formato `12345-SP` no cadastro e,

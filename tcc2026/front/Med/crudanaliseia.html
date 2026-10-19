@@ -400,6 +400,7 @@
 
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="../JS/navbar.js"></script>
+<script src="../JS/formatacao.js"></script>
 <script src="../JS/texto-ia.js"></script>
 <script src="../JS/auth.js"></script>
 <script src="../JS/exportar.js"></script>
@@ -448,11 +449,6 @@
         );
     }
   }
-  function formatarCPF(cpf) {
-    if (!cpf || cpf === '—') return '—';
-    const c = String(cpf).replace(/\D/g, '').padStart(11, '0');
-    return c.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
-  }
 
   function formatarDataHora(iso) {
     if (!iso) return '—';
@@ -475,12 +471,6 @@
     if (tipo === 'Hemograma') return `<span class="tipo-badge tipo-hemograma">Hemograma</span>`;
     if (tipo === 'Mielograma') return `<span class="tipo-badge tipo-mielograma">Mielograma</span>`;
     return `<span style="color:var(--text-3)">—</span>`;
-  }
-
-  function formatarData(iso) {
-    if (!iso) return '—';
-    const d = new Date(iso);
-    return d.toLocaleDateString('pt-BR');
   }
 
   // ============================================

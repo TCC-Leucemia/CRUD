@@ -593,6 +593,7 @@
 
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="../JS/navbar.js"></script>
+<script src="../JS/formatacao.js"></script>
 <script src="../JS/exportar.js"></script>
 <script src="../JS/auth.js"></script>
 <script>
@@ -608,11 +609,6 @@
   let idDetalhe = null;
   let idEditar = null;
   let consultaAnamneseId = null;
-
-  function formatarCPF(cpf) {
-    const c = String(cpf).replace(/\D/g, '').padStart(11, '0');
-    return c.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
-  }
 
   function formatarDataHora(iso) {
     if (!iso) return '—';

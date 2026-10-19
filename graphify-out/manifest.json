@@ -1,0 +1,860 @@
+{
+  "tcc2026/api/app.js": {
+    "mtime": 1792310312.0273824,
+    "seen": 1792439295.45342,
+    "ast_hash": "8bbe235c3d6848541897a4e9e4041a34",
+    "semantic_hash": "8bbe235c3d6848541897a4e9e4041a34"
+  },
+  "tcc2026/api/control/AnaliseIAControl.js": {
+    "mtime": 1791940715.6600792,
+    "seen": 1792439295.453426,
+    "ast_hash": "7aed89bf196b02ec5229f23e32533bba",
+    "semantic_hash": "7aed89bf196b02ec5229f23e32533bba"
+  },
+  "tcc2026/api/control/AnamneseControl.js": {
+    "mtime": 1790202098.40103,
+    "seen": 1792439295.4534283,
+    "ast_hash": "5d19efac967dc554d0228892c0e41d88",
+    "semantic_hash": "5d19efac967dc554d0228892c0e41d88"
+  },
+  "tcc2026/api/control/ConsultasControl.js": {
+    "mtime": 1790229372.4406154,
+    "seen": 1792439295.4534295,
+    "ast_hash": "aa113799b0295e1ceefaa48c9c990f29",
+    "semantic_hash": "aa113799b0295e1ceefaa48c9c990f29"
+  },
+  "tcc2026/api/control/EnderecosControl.js": {
+    "mtime": 1790229387.708056,
+    "seen": 1792439295.453431,
+    "ast_hash": "ffb2e745c8833235e1af5ea1767da177",
+    "semantic_hash": "ffb2e745c8833235e1af5ea1767da177"
+  },
+  "tcc2026/api/control/ExamesControl.js": {
+    "mtime": 1790202098.4030328,
+    "seen": 1792439295.4534318,
+    "ast_hash": "f191159af9ab14d8caae243d434d0b9c",
+    "semantic_hash": "f191159af9ab14d8caae243d434d0b9c"
+  },
+  "tcc2026/api/control/ImagensExameControl.js": {
+    "mtime": 1790202098.4030328,
+    "seen": 1792439295.4534328,
+    "ast_hash": "35cc08c8344f80b95a5af4fb481bf2bc",
+    "semantic_hash": "35cc08c8344f80b95a5af4fb481bf2bc"
+  },
+  "tcc2026/api/control/LoginControl.js": {
+    "mtime": 1791940715.6610844,
+    "seen": 1792439295.4534335,
+    "ast_hash": "d065ce07c6e91bbcb2ffda81230bd7b0",
+    "semantic_hash": "d065ce07c6e91bbcb2ffda81230bd7b0"
+  },
+  "tcc2026/api/control/MedicosControl.js": {
+    "mtime": 1790202098.4030328,
+    "seen": 1792439295.4534347,
+    "ast_hash": "5750219ab2075e99b32b6e04ad3bc293",
+    "semantic_hash": "5750219ab2075e99b32b6e04ad3bc293"
+  },
+  "tcc2026/api/control/PacientesControl.js": {
+    "mtime": 1790728954.8990822,
+    "seen": 1792439295.4534357,
+    "ast_hash": "cf6959f35290f0e8ba23bba502ad28b2",
+    "semantic_hash": "cf6959f35290f0e8ba23bba502ad28b2"
+  },
+  "tcc2026/api/control/ResultadosExameControl.js": {
+    "mtime": 1790202098.4054585,
+    "seen": 1792439295.4534369,
+    "ast_hash": "cf7ae1dd97197bc4ca295168a51e61bb",
+    "semantic_hash": "cf7ae1dd97197bc4ca295168a51e61bb"
+  },
+  "tcc2026/api/dao/AnaliseIADAO.js": {
+    "mtime": 1790209060.7957509,
+    "seen": 1792439295.4534383,
+    "ast_hash": "726e6ca413c66a75713b871f9c1be666",
+    "semantic_hash": "726e6ca413c66a75713b871f9c1be666"
+  },
+  "tcc2026/api/dao/AnamneseDAO.js": {
+    "mtime": 1790202098.4054585,
+    "seen": 1792439295.4534392,
+    "ast_hash": "b1cf23f7ebaf4b74a05f8613fc6861fb",
+    "semantic_hash": "b1cf23f7ebaf4b74a05f8613fc6861fb"
+  },
+  "tcc2026/api/dao/ConsultasDAO.js": {
+    "mtime": 1792310312.0347695,
+    "seen": 1792439295.4534402,
+    "ast_hash": "b1139eaae87adbe6b5cdac169f70603b",
+    "semantic_hash": "b1139eaae87adbe6b5cdac169f70603b"
+  },
+  "tcc2026/api/dao/EnderecosDAO.js": {
+    "mtime": 1790202098.4054585,
+    "seen": 1792439295.4534411,
+    "ast_hash": "9d3685fe46f5aa967c9ba5691b20329a",
+    "semantic_hash": "9d3685fe46f5aa967c9ba5691b20329a"
+  },
+  "tcc2026/api/dao/ExamesDAO.js": {
+    "mtime": 1790202098.4054585,
+    "seen": 1792439295.4534423,
+    "ast_hash": "3311e47523f4b99a852c398aff2554f6",
+    "semantic_hash": "3311e47523f4b99a852c398aff2554f6"
+  },
+  "tcc2026/api/dao/ImagensExameDAO.js": {
+    "mtime": 1790202098.4054585,
+    "seen": 1792439295.453443,
+    "ast_hash": "4aecd439f9bae35e8542279279c0ffeb",
+    "semantic_hash": "4aecd439f9bae35e8542279279c0ffeb"
+  },
+  "tcc2026/api/dao/LoginDAO.js": {
+    "mtime": 1791940715.6610844,
+    "seen": 1792439295.453444,
+    "ast_hash": "231130b8b314bfe93d13e4278f7c91ad",
+    "semantic_hash": "231130b8b314bfe93d13e4278f7c91ad"
+  },
+  "tcc2026/api/dao/MedicosDAO.js": {
+    "mtime": 1790202098.4054585,
+    "seen": 1792439295.4534452,
+    "ast_hash": "f9c1451d829f026db0bcdf3dd24c6c0f",
+    "semantic_hash": "f9c1451d829f026db0bcdf3dd24c6c0f"
+  },
+  "tcc2026/api/dao/PacientesDAO.js": {
+    "mtime": 1791940715.6620898,
+    "seen": 1792439295.4534461,
+    "ast_hash": "88c248facd4803b62db84bad135b4e8b",
+    "semantic_hash": "88c248facd4803b62db84bad135b4e8b"
+  },
+  "tcc2026/api/dao/ResultadosExameDAO.js": {
+    "mtime": 1790202098.4088657,
+    "seen": 1792439295.4534473,
+    "ast_hash": "f748266f3a292ba2e63fbde203b9079d",
+    "semantic_hash": "f748266f3a292ba2e63fbde203b9079d"
+  },
+  "tcc2026/api/database/banco.sql": {
+    "mtime": 1791940715.6620898,
+    "seen": 1792439295.4534488,
+    "ast_hash": "66384cdbb0e7be29ceb8bf9d2f81c6de",
+    "semantic_hash": "66384cdbb0e7be29ceb8bf9d2f81c6de"
+  },
+  "tcc2026/api/http/MeuTokenJWT.js": {
+    "mtime": 1790229246.3821943,
+    "seen": 1792439295.4534504,
+    "ast_hash": "779ebef68baf905ba8d6f791d1c70bd1",
+    "semantic_hash": "779ebef68baf905ba8d6f791d1c70bd1"
+  },
+  "tcc2026/api/middleware/AnaliseIAMiddleware.js": {
+    "mtime": 1790202098.4088657,
+    "seen": 1792439295.4534516,
+    "ast_hash": "f54f7baf0f1f6ff882eccf94188ca0cf",
+    "semantic_hash": "f54f7baf0f1f6ff882eccf94188ca0cf"
+  },
+  "tcc2026/api/middleware/AnamneseMiddleware.js": {
+    "mtime": 1790202098.4108691,
+    "seen": 1792439295.4534523,
+    "ast_hash": "c3fcdc769f170c4412fd28a9d8604fa1",
+    "semantic_hash": "c3fcdc769f170c4412fd28a9d8604fa1"
+  },
+  "tcc2026/api/middleware/ConsultasMiddleware.js": {
+    "mtime": 1791940715.6630943,
+    "seen": 1792439295.4534533,
+    "ast_hash": "bb0537dc030b76769d79dd87f8bd490f",
+    "semantic_hash": "bb0537dc030b76769d79dd87f8bd490f"
+  },
+  "tcc2026/api/middleware/EnderecosMiddleware.js": {
+    "mtime": 1791940715.6640933,
+    "seen": 1792439295.453454,
+    "ast_hash": "712448dde1a43f103424581650451bc6",
+    "semantic_hash": "712448dde1a43f103424581650451bc6"
+  },
+  "tcc2026/api/middleware/ExamesMiddleware.js": {
+    "mtime": 1791940715.6645956,
+    "seen": 1792439295.4534547,
+    "ast_hash": "f86bc71b85a76bd3300b3e877c525c08",
+    "semantic_hash": "f86bc71b85a76bd3300b3e877c525c08"
+  },
+  "tcc2026/api/middleware/ImagensExameMiddleware.js": {
+    "mtime": 1790202098.4108691,
+    "seen": 1792439295.453456,
+    "ast_hash": "b7a5876bf02ea3720636639315859e1f",
+    "semantic_hash": "b7a5876bf02ea3720636639315859e1f"
+  },
+  "tcc2026/api/middleware/JwtMiddleware.js": {
+    "mtime": 1790229263.3009226,
+    "seen": 1792439295.4534574,
+    "ast_hash": "6d8626d68b3e422b7476d7660d994bb3",
+    "semantic_hash": "6d8626d68b3e422b7476d7660d994bb3"
+  },
+  "tcc2026/api/middleware/LoginMiddleware.js": {
+    "mtime": 1790202098.4108691,
+    "seen": 1792439295.453458,
+    "ast_hash": "b8fc335c61829104370dbf788f277bd8",
+    "semantic_hash": "b8fc335c61829104370dbf788f277bd8"
+  },
+  "tcc2026/api/middleware/MedicosMiddleware.js": {
+    "mtime": 1791940715.6645956,
+    "seen": 1792439295.4534593,
+    "ast_hash": "481bce864162b3c764d02272b35a120a",
+    "semantic_hash": "481bce864162b3c764d02272b35a120a"
+  },
+  "tcc2026/api/middleware/PacientesMiddleware.js": {
+    "mtime": 1791940715.6655972,
+    "seen": 1792439295.4534602,
+    "ast_hash": "85cc22104fc28ac776b0d0ffc51b6ae3",
+    "semantic_hash": "85cc22104fc28ac776b0d0ffc51b6ae3"
+  },
+  "tcc2026/api/middleware/ResultadosExameMiddleware.js": {
+    "mtime": 1791940715.6655972,
+    "seen": 1792439295.4534614,
+    "ast_hash": "7af78b962ce49976da8bbc0eeb2969da",
+    "semantic_hash": "7af78b962ce49976da8bbc0eeb2969da"
+  },
+  "tcc2026/api/middleware/RoleMiddleware.js": {
+    "mtime": 1790202098.4132223,
+    "seen": 1792439295.4534624,
+    "ast_hash": "1ef1e48615b92033433b4317a3a08e49",
+    "semantic_hash": "1ef1e48615b92033433b4317a3a08e49"
+  },
+  "tcc2026/api/model/AnaliseIA.js": {
+    "mtime": 1790202098.4132223,
+    "seen": 1792439295.453463,
+    "ast_hash": "07138a89a3d89d93280c91945ab82a1d",
+    "semantic_hash": "07138a89a3d89d93280c91945ab82a1d"
+  },
+  "tcc2026/api/model/Anamnese.js": {
+    "mtime": 1790202098.4132223,
+    "seen": 1792439295.453464,
+    "ast_hash": "ab25f757b99a42702af9fa34dbcde8b2",
+    "semantic_hash": "ab25f757b99a42702af9fa34dbcde8b2"
+  },
+  "tcc2026/api/model/Consultas.js": {
+    "mtime": 1790202098.4132223,
+    "seen": 1792439295.453465,
+    "ast_hash": "7b7bb9a5e6b489d1101120a0208242a6",
+    "semantic_hash": "7b7bb9a5e6b489d1101120a0208242a6"
+  },
+  "tcc2026/api/model/Enderecos.js": {
+    "mtime": 1790202098.4132223,
+    "seen": 1792439295.453466,
+    "ast_hash": "ed0ef626735e6865725ec746baa27400",
+    "semantic_hash": "ed0ef626735e6865725ec746baa27400"
+  },
+  "tcc2026/api/model/Exames.js": {
+    "mtime": 1790202098.4132223,
+    "seen": 1792439295.453467,
+    "ast_hash": "a7cef4a3f0d6dcaef10d9ec3d9f0c5c4",
+    "semantic_hash": "a7cef4a3f0d6dcaef10d9ec3d9f0c5c4"
+  },
+  "tcc2026/api/model/ImagensExame.js": {
+    "mtime": 1790202098.4132223,
+    "seen": 1792439295.4534678,
+    "ast_hash": "576a3615f42e7ff58dd980541003a035",
+    "semantic_hash": "576a3615f42e7ff58dd980541003a035"
+  },
+  "tcc2026/api/model/Login.js": {
+    "mtime": 1790202098.4132223,
+    "seen": 1792439295.4534686,
+    "ast_hash": "a35a749f7a476d841bd0ed441516d509",
+    "semantic_hash": "a35a749f7a476d841bd0ed441516d509"
+  },
+  "tcc2026/api/model/Medicos.js": {
+    "mtime": 1790202098.4132223,
+    "seen": 1792439295.4534698,
+    "ast_hash": "02471993c27b3b8ca03df279f3186805",
+    "semantic_hash": "02471993c27b3b8ca03df279f3186805"
+  },
+  "tcc2026/api/model/Pacientes.js": {
+    "mtime": 1790202098.4132223,
+    "seen": 1792439295.4534717,
+    "ast_hash": "7b225eb1c7254a08b8e05c8c97df1cf5",
+    "semantic_hash": "7b225eb1c7254a08b8e05c8c97df1cf5"
+  },
+  "tcc2026/api/model/ResultadosExames.js": {
+    "mtime": 1790202098.4175508,
+    "seen": 1792439295.453473,
+    "ast_hash": "417f6782e94ec1291f1d64a46eafad11",
+    "semantic_hash": "417f6782e94ec1291f1d64a46eafad11"
+  },
+  "tcc2026/api/routes/RotasAnaliseIA.js": {
+    "mtime": 1790202098.4175508,
+    "seen": 1792439295.4534738,
+    "ast_hash": "a387a3c38cc77b5bdb0855609e1257ad",
+    "semantic_hash": "a387a3c38cc77b5bdb0855609e1257ad"
+  },
+  "tcc2026/api/routes/RotasAnamnese.js": {
+    "mtime": 1790202098.4175508,
+    "seen": 1792439295.4534748,
+    "ast_hash": "7fe6c4a77c621ceaf4da4b7ce799bff2",
+    "semantic_hash": "7fe6c4a77c621ceaf4da4b7ce799bff2"
+  },
+  "tcc2026/api/routes/RotasConsultas.js": {
+    "mtime": 1790202098.4175508,
+    "seen": 1792439295.4534755,
+    "ast_hash": "3591933678ccca87f512a181cf8726b9",
+    "semantic_hash": "3591933678ccca87f512a181cf8726b9"
+  },
+  "tcc2026/api/routes/RotasEnderecos.js": {
+    "mtime": 1790202098.4175508,
+    "seen": 1792439295.4534764,
+    "ast_hash": "188d99ef21554d82524cfcd5c0f5f59a",
+    "semantic_hash": "188d99ef21554d82524cfcd5c0f5f59a"
+  },
+  "tcc2026/api/routes/RotasExames.js": {
+    "mtime": 1791940715.6669333,
+    "seen": 1792439295.453478,
+    "ast_hash": "01e2c98b6700f2676af0a57bcacb9692",
+    "semantic_hash": "01e2c98b6700f2676af0a57bcacb9692"
+  },
+  "tcc2026/api/routes/RotasImagensExame.js": {
+    "mtime": 1790202098.4175508,
+    "seen": 1792439295.453479,
+    "ast_hash": "915c7125109ad5dfb86f1f8c671cdbcd",
+    "semantic_hash": "915c7125109ad5dfb86f1f8c671cdbcd"
+  },
+  "tcc2026/api/routes/RotasImportacaoAdmin.js": {
+    "mtime": 1792310312.0402238,
+    "seen": 1792439295.45348,
+    "ast_hash": "8385aa5f185e2a934f850b862f797997",
+    "semantic_hash": "8385aa5f185e2a934f850b862f797997"
+  },
+  "tcc2026/api/routes/RotasLogin.js": {
+    "mtime": 1791940715.6669333,
+    "seen": 1792439295.4534817,
+    "ast_hash": "a5974360f15daf51996210fdf42acdc4",
+    "semantic_hash": "a5974360f15daf51996210fdf42acdc4"
+  },
+  "tcc2026/api/routes/RotasMedicos.js": {
+    "mtime": 1791940715.668104,
+    "seen": 1792439295.4534824,
+    "ast_hash": "afd245f48d99a0a4866bb5e45e041afe",
+    "semantic_hash": "afd245f48d99a0a4866bb5e45e041afe"
+  },
+  "tcc2026/api/routes/RotasPacientes.js": {
+    "mtime": 1790728954.9132104,
+    "seen": 1792439295.4534836,
+    "ast_hash": "ff29361b00db31f04865581bd27cc4a8",
+    "semantic_hash": "ff29361b00db31f04865581bd27cc4a8"
+  },
+  "tcc2026/api/routes/RotasResultadosExame.js": {
+    "mtime": 1790202098.4207647,
+    "seen": 1792439295.4534848,
+    "ast_hash": "781f32de2263a95070c6145291ecf3ad",
+    "semantic_hash": "781f32de2263a95070c6145291ecf3ad"
+  },
+  "tcc2026/api/service/AnaliseIAService.js": {
+    "mtime": 1791940715.6691084,
+    "seen": 1792439295.4534855,
+    "ast_hash": "c8c30d274bddd4784448a702759b1fa6",
+    "semantic_hash": "c8c30d274bddd4784448a702759b1fa6"
+  },
+  "tcc2026/api/service/AnamneseService.js": {
+    "mtime": 1790202098.4207647,
+    "seen": 1792439295.4534867,
+    "ast_hash": "36f918edcc3fd4dfc72388a2d95d20d8",
+    "semantic_hash": "36f918edcc3fd4dfc72388a2d95d20d8"
+  },
+  "tcc2026/api/service/ConsultasService.js": {
+    "mtime": 1791940715.6691084,
+    "seen": 1792439295.4534874,
+    "ast_hash": "797e310c1e6fe8f16df5b5c0df269f9c",
+    "semantic_hash": "797e310c1e6fe8f16df5b5c0df269f9c"
+  },
+  "tcc2026/api/service/EmailService.js": {
+    "mtime": 1791940715.6702228,
+    "seen": 1792439295.4534883,
+    "ast_hash": "ff75cac31cbc40b64dd0cec383dbca89",
+    "semantic_hash": "ff75cac31cbc40b64dd0cec383dbca89"
+  },
+  "tcc2026/api/service/EnderecosService.js": {
+    "mtime": 1790202098.4207647,
+    "seen": 1792439295.45349,
+    "ast_hash": "e965193118c86e76d338c5c73c95c31e",
+    "semantic_hash": "e965193118c86e76d338c5c73c95c31e"
+  },
+  "tcc2026/api/service/ExamesService.js": {
+    "mtime": 1792310312.0466843,
+    "seen": 1792439295.4534914,
+    "ast_hash": "5e50cb40170a5366b14235ed845b7e61",
+    "semantic_hash": "5e50cb40170a5366b14235ed845b7e61"
+  },
+  "tcc2026/api/service/ImagensExameService.js": {
+    "mtime": 1790202098.4207647,
+    "seen": 1792439295.4534934,
+    "ast_hash": "661bc95d9defd5e224e24d2ce16b35ec",
+    "semantic_hash": "661bc95d9defd5e224e24d2ce16b35ec"
+  },
+  "tcc2026/api/service/LoginService.js": {
+    "mtime": 1791940715.6712248,
+    "seen": 1792439295.4534948,
+    "ast_hash": "8677cafb3d9c1fd53fc672744fef54d0",
+    "semantic_hash": "8677cafb3d9c1fd53fc672744fef54d0"
+  },
+  "tcc2026/api/service/MedicosService.js": {
+    "mtime": 1791940715.6712248,
+    "seen": 1792439295.4534962,
+    "ast_hash": "6f76bf9599dadcd476527a43c71e048c",
+    "semantic_hash": "6f76bf9599dadcd476527a43c71e048c"
+  },
+  "tcc2026/api/service/PacientesService.js": {
+    "mtime": 1791940715.672225,
+    "seen": 1792439295.4534972,
+    "ast_hash": "073d5bfd72f62652308cd6f9b2a76af7",
+    "semantic_hash": "073d5bfd72f62652308cd6f9b2a76af7"
+  },
+  "tcc2026/api/service/ResultadosExameService.js": {
+    "mtime": 1790202098.4240658,
+    "seen": 1792439295.4534981,
+    "ast_hash": "a7a6aa58da70f618fde6f97e38256546",
+    "semantic_hash": "a7a6aa58da70f618fde6f97e38256546"
+  },
+  "tcc2026/api/tests/auditoria-final.test.js": {
+    "mtime": 1791940715.672225,
+    "seen": 1792439295.453499,
+    "ast_hash": "8f29eba4bd575a75ddef9f4dd0b6054b",
+    "semantic_hash": "8f29eba4bd575a75ddef9f4dd0b6054b"
+  },
+  "tcc2026/api/tests/permissao-e-pdf.test.js": {
+    "mtime": 1791940715.673534,
+    "seen": 1792439295.4534998,
+    "ast_hash": "09cac57f01798430c37c9b3f23c487b4",
+    "semantic_hash": "09cac57f01798430c37c9b3f23c487b4"
+  },
+  "tcc2026/api/tests/recuperacao-senha.test.js": {
+    "mtime": 1790229509.6328948,
+    "seen": 1792439295.453501,
+    "ast_hash": "5db405aef2f75a3ee00484f0708a8724",
+    "semantic_hash": "5db405aef2f75a3ee00484f0708a8724"
+  },
+  "tcc2026/api/tests/separador-e-etapas.test.js": {
+    "mtime": 1791940715.673534,
+    "seen": 1792439295.4535017,
+    "ast_hash": "2fc7d50e369d7156045ac70cedf6b9f9",
+    "semantic_hash": "2fc7d50e369d7156045ac70cedf6b9f9"
+  },
+  "tcc2026/api/tests/tratamento-erros.test.js": {
+    "mtime": 1790229528.989516,
+    "seen": 1792439295.4535027,
+    "ast_hash": "ed720de29007c32f26215ed96adb3114",
+    "semantic_hash": "ed720de29007c32f26215ed96adb3114"
+  },
+  "tcc2026/api/utils/ErrorResponse.js": {
+    "mtime": 1790202098.4240658,
+    "seen": 1792439295.4535034,
+    "ast_hash": "a3c0d9e531485540b9bad4a14bc6c301",
+    "semantic_hash": "a3c0d9e531485540b9bad4a14bc6c301"
+  },
+  "tcc2026/api/utils/analiseIA.js": {
+    "mtime": 1792375181.7543595,
+    "seen": 1792439295.4535046,
+    "ast_hash": "a913c0680a6029d64621359f51f5a5cc",
+    "semantic_hash": "a913c0680a6029d64621359f51f5a5cc"
+  },
+  "tcc2026/api/utils/crm.js": {
+    "mtime": 1791940715.6745343,
+    "seen": 1792439295.4535053,
+    "ast_hash": "96171b9dcf91ad4eafe663ac2921af96",
+    "semantic_hash": "96171b9dcf91ad4eafe663ac2921af96"
+  },
+  "tcc2026/api/utils/datas.js": {
+    "mtime": 1791940715.6745343,
+    "seen": 1792439295.4535062,
+    "ast_hash": "50cdc65b9960b2f1d93fcfa9ced20b37",
+    "semantic_hash": "50cdc65b9960b2f1d93fcfa9ced20b37"
+  },
+  "tcc2026/api/utils/importacaoAdmin.js": {
+    "mtime": 1792310312.051679,
+    "seen": 1792439295.4535072,
+    "ast_hash": "67fa59ca77fe61e6d13c6885ff87bc5d",
+    "semantic_hash": "67fa59ca77fe61e6d13c6885ff87bc5d"
+  },
+  "tcc2026/api/utils/senha.js": {
+    "mtime": 1791940715.6755345,
+    "seen": 1792439295.4535084,
+    "ast_hash": "9f8a84a11d351f4879b9cc26f491878f",
+    "semantic_hash": "9f8a84a11d351f4879b9cc26f491878f"
+  },
+  "tcc2026/api/utils/tratamentoErros.js": {
+    "mtime": 1790235527.7956698,
+    "seen": 1792439295.453509,
+    "ast_hash": "80a9b849af99c013b9296c4d390beb9c",
+    "semantic_hash": "80a9b849af99c013b9296c4d390beb9c"
+  },
+  "tcc2026/backend/analise_celular.py": {
+    "mtime": 1792375181.7563624,
+    "seen": 1792439295.4535098,
+    "ast_hash": "1d0d700fd14ed6f0bea01dac878761e5",
+    "semantic_hash": "1d0d700fd14ed6f0bea01dac878761e5"
+  },
+  "tcc2026/backend/hemoPDF.py": {
+    "mtime": 1791940715.676535,
+    "seen": 1792439295.453511,
+    "ast_hash": "542909d8ea2d23da1c594be4a7306476",
+    "semantic_hash": "542909d8ea2d23da1c594be4a7306476"
+  },
+  "tcc2026/backend/normalizar_laudo.py": {
+    "mtime": 1791940715.676535,
+    "seen": 1792439295.4535117,
+    "ast_hash": "1069bc65517804e0f112b04e1e5e82dd",
+    "semantic_hash": "1069bc65517804e0f112b04e1e5e82dd"
+  },
+  "tcc2026/backend/resultadopaciente.py": {
+    "mtime": 1791940715.677683,
+    "seen": 1792439295.4535127,
+    "ast_hash": "231e9488367f210c978510489331963f",
+    "semantic_hash": "231e9488367f210c978510489331963f"
+  },
+  "tcc2026/front/JS/api.js": {
+    "mtime": 1790202098.4302237,
+    "seen": 1792439295.4535136,
+    "ast_hash": "db35e75e3cf4cac229e4aa6732db5ad1",
+    "semantic_hash": "db35e75e3cf4cac229e4aa6732db5ad1"
+  },
+  "tcc2026/front/JS/auth.js": {
+    "mtime": 1790202098.4302237,
+    "seen": 1792439295.4535146,
+    "ast_hash": "03271972662a2ca1a726bff24923bfa5",
+    "semantic_hash": "03271972662a2ca1a726bff24923bfa5"
+  },
+  "tcc2026/front/JS/crm.js": {
+    "mtime": 1791940715.6817124,
+    "seen": 1792439295.4535153,
+    "ast_hash": "b28f6d36c60104e38f8671ec8ef01472",
+    "semantic_hash": "b28f6d36c60104e38f8671ec8ef01472"
+  },
+  "tcc2026/front/JS/erro-popup.js": {
+    "mtime": 1791940715.6817124,
+    "seen": 1792439295.4535172,
+    "ast_hash": "d53522bb50e0d8c3b053fb4a98951ee8",
+    "semantic_hash": "d53522bb50e0d8c3b053fb4a98951ee8"
+  },
+  "tcc2026/front/JS/etapas-cadastro.js": {
+    "mtime": 1791940715.6829233,
+    "seen": 1792439295.4535186,
+    "ast_hash": "c1c41b1e07cf3d0226c6bbf89115da3b",
+    "semantic_hash": "c1c41b1e07cf3d0226c6bbf89115da3b"
+  },
+  "tcc2026/front/JS/exportar.js": {
+    "mtime": 1791940715.6840045,
+    "seen": 1792439295.4535193,
+    "ast_hash": "f77068d9322d208d7fdd1a8e7c135d04",
+    "semantic_hash": "f77068d9322d208d7fdd1a8e7c135d04"
+  },
+  "tcc2026/front/JS/importacao-admin.js": {
+    "mtime": 1792310312.109112,
+    "seen": 1792439295.45352,
+    "ast_hash": "ba6a840b4eb9b3ed0fd98e38f04d15be",
+    "semantic_hash": "ba6a840b4eb9b3ed0fd98e38f04d15be"
+  },
+  "tcc2026/front/JS/navbar.js": {
+    "mtime": 1791940715.6840045,
+    "seen": 1792439295.4535213,
+    "ast_hash": "2b514bdafe5813ecab13ed7fe2e9af8d",
+    "semantic_hash": "2b514bdafe5813ecab13ed7fe2e9af8d"
+  },
+  "tcc2026/front/JS/texto-ia.js": {
+    "mtime": 1791940715.6850407,
+    "seen": 1792439295.453522,
+    "ast_hash": "1c9b758d9a3abeb9aba90cb40adc41a2",
+    "semantic_hash": "1c9b758d9a3abeb9aba90cb40adc41a2"
+  },
+  "tcc2026/front/JS/theme-init.js": {
+    "mtime": 1790202098.4302237,
+    "seen": 1792439295.453523,
+    "ast_hash": "55e097ca29c3f47c1a7acaaaa970482b",
+    "semantic_hash": "55e097ca29c3f47c1a7acaaaa970482b"
+  },
+  "tcc2026/package.json": {
+    "mtime": 1792310312.156097,
+    "seen": 1792439295.4535239,
+    "ast_hash": "2ef7e05e01e1c4dcc9dcc9770328b31d",
+    "semantic_hash": "2ef7e05e01e1c4dcc9dcc9770328b31d"
+  },
+  "README.md": {
+    "mtime": 1792375181.7543595,
+    "seen": 1792439295.4535248,
+    "ast_hash": "a52b5eb68846f0ed28646ec0a1477a94",
+    "semantic_hash": "a52b5eb68846f0ed28646ec0a1477a94"
+  },
+  "docs/analise-ia.md": {
+    "mtime": 1792375181.7543595,
+    "seen": 1792439295.4535255,
+    "ast_hash": "eac072603e158367b6316d978fc09edf",
+    "semantic_hash": "eac072603e158367b6316d978fc09edf"
+  },
+  "docs/banco-de-dados.md": {
+    "mtime": 1791940715.6580448,
+    "seen": 1792439295.4535265,
+    "ast_hash": "e7b95d8d19881aa5b4464e8cfb08cb27",
+    "semantic_hash": "e7b95d8d19881aa5b4464e8cfb08cb27"
+  },
+  "docs/exportacao.md": {
+    "mtime": 1790218546.9175205,
+    "seen": 1792439295.4535275,
+    "ast_hash": "8477604bb17a9b83ddb3b14808d5d144",
+    "semantic_hash": "8477604bb17a9b83ddb3b14808d5d144"
+  },
+  "docs/recuperacao-de-senha.md": {
+    "mtime": 1790229637.9315562,
+    "seen": 1792439295.4535284,
+    "ast_hash": "89395e498adc0761c498456719375a9b",
+    "semantic_hash": "89395e498adc0761c498456719375a9b"
+  },
+  "docs/tarefas/2026-10-19-graphify.md": {
+    "mtime": 1792438410.373732,
+    "seen": 1792439295.4535294,
+    "ast_hash": "d1c7aed1fd856d85d7ab76c97c9989fa",
+    "semantic_hash": "d1c7aed1fd856d85d7ab76c97c9989fa"
+  },
+  "docs/tratamento-de-erros.md": {
+    "mtime": 1790229627.313075,
+    "seen": 1792439295.45353,
+    "ast_hash": "3bfe2f1650a7b7ff1b5d373293b57d08",
+    "semantic_hash": "3bfe2f1650a7b7ff1b5d373293b57d08"
+  },
+  "tcc2026/docs/importacao-administrador.md": {
+    "mtime": 1792310312.0641246,
+    "seen": 1792439295.4535308,
+    "ast_hash": "0800e6c088bda67a0d3847339b7af551",
+    "semantic_hash": "0800e6c088bda67a0d3847339b7af551"
+  },
+  "tcc2026/front/Adm/administrador.html": {
+    "mtime": 1791940715.677683,
+    "seen": 1792439295.453532,
+    "ast_hash": "aeaa1fb2b2b2b47f673c5a3299fdccea",
+    "semantic_hash": "aeaa1fb2b2b2b47f673c5a3299fdccea"
+  },
+  "tcc2026/front/Adm/configuracoes.html": {
+    "mtime": 1792310312.079627,
+    "seen": 1792439295.4535327,
+    "ast_hash": "64a6dd8efde4e0771fe719fd25956e38",
+    "semantic_hash": "64a6dd8efde4e0771fe719fd25956e38"
+  },
+  "tcc2026/front/Adm/crudconsulta.html": {
+    "mtime": 1792310312.0846834,
+    "seen": 1792439295.4535334,
+    "ast_hash": "a4b1d925c66c1ebecfc7b83fef234554",
+    "semantic_hash": "a4b1d925c66c1ebecfc7b83fef234554"
+  },
+  "tcc2026/front/Adm/crudmedico.html": {
+    "mtime": 1792310312.089702,
+    "seen": 1792439295.4535341,
+    "ast_hash": "008ae36e29a3a31a741f08adf0ef2f67",
+    "semantic_hash": "008ae36e29a3a31a741f08adf0ef2f67"
+  },
+  "tcc2026/front/Adm/crudpaciente.html": {
+    "mtime": 1792310312.106544,
+    "seen": 1792439295.4535353,
+    "ast_hash": "964a478105d56894afb55ce71ae96f63",
+    "semantic_hash": "964a478105d56894afb55ce71ae96f63"
+  },
+  "tcc2026/front/Med/calendario.html": {
+    "mtime": 1791940715.6850407,
+    "seen": 1792439295.453536,
+    "ast_hash": "7a2e96d93c20ccaf7fde1ad87906f3a3",
+    "semantic_hash": "7a2e96d93c20ccaf7fde1ad87906f3a3"
+  },
+  "tcc2026/front/Med/configuracoes_med.html": {
+    "mtime": 1791940715.6861572,
+    "seen": 1792439295.453537,
+    "ast_hash": "9bd554209a7b4ab73b3c99495f51106d",
+    "semantic_hash": "9bd554209a7b4ab73b3c99495f51106d"
+  },
+  "tcc2026/front/Med/crudanaliseia.html": {
+    "mtime": 1792310312.109112,
+    "seen": 1792439295.4535377,
+    "ast_hash": "d97fcd714264dc544743f639b8287766",
+    "semantic_hash": "d97fcd714264dc544743f639b8287766"
+  },
+  "tcc2026/front/Med/crudanamnese.html": {
+    "mtime": 1790234614.6969554,
+    "seen": 1792439295.453539,
+    "ast_hash": "7962314a9b2549b0bdadda10e8d649ef",
+    "semantic_hash": "7962314a9b2549b0bdadda10e8d649ef"
+  },
+  "tcc2026/front/Med/crudconsulta_med.html": {
+    "mtime": 1792310312.109112,
+    "seen": 1792439295.4535396,
+    "ast_hash": "5e3e984c57bc0ae115dad4cfc5d82a36",
+    "semantic_hash": "5e3e984c57bc0ae115dad4cfc5d82a36"
+  },
+  "tcc2026/front/Med/crudexame.html": {
+    "mtime": 1792310312.1305196,
+    "seen": 1792439295.453541,
+    "ast_hash": "e949f9943474a56addfa3a07292f2758",
+    "semantic_hash": "e949f9943474a56addfa3a07292f2758"
+  },
+  "tcc2026/front/Med/crudresultado.html": {
+    "mtime": 1792310312.1305196,
+    "seen": 1792439295.453542,
+    "ast_hash": "55a9206414df9660a8c0bd2908aa7c75",
+    "semantic_hash": "55a9206414df9660a8c0bd2908aa7c75"
+  },
+  "tcc2026/front/Med/medico.html": {
+    "mtime": 1790202098.4353778,
+    "seen": 1792439295.453543,
+    "ast_hash": "d8edd9d2d64935470fa20bb1036fa4ab",
+    "semantic_hash": "d8edd9d2d64935470fa20bb1036fa4ab"
+  },
+  "tcc2026/front/Med/nova_analise_ia.html": {
+    "mtime": 1791940715.6901994,
+    "seen": 1792439295.4535437,
+    "ast_hash": "538e6d30353b607efffb9b9dba5e6dce",
+    "semantic_hash": "538e6d30353b607efffb9b9dba5e6dce"
+  },
+  "tcc2026/front/Paciente/configuracoes_paciente.html": {
+    "mtime": 1792310312.1402185,
+    "seen": 1792439295.4535444,
+    "ast_hash": "98d77332836f39f01926032e424b77fb",
+    "semantic_hash": "98d77332836f39f01926032e424b77fb"
+  },
+  "tcc2026/front/Paciente/historicoPaciente.html": {
+    "mtime": 1792310312.1402185,
+    "seen": 1792439295.4535456,
+    "ast_hash": "70711dc8d82a2b217ba546e58d03fe1e",
+    "semantic_hash": "70711dc8d82a2b217ba546e58d03fe1e"
+  },
+  "tcc2026/front/Paciente/paciente.html": {
+    "mtime": 1790202098.4373806,
+    "seen": 1792439295.4535463,
+    "ast_hash": "65bcb00dc4a4b76e1608e778ca94bc89",
+    "semantic_hash": "65bcb00dc4a4b76e1608e778ca94bc89"
+  },
+  "tcc2026/front/Paciente/resultadosExame.html": {
+    "mtime": 1792310312.1402185,
+    "seen": 1792439295.4535472,
+    "ast_hash": "6ae5cc93d7bb7687c5043d6e6faeeb88",
+    "semantic_hash": "6ae5cc93d7bb7687c5043d6e6faeeb88"
+  },
+  "tcc2026/front/Senha/confirmar_codigo.html": {
+    "mtime": 1791940715.6912026,
+    "seen": 1792439295.453548,
+    "ast_hash": "6dfee54d72903c29a75c4580c0c127e6",
+    "semantic_hash": "6dfee54d72903c29a75c4580c0c127e6"
+  },
+  "tcc2026/front/Senha/esqueci_senha.html": {
+    "mtime": 1792310312.1402185,
+    "seen": 1792439295.4535491,
+    "ast_hash": "c3ba380b5e02be51f115f628959e4205",
+    "semantic_hash": "c3ba380b5e02be51f115f628959e4205"
+  },
+  "tcc2026/front/Senha/nova_senha.html": {
+    "mtime": 1791940715.6924586,
+    "seen": 1792439295.4535506,
+    "ast_hash": "1577a49a2d7d03dd372226c98af7ae46",
+    "semantic_hash": "1577a49a2d7d03dd372226c98af7ae46"
+  },
+  "tcc2026/front/login.html": {
+    "mtime": 1792375175.0630338,
+    "seen": 1792439295.4535513,
+    "ast_hash": "83360b166d05930cc33b78c2ee2fc111",
+    "semantic_hash": "83360b166d05930cc33b78c2ee2fc111"
+  },
+  "tcc2026/front/selecionar_perfil.html": {
+    "mtime": 1791940715.6938167,
+    "seen": 1792439295.4535522,
+    "ast_hash": "4101a4dfaa749a92ec040a85cbbbae5f",
+    "semantic_hash": "4101a4dfaa749a92ec040a85cbbbae5f"
+  },
+  "tcc2026/front/telaInicial.html": {
+    "mtime": 1791940715.6938167,
+    "seen": 1792439295.453553,
+    "ast_hash": "78d869c402f8ee0aa9eaf73d63debab1",
+    "semantic_hash": "78d869c402f8ee0aa9eaf73d63debab1"
+  },
+  "tcc2026/exemplos-exportacao/01-adm-hematoai-medicos.pdf": {
+    "mtime": 1790228056.5923333,
+    "seen": 1792439295.453554,
+    "ast_hash": "bd35403dd36f170e539ae2b93daea45f",
+    "semantic_hash": "bd35403dd36f170e539ae2b93daea45f"
+  },
+  "tcc2026/exemplos-exportacao/02-adm-hematoai-pacientes.pdf": {
+    "mtime": 1790228056.6089132,
+    "seen": 1792439295.4535546,
+    "ast_hash": "d95dba17ea74ac3a9ada8ac834a4cc09",
+    "semantic_hash": "d95dba17ea74ac3a9ada8ac834a4cc09"
+  },
+  "tcc2026/exemplos-exportacao/03-adm-hematoai-consultas.pdf": {
+    "mtime": 1790228056.624044,
+    "seen": 1792439295.4535553,
+    "ast_hash": "96570abf3c1069f106cb5dcb0a95ede1",
+    "semantic_hash": "96570abf3c1069f106cb5dcb0a95ede1"
+  },
+  "tcc2026/exemplos-exportacao/04-med-hematoai-minhas-consultas.pdf": {
+    "mtime": 1790228056.6394992,
+    "seen": 1792439295.4535565,
+    "ast_hash": "89f76394067c64bd78bb85cb01bc2663",
+    "semantic_hash": "89f76394067c64bd78bb85cb01bc2663"
+  },
+  "tcc2026/exemplos-exportacao/05-med-hematoai-exames.pdf": {
+    "mtime": 1790228056.65362,
+    "seen": 1792439295.4535573,
+    "ast_hash": "4721a5251f5d97b3a7092d6a7d1204de",
+    "semantic_hash": "4721a5251f5d97b3a7092d6a7d1204de"
+  },
+  "tcc2026/exemplos-exportacao/06-med-hematoai-resultados-exames.pdf": {
+    "mtime": 1790228056.6678143,
+    "seen": 1792439295.453558,
+    "ast_hash": "2a25c5e4bafdcc07b9ba228f6260d707",
+    "semantic_hash": "2a25c5e4bafdcc07b9ba228f6260d707"
+  },
+  "tcc2026/exemplos-exportacao/07-med-hematoai-anamneses.pdf": {
+    "mtime": 1790228056.681877,
+    "seen": 1792439295.453559,
+    "ast_hash": "f6785410d198dd501c11f3be37c497ba",
+    "semantic_hash": "f6785410d198dd501c11f3be37c497ba"
+  },
+  "tcc2026/exemplos-exportacao/08-med-hematoai-analises-ia.pdf": {
+    "mtime": 1790228056.6960087,
+    "seen": 1792439295.4535599,
+    "ast_hash": "f0a1daf107857167388cbaeab8a2b794",
+    "semantic_hash": "f0a1daf107857167388cbaeab8a2b794"
+  },
+  "tcc2026/exemplos-exportacao/08-med-hematoai-laudo-analise-ia-1.pdf": {
+    "mtime": 1790228056.7098036,
+    "seen": 1792439295.4535606,
+    "ast_hash": "6b6f72e2bc40c89d915ee47f84ba9985",
+    "semantic_hash": "6b6f72e2bc40c89d915ee47f84ba9985"
+  },
+  "tcc2026/exemplos-exportacao/09-med-hematoai-agenda-setembro-2026.pdf": {
+    "mtime": 1790228056.7159152,
+    "seen": 1792439295.4535615,
+    "ast_hash": "fd856c3047b8e4762a153b68b68b6385",
+    "semantic_hash": "fd856c3047b8e4762a153b68b68b6385"
+  },
+  "tcc2026/exemplos-exportacao/10-pac-historico-hematoai-consulta-2.pdf": {
+    "mtime": 1790228056.7292013,
+    "seen": 1792439295.4535623,
+    "ast_hash": "cfa5d62ca252017f24c59f5de651b329",
+    "semantic_hash": "cfa5d62ca252017f24c59f5de651b329"
+  },
+  "tcc2026/exemplos-exportacao/10-pac-historico-hematoai-minhas-consultas.pdf": {
+    "mtime": 1790228056.7353742,
+    "seen": 1792439295.4535632,
+    "ast_hash": "c6771a02e4740bc133c7e67682b9dc04",
+    "semantic_hash": "c6771a02e4740bc133c7e67682b9dc04"
+  },
+  "tcc2026/exemplos-exportacao/11-pac-historico-hematoai-exame-2.pdf": {
+    "mtime": 1790228056.7486422,
+    "seen": 1792439295.4535642,
+    "ast_hash": "7507c06b9f959fdd6b12831a33fe7e68",
+    "semantic_hash": "7507c06b9f959fdd6b12831a33fe7e68"
+  },
+  "tcc2026/exemplos-exportacao/11-pac-historico-hematoai-meus-exames.pdf": {
+    "mtime": 1790228056.755868,
+    "seen": 1792439295.453565,
+    "ast_hash": "bf062045889174515dad2f3b5c339863",
+    "semantic_hash": "bf062045889174515dad2f3b5c339863"
+  },
+  "tcc2026/exemplos-exportacao/12-pac-hematoai-resultado-exame-22.pdf": {
+    "mtime": 1790228056.7680159,
+    "seen": 1792439295.4535658,
+    "ast_hash": "bf1360f286ce55b2e96107f6de61cb6c",
+    "semantic_hash": "bf1360f286ce55b2e96107f6de61cb6c"
+  },
+  "tcc2026/exemplos-exportacao/12-pac-hematoai-resultados-exames.pdf": {
+    "mtime": 1790228056.7740445,
+    "seen": 1792439295.4535668,
+    "ast_hash": "c81305b8a6b628cc65f1d062f78f6235",
+    "semantic_hash": "c81305b8a6b628cc65f1d062f78f6235"
+  },
+  "tcc2026/exemplos-exportacao/13-nova-analise-ia-laudo-backend.pdf": {
+    "mtime": 1790228056.7871232,
+    "seen": 1792439295.4535675,
+    "ast_hash": "7db8e7de76b5c620597115c58c99b232",
+    "semantic_hash": "7db8e7de76b5c620597115c58c99b232"
+  }
+}

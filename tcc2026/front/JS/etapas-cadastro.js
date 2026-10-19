@@ -17,7 +17,20 @@
       (!preenchido(cep) || cepDigitos.length === 8);
   }
 
-  const api = { enderecoCompleto };
+  // Desfaz um cadastro em etapas que falhou no meio: apaga o login e/ou o
+  // endereço que já tinham sido criados, para não deixar registros órfãos.
+  // login e enderecos não têm chave estrangeira entre si, então a ordem não
+  // importa. Usa o del() de api.js, carregado antes nas telas de cadastro.
+  async function rollbackCadastro(id_usuario, id_endereco) {
+    try {
+      if (id_usuario !== null) await raiz.del('/login/' + id_usuario);
+      if (id_endereco !== null) await raiz.del('/enderecos/' + id_endereco);
+    } catch (erro) {
+      console.error('Erro no rollback:', erro);
+    }
+  }
+
+  const api = { enderecoCompleto, rollbackCadastro };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else raiz.HematoEtapas = api;
 })(typeof window !== 'undefined' ? window : globalThis);

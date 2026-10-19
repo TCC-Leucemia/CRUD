@@ -434,6 +434,7 @@
 <script src="../JS/auth.js"></script>
 <script src="../JS/api.js"></script>
 <script src="../JS/navbar.js"></script>
+<script src="../JS/formatacao.js"></script>
 <script src="../JS/exportar.js"></script>
 <script>
 
@@ -837,15 +838,6 @@ function irParaResultado(idExame) {
 ═══════════════════════════════════════════════════════ */
 function corStatus(s) {
   return { Finalizado:'green', 'Em andamento':'blue', Pendente:'yellow' }[s] || 'gray';
-}
-function formatarData(d) {
-    if (!d) return "—";
-
-    const data = new Date(d);
-
-    if (isNaN(data)) return "—";
-
-    return data.toLocaleDateString("pt-BR");
 }
 
 function formatarDataLonga(d) {

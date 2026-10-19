@@ -8,13 +8,46 @@ O resultado é apoio à decisão, não um diagnóstico definitivo. A classifica�
 
 ## Critérios de segurança diagnóstica
 
-A IA avalia primeiro se a imagem permite triagem. Foco, coloração, artefatos, sobreposição de células, escolha do campo e quantidade de leucócitos avaliáveis podem impedir uma conclusão. Nesses casos, ou quando há achados conflitantes, a saída obrigatória é `INDETERMINADO`; ausência de uma alteração em uma única foto não autoriza resultado normal.
+A IA avalia primeiro se a imagem permite triagem. Foco, coloração, artefatos graves ou ausência de células nucleadas avaliáveis levam a `INDETERMINADO`. Todas as classes saem como **suspeita morfológica**: o laudo sempre afirma que a confirmação depende de hemograma, imunofenotipagem/citometria e estudos citogenéticos/moleculares.
 
-Uma imagem isolada não é diferencial leucocitário nem permite calcular percentual de blastos. Por isso, o sistema não deve transformar a proporção de células na fotografia em percentual sanguíneo ou medular, nem usar densidade aparente do campo, predominância de hemácias ou poucos linfócitos como critério diagnóstico.
+Uma imagem isolada não é diferencial leucocitário nem permite calcular percentual de blastos; o prompt proíbe percentuais e pede termos como "predomínio", "maioria" e "raros". A **frequência de leucócitos em relação às hemácias**, porém, é lida como achado descritivo: cerca de 1 leucócito para cada 500 a 1000 hemácias é o esperado, e 1 para 30 ou mais é leucocitose aparente. Essa frequência separa NORMAL de LLC (um ou dois linfócitos isolados são normais; vários linfócitos pequenos e uniformes no mesmo campo não) e orienta a suspeita, mas nunca define o tipo sozinha.
 
-LMA e LLA podem ter morfologia semelhante e a linhagem não é confirmada por uma fotografia. A IA só pode apontar LMA como principal hipótese na presença inequívoca de bastonetes de Auer ou granulação mieloide em células blásticas; se a linhagem permanecer incerta, o resultado deve ser indeterminado com os diferenciais no laudo.
+O prompt traz critérios contrastivos para os pares que o modelo confundia, aplicados em ordem:
 
-LLC exige correlação com contagem absoluta de linfócitos/células B e demonstração de clonalidade por citometria de fluxo; linfócitos maduros ou células de Gumprecht em uma imagem podem ter outras explicações. LMC também não é confirmável pela imagem: processos leucemoides e outras neoplasias mieloproliferativas podem se sobrepor, e a alteração BCR::ABL1 não é visualmente detectável.
+- **LLC × LLA:** cromatina grumosa em blocos, sem nucléolo e célula pequena a média indicam LLC; cromatina fina e homogênea, nucléolo discreto e lâmina monótona de blastos indicam LLA.
+- **LLA × LMA:** citoplasma escasso e liso com núcleo redondo e população monótona indicam LLA; citoplasma moderado a abundante, grânulos finos, núcleos dobrados e população heterogênea indicam LMA. Auer, granulação azurófila em blastos ou diferenciação monocítica decidem por LMA.
+- **LMC × LMA:** o tamanho da célula não decide, porque promielócitos e mielócitos são grandes sem serem blastos. Decide a maturação: neutrófilos segmentados e bastões ao lado de metamielócitos, mielócitos ou promielócitos (três ou mais estágios), com blastos em minoria e eosinófilos/basófilos, indicam LMC; blastos predominantes com hiato de maturação indicam LMA.
+
+`INDETERMINADO` fica para imagem inadequada ou para empate real entre duas hipóteses depois dessas regras, e não como saída padrão para casos difíceis. LLC e LMC continuam sem confirmação visual possível (clonalidade, contagem absoluta e BCR::ABL1 dependem de exames), o que o laudo registra nas recomendações.
+
+Antes de classificar, o prompt manda excluir **artefatos** que o modelo confundia com achados: marcas d'água, células rompidas/borradas (que ele lia como "granulação azurófila" e transformavam LLA em LMA), figuras de mitose (lidas como neutrófilo) e plaquetas. Depois segue um **roteiro em passos**, olhando só células intactas: (1) leucócitos raros e maduros → NORMAL; (2) três ou mais estágios granulocíticos com eosinófilos/basófilos → LMC; (3) citoplasma das células predominantes — escasso com linfócitos espalhados entre hemácias e cromatina em blocos → LLC; escasso com blastos agrupados em lâmina e cromatina fina → LLA; moderado a abundante em volta do núcleo, células grandes e núcleos dobrados → LMA. A decisão é sempre pela maioria das células, não por "algumas".
+
+O modelo usado na chamada vem da variável de ambiente `OPENAI_MODEL` (padrão `gpt-6-sol`, o modelo com que o prompt foi ajustado); a chamada permite até 6000 tokens de saída, porque o laudo em duas partes é longo. O texto é lido por `response.output_text`.
+
+## Resultado da validação do prompt (2026-10-19)
+
+Conjunto: as 6 imagens de `imagens TCC.zip` (LLA, LLC, LMA, LMC, normal, saudável), mais duas versões transformadas de cada uma (rotação/espelho/redução e variação de brilho, contraste e cor), com `gpt-6-sol`.
+
+| Versão do prompt | Acertos |
+| --- | --- |
+| Primeira reescrita | 4/6 (LLA e LLC saíam LMA) |
+| + artefatos e roteiro por citoplasma | 5/6, depois 6/6, depois 5/6 (LLC oscilava para LLA) |
+| + distribuição e textura da cromatina para LLC × LLA (final) | 24/24 em 4 rodadas (originais ×2, transformadas, cor) |
+
+O que o laudo final respondeu em cada imagem (rodada de confirmação):
+
+| Imagem | Suspeita no laudo | Grau | Achado que o modelo apontou |
+| --- | --- | --- | --- |
+| LLA | Leucemia Linfoblástica Aguda (LLA) | Moderado | Células imaturas agrupadas, citoplasma escasso, cromatina fina |
+| LLC | Leucemia Linfocítica Crônica (LLC) | Moderado | Linfoides numerosos, espalhados entre hemácias, cromatina condensada sem nucléolo |
+| LMA | Leucemia Mieloide Aguda (LMA) | Moderado | Células grandes, citoplasma moderado a abundante, núcleos indentados/reniformes |
+| LMC | Leucemia Mieloide Crônica (LMC) | Baixo/Moderado | Segmentados junto de formas granulocíticas imaturas granulares |
+| normal | Normal | Moderado | Um linfócito maduro isolado entre muitas hemácias |
+| saudável | Normal | Moderado | Linfócito e neutrófilo maduros, raros |
+
+Todas as 24 Partes 2 trazem os campos do laudo, sem códigos internos, percentuais ou grau Alto. Uma rodada custa cerca de 42 mil tokens de entrada e 13 mil de saída para as 6 imagens.
+
+Esse resultado mostra que o prompt classifica corretamente estas imagens e versões transformadas delas; **não** é medida de acurácia clínica. As 6 imagens vêm de atlas públicos e são casos típicos. Para o TCC vale o que está em "Confiança e validação": um conjunto separado, maior e rotulado por hematopatologista.
 
 ## Confiança e validação
 

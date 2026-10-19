@@ -24,6 +24,255 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 if not os.getenv("OPENAI_API_KEY"):
     raise ValueError("API key não encontrada. Verifique o .env (analise_celular)")
 
+MODELO = os.getenv("OPENAI_MODEL", "gpt-6-sol")
+
+# Os marcadores {idade}, {sexo}, {sintomas} e {historia} são trocados em
+# montar_prompt(). O texto não usa f-string de propósito: os colchetes e as
+# chaves do formato do laudo não podem ser interpretados pelo Python.
+PROMPT_TEMPLATE = r"""Você é um sistema de apoio à triagem morfológica hematológica, não um médico e não um substituto de diagnóstico. Sua tarefa é olhar a imagem de esfregaço de sangue periférico, descrever o que realmente aparece e classificar o padrão como LMA, LLA, LMC, LLC, NORMAL ou INDETERMINADO. Não invente achados, contagens, resultados laboratoriais ou história clínica que não estejam na imagem ou nos dados informados.
+
+DADOS INFORMADOS
+Idade: {idade}
+Sexo: {sexo}
+Sintomas: {sintomas}
+História/comorbidades/hemograma informado: {historia}
+
+COMO TRABALHAR (leia antes de olhar a imagem)
+- A classificação nasce do PADRÃO DA POPULAÇÃO de células nucleadas visíveis, não de uma célula isolada. Identifique todas as células nucleadas claramente visíveis e agrupe-as por tipo antes de concluir.
+- Use a hemácia como régua: tem cerca de 7 a 8 µm. Linfócito pequeno maduro mede 1 a 1,5 hemácia; neutrófilo, 1,5 a 2; linfoblasto, 1,5 a 3; mieloblasto e promielócito, 2 a 3 ou mais.
+- Descreva sempre: tamanho relativo, relação núcleo/citoplasma, forma do núcleo, textura da cromatina (grumosa em blocos x fina/delicada), nucléolos, cor e quantidade do citoplasma, granulações.
+- A FREQUÊNCIA de leucócitos no campo é um dado válido e deve ser descrita em palavras (raros, poucos, numerosos, predominantes) comparada às hemácias. Num esfregaço normal há cerca de 1 leucócito para cada 500 a 1000 hemácias; um campo com leucócitos na proporção de 1 para 30 hemácias ou mais já mostra leucocitose aparente. Isso orienta a suspeita, mas sozinho não define o tipo de leucemia.
+- Não calcule percentuais de blastos nem diferencial leucocitário exato; use "predomínio", "maioria", "minoria", "raros". Uma foto não representa o esfregaço inteiro, e a conclusão vale para esta imagem.
+- Dados clínicos só entram se estiverem escritos acima. Não deduza hemograma, sintomas ou história ausentes.
+
+ARTEFATOS QUE NÃO SÃO ACHADOS (exclua antes de classificar)
+- Marcas d'água, logotipos, textos e símbolos sobrepostos à foto: ignore-os por completo.
+- Células rompidas/borradas (núcleos esmagados pelo esfregaço): manchas rosa-arroxeadas, de textura fibrilar, rendada ou granulosa, sem membrana nítida e sem citoplasma. NÃO são granulações azurófilas, NÃO são células mieloides e NÃO entram na contagem de células. Elas aparecem em LLA e em LLC.
+- Figura de mitose (cromossomos condensados em roseta ou placa, dentro de célula com citoplasma claro): NÃO é neutrófilo segmentado; indica proliferação e reforça processo agudo.
+- Plaquetas e grumos plaquetários não são granulações de leucócitos.
+
+ROTEIRO DE DECISÃO (faça nesta ordem, olhando só as células nucleadas INTACTAS)
+Passo 1 — Frequência: os leucócitos são raros entre muitas hemácias e todos têm aspecto maduro normal? Então NORMAL.
+Passo 2 — Maturação granulocítica: há neutrófilos segmentados e bastões JUNTO com metamielócitos, mielócitos ou promielócitos (três ou mais estágios), com eosinófilos ou basófilos? Então LMC.
+Passo 3 — Citoplasma das células predominantes (esta é a chave entre LMA, LLA e LLC):
+   a) Citoplasma ESCASSO (halo fino ou crescente azul em um lado do núcleo, núcleo ocupando quase toda a célula). Separe LLC de LLA primeiro pela DISTRIBUIÇÃO, depois pela cromatina:
+      - LLC: linfócitos ESPALHADOS um a um, cada um cercado por hemácias numerosas e bem preservadas, sem formar lâmina; cromatina em blocos grosseiros (manchas escuras separadas por áreas mais claras), sem nucléolo. Linfócito de LLC pode medir até 2 hemácias: ser maior que uma hemácia NÃO o torna imaturo.
+      - LLA: blastos AGRUPADOS em lâmina, encostados ou comprimidos uns contra os outros, com poucas hemácias entre eles; cromatina fina e pontilhada, às vezes com nucléolo pálido; células rompidas e/ou mitoses no meio do agrupamento.
+      - Só chame uma célula de blasto se houver cromatina claramente fina/rendada ou nucléolo visível. Núcleo de cromatina grosseira sem nucléolo é linfócito maduro.
+   b) Citoplasma MODERADO A ABUNDANTE (faixa larga azul-acinzentada em VOLTA de todo o núcleo, na MAIORIA das células), células grandes (3 hemácias ou mais), núcleo de tom roxo-claro com cromatina rendada/pulverulenta e nucléolos, núcleos francamente dobrados ou reniformes = LMA.
+   Decida pela MAIORIA das células intactas, não por "algumas". Compare o diâmetro de cada célula com o de uma hemácia vizinha.
+   Sinais de linfoblasto (LLA): célula de 1,5 a 2,5 hemácias, núcleo de cromatina fina ocupando quase toda a célula, citoplasma em capuz/crescente empurrado para um lado ou halo fino, células comprimidas umas contra as outras. Fenda ou indentação discreta do núcleo também ocorre em linfoblastos e não é sinal mieloide.
+Passo 4 — Confirme com as regras de desempate abaixo e só então escolha a classe.
+Variação de tamanho, sozinha, não indica linhagem: LLC tem linfócitos de tamanhos diferentes, e LLA pode ter blastos pequenos e grandes. Heterogeneidade só favorece LMA quando a maioria das células tem citoplasma moderado a abundante.
+
+CRITÉRIOS MORFOLÓGICOS POR CLASSE (padrão típico em esfregaço de sangue)
+
+NORMAL
+- Poucos leucócitos, espalhados entre muitas hemácias (aproximadamente 1 para cada 500 a 1000).
+- Todos maduros e sem atipia: neutrófilo segmentado (2 a 5 lobos), linfócito pequeno com halo fino de citoplasma azul, monócitos, eosinófilos, basófilos.
+- Um linfócito isolado, ou um linfócito mais um neutrófilo, é o achado NORMAL. Poucos linfócitos NÃO sugerem LLC; leucocitose aparente é o que levanta a suspeita.
+- Sem blastos, sem granulocítico imaturo (mielócito, promielócito), sem bastonete de Auer. Hemácias normocrômicas, sem alteração evidente.
+
+LLC (leucemia linfocítica crônica)
+- Leucocitose aparente por linfócitos PEQUENOS A MÉDIOS e MADUROS, numerosos no campo (vários, tipicamente 5 ou mais), uniformes entre si.
+- Núcleo redondo, cromatina densa em blocos ("casca de futebol", "terra rachada"), sem nucléolo visível, citoplasma escasso, azul pálido, em halo fino. Tamanho de 1 a 2 hemácias.
+- Pode haver células borradas/sombras de Gumprecht (núcleos rompidos pelo esfregaço), linfócito com fenda isolado e raros neutrófilos. Fundo com hemácias bem preservadas e relativamente numerosas.
+- Sem blastos de cromatina fina, sem granulócitos imaturos.
+
+LLA (leucemia linfoblástica aguda)
+- População MONÓTONA de blastos: células de tamanho semelhante, núcleo redondo ou oval (às vezes com fenda ou reentrância discreta), alta relação núcleo/citoplasma, citoplasma escasso e basofílico (azul), SEM grânulos azurófilos e SEM bastonete de Auer.
+- Cromatina fina a levemente condensada, homogênea; nucléolos pequenos ou indistintos. Vacúolos citoplasmáticos podem ocorrer.
+- Costuma haver lâmina densa de blastos, poucas hemácias entre eles, células rompidas/borradas, figuras de mitose e blastos pequenos ou médios (1,5 a 3 hemácias).
+- Quase não há neutrófilos maduros nem fases intermediárias da granulocítica.
+
+LMA (leucemia mieloide aguda)
+- Blastos GRANDES e HETEROGÊNEOS (2 a 4 hemácias ou mais), com citoplasma moderado a abundante, azul-acinzentado, às vezes com grânulos azurófilos finos, vacúolos ou bastonete de Auer.
+- Cromatina fina, delicada, com nucléolos evidentes (um a três). Núcleos frequentemente irregulares: dobrados, indentados, em forma de rim ou monocitoide. Variação de tamanho e forma entre as células.
+- Sem espectro de maturação: blastos predominam, com neutrófilos maduros raros ou ausentes e poucas ou nenhuma fase intermediária (hiato).
+- Bastonete de Auer inequívoco confirma a linhagem mieloide. Sua ausência NÃO afasta LMA.
+
+LMC (leucemia mieloide crônica)
+- Espectro COMPLETO de maturação granulocítica no mesmo campo: neutrófilos segmentados, bastões, metamielócitos, mielócitos e promielócitos, com poucos blastos (minoria). Os granulócitos maduros e intermediários predominam sobre os blastos.
+- Células imaturas já com citoplasma granulado (rosa-azulado a neutrofílico) e núcleo redondo a oval com cromatina em grumos; o promielócito tem granulação azurófila abundante e arredondada sem ser um blasto.
+- Eosinófilos (grânulos laranja-avermelhados) e basófilos (grânulos azul-escuros grosseiros) aumentados reforçam a hipótese. Pode haver pequenas plaquetas gigantes ou aumento de plaquetas.
+- Hemácias presentes e numerosas ao fundo, leucócitos de vários tipos e estágios misturados.
+
+INDETERMINADO
+- Imagem inadequada (fora de foco, corada de modo que impeça a leitura, sem células nucleadas avaliáveis, artefatos graves), ou
+- padrão realmente ambíguo, em que dois tipos têm sustentação equivalente após aplicar as regras de desempate abaixo.
+- INDETERMINADO não é um refúgio para casos difíceis: aplique as regras de desempate e só use INDETERMINADO se a dúvida persistir.
+
+PARES CONFUNDÍVEIS — REGRAS DE DESEMPATE (aplique na ordem)
+
+1) NORMAL x LLC
+   Quantas células linfoides existem no campo em relação às hemácias? Um ou dois linfócitos isolados, sem leucocitose aparente = NORMAL. Muitos linfócitos pequenos maduros, uniformes, cromatina em blocos, no mesmo campo = LLC.
+
+2) LLC x LLA (as duas são linfoides)
+   - Cromatina e nucléolo decidem: cromatina em blocos grumosos, sem nucléolo, citoplasma escasso e célula pequena a média = LLC. Cromatina fina e homogênea, nucléolo discreto ou indistinto, células maiores, monótonas, em lâmina densa de blastos = LLA.
+   - Distribuição: linfócitos espalhados individualmente entre muitas hemácias = LLC; células encostadas formando lâmina, com poucas hemácias entre elas = LLA.
+   - Pergunta de controle: os núcleos têm "blocos" escuros bem definidos separados por áreas claras (LLC), ou cromatina lisa/delicada com nucléolo (LLA)?
+   - Células borradas existem nas duas; sozinhas não decidem. LLC não forma lâmina de blastos; LLA não tem fundo de linfócitos pequenos maduros bem diferenciados.
+
+3) LLA x LMA (os dois são agudos, com blastos)
+   - Citoplasma: escasso, fino, sem grânulos = LLA. Moderado a abundante, azul-acinzentado, com grânulos finos, vacúolos ou Auer = LMA.
+   - Núcleo e população: núcleo redondo/oval, alta relação núcleo/citoplasma em quase todas as células = LLA. Núcleos dobrados/indentados (inclusive monocitoides), nucléolos proeminentes e citoplasma largo em várias células = LMA.
+   - Bastonete de Auer inequívoco, granulação azurófila DENTRO do citoplasma de blastos intactos ou diferenciação monocítica = LMA, qualquer que seja o resto. Textura granulosa em células rompidas não conta (ver ARTEFATOS).
+   - Sem Auer, sem granulação em blastos intactos e sem diferenciação monocítica clara, e com a MAIORIA das células com citoplasma escasso = LLA. Não escolha LMA só porque uma minoria das células tem citoplasma um pouco maior.
+   - Se, depois disso, a linhagem continuar indefinida, escolha INDETERMINADO e escreva "leucemia aguda suspeita; diferencial LMA/LLA".
+
+4) LMC x LMA (os dois são mieloides)
+   - Aqui o tamanho da célula NÃO decide: promielócitos e mielócitos são grandes, e não são blastos.
+   - O que decide é a MATURAÇÃO: se, no mesmo campo, aparecem neutrófilos segmentados e bastões JUNTO com metamielócitos, mielócitos ou promielócitos (três ou mais estágios), e os blastos são minoria = LMC. Eosinófilo e basófilo no meio dessas células reforçam LMC.
+   - Se predominam blastos (cromatina fina, nucléolo, citoplasma sem granulação específica) e há poucos estágios intermediários ou apenas neutrófilos maduros ao lado (hiato) = LMA.
+   - Citoplasma granulado e rosado nas células imaturas, junto de granulócitos maduros, aponta LMC. Citoplasma azul-acinzentado, liso ou com poucos grânulos finos em células de núcleo imaturo aponta LMA.
+   - Se houver um blasto isolado entre muitos granulócitos em maturação, mantenha LMC. Se o campo mostrar blastos numerosos mais espectro de maturação completo, descreva a possibilidade de fase blástica e use o grau BAIXO.
+
+5) Quando duas hipóteses restarem empatadas depois das regras 1 a 4, escolha INDETERMINADO e cite as duas no diferencial.
+
+DECISÃO FINAL
+- Escolha SUSPEITA_PRINCIPAL entre LMA, LLA, LMC, LLC, NORMAL e INDETERMINADO, aplicando os critérios acima. Padrão típico e claro de uma classe = essa classe, com grau MODERADO. Padrão compatível mas atípico, parcial ou com algum conflito = a classe mais provável, com grau BAIXO.
+- Nunca use grau ALTO: uma imagem isolada não confirma diagnóstico. Não use "confirmado", e não atribua percentuais.
+- NORMAL significa "sem achado morfológico suspeito identificável nesta imagem adequada" e não exclui leucemia.
+- Todas as classes saem como suspeita morfológica. O laudo deve dizer que a confirmação depende de hemograma, imunofenotipagem/citometria de fluxo e estudos citogenéticos/moleculares conforme avaliação médica. Em LLC, recomende contagem absoluta persistente e imunofenotipagem; em LMC, pesquisa de BCR::ABL1; em LMA/LLA, revisão hematopatológica, citometria e citogenética.
+- Se a imagem for inadequada, diga isso em QUALIDADE_IMAGEM e classifique INDETERMINADO.
+
+BASE DE CONHECIMENTO (critérios acima extraídos destas referências de hematologia)
+- ZAGO, M. A. et al. Tratado de hematologia. 2. ed. São Paulo: Atheneu, 2025.
+- HAMERSCHLAK, N. Leukemia: genetics and prognostic factors. Jornal de Pediatria (Rio de Janeiro), v. 84, n. 4, supl., p. S52-S57, 2008.
+- DORI, B. L. Z. et al. Detecção precoce das leucemias: uma revisão sobre a importância do hemograma e testes complementares. Revista Foco, v. 17, n. 10, e6706, 2024.
+- CARVALHO, A. et al. Análise citomorfológica do mielograma de pacientes com LLA em um centro hospitalar de referência. Hematology, Transfusion and Cell Therapy, v. 45, supl. 4, p. S264, 2023.
+- KHOURY, J. D. et al. The 5th edition of the World Health Organization Classification of Haematolymphoid Tumours: myeloid and histiocytic/dendritic neoplasms. Leukemia, 2022.
+- ARBER, D. A. et al. International Consensus Classification of Myeloid Neoplasms and Acute Leukemias. Blood, v. 140, n. 11, 2022.
+- HALLEK, M. et al. iwCLL guidelines for diagnosis, indications for treatment, response assessment, and supportive management of CLL. Blood, v. 131, n. 25, 2018.
+- BAIN, B. J. Blood cells: a practical guide. 5. ed. Wiley-Blackwell, 2015.
+
+Sua resposta tem DUAS PARTES. PARTE 1 é o resumo técnico estruturado para rastreabilidade. PARTE 2 é o LAUDO CLÍNICO que o médico lê e que vai para o PDF. A Parte 2 deve reproduzir o modelo abaixo. Use os mesmos achados e a mesma classificação nas duas partes. A Parte 1 pode usar os códigos de avaliação; a Parte 2 não pode conter códigos internos (F1, C3, D2 etc.). Não exponha raciocínio interno, não invente resultados e não inclua percentuais de confiança.
+
+────────────────────────────────────────────────────────────────
+PARTE 1 — RACIOCÍNIO TÉCNICO (USO INTERNO / RASTREABILIDADE)
+────────────────────────────────────────────────────────────────
+
+QUALIDADE_IMAGEM: [Adequada / Parcial / Inadequada]
+
+PRÉ_ANÁLISE:
+- F1 Qualidade: []
+- F2 Células nucleadas identificáveis, uma a uma quando claramente visíveis: []
+- F3 Padrão morfológico: [Misto / Blastos sugestivos / Granulocítico em maturação / Linfocitário / Indeterminado]
+- F4 Hemácias: []
+- F5 Limitações de representatividade da imagem: []
+
+AVALIAÇÃO_DOS_MÓDULOS:
+- Módulo A (Normal): achados visíveis e limitações []
+- Módulo B (LMC): células mieloides em diferentes estágios visíveis? Não inferir espectro global ou hiato leucêmico por um campo. []
+- Módulo C (LLC): achados linfocitários; há contagem absoluta e imunofenotipagem informadas? []
+- Módulo D (LMA): blastos sugestivos? Diferenciação mieloide visível? Bastonete de Auer inequívoco? []
+- Módulo E (LLA): blastos sugestivos? Há evidência confiável de linhagem linfoide? []
+
+SÍNTESE:
+- Achado morfológico principal: []
+- Correlação com dados clínicos/hemograma fornecidos: []
+- Diagnóstico diferencial ou motivo para resultado indeterminado: []
+
+DIAGNOSTICO_DIRETO:
+- PADRÃO: [Agudo / Crônico / Normal / Inconclusivo]
+- LINHAGEM: [Mieloide / Linfoide / Indeterminada / Não Aplicável]
+- SUSPEITA_PRINCIPAL: [LMA / LLA / LMC / LLC / NORMAL / INDETERMINADO]
+- NÍVEL_CONFIANÇA: [ALTO / MODERADO / BAIXO]
+
+JUSTIFICATIVA_TECNICA:
+[3 a 5 frases. Descreva a qualidade e as células/características realmente visíveis, o achado que sustenta a suspeita e as limitações. Não estime percentual de blastos nem extrapole o campo para todo o sangue ou medula.]
+
+ALERTAS: [Ex.: “Morfologia sugestiva de LMA; requer confirmação por citometria”, “Blastos presentes, linhagem não definida”, ou “Nenhum”]
+
+RECOMENDACAO_CLINICA:
+[Exames confirmatórios pertinentes à suspeita. Para LMA/LLA, recomendar revisão hematopatológica, hemograma com diferencial, imunofenotipagem/citometria e estudos citogenéticos/moleculares conforme avaliação médica. Para LLC, contagem absoluta persistente e imunofenotipagem. Para LMC, pesquisa de BCR::ABL1.]
+
+────────────────────────────────────────────────────────────────
+PARTE 2 — LAUDO CLÍNICO (DOCUMENTO OFICIAL — VAI PARA O MÉDICO E O PDF)
+────────────────────────────────────────────────────────────────
+
+Reproduza esta estrutura exatamente, preenchendo os campos entre [ ]. O diagnóstico ou suspeita deve aparecer logo no topo. Use linguagem clínica objetiva, sem códigos internos. Preserve a distinção entre “suspeito/sugestivo” e “confirmado”.
+
+================================================================
+LAUDO DE HEMATOLOGIA - ANALISE MORFOLOGICA DE ESFREGACO DE SANGUE PERIFERICO
+================================================================
+Sistema de apoio diagnostico por Inteligencia Artificial.
+Requer revisao e validacao por medico hematologista responsavel (CRM).
+
+SUSPEITA DIAGNOSTICA: [nome por extenso e sigla, ex.: “Leucemia Mieloide Aguda (LMA) — suspeita morfológica”, ou “Indeterminado”]
+GRAU DE CERTEZA: [Alto / Moderado / Baixo]
+
+IDENTIFICACAO DO PACIENTE
+----------------------------------------------------------------
+Idade: {idade} anos
+Sexo: {sexo}
+
+DADOS DO EXAME
+----------------------------------------------------------------
+Tipo de exame: Analise morfologica de esfregaco de sangue periferico
+Dados clinicos informados: [resumo objetivo de 1-2 linhas somente dos dados fornecidos]
+Qualidade da amostra: [Adequada / Parcial / Inadequada] - [motivo; se adequada, “Adequada para analise.”]
+
+DESCRICAO DOS ACHADOS
+----------------------------------------------------------------
+Serie vermelha (hemacias): [morfologia das hemacias em 1 frase, ou limitacao de avaliacao]
+Serie branca (leucocitos): [3-6 frases corridas descrevendo as celulas e caracteristicas efetivamente visiveis, inclusive blastos, cromatina, nucleolos, granulacoes e bastonetes de Auer somente se inequivocos. Nao generalizar ao esfregaco inteiro nem estimar percentuais sanguineos.]
+
+ACHADOS DETERMINANTES
+----------------------------------------------------------------
+- [achado 1]
+- [achado 2]
+- [achado 3, se houver; caso contrario, “Sem outro achado determinante identificavel nesta imagem.”]
+
+INTERPRETACAO / IMPRESSAO DIAGNOSTICA
+----------------------------------------------------------------
+Padrao: [Agudo / Cronico / Normal / Inconclusivo]
+Linhagem: [Mieloide / Linfoide / Indeterminada / Nao se aplica]
+Suspeita diagnostica principal: [LMA / LLA / LMC / LLC / Normal / Indeterminado]
+Grau de certeza: [Alto / Moderado / Baixo]
+
+CORRELACAO CLINICA
+----------------------------------------------------------------
+[1-3 frases: como os dados clinicos/hemograma fornecidos convergem ou divergem dos achados. Se nao houver hemograma ou dado confirmatorio, diga isso explicitamente.]
+
+CONCLUSAO
+----------------------------------------------------------------
+[2-3 frases objetivas. Para suspeita de LMA, iniciar com “Achados morfologicos sugestivos de Leucemia Mieloide Aguda (LMA)” e declarar que requer confirmacao; para LLA, LMC e LLC, usar a mesma construcao com o nome da doenca. Para NORMAL, iniciar com “Nesta imagem adequada, nao se identificam achados morfologicos suspeitos”, sem excluir leucemia. Para INDETERMINADO, explicar se ha blastos sem linhagem definida ou se a imagem e insuficiente.]
+
+RECOMENDACOES
+----------------------------------------------------------------
+- [proximo passo 1 pertinente]
+- [proximo passo 2, se houver]
+- [proximo passo 3, se houver]
+
+OBSERVACOES
+----------------------------------------------------------------
+[Alertas e limitacoes em linguagem simples. Se nao houver outro alerta, escrever “A conclusao se limita a imagem enviada.”]
+
+================================================================
+Laudo gerado por sistema de apoio a decisao (Inteligencia Artificial).
+NAO substitui avaliacao clinica presencial, hemograma, mielograma,
+imunofenotipagem por citometria de fluxo ou estudos citogeneticos/moleculares.
+Requer revisao e validacao por medico hematologista responsavel antes de
+qualquer conduta clinica.
+================================================================
+"""
+
+
+def montar_prompt(idade, sexo, sintomas, historia):
+    """Preenche o prompt com os dados clínicos informados na anamnese."""
+    dados = {
+        "{idade}": idade,
+        "{sexo}": sexo,
+        "{sintomas}": sintomas,
+        "{historia}": historia,
+    }
+    prompt = PROMPT_TEMPLATE
+    for marcador, valor in dados.items():
+        texto = str(valor).strip() if valor not in (None, "") else "não informado"
+        prompt = prompt.replace(marcador, texto)
+    return prompt
+
 
 def extrair_relatorio_clinico(texto_completo):
     """Remove os campos técnicos que o backend usa para persistir a análise."""
@@ -37,337 +286,7 @@ def analisar_celula(caminho_da_imagem, idade, sexo, sintomas, historia):
     try:
         sys.stderr.write("DEBUG: Iniciando função analisar_celula...\n")
 
-        prompt_especialista = f"""You are an expert Hematopathologist assisting in a diagnostic support system. Analyze the provided peripheral blood smear image alongside the patient's clinical history/hemogram data to evaluate for acute or chronic leukemias.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-PATIENT CLINICAL & LABORATORY DATA
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Age / Sex: {idade} / {sexo}
-Clinical Symptoms / History: {sintomas}
-
-⚠️ EXCEPTION FOR CLL: unlike the other three leukemias, CLL cannot be
-reliably confirmed by morphology alone — mature CLL lymphocytes normally
-look nearly identical to normal lymphocytes. CLL is clinically DEFINED by an
-absolute lymphocyte count (>5,000/µL, often much higher) plus flow
-cytometry. If the clinical data above mentions any leukocyte/lymphocyte
-count, or words like "leucocitose"/"linfocitose", extract it and give it
-STRONG weight for the CLL hypothesis — this is an exception to the general
-"clinical data only ±10% in Synthesis" rule below. For Modules A, B, D, E,
-use clinical data only in Synthesis as usual.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-KEY PHYSICAL FACT ABOUT BLOOD SMEAR IMAGES (governs the whole analysis)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Red blood cells outnumber white blood cells by roughly 700:1 in ANY blood
-smear, healthy or leukemic. Every field — including real CLL, CML, or AML
-fields — will look dominated by red cells, with only a handful of nucleated
-(white) cells scattered among them. This is completely normal appearance and
-tells you NOTHING about diagnosis by itself.
-
-★ NEVER use "how many total cells are in the field" or "does the field look
-dense or sparse" as a diagnostic criterion, anywhere in this analysis. It is
-never informative and is a known source of misdiagnosis in this system —
-avoid it explicitly. ★
-
-What IS informative: of the white (nucleated) cells you DO see — even if
-there are only 2, 3, or 4 — what TYPE are they, and what is their
-proportion to each other? A normal field, even with very few white cells
-visible, should show a MIX of types (mostly neutrophils, occasionally a
-lymphocyte or monocyte). If EVERY nucleated cell you can find is the SAME
-type — especially if all are small mature lymphocytes with no neutrophils
-at all — that is the abnormal signal, regardless of total count.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-STEP 1 — PRE-ANALYSIS — FIELD READING
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-F1. TECHNICAL QUALITY: Staining and focus adequate? [YES / NO / PARTIAL]
-
-F2. List EVERY nucleated (white) cell you can identify in the field, one by
-    one, with its type if identifiable: neutrophil (segmented / band /
-    metamyelocyte / myelocyte), small mature lymphocyte, monocyte, blast,
-    smudge cell, or unclear. Do not skip any, even if there are only 2-4
-    total — this list is the basis for everything that follows.
-
-F3. Among the cells listed in F2, classify the overall composition:
-    - MIXED-NORMAL: several different types present, neutrophils among them
-    - MONOTONOUS-SMALL-LYMPHOCYTE: all/nearly all are small mature
-      lymphocytes, no neutrophils seen (possible CLL — do not dismiss this
-      just because total cell count in the field is low)
-    - MONOTONOUS-BLASTIC: all/nearly all are blasts (open chromatin,
-      visible nucleoli)
-    - MONOTONOUS-GRANULOCYTIC-SPECTRUM: a range of granulocytic maturation
-      stages together, few or no blasts (possible CML)
-
-F4. RBC morphology: normal or altered (describe briefly)?
-
-F5. LEUKEMIC HIATUS CHECK (only needed if F3 = Monotonous-blastic or
-    Monotonous-granulocytic-spectrum, to separate acute from chronic):
-    classify each nucleated cell into blasts / intermediate forms
-    (promyelocyte, myelocyte, metamyelocyte, band) / mature forms
-    (segmented neutrophil). Is there a GAP — blasts and mature forms present
-    but intermediate forms absent or very rare (<10%)?
-    - YES (hiatus present) -> ACUTE pattern (production stuck at blast
-      stage, no step-wise maturation)
-    - NO (full continuous spectrum, all stages represented) -> CHRONIC
-      myeloid pattern (production active and continuous — classic CML,
-      "factory running")
-    [PRESENT / ABSENT / N/A]
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-STEP 2 — MODULE A — NORMAL / NON-LEUKEMIC
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-A1. Red blood cells with normal morphology (matches F4)? [YES / NO]
-A2. At least one neutrophil present among the cells listed in F2? (A field
-    with ONLY lymphocytes, even if just 2-4 total cells, is NOT normal —
-    fails this item.) [YES / NO]
-A3. Nucleated cells show expected mature morphology, whatever their type? [YES / NO]
-A4. Absence of blasts, abnormal granulations, or Auer rods? [YES / NO]
-A5. F3 = MIXED-NORMAL (confirms no single type — especially not small
-    lymphocytes alone — monopolizes the visible white cells)? [YES / NO]
-
-Rule: ALL 5 must be YES for Normal. A2 and A5 failing (lymphocyte-only
-field, however few cells) rules out Normal regardless of A1/A3/A4 — go
-evaluate Module C.
-
-Scoring: 5/5 -> Normal Likely (Confidence 75-85%) | 4/5 -> Normal
-Improbable (30%) | ≤3/5 -> Normal Ruled Out (0%)
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-STEP 3 — MODULE B — CHRONIC MYELOID LEUKEMIA (CML / LMC)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-FUNDAMENTAL RULE: LMC is a disease of MATURE and MATURING cells — full
-granulocytic spectrum, "factory running", NO leukemic hiatus (F5 = ABSENT).
-Mature cells (segmented, band) are the MAJORITY; blasts are a MINORITY (<10%).
-
-B0. QUICK EXCLUSION: F5 = PRESENT (hiatus)? -> CML VERY UNLIKELY, score 5%,
-    prioritize Module D. F5 = ABSENT or N/A -> continue B1-B5.
-
-B1. Segmented neutrophils present in relevant quantity (2-5 lobes, thin
-    filament connecting them)? [YES / NO / UNCERTAIN]
-B2. Band forms present (U/horseshoe-shaped nucleus, no lobulation)? [YES / NO / UNCERTAIN]
-B3. Metamyelocytes present (kidney/bean-shaped nucleus)? [YES / NO / UNCERTAIN]
-B4. Myelocytes present (oval-round nucleus, chromatin in blocks, no
-    prominent nucleolus)? [YES / NO / UNCERTAIN]
-B5. Mature forms (segmented+band+metamyelocyte) outnumber immature forms
-    (myelocyte+blast) in the field? [YES / NO]
-B6. [Bonus] Increased basophils and/or eosinophils (dark coarse granules /
-    orange-red refractile granules) in more than isolated numbers? [YES / NO]
-B7. [Bonus, classic but optional] Bimodal distribution — two abundance
-    peaks (segmented/band AND myelocyte) with relatively fewer
-    metamyelocytes between them, rather than a smooth even progression? [YES / NO]
-
-Scoring (only if B0 passed):
-B1+B2+B3=YES + B5=YES -> CML Very Likely (90%), +B6 -> 95%
-3/4 of B1-B4 + B5=YES -> CML Very Likely (85%)
-3/4 of B1-B4 + B5=NO -> CML Likely (65%)
-2/4 + B5=YES -> CML Possible (50%) | 2/4 + B5=NO -> CML Unlikely (25%)
-≤1/4 -> CML Ruled Out (10%) | B0 failed -> CML Ruled Out (5%)
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-STEP 4 — MODULE C — CHRONIC LYMPHOCYTIC LEUKEMIA (CLL / LLC)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-FUNDAMENTAL RULE (this module works differently from the others — read
-carefully): CLL lymphocytes typically look like NORMAL mature lymphocytes.
-There is often no single dramatic visual feature. The clues are (a) EVERY or
-nearly every white cell in the field being a small mature lymphocyte with NO
-neutrophils mixed in, even if only a few cells total are visible, (b) smudge
-cells, and (c) lab-confirmed lymphocytosis if mentioned in patient data.
-NEVER require a "packed" or "dense-looking" field for CLL — see Key Physical
-Fact above; that essentially never happens in any real smear photo.
-
-C1. F3 = MONOTONOUS-SMALL-LYMPHOCYTE (all/nearly all identified nucleated
-    cells are small mature lymphocytes, no neutrophils among them)? [YES / NO]
-C2. Those lymphocytes are SMALL (≈ RBC size, up to 1.2x RBC)? [YES / NO]
-C3. Chromatin is DENSE/CLUMPED ("soccer ball"/cracked-earth pattern), with
-    NO visible nucleoli? (If nucleoli ARE visible with open/lacy chromatin,
-    this is a lymphoblast, not CLL — go to Module E instead.) [YES / NO]
-C4. Nuclei round, regular, scant agranular cytoplasm? [YES / NO]
-C5. [Bonus] SMUDGE CELLS / GUMPRECHT SHADOWS present anywhere in the field?
-    (near pathognomonic when present, but absence does NOT rule out CLL) [YES / NO]
-C6. Does patient data mention elevated leukocyte/lymphocyte count,
-    "leucocitose", or "linfocitose"? [YES / NO / Not mentioned]
-
-Scoring:
-C1+C2+C3 = YES -> CLL Very Likely (80%), even with only a few lymphocytes
-  visible in this field
-+ C5 present -> 90%+
-+ C6 = YES -> 90-95% — this is the strongest single piece of evidence for
-  CLL and must be weighted heavily, not capped at ±10% like other clinical data
-C3 = NO (nucleoli visible/open chromatin) -> NOT CLL, evaluate as blast
-  (Module D/E)
-C1 = NO (neutrophils genuinely present among visible cells) -> CLL RULED
-  OUT (0%) -> re-check Module A
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-STEP 5 — MODULE D — ACUTE MYELOID LEUKEMIA (AML / LMA)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-FUNDAMENTAL RULE: LMA is a disease of BLASTS with a LEUKEMIC HIATUS (F5 =
-PRESENT): blasts and mature neutrophils coexist, but intermediate forms
-(myelocyte, metamyelocyte, band) are rare/absent. This gap, not just "many
-blasts", is what separates LMA from LMC.
-
-D0. QUICK EXCLUSION: F5 = ABSENT (continuous spectrum)? -> AML VERY
-    UNLIKELY, score 5%. F5 = PRESENT or N/A -> continue D1-D6.
-
-D1. Myeloid blasts dominate (>20%)? STRICT definition — ALL must be true:
-    round/oval nucleus (never lobulated/banded), open/lacy chromatin,
-    visible nucleoli (often prominent, 1-3), cytoplasm present. A large
-    cell with a lobulated nucleus is a neutrophil/metamyelocyte, NOT a
-    blast. [YES / NO]
-D2. Intermediate forms (myelocyte+metamyelocyte+band) absent or very rare
-    (<10%)? This is the same hiatus evaluated in F5 — it is the criterion
-    that separates LMA from LMC. [YES / NO]
-D3. Blast cytoplasm moderate-to-abundant, myeloid appearance (visible
-    beyond the nucleus, not just a thin rim)? [YES / NO]
-D4. Azurophilic granulations visible in blast cytoplasm? [YES / NO]
-D5. AUER ROD present (needle/rod-shaped intracytoplasmic structure,
-    red/purple)? Pathognomonic — if present, AML CONFIRMED. [YES / NO]
-D6. Field moderate-to-dense in terms of variety/abnormal cells (not about
-    total density, but about abnormal cells being clearly present, not
-    just 1 isolated cell)? [YES / NO]
-
-⚠️ CAVEAT (CML blast crisis): a CML in blastic transformation can show
->20% blasts and morphologically mimic AML. If F5 looks present but there is
-also marked basophilia (B6) or history suggestive of a prior chronic
-myeloid process, flag this in ALERTAS and recommend BCR-ABL testing before
-closing as de novo AML — morphology alone cannot fully distinguish these.
-
-Scoring:
-D5 = YES -> AML CONFIRMED (95%)
-D1+D2=YES + D6=YES -> AML Very Likely (85%)
-D1+D2=YES + (D3 or D4=YES) -> AML Very Likely (80%)
-D1+D2=YES -> AML Likely (65%)
-D1=YES + D2=NO -> Possible CML in transformation (AML confidence 30%) —
-  re-evaluate Module B with priority, flag BCR-ABL need
-D0 failed -> AML Unlikely (10%) | D1=NO -> AML Ruled Out (5%)
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-STEP 6 — MODULE E — ACUTE LYMPHOBLASTIC LEUKEMIA (ALL / LLA)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-FUNDAMENTAL RULE: LLA has LYMPHOBLASTS — scant/smooth cytoplasm, round
-regular nucleus, OPEN/lacy chromatin (opposite of CLL's condensed
-chromatin), discrete-to-prominent nucleoli. Field otherwise unremarkable
-aside from the blasts.
-
-E1. Blasts dominate (>20%)? Round/oval nucleus + open/lacy chromatin +
-    visible nucleoli. [YES / NO]
-E2. Cytoplasm SCANT and SMOOTH (thin blue rim)? Moderate/abundant
-    cytoplasm = NO (reconsider AML). [YES / NO]
-E3. Nucleus ROUND and REGULAR, borders smooth? [YES / NO]
-E4. Nucleoli DISCRETE (1-2, small)? Prominent nucleoli = NO (reconsider AML). [YES / NO]
-E5. ABSENCE of azurophilic granules and Auer rods? Any myeloid granulation
-    or Auer rod = NO, LLA ruled out. [YES / NO]
-
-Scoring: E1+E2+E5=YES -> LLA Very Likely (80%) | E2+E3+E4=YES -> LLA Likely
-(65%) | E2=NO or E5=NO -> LLA RULED OUT (0%) | ≤2 YES total -> LLA Unlikely (10%)
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-STEP 7 — SYNTHESIS & TIE-BREAKERS (execute in order)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-1. Take the module with the highest confidence as the leading candidate.
-
-2. CRITICAL — AML vs CML: if F5/hiatus PRESENT and D1=YES -> MUST select
-   AML over CML. If F5/hiatus ABSENT and B5=YES -> MUST select CML over AML.
-   If F5 is ambiguous AND both D1 and B1-B4 score high (possible blast
-   crisis of CML), do NOT force a choice — classify as "Indeterminado entre
-   LMA e LMC" and flag BCR-ABL/cytogenetics need in ALERTAS.
-
-3. CRITICAL — CLL vs NORMAL (most commonly confused pair in this system):
-   total white cells visible is NEVER a reason to favor Normal. A field
-   with only 2-4 white cells, ALL small mature lymphocytes, zero
-   neutrophils, FAILS Module A (A2, A5) and must be evaluated fully under
-   Module C — never default to Normal just because no blasts/Auer rods
-   were seen; that description fits CLL just as well as it fits Normal.
-   If C6=YES (lab-confirmed lymphocytosis), this alone is strong support
-   for CLL even with subtle morphology.
-
-4. CRITICAL — CLL vs ALL: chromatin texture decides it. Condensed/clumped,
-   no nucleoli -> CLL. Open/lacy, with nucleoli -> ALL. Cell size and field
-   density never decide this.
-
-5. TIE-BREAKERS (in priority order):
-   a. Auer rod present -> AML immediately, overrides everything else.
-   b. Gumprecht shadows OR lab-confirmed lymphocytosis (C6=YES), combined
-      with a monotonous small mature lymphocyte pattern -> CLL over any
-      other module, including Normal.
-   c. B5=YES + ≥3 stages present in Module B -> CML over AML.
-   d. Scant cytoplasm (E2=YES) -> ALL over AML.
-
-6. CLINICAL ADJUSTMENT (max ±10%, EXCEPT C6 for CLL which is weighted as
-   described in Module C — not capped at ±10%):
-   - CML: age 40-60 + splenomegaly + documented leukocytosis (+10%)
-   - CLL: age >60 + chronic asymptomatic lymphocytosis (+10%, on top of any
-     C6 weighting already applied)
-   - AML: sudden onset + pancytopenia + fever without focus (+10%)
-   - ALL: age <15 or >50 + lymphadenopathy + acute onset (+10%)
-   Ignore as nonspecific: fatigue, night sweats, weight loss, weakness,
-   isolated splenomegaly, isolated leukocytosis without a specific count.
-
-7. FINAL CONFIDENCE CALIBRATION:
-   HIGH (75-95%): a confirmatory finding present (Auer rod; or Gumprecht +
-     clear monotony; or hiatus/continuous-spectrum very unambiguous), good
-     image quality.
-   MODERATE (45-70%): clear pattern but no pathognomonic finding, or
-     partial image quality.
-   LOW (<40%): conflicting findings, genuine doubt between two diagnoses,
-     poor image quality, or very few nucleated cells visible. In this case
-     report "Indeterminado" and cite the hypothesis/hypotheses rather than
-     forcing a diagnosis.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-FINAL CHECKLIST — do not display in output
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-□ Listed cells one by one in F2 before classifying anything?
-□ NEVER used field density (dense/sparse) as a diagnostic criterion?
-□ A field with only lymphocytes and no neutrophils, however few cells,
-  was NOT called Normal?
-□ Checked F5 (leukemic hiatus) to separate Agudo vs Crônico, not just %blasts?
-□ Did not confuse a lobulated/segmented nucleus with a blast?
-□ Chromatin texture (condensed vs open+nucleolus) used to separate CLL from ALL?
-□ Considered CML blast crisis when hiatus ambiguous + high blasts?
-□ Checked patient data for a lymphocyte/leukocyte count and weighted it
-  heavily for CLL specifically (not capped at ±10%)?
-□ Auer rod, if present, triggered immediate AML tie-break?
-□ Final output has a concrete diagnosis, confidence level, and next step?
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-OUTPUT FORMAT (MANDATORY STRUCTURE)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-QUALIDADE_IMAGEM: [Adequada / Parcial / Inadequada]
-
-PRÉ_ANÁLISE:
-- F1 Qualidade: []
-- F2 Células listadas (uma a uma, com tipo): []
-- F3 Padrão de composição: [Mixed-normal / Monotonous-small-lymphocyte / Monotonous-blastic / Monotonous-granulocytic-spectrum]
-- F4 Hemácias: []
-- F5 Hiato leucêmico: [PRESENTE / AUSENTE / N/A — % blastos / % intermediárias / % maduras]
-
-AVALIAÇÃO_DOS_MÓDULOS:
-- Módulo A (Normal): A2 (neutrófilo presente?): [SIM/NÃO] | A5 (mix confirmado?): [SIM/NÃO] | Escore ___/5 | Confiança: ___%
-- Módulo B (LMC): B0 exclusão: [passou/falhou] | Espectro completo (B1-B4): ___/4 | B5 Maturidade: [SIM/NÃO] | B6 Basofilia/Eosinofilia: [SIM/NÃO] | Confiança: ___%
-- Módulo C (LLC): C1 Monotonia (sem neutrófilos): [SIM/NÃO] | Escore C1-C4: ___/4 | C5 Gumprecht: [SIM/NÃO] | C6 Hemograma sugere linfocitose: [SIM/NÃO/Não mencionado] | Confiança: ___%
-- Módulo D (LMA): D0 exclusão: [passou/falhou] | D1 Blastos dominam: [SIM/NÃO] | D2 Hiato/intermediárias ausentes: [SIM/NÃO] | D5 Auer: [SIM/NÃO] | Confiança: ___%
-- Módulo E (LLA): E1 Blastos dominam: [SIM/NÃO] | E2 Citoplasma escasso: [SIM/NÃO] | E3/E4 Núcleo+nucléolo: [SIM/NÃO] | E5 Ausência de granulações/Auer: [SIM/NÃO] | Confiança: ___%
-
-SÍNTESE:
-- Diagnóstico morfológico primário: []
-- Ajuste por dados clínicos/hemograma: [aplicado/não aplicado — justificativa]
-- Desempate ativado: []
-
-DIAGNOSTICO_DIRETO:
-- PADRÃO: [Agudo / Crônico / Normal / Inconclusivo]
-- LINHAGEM: [Mieloide / Linfoide / Indeterminada / Não Aplicável]
-- SUSPEITA_PRINCIPAL: [LMA / LLA / LMC / LLC / Normal / Indeterminado]
-- NÍVEL_CONFIANÇA: [Alto (>75%) / Moderado (45-70%) / Baixo (<40%)]
-
-JUSTIFICATIVA_TECNICA:
-[3 a 5 frases. Liste as células vistas (de F2), a proporção entre tipos, e o achado determinante (hiato, cromatina, Gumprecht, ou hemograma). NUNCA mencione "campo denso/esparso" como parte da justificativa.]
-
-ALERTAS: [Ex: "Hiato leucêmico presente — padrão agudo", "Auer presente — LMA confirmada", "Hemograma com linfocitose confirmada — reforça LLC", "Blastos altos com hiato ambíguo — considerar crise blástica de LMC, recomendar BCR-ABL", ou "Nenhum"]
-
-RECOMENDACAO_CLINICA:
-[Indicação de exames confirmatórios: Citometria de Fluxo, Cariótipo/PCR BCR-ABL, Mielograma. Para suspeita de LLC, sempre recomendar confirmação por contagem absoluta de linfócitos + imunofenotipagem, mesmo com alta confiança morfológica.]"""
+        prompt_especialista = montar_prompt(idade, sexo, sintomas, historia)
 
         sys.stderr.write(f"DEBUG caminho imagem: {caminho_da_imagem}\n")
         with open(caminho_da_imagem, "rb") as arquivo:
@@ -377,7 +296,7 @@ RECOMENDACAO_CLINICA:
         tipo_mime = tipo_mime if tipo_mime in {"image/jpeg", "image/png"} else "image/jpeg"
 
         response = client.responses.create(
-            model="gpt-4.1",
+            model=MODELO,
             input=[
                 {
                     "role": "user",
@@ -390,10 +309,10 @@ RECOMENDACAO_CLINICA:
                     ],
                 }
             ],
-            max_output_tokens=2600,
+            max_output_tokens=6000,
         )
 
-        laudo_texto = response.output[0].content[0].text
+        laudo_texto = response.output_text
         relatorio_clinico = extrair_relatorio_clinico(laudo_texto)
 
         timestamp = int(time.time())

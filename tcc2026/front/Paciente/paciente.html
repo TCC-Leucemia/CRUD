@@ -477,6 +477,7 @@
 
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="../JS/navbar.js"></script>
+<script src="../JS/formatacao.js"></script>
 <script src="../JS/auth.js"></script>
 <script>
   // ============================================================
@@ -758,12 +759,6 @@
       'Pendente': 'status-pendente'
     };
     return `<span class="status-badge ${map[status] || 'status-pendente'}">${status}</span>`;
-  }
-
-  function formatarData(iso) {
-    if (!iso) return '—';
-    const d = new Date(iso);
-    return d.toLocaleDateString('pt-BR');
   }
 
   // ============================================================
