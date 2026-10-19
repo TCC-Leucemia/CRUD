@@ -27,21 +27,15 @@ const semAcento = (texto) =>
         .replace(/[̀-ͯ]/g, "")
         .replace(/[*`]/g, "");
 
-const extrairCamposTecnicos = (laudo) => {
+const extrairDiagnostico = (laudo) => {
     const texto = semAcento(laudo);
-    const linhas = texto.split(/\r?\n/);
-    const principais = linhas.filter((linha) =>
-        /^[ \t]*[-•]?[ \t]*SUSPEITA(?:_|[ \t]+)PRINCIPAL[ \t]*:/i.test(linha));
-    const niveis = linhas.filter((linha) =>
-        /^[ \t]*[-•]?[ \t]*NIVEL(?:_|[ \t]+)CONFIANCA[ \t]*:/i.test(linha));
 
-    // Valor único por linha e exatamente uma ocorrência de cada campo.
-    // Uma lista "LMA | LLA" não pode virar uma classificação LMA silenciosa.
-    const principal = principais.length === 1 && principais[0].match(
-        /^[ \t]*[-•]?[ \t]*SUSPEITA(?:_|[ \t]+)PRINCIPAL[ \t]*:[ \t]*\[?[ \t]*(LMA|LLA|LMC|LLC|NORMAL|INDETERMINADO)[ \t]*\]?[ \t]*$/i
+    const principal = texto.match(
+        /^\s*[-•]?\s*SUSPEITA(?:_|\s+)PRINCIPAL\s*:\s*\[?\s*(LMA|LLA|LMC|LLC|NORMAL|INDETERMINADO)\b\s*\]?/im
     );
-    const nivel = niveis.length === 1 && niveis[0].match(
-        /^[ \t]*[-•]?[ \t]*NIVEL(?:_|[ \t]+)CONFIANCA[ \t]*:[ \t]*\[?[ \t]*(ALTO|MODERADO|BAIXO)[ \t]*(?:\([^|)\r\n]*\))?[ \t]*\]?[ \t]*$/i
+
+    const nivel = texto.match(
+        /^\s*[-•]?\s*NIVEL(?:_|\s+)CONFIANCA\s*:\s*\[?\s*(ALTO|MODERADO|BAIXO)\b\s*(?:\([^)\r\n]*\))?\s*\]?/im
     );
 
     if (!principal || !nivel) {
@@ -51,15 +45,11 @@ const extrairCamposTecnicos = (laudo) => {
         );
     }
 
-    return { tipo: principal[1].toUpperCase(), nivel: nivel[1].toUpperCase() };
-};
-
-const extrairDiagnostico = (laudo) => {
-    const { tipo, nivel } = extrairCamposTecnicos(laudo);
+    const tipo = principal[1].toUpperCase();
 
     return {
         // Nível de confiança (categoria), sempre preenchido.
-        suspeita_ia: NIVEL_PARA_COLUNA[nivel],
+        suspeita_ia: NIVEL_PARA_COLUNA[nivel[1].toUpperCase()],
         // A coluna só aceita os quatro tipos ou "Não identificado"; NORMAL e
         // INDETERMINADO são distinguidos pelo texto (ver classificacaoIA).
         tipo_leucemia_ia: TIPOS_LEUCEMIA.includes(tipo) ? tipo : CLASSIFICACAO_NAO_INFORMADA,
@@ -140,7 +130,6 @@ const apresentarAnalise = (analise) => {
 };
 
 module.exports = {
-    extrairCamposTecnicos,
     extrairDiagnostico,
     nivelConfianca,
     classificacaoIA,
